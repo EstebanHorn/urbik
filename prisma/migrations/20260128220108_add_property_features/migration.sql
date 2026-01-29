@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Property" ADD COLUMN     "hasElectricity" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "hasGas" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "hasInternet" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "hasParking" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "hasPool" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "hasWater" BOOLEAN NOT NULL DEFAULT false;
