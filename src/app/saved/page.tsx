@@ -1,0 +1,197 @@
+/*
+Este código define una página que gestiona y visualiza las propiedades marcadas como favoritas
+por un usuario autenticado, permitiendo cargarlas desde una API, eliminarlas de la lista y
+seleccionarlas (hasta un máximo de cinco) para realizar comparaciones mediante un modo
+interactivo denominado "SmartZone". La interfaz implementa estados de carga, validación de
+sesión, animaciones con Framer Motion y una disposición adaptable que transforma las tarjetas
+de propiedades en elementos seleccionables cuando se activa el componente de comparación,
+integrando etiquetas personalizadas para el tipo de inmueble y operación junto con el precio
+formateado.
+*/
+
+"use client";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Heart, X, MapPin } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { motion } from "framer-motion";
+import Versus from "../../components/SmartZone/SmartCompare";
+
+export default function GuardadosPage() {
+  const { data: session } = useSession();
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [isSmartZone, setIsSmartZone] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  const fetchFavorites = async () => {
+    try {
+      const res = await fetch("/api/properties/favorites");
+      if (res.ok) {
+        const data = await res.json();
+        setFavorites(data);
+      }
+    } catch (error) {
+      console.error("Error cargando favoritos");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (session) fetchFavorites();
+  }, [session]);
+
+  const toggleSelectProperty = (id: number) => {
+    if (!isSmartZone) return;
+    setSelectedIds((prev) =>
+      prev.includes(id)
+        ? prev.filter((i) => i !== id)
+        : prev.length < 5
+        ? [...prev, id]
+        : prev
+    );
+  };
+
+  const removeFavorite = async (e: React.MouseEvent, propertyId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFavorites((prev) => prev.filter((p) => p.id !== propertyId));
+    try {
+      const res = await fetch("/api/properties/favorite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ propertyId }),
+      });
+      if (!res.ok) fetchFavorites();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const getOperationLabel = (type: string) => {
+    switch (type) {
+      case "SALE": return "Venta";
+      case "RENT": return "Alquiler";
+      case "SALE_RENT": return "Venta y Alquiler";
+      default: return type;
+    }
+  };
+
+  const getPropertyLabel = (type: string) => {
+    switch (type) {
+      case "HOUSE": return "CASA";
+      case "APARTMENT": return "DPTO";
+      case "LAND": return "TERRENO";
+      case "COMMERCIAL_PROPERTY": return "LOCAL";
+      case "OFFICE": return "OFICINA";
+      default: return type;
+    }
+  };
+
+  if (!session) return <div className="pt-20 text-center font-medium">Inicia sesión para ver tus favoritos.</div>;
+
+  return (
+    <div className="bg-white overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-6 py-20 min-h-screen relative mt-10">
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <h1 className="text-5xl ml-5 font-display font-bold text-urbik-black tracking-tighter">
+              Propiedades 
+            </h1>
+            <span className="italic font-black text-6xl text-urbik-black">Guardadas.</span>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mt-12 animate-pulse">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="bg-urbik-g200 h-64 rounded-3xl" />
+            ))}
+          </div>
+        ) : favorites.length === 0 ? (
+          <div className="text-center py-20 mt-10 bg-urbik-white2 rounded-[2rem] border border-dashed border-urbik-black/10">
+            <p className="text-urbik-muted font-medium">Aún no has guardado ninguna propiedad.</p>
+            <Link href="/" className="text-urbik-black font-bold underline mt-4 block">Explorar propiedades</Link>
+          </div>
+        ) : (
+          <div className="mt-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 mb-15">
+              {favorites.map((prop: any) => {
+                const isSelected = selectedIds.includes(prop.id);
+                
+                return (
+                  <div 
+                    key={prop.id} 
+                    onClick={() => toggleSelectProperty(prop.id)}
+                    className={`relative transition-all duration-300 ${isSmartZone ? "cursor-pointer" : ""}`}
+                  >
+                    <div className={`h-full transition-all duration-500 ${isSmartZone && !isSelected ? "opacity-40 grayscale scale-[0.95]" : "opacity-100"}`}>
+                      <div className={`bg-urbik-white2 rounded-md border-1 overflow-hidden hover:scale-105 hover:brightness-105
+                        hover:bg-none hover:shadow-lg transition-all h-full flex flex-col relative ${isSelected ? 'border-urbik-emerald' : 'border-urbik-g100'}`}>
+                        
+                        {!isSmartZone && <Link href={`/property/${prop.id}`} className="absolute inset-0 z-10" />}
+                        
+                        {!isSmartZone && (
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={(e) => removeFavorite(e, prop.id)}
+                            className="absolute top-3 right-3 z-20 p-2 bg-urbik-rose backdrop-blur-sm rounded-full shadow-md"
+                          >
+                            <Heart size={16} className="fill-white text-white" />
+                          </motion.button>
+                        )}
+
+                        <div className="relative h-40 bg-urbik-g200">
+                          <img src={prop.images[0]} alt={prop.title} className="w-full h-full object-cover" />
+                        </div>
+
+                        <div className="p-4 flex flex-col flex-grow">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="bg-urbik-black text-white text-xs px-3 py-1 rounded-full font-bold tracking-tight">
+                              {getPropertyLabel(prop.type)}
+                            </span>
+                            <span className="bg-urbik-cyan text-urbik-muted text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-tight">
+                              {getOperationLabel(prop.operationType)}
+                            </span>
+                          </div>
+
+                          <h3 className="text-lg font-black mb-1 line-clamp-1 text-urbik-dark uppercase">
+                            {prop.title}
+                          </h3>
+                          
+                          <div className="flex items-center justify-end text-urbik-dark/60 mb-2">
+                            <MapPin size={12} strokeWidth={3} />
+                            <p className="text-xs font-bold text-urbik-dark ">{prop.city}</p>
+                          </div>
+
+                          <div className="mt-auto">
+                            <hr className="border-urbik-g100 mb-4" />
+                            <p className="text-xl font-black text-urbik-dark tracking-tighter text-right">
+                              $ {prop.price?.toLocaleString('es-AR')}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <Versus 
+              selectedProperties={favorites.filter(p => selectedIds.includes(p.id))} 
+              isVersusMode={isSmartZone}
+              setIsVersusMode={setIsSmartZone}
+              hasFavorites={favorites.length > 1}
+              setSelectedIds={setSelectedIds}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
