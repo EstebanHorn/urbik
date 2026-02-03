@@ -56,7 +56,13 @@ model RealEstate {
   province   String
   city       String
   street     String
-  address    String 
+  address    String
+
+  bio        String?  @db.Text
+  website    String?
+  instagram  String?
+  logoUrl    String?
+  bannerUrl  String?
 
   allUser    AllUsers @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   properties Property[]
@@ -75,8 +81,12 @@ model Property {
   operationType   OperationType
   status          PropertyStatus
 
-  price           Float
-  currency        Currency
+  salePrice       Float?
+  saleCurrency  Currency? @default(USD)
+
+  rentPrice       Float?
+  rentCurrency  Currency? @default(ARS)
+
   area            Float?
 
   rooms           Int?

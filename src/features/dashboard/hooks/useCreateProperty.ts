@@ -17,22 +17,23 @@ import type { SelectedParcel } from "@/features/map/types/types";
 const createEmptyForm = () => ({
   title: "",
   description: "",
-
   province: "",
   city: "",
   street: "",
   number: "",
-
   type: "HOUSE",
   operationType: "RENT",
   status: "AVAILABLE",
-
-  price: "",
+  
+  salePrice: "", 
+  saleCurrency: "USD",
+  rentPrice: "",
+  rentCurrency: "ARS",
+  
   currency: "USD",
   areaM2: "",
   rooms: "",
   bathrooms: "",
-
   amenities: {
     agua: false,
     luz: false,
@@ -41,19 +42,17 @@ const createEmptyForm = () => ({
     cochera: false,
     pileta: false,
   },
-
   images: [],
 });
 
-
 export function useCreateProperty(
   initialData: any,
-  onCreated: () => void,
+  onCreated: (data?: any) => void,
   onClose: () => void
 ) {
   const isEditing = !!initialData;
 
-  const [step, setStep] = useState<1 | 2>(isEditing ? 2 : 1);
+  const [step, setStep] = useState<1 | 2>(isEditing ? 1 : 1);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -70,38 +69,39 @@ export function useCreateProperty(
   );
 
   const [form, setForm] = useState(() => {
-  if (!isEditing) return createEmptyForm();
+    if (!isEditing) return createEmptyForm();
 
-  return {
-    ...createEmptyForm(),
-    title: initialData.title ?? "",
-    description: initialData.description ?? "",
-    province: initialData.province ?? "",
-    city: initialData.city ?? "",
-    type: initialData.type ?? "HOUSE",
-    operationType: initialData.operationType ?? "RENT",
-    isAvailable: initialData.status === "AVAILABLE",
-    price: initialData.price?.toString() ?? "",
-    currency: initialData.currency ?? "USD",
-    areaM2: initialData.area?.toString() ?? "",
-    rooms: initialData.rooms?.toString() ?? "",
-    bathrooms: initialData.bathrooms?.toString() ?? "",
-    images: initialData.images ?? [],
-    amenities: {
-      agua: initialData.hasWater ?? false,
-      luz: initialData.hasElectricity ?? false,
-      gas: initialData.hasGas ?? false,
-      internet: initialData.hasInternet ?? false,
-      cochera: initialData.hasParking ?? false,
-      pileta: initialData.hasPool ?? false,
-    },
-  };
-});
-
-useEffect(() => {
-  console.log("useCreateProperty MOUNT");
-  return () => console.log("useCreateProperty UNMOUNT");
-}, []);
+    return {
+      ...createEmptyForm(),
+      title: initialData.title ?? "",
+      description: initialData.description ?? "",
+      province: initialData.province ?? "",
+      city: initialData.city ?? "",
+      street: initialData.address?.split(' ')[0] ?? "",
+      number: initialData.address?.split(' ')[1] ?? "",
+      type: initialData.type ?? "HOUSE",
+      operationType: initialData.operationType ?? "RENT",
+      status: initialData.status ?? "AVAILABLE",
+      
+      salePrice: initialData.salePrice?.toString() ?? "",
+      saleCurrency: initialData.saleCurrency ?? "USD",
+      rentPrice: initialData.rentPrice?.toString() ?? "",
+      rentCurrency: initialData.rentCurrency ?? "ARS",
+      
+      areaM2: initialData.area?.toString() ?? "",
+      rooms: initialData.rooms?.toString() ?? "",
+      bathrooms: initialData.bathrooms?.toString() ?? "",
+      images: initialData.images ?? [],
+      amenities: {
+        agua: initialData.hasWater ?? false,
+        luz: initialData.hasElectricity ?? false,
+        gas: initialData.hasGas ?? false,
+        internet: initialData.hasInternet ?? false,
+        cochera: initialData.hasParking ?? false,
+        pileta: initialData.hasPool ?? false,
+      },
+    };
+  });
 
   useEffect(() => {
     if (!isEditing && selectedParcel && !form.title) {
@@ -113,71 +113,58 @@ useEffect(() => {
   }, [selectedParcel, isEditing, form.title]);
 
   const handleSave = async () => {
-
     setSaving(true);
     setMessage(null);
 
-    const address =
-      form.street || form.number
-        ? `${form.street ?? ""} ${form.number ?? ""}`.trim()
-        : null;
-
-
-        const normalizedOperationType =
-  form.operationType === "sale"
-    ? "SALE"
-    : form.operationType === "both"
-    ? "SALE_RENT"
-    : "RENT";
-
-const normalizedStatus = form.status ? "AVAILABLE" : "PAUSED";
-
+    const fullAddress = form.street || form.number
+      ? `${form.street ?? ""} ${form.number ?? ""}`.trim()
+      : form.city;
 
     const payload = {
-  title: form.title,
-  description: form.description,
+      title: form.title,
+      description: form.description,
+      address: fullAddress,
+      city: form.city,
+      province: form.province,
+      country: "Argentina",
+      type: form.type,
+      operationType: form.operationType,
+      status: form.status,
 
-  address,
-  city: form.city,
-  province: form.province,
-  country: "Argentina",
+      salePrice: form.salePrice ? Number(form.salePrice) : null,
+      saleCurrency: form.saleCurrency,
+      rentPrice: form.rentPrice ? Number(form.rentPrice) : null,
+      rentCurrency: form.rentCurrency,
 
-  type: form.type,
-  operationType: normalizedOperationType,
-  status: normalizedStatus,
+      areaM2: form.areaM2 ? Number(form.areaM2) : null,
+      rooms: form.rooms ? Number(form.rooms) : null,
+      bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
 
-  price: Number(form.price),
-  currency: form.currency,
+      hasWater: form.amenities.agua,
+      hasElectricity: form.amenities.luz,
+      hasGas: form.amenities.gas,
+      hasInternet: form.amenities.internet,
+      hasParking: form.amenities.cochera,
+      hasPool: form.amenities.pileta,
 
-  area: form.areaM2 ? Number(form.areaM2) : null,
-  rooms: form.rooms ? Number(form.rooms) : null,
-  bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
+      latitude: selectedParcel?.lat ?? null,
+      longitude: selectedParcel?.lon ?? null,
+      parcelCCA: selectedParcel?.CCA ?? null,
+      parcelPDA: selectedParcel?.PDA ?? null,
+      parcelGeom: selectedParcel?.geometry ?? null,
 
-  hasWater: form.amenities.agua,
-  hasElectricity: form.amenities.luz,
-  hasGas: form.amenities.gas,
-  hasInternet: form.amenities.internet,
-  hasParking: form.amenities.cochera,
-  hasPool: form.amenities.pileta,
-
-  latitude: selectedParcel?.lat ?? null,
-  longitude: selectedParcel?.lon ?? null,
-  parcelCCA: selectedParcel?.CCA ?? null,
-  parcelPDA: selectedParcel?.PDA ?? null,
-  parcelGeom: selectedParcel?.geometry ?? null,
-
-  images: form.images,
-};
-
+      images: form.images,
+    };
 
     try {
+      let result;
       if (isEditing) {
-        await updateProperty(initialData.id, payload);
+        result = await updateProperty(initialData.id, payload);
       } else {
-        await createProperty(payload);
+        result = await createProperty(payload);
       }
 
-      onCreated?.();
+      if (onCreated) onCreated(result);
       onClose();
     } catch (e: any) {
       setMessage(e.message ?? "Error al guardar la propiedad");

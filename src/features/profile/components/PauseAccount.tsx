@@ -37,7 +37,7 @@ const PauseAccountZone = ({ isPaused, onTogglePause }: PauseAccountZoneProps) =>
           </p>
           <button 
             onClick={() => setShowModal(true)}
-            className={`whitespace-nowrap px-5 py-2 border-2 font-bold rounded-full transition-all shadow-sm ${
+            className={`whitespace-nowrap cursor-pointer px-5 py-2 border-2 font-bold rounded-full transition-all shadow-sm ${
               isPaused 
               ? "border-urbik-emerald text-urbik-emerald hover:bg-urbik-emerald hover:text-white" 
               : "border-urbik-black/50 text-urbik-black/50 hover:bg-urbik-black/50 hover:text-white"
@@ -60,7 +60,7 @@ const PauseAccountZone = ({ isPaused, onTogglePause }: PauseAccountZoneProps) =>
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-md p-10 rounded-[3rem] shadow-2xl text-center"
             >
-              <button onClick={() => setShowModal(false)} className="absolute top-8 right-8 text-gray-400 hover:text-black">
+              <button onClick={() => setShowModal(false)} className="absolute cursor-pointer top-8 right-8 text-gray-400 hover:text-black">
                 <X size={28} />
               </button>
 
@@ -83,7 +83,7 @@ const PauseAccountZone = ({ isPaused, onTogglePause }: PauseAccountZoneProps) =>
                   onTogglePause(!isPaused);
                   setShowModal(false);
                 }} 
-                className={`w-full py-4 rounded-full font-black transition-all ${
+                className={`w-full py-4 cursor-pointer rounded-full font-black transition-all ${
                   isPaused 
                   ? "bg-urbik-emerald text-white shadow-green-200 shadow-xl" 
                   : "bg-urbik-black/50 text-white shadow-urbik-black/20 shadow-xl"

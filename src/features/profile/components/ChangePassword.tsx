@@ -60,7 +60,6 @@ const SecuritySection = () => {
 
   return (
     <>
-      {/* BOTÓN DISPARADOR */}
       <div className="bg-white p-8 rounded-[2rem] border border-gray-200 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-4">
           <div className="bg-black p-3 rounded-full text-white">
@@ -73,20 +72,19 @@ const SecuritySection = () => {
         </div>
         <button 
           onClick={() => setIsOpen(true)}
-          className="px-6 py-3 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-all"
+          className="px-6 py-3 cursor-pointer bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-all"
         >
           Cambiar Contraseña
         </button>
       </div>
 
-      {/* MODAL / POPUP */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-gray-50 w-full max-w-lg rounded-[3rem] p-8 md:p-12 shadow-2xl relative animate-in fade-in zoom-in duration-300">
             
             <button 
               onClick={() => setIsOpen(false)}
-              className="absolute right-8 top-8 text-gray-400 hover:text-black transition-colors"
+              className="absolute cursor-pointer right-8 top-8 text-gray-400 hover:text-black transition-colors"
             >
               <X size={24} />
             </button>
@@ -99,7 +97,6 @@ const SecuritySection = () => {
             </div>
 
             <form className="space-y-5" onSubmit={handleSubmit}>
-              {/* Contraseña Actual */}
               <div className="space-y-2">
                 <label className="ml-4 text-xs font-bold text-black opacity-40 uppercase tracking-widest">Contraseña Actual</label>
                 <input 
@@ -114,7 +111,6 @@ const SecuritySection = () => {
 
               <hr className="border-gray-200 my-2" />
 
-              {/* Nueva Contraseña */}
               <div className="space-y-2 relative">
                 <label className="ml-4 text-xs font-bold text-black opacity-40 uppercase tracking-widest">Nueva Contraseña</label>
                 <input 
@@ -128,13 +124,12 @@ const SecuritySection = () => {
                 <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-6 top-[3.2rem] text-gray-400 hover:text-black"
+                  className="absolute cursor-pointer right-6 top-[3.2rem] text-gray-400 hover:text-black"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
 
-              {/* Confirmar Contraseña */}
               <div className="space-y-2">
                 <label className="ml-4 text-xs font-bold text-black opacity-40 uppercase tracking-widest">Confirmar Nueva Contraseña</label>
                 <input 
@@ -157,7 +152,7 @@ const SecuritySection = () => {
                 <button 
                   type="submit" 
                   disabled={loading}
-                  className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-all disabled:bg-gray-400"
+                  className="w-full cursor-pointer py-4 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-all disabled:bg-gray-400"
                 >
                   {loading ? "Procesando..." : "Guardar Cambios"}
                 </button>

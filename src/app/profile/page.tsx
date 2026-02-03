@@ -32,7 +32,7 @@ export default function Profile() {
     handleManualChange,
     handleSubmit,
   } = useProfile();
-
+console.log(form);
   if (status === "loading" || userRole === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-urbik-white">
@@ -50,7 +50,7 @@ export default function Profile() {
           <p className="text-urbik-muted font-medium mb-8">Debes iniciar sesión para gestionar tu perfil y propiedades.</p>
           <button
             onClick={() => signIn()}
-            className="w-full py-4 bg-urbik-black text-white rounded-full font-bold hover:bg-urbik-emerald transition-all active:scale-95"
+            className="w-full cursor-pointer py-4 bg-urbik-black text-white rounded-full font-bold hover:bg-urbik-emerald transition-all active:scale-95"
           >
             Iniciar sesión
           </button>

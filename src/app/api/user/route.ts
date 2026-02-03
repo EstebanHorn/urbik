@@ -109,3 +109,4 @@ export async function DELETE(req: NextRequest): Promise<Response> {
     return handleServiceError(err as Error, 500);
   }
 }
+

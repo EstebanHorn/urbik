@@ -29,7 +29,8 @@ export async function GET() {
       select: {
         id: true,
         title: true,
-        price: true,
+        salePrice: true, 
+        rentPrice: true,
         operationType: true,
         address: true,
         city: true,

@@ -124,7 +124,7 @@ export default function DashboardPage() {
           </p>
           <button
             onClick={() => signIn()}
-            className="mt-6 rounded-full bg-urbik-black px-6 py-3 text-sm font-bold text-white hover:opacity-90 transition"
+            className="mt-6 rounded-full cursor-pointer bg-urbik-black px-6 py-3 text-sm font-bold text-white hover:opacity-90 transition"
           >
             Iniciar sesión
           </button>

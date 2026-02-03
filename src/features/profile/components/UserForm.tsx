@@ -93,7 +93,7 @@ const UserForm = ({ form, handleChange, handleSubmit, loading }) => {
               type="submit"
               disabled={loading}
               className={`
-                px-10 py-5 font-bold rounded-full transition-all flex items-center justify-center gap-3 active:scale-95 shadow-xl
+                px-10 py-5 font-bold rounded-full cursor-pointer transition-all flex items-center justify-center gap-3 active:scale-95 shadow-xl
                 ${loading 
                   ? 'bg-urbik-g300 text-urbik-muted cursor-not-allowed' 
                   : 'bg-urbik-black text-white hover:bg-urbik-emerald'

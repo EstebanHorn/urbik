@@ -21,6 +21,10 @@ import { getDynamicParcelStyle } from "../utils/parcelStyles";
 import { useMapSettings } from "@/features/map/context/MapSettingsProvider";
 import { motion, AnimatePresence } from "framer-motion";
 
+const getDisplayPrice = (prop: MapProperty) => {
+  return prop.rentPrice ?? prop.salePrice ?? 0;
+};
+
 const formatPriceShort = (price: number) => {
   if (price >= 1000000) return `${(price / 1000000).toFixed(1).replace(/\.0$/, '')}M`;
   if (price >= 1000) return `${Math.round(price / 1000)}K`;
@@ -69,7 +73,9 @@ export function DbParcelsLayer({ properties }: DbParcelsLayerProps) {
         } catch (e) { return null; }
 
         const dynamicStyle = getDynamicParcelStyle(prop as any, colorMode);
-        const shortPrice = formatPriceShort(prop.price);
+        
+        const displayPrice = getDisplayPrice(prop);
+        const shortPrice = formatPriceShort(displayPrice);
         
         const position = getCenterOfGeometry(geometry);
 
@@ -119,7 +125,7 @@ export function DbParcelsLayer({ properties }: DbParcelsLayerProps) {
                   >
                     <div className="h-28 w-full relative parcel-layer-shadow">
                       {prop.images?.[0] ? (
-                        <img src={prop.images[0]} className="w-full h-full object-cover" />
+                        <img src={prop.images[0]} className="w-full h-full object-cover" alt={prop.title} />
                       ) : (
                         <div className="flex h-full items-center justify-center bg-slate-100 text-[10px] text-slate-400">Sin imagen</div>
                       )}
@@ -130,7 +136,10 @@ export function DbParcelsLayer({ properties }: DbParcelsLayerProps) {
                     <div className="p-2.5 text-left">
                       <h4 className="text-sm font-black truncate italic text-urbik-black/50 mb-1">{prop.title}</h4>
                       <div className="pt-2 border-t border-slate-100 flex justify-end">
-                        <span className="text-md font-black text-urbik-black/90">USD {prop.price.toLocaleString('es-AR')}</span>
+                        <span className="text-md font-black text-urbik-black/90">
+                          USD {displayPrice.toLocaleString('es-AR')}
+                          {prop.rentPrice && !prop.salePrice ? ' / mes' : ''}
+                        </span>
                       </div>
                     </div>
                   </motion.div>

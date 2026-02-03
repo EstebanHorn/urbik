@@ -13,7 +13,7 @@ import prisma from "@/libs/db";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { NextResponse, NextRequest } from "next/server";
-import { PropertyType, OperationType } from "@prisma/client";
+import { PropertyType, OperationType, Currency } from "@prisma/client";
 
 interface PropertyRequestBody {
   title: string;
@@ -22,9 +22,11 @@ interface PropertyRequestBody {
   city: string;
   province?: string;
   country?: string;
-  PropertyType: PropertyType;
-  price: number | string;
-  area?: number | string;
+  type: PropertyType;
+  salePrice?: number | string;
+  rentPrice?: number | string;
+  currency: Currency;
+  areaM2?: number | string;
   rooms?: number | string;
   bathrooms?: number | string;
   operationType: OperationType;
@@ -39,40 +41,17 @@ export async function POST(req: NextRequest) {
 
   const email = session.user?.email;
   if (!email) {
-    return NextResponse.json(
-      { error: "Email de sesión no encontrado" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Email de sesión no encontrado" }, { status: 401 });
   }
 
   try {
     const user = await prisma.allUsers.findUnique({
       where: { email },
+      include: { realEstate: true }
     });
 
-    if (!user) {
-      return NextResponse.json(
-        { error: "Usuario no encontrado" },
-        { status: 404 }
-      );
-    }
-
-    if (user.role !== "REALESTATE") {
-      return NextResponse.json(
-        {
-          error:
-            "Acceso denegado. Solo inmobiliarias pueden crear propiedades.",
-        },
-        { status: 403 }
-      );
-    }
-
-    const agency = user.realEstateAgencies[0];
-    if (!agency) {
-      return NextResponse.json(
-        { error: "La cuenta inmobiliaria no está configurada correctamente." },
-        { status: 409 }
-      );
+    if (!user || user.role !== "REALESTATE") {
+      return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
     }
 
     const body: PropertyRequestBody = await req.json();
@@ -84,39 +63,42 @@ export async function POST(req: NextRequest) {
       city,
       province,
       country,
-      PropertyType: propType,
-      price,
-      area,
+      type,
+      salePrice,
+      saleCurrency,
+      rentPrice,
+      rentCurrency,
+      areaM2,
       rooms,
       bathrooms,
       operationType,
       images,
     } = body;
 
-    if (!title || !address || !city || !propType || !price || !operationType) {
-      return NextResponse.json(
-        { error: "Faltan campos obligatorios" },
-        { status: 400 }
-      );
+    if (!title || !city || !operationType) {
+      return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
     }
 
     const newProperty = await prisma.property.create({
       data: {
         title,
-        description,
+        description: description || "",
         address,
         city,
         province: province ?? "",
-        country: country ?? "",
-        type: propType,
-        price: parseFloat(price.toString()),
-        area: area ? parseFloat(area.toString()) : null,
+        country: country ?? "Argentina",
+        type,
+        operationType,
+        status: "AVAILABLE",
+        salePrice: salePrice ? parseFloat(salePrice.toString()) : null,
+        saleCurrency: saleCurrency || "USD",
+        rentPrice: rentPrice ? parseFloat(rentPrice.toString()) : null,
+        rentCurrency: rentCurrency || "ARS",
+        area: areaM2 ? parseFloat(areaM2.toString()) : null,
         rooms: rooms ? parseInt(rooms.toString()) : null,
         bathrooms: bathrooms ? parseInt(bathrooms.toString()) : null,
-        operationType,
         images: images || [],
-        userId: user.user_id,
-        isAvailable: true,
+        realEstateId: user.user_id,
       },
     });
 

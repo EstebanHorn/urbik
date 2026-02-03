@@ -168,7 +168,7 @@ export default function RegisterForm() {
         <button 
           type="submit" 
           disabled={isFormInvalid}
-          className={`w-full font-bold py-3 rounded-full text-lg shadow-sm transition-all mt-16 
+          className={`w-full font-bold py-3 cursor-pointer rounded-full text-lg shadow-sm transition-all mt-16 
             ${isFormInvalid 
               ? "bg-gray-300 cursor-not-allowed opacity-70" 
               : "bg-[#00deff] text-white hover:opacity-90"}`}
@@ -177,7 +177,7 @@ export default function RegisterForm() {
         </button>
 
         <div className="text-center mt-10">
-          <button type="button" onClick={() => handleRoleSelection(isAgency ? "USER" : "REALESTATE")} className="text-urbik-cyan text-sm font-medium hover:underline">
+          <button type="button" onClick={() => handleRoleSelection(isAgency ? "USER" : "REALESTATE")} className="text-urbik-cyan cursor-pointer text-sm font-medium hover:underline">
             {isAgency ? "Quiero registrarme como usuario particular" : "¿Sos una inmobiliaria? Registrate acá"}
           </button>
         </div>

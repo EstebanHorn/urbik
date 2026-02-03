@@ -54,7 +54,7 @@ const handleUpload = (result: any) => {
             <button
               onClick={() => onRemove(url)}
               type="button"
-              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition shadow-sm z-10"
+              className="absolute top-1 cursor-pointer right-1 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition shadow-sm z-10"
             >
               ✕
             </button>
@@ -77,7 +77,7 @@ const handleUpload = (result: any) => {
               <button
                 type="button"
                 onClick={() => open?.()}
-                className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 text-gray-400 hover:border-[#00F0FF] hover:text-sky-500 hover:bg-sky-50 transition cursor-pointer gap-2"
+                className="flex flex-col cursor-pointer items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 text-gray-400 hover:border-[#00F0FF] hover:text-sky-500 hover:bg-sky-50 transition cursor-pointer gap-2"
               >
                 <span className="text-2xl">+</span>
                 <span className="text-xs font-medium">Subir fotos</span>

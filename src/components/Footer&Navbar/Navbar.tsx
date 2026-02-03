@@ -1,14 +1,3 @@
-/*
-Este código implementa un componente de barra de navegación funcional para una aplicación Next.js
-que gestiona dinámicamente la interfaz de usuario según el estado de la sesión, el rol del usuario
-y la ruta actual. Utiliza NextAuth para la autenticación y Framer Motion para animar la aparición
-de una barra de búsqueda que solo se muestra cuando el usuario está logueado y fuera de la página
-de inicio. Además, define una configuración de navegación específica por rol (ADMIN, USER, REALESTATE),
-incluye un estado de carga con animaciones de tipo "skeleton", oculta el menú por completo en las
-páginas de login y registro, y centraliza las acciones de perfil y cierre de sesión a través de un
-menú desplegable personalizado.
-*/
-
 "use client";
 
 import Link from "next/link";
@@ -47,19 +36,26 @@ function Navbar() {
     );
   }
 
-  const getRoleConfig = (role?: string) => {
+  const getNavLinks = (role?: string) => {
     switch (role) {
-      case "ADMIN": return { label: "Administrar", href: "/administrate" };
-      case "USER": return { label: "Propiedades Guardadas", href: "/saved" };
-      case "REALESTATE": return { label: "Mis Propiedades", href: "/dashboard" };
-      default: return { label: "Mis Propiedades", href: "/dashboard" };
+      case "ADMIN":
+        return [{ label: "Administrar", href: "/administrate" }];
+      case "REALESTATE":
+        return [
+          { label: "Mis Propiedades", href: "/dashboard" },
+          { label: "Propiedades Guardadas", href: "/saved" }
+        ];
+      case "USER":
+        return [{ label: "Propiedades Guardadas", href: "/saved" }];
+      default:
+        return [{ label: "Mis Propiedades", href: "/dashboard" }];
     }
   };
 
-  const roleConfig = getRoleConfig(session?.user?.role);
+  const navLinks = getNavLinks(session?.user?.role);
 
   const profileOptions = session ? [
-...(session.user?.role !== "ADMIN" 
+    ...(session.user?.role !== "ADMIN" 
       ? [{ label: "Editar Perfil", value: "/profile" }] 
       : []),
     { label: "Configuración", value: "/settings" },
@@ -103,7 +99,7 @@ function Navbar() {
                     <Search className="h-4 w-4 text-urbik-muted opacity-50" />
                   </div>
                   <div className="w-full py-2 pl-10">
-                    <SearchBar />
+                    <div className="h-4" /> 
                   </div>
                 </motion.div>
               )}
@@ -119,14 +115,15 @@ function Navbar() {
                 </Link> 
               )}
 
-              {session && (
+              {session && navLinks.map((link) => (
                 <Link
-                  href={roleConfig.href}
-                  className={`transition-colors duration-300 ${pathname === roleConfig.href ? "text-urbik-white" : "text-white/40 hover:text-urbik-white"}`}
+                  key={link.href}
+                  href={link.href}
+                  className={`transition-colors duration-300 ${pathname === link.href ? "text-urbik-white" : "text-white/40 hover:text-urbik-white"}`}
                 >
-                  {roleConfig.label}
+                  {link.label}
                 </Link>
-              )}
+              ))}
             </div>
           </div>
         </div>

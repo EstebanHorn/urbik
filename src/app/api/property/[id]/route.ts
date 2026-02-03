@@ -30,6 +30,9 @@ export async function PUT(
     const id = Number(resolvedParams.id);
     const body = await req.json();
 
+    console.log("LOG: Iniciando UPDATE para ID:", id);
+    console.log("LOG: Payload recibido:", JSON.stringify(body, null, 2));
+
     const userAccount = await prisma.allUsers.findUnique({
       where: { email: session.user.email },
     });
@@ -37,6 +40,7 @@ export async function PUT(
     const property = await prisma.property.findUnique({ where: { id } });
 
     if (!property || !userAccount) {
+      console.log("LOG: Propiedad o Usuario no encontrado");
       return NextResponse.json({ error: "No encontrado" }, { status: 404 });
     }
 
@@ -44,28 +48,43 @@ export async function PUT(
     const isAdmin = userAccount.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {
+      console.log("LOG: Usuario no tiene permisos. Owner:", isOwner, "Admin:", isAdmin);
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
-    const updateData: any = {};
-    if (body.status) {
-      updateData.status = body.status;
-    } else {
-      updateData.title = body.title;
-      updateData.description = body.description;
-      updateData.price = Number(body.price);
-      updateData.status = body.isAvailable ? "AVAILABLE" : "PAUSED";
-    }
+    const updateData: any = {
+      title: body.title,
+      description: body.description,
+      status: body.status,
+      operationType: body.operationType,
+      area: body.area ? Number(body.area) : null,
+      rooms: body.rooms ? Number(body.rooms) : null,
+      bathrooms: body.bathrooms ? Number(body.bathrooms) : null,
+      images: body.images,
+      amenities: body.amenities,
+      salePrice: body.salePrice !== undefined ? Number(body.salePrice) : undefined,
+      rentPrice: body.rentPrice !== undefined ? Number(body.rentPrice) : undefined,
+    };
+
+    Object.keys(updateData).forEach(key => 
+      updateData[key] === undefined && delete updateData[key]
+    );
+
+    console.log("LOG: Datos preparados para Prisma:", updateData);
 
     const updated = await prisma.property.update({
       where: { id },
       data: updateData,
     });
 
+    console.log("LOG: Actualización exitosa");
     return NextResponse.json(updated);
-  } catch (error) {
-    console.error("Error en PUT property:", error);
-    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  } catch (error: any) {
+    console.error("ERROR CRÍTICO EN PUT PROPERTY:", error);
+    return NextResponse.json({ 
+      error: "Error interno", 
+      message: error.message 
+    }, { status: 500 });
   }
 }
 

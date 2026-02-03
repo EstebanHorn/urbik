@@ -21,7 +21,6 @@ interface CustomDropdownProps {
   options: Option[];
   onChange: (value: string) => void;
   className?: string;
-  // Nueva prop para definir el estilo del fondo
   variant?: "white" | "white2"; 
 }
 
@@ -58,7 +57,7 @@ export function CustomDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`${variantStyles[variant]} h-10 px-5 py-2 rounded-full font-extrabold tracking-wide transition flex items-center gap-2 min-w-[120px] justify-between`}
+        className={`${variantStyles[variant]} h-10 cursor-pointer px-5 py-2 rounded-full font-extrabold tracking-wide transition flex items-center gap-2 min-w-[120px] justify-between`}
       >
         <span className="text-md tracking-wider">
           {selectedOption ? selectedOption.label : label}
@@ -89,7 +88,7 @@ export function CustomDropdown({
                     onChange(opt.value);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-5 py-3 text-sm font-medium transition ${
+                  className={`w-full text-left cursor-pointer px-5 py-3 text-sm font-medium transition ${
                     opt.value === "logout" 
                       ? "text-urbik-rose hover:bg-urbik-rose/90 hover:text-urbik-white" 
                       : "text-urbik-white hover:bg-white/10"

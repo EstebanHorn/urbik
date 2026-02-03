@@ -98,7 +98,6 @@ export default function HelpClient({ initialPosts }: { initialPosts: Post[] }) {
           </div>
         )}
 
-        {/* --- SECCIÓN DE CATEGORÍAS CON ICONOS --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
@@ -119,7 +118,6 @@ export default function HelpClient({ initialPosts }: { initialPosts: Post[] }) {
           })}
         </div>
 
-        {/* --- SECCIÓN: CONTACTO --- */}
         <div className="mt-10 pt-10 border-t border-gray-100 flex flex-col items-center text-center">
           <h2 className="text-3xl font-bold text-black mb-3 italic">
             Mandanos un mensaje.

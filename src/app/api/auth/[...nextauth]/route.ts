@@ -50,7 +50,6 @@ export const authOptions: NextAuthOptions = {
         if (user.role === "REALESTATE" && user.status === "PENDING") {
           throw new Error("Tu cuenta está en revisión. Te avisaremos cuando sea habilitada.");
         }
-        // ----------------------------------
 
         const displayName = user.role === "REALESTATE" 
           ? user.realEstate?.agencyName 

@@ -57,7 +57,10 @@ export default function CreatePropertyModal({ open, onClose, onCreated, initialD
 const isFormComplete = 
   !!form.title?.trim() &&
   !!form.operationType &&
-  !!form.price &&
+  !!form.street?.trim() &&
+  (form.operationType === "SALE" ? !!form.salePrice : 
+   form.operationType === "RENT" ? !!form.rentPrice : 
+   (!!form.salePrice && !!form.rentPrice)) &&
   !!form.areaM2 &&
   !!form.province &&
   !!form.city &&
@@ -115,7 +118,7 @@ const isFormComplete =
                 {step === 1 ? "Datos de la Propiedad" : "Seleccionar Parcela en Mapa"}
               </h2>
             </div>
-            <button onClick={onClose} className="text-urbik-black hover:text-black/60 transition font-black text-2xl">✕</button>
+            <button onClick={onClose} className="text-urbik-black cursor-pointer hover:text-black/60 transition font-black text-2xl">✕</button>
           </div>
 
           <div className="flex-1 overflow-hidden relative">
@@ -138,7 +141,7 @@ const isFormComplete =
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input
                               type="text"
-                              placeholder="Calle (Opcional)"
+                              placeholder="Calle (Obligatorio)"
                               value={form.street || ""}
                               onChange={(e) => handleInputChange("street", e.target.value)}
                               className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
@@ -156,7 +159,7 @@ const isFormComplete =
                              type="button"
                              disabled={!canSelectParcel || isSearchingCity}
                              onClick={handleGoToMap}
-                             className={`w-full py-4 px-6 rounded-2xl border-2 border-dashed transition-all flex items-center justify-center gap-2 font-black uppercase tracking-wide
+                             className={`w-full py-4 px-6 cursor-pointer rounded-2xl border-2 border-dashed transition-all flex items-center justify-center gap-2 font-black uppercase tracking-wide
                                ${selectedParcel 
                                  ? "border-green-500 text-green-600 bg-green-50" 
                                  : "border-gray-300 text-gray-600 hover:border-black hover:text-black"
@@ -191,7 +194,8 @@ const isFormComplete =
                           <SmartDescription 
                             description={form.description || ""} 
                             context={{
-                              price: form.price,
+                              salePrice: form.salePrice,
+                              rentPrice: form.rentPrice,
                               area: form.areaM2,
                               type: form.operationType,
                               city: form.city
@@ -217,7 +221,7 @@ const isFormComplete =
                           <button 
                             onClick={handleSave} 
                             disabled={saving || !isFormComplete}
-                            className="px-7 text-xs bg-urbik-emerald border border-urbik-white text-urbik-dark py-4 rounded-full 
+                            className="px-7 text-xs cursor-pointer bg-urbik-emerald border border-urbik-white text-urbik-dark py-4 rounded-full 
                             font-black uppercase tracking-wide hover:bg-urbik-emerald transition disabled:opacity-20"
                           >
                             {saving ? "Guardando..." : "Publicar Propiedad"}
@@ -250,7 +254,7 @@ const isFormComplete =
                   <div className="space-y-6">
                     <button 
                       onClick={() => setStep(1)} 
-                      className="group flex items-center gap-2 text-xs font-black text-urbik-black/60 hover:text-black transition-all"
+                      className="group cursor-pointer flex items-center gap-2 text-xs font-black text-urbik-black/60 hover:text-black transition-all"
                     >
                       <span className="text-lg">←</span> VOLVER AL FORMULARIO
                     </button>
@@ -276,7 +280,7 @@ const isFormComplete =
                   <button 
                     disabled={!selectedParcel}
                     onClick={() => setStep(1)}
-                    className="w-full bg-urbik-black text-white py-5 rounded-2xl font-black uppercase hover:bg-gray-800 transition-all shadow-lg disabled:opacity-30 disabled:scale-95"
+                    className="w-full cursor-pointer bg-urbik-black text-white py-5 rounded-2xl font-black uppercase hover:bg-gray-800 transition-all shadow-lg disabled:opacity-30 disabled:scale-95"
                   >
                     Confirmar y Continuar
                   </button>

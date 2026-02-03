@@ -77,7 +77,7 @@ export default function AdminActions({ id, currentStatus, type }: AdminActionsPr
         {type === "property" && (
           <button
             onClick={handleTogglePause}
-            className="flex items-center gap-2 px-4 py-2 border border-urbik-white bg-urbik-cyan hover:bg-urbik-white hover:border-urbik-cyan hover:text-urbik-cyan text-white rounded-full text-sm font-bold transition-colors"
+            className="flex cursor-pointer items-center gap-2 px-4 py-2 border border-urbik-white bg-urbik-cyan hover:bg-urbik-white hover:border-urbik-cyan hover:text-urbik-cyan text-white rounded-full text-sm font-bold transition-colors"
           >
             {currentStatus === "PAUSED" ? <Play size={16} /> : <Pause size={16} />}
             {currentStatus === "PAUSED" ? "Reanudar" : "Pausar"}
@@ -85,7 +85,7 @@ export default function AdminActions({ id, currentStatus, type }: AdminActionsPr
         )}
         <button
           onClick={handleDelete}
-          className="flex items-center gap-2 px-4 py-2 border border-urbik-white bg-urbik-rose hover:bg-urbik-white hover:border-urbik-rose hover:text-urbik-rose text-white rounded-full text-sm font-bold transition-colors"
+          className="flex cursor-pointer items-center gap-2 px-4 py-2 border border-urbik-white bg-urbik-rose hover:bg-urbik-white hover:border-urbik-rose hover:text-urbik-rose text-white rounded-full text-sm font-bold transition-colors"
         >
           <Trash2 size={16} />
           Eliminar {type === "property" ? "Propiedad" : "Inmobiliaria"}

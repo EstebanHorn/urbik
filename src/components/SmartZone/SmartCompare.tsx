@@ -147,7 +147,7 @@ export default function Versus({
                 setIsVersusMode(!isVersusMode);
                 if (isVersusMode) setSelectedIds([]);
               }}
-              className={`w-12 h-6 md:w-14 md:h-7 flex items-center rounded-full p-1 transition-all duration-300 shadow-inner ${isVersusMode ? 'bg-urbik-emerald shadow-emerald-500/50' : 'bg-white/10'}`}
+              className={`w-12 h-6 md:w-14 cursor-pointer md:h-7 flex items-center rounded-full p-1 transition-all duration-300 shadow-inner ${isVersusMode ? 'bg-urbik-emerald shadow-emerald-500/50' : 'bg-white/10'}`}
             >
               <motion.div 
                 layout

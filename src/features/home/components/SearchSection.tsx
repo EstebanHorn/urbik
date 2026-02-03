@@ -119,7 +119,7 @@ useEffect(() => {
           />
           <button
             onClick={() => setOperation("SALE")}
-            className={`relative z-10 px-10 py-3 font-bold tracking-wide text-md rounded-full transition-colors duration-300 flex-1 whitespace-nowrap ${
+            className={`relative z-10 cursor-pointer px-10 py-3 font-bold tracking-wide text-md rounded-full transition-colors duration-300 flex-1 whitespace-nowrap ${
               operation === "SALE"
                 ? "text-urbik-g100"
                 : "text-urbik-muted hover:bg-urbik-g400/50"
@@ -129,7 +129,7 @@ useEffect(() => {
           </button>
           <button
             onClick={() => setOperation("RENT")}
-            className={`relative z-10 px-10 py-3 font-bold tracking-wide text-md rounded-full transition-colors duration-300 flex-1 whitespace-nowrap ${
+            className={`relative z-10 cursor-pointer px-10 py-3 font-bold tracking-wide text-md rounded-full transition-colors duration-300 flex-1 whitespace-nowrap ${
               operation === "RENT"
                 ? "text-urbik-white"
                 : "text-urbik-muted hover:bg-urbik-g400/50"
@@ -154,7 +154,7 @@ useEffect(() => {
                 setPropertyType(opt.id);
                 updatePill(e.currentTarget);
               }}
-              className={`relative z-10 px-5.5 py-3 font-bold tracking-wide text-md transition-colors duration-300 whitespace-nowrap rounded-full ${
+              className={`relative z-10 cursor-pointer px-5.5 py-3 font-bold tracking-wide text-md transition-colors duration-300 whitespace-nowrap rounded-full ${
                 propertyType === opt.id
                   ? "text-urbik-white"
                   : "text-urbik-muted hover:bg-urbik-g400/50"
@@ -179,7 +179,7 @@ useEffect(() => {
         <div className="flex justify-end w-full">
           <button
             onClick={onSearch}
-            className="px-5 py-2 rounded-full bg-urbik-white3 text-urbik-muted font-bold transition-all flex items-center gap-2 active:scale-95 hover:bg-urbik-emerald hover:text-white hover:shadow-lg hover:shadow-urbik-emerald/20"
+            className="px-5 py-2 cursor-pointer rounded-full bg-urbik-white3 text-urbik-muted font-bold transition-all flex items-center gap-2 active:scale-95 hover:bg-urbik-emerald hover:text-white hover:shadow-lg hover:shadow-urbik-emerald/20"
           >
             Buscar
           </button>

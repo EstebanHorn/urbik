@@ -13,45 +13,60 @@ import { useState } from "react";
 import { updateProperty } from "../service/dashboardService";
 
 export function useEditProperty(property: any, onUpdated: () => void, onClose: () => void) {
-  const [title, setTitle] = useState(property.title);
-  const [price, setPrice] = useState(property.price?.toString() || "");
-  const [description, setDescription] = useState(property.description || "");
-  const [areaM2, setAreaM2] = useState(property.area?.toString() || "");
-  const [rooms, setRooms] = useState(property.rooms?.toString() || "");
-  const [bathrooms, setBathrooms] = useState(property.bathrooms?.toString() || "");
-  const [images, setImages] = useState<string[]>(property.images || []);
-  const [operationType, setOperationType] = useState(property.operationType || "SALE");
-  const [status, setStatus] = useState(property.status || "AVAILABLE");
-  const [saving, setSaving] = useState(false);
-  const [viewMap, setViewMap] = useState(false);
-  const [selectedParcel, setSelectedParcel] = useState({
-    lat: property.latitude ?? -34.921,
-    lon: property.longitude ?? -57.954,
-    CCA: property.parcelCCA,
-    geometry: property.parcelGeom,
+  const [form, setForm] = useState({
+    ...property,
+    areaM2: property.area?.toString() || "",
+    rooms: property.rooms?.toString() || "",
+    bathrooms: property.bathrooms?.toString() || "",
+    salePrice: property.salePrice?.toString() || "",
+    rentPrice: property.rentPrice?.toString() || "",
   });
 
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+
   const handleUpdate = async () => {
+    console.log("CLIENT-LOG: Iniciando handleUpdate");
     setSaving(true);
+    setMessage("");
+
+    const updateData: any = {
+      title: form.title,
+      description: form.description,
+      images: form.images,
+      operationType: form.operationType,
+      status: form.status,
+      area: Number(form.areaM2),
+      rooms: Number(form.rooms),
+      bathrooms: Number(form.bathrooms),
+      amenities: form.amenities,
+    };
+
+    if (form.operationType === "SALE") {
+      updateData.salePrice = Number(form.salePrice);
+      updateData.rentPrice = null;
+    } else if (form.operationType === "RENT") {
+      updateData.rentPrice = Number(form.rentPrice);
+      updateData.salePrice = null;
+    } else {
+      updateData.salePrice = Number(form.salePrice);
+      updateData.rentPrice = Number(form.rentPrice);
+    }
+
+    console.log("CLIENT-LOG: Datos a enviar:", updateData);
+
     try {
-      await updateProperty(property.id, {
-        title, description, images, operationType, status,
-        price: Number(price), areaM2: Number(areaM2),
-        rooms: Number(rooms), bathrooms: Number(bathrooms),
-        lat: selectedParcel.lat, lon: selectedParcel.lon,
-        parcel: selectedParcel.CCA ? { CCA: selectedParcel.CCA, geometry: selectedParcel.geometry } : undefined,
-      });
+      const res = await updateProperty(property.id, updateData);
+      console.log("CLIENT-LOG: Respuesta del servidor:", res);
       onUpdated();
       onClose();
     } catch (e: any) {
-      alert(e.message);
+      console.error("CLIENT-LOG: Error capturado:", e.message);
+      setMessage(e.message || "Error al actualizar");
     } finally {
       setSaving(false);
     }
   };
 
-  return {
-    state: { title, price, description, areaM2, rooms, bathrooms, images, operationType, status, saving, viewMap, selectedParcel },
-    actions: { setTitle, setPrice, setDescription, setAreaM2, setRooms, setBathrooms, setImages, setOperationType, setStatus, setViewMap, setSelectedParcel, handleUpdate }
-  };
+  return { form, setForm, saving, message, handleUpdate };
 }

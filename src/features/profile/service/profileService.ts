@@ -79,10 +79,13 @@ type UpdateServerProfileBody = {
   firstName?: string;
   lastName?: string;
   phone?: string;
-
   name?: string;
   address?: string;
   website?: string;
+  instagram?: string;
+  bio?: string;    
+  province?: string; 
+  city?: string;    
 };
 
 export async function updateServerProfile(
@@ -107,19 +110,24 @@ export async function updateServerProfile(
       });
     }
 
-    if (authUser.role === "REALESTATE") {
-      const { name, address, website, phone } = body;
-      if (!name) throw new Error("El nombre de la inmobiliaria es requerido");
+if (authUser.role === "REALESTATE") {
+    const { name, address, website, phone, instagram, bio, province, city } = body;
+    if (!name) throw new Error("El nombre de la inmobiliaria es requerido");
 
-      return await tx.realEstate.update({
-        where: { user_id: authUser.user_id },
-        data: { 
-          agencyName: name,
-          address, 
-          phone 
-        },
-      });
-    }
+    return await tx.realEstate.update({
+      where: { user_id: authUser.user_id },
+      data: { 
+        agencyName: name,
+        address, 
+        phone,
+        website,
+        instagram,
+        bio,      
+        province, 
+        city      
+      },
+    });
+  }
 
     throw new Error("Rol no soportado");
   });

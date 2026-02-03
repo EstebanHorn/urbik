@@ -40,7 +40,12 @@ const initialFormState: FormState = {
   address: "", 
   website: "", 
   auth_provider: "",
-  isActive: true // Estado inicial por defecto
+  isActive: true,
+  instagram: "", 
+  bio: "",
+  province: "",
+  city: "",
+  license: ""
 };
 
 export function useProfile(): UseProfileResult {
@@ -73,17 +78,20 @@ export function useProfile(): UseProfileResult {
           auth_provider: provider
         });
         setUserProperties(data.properties || []); 
-      } else if (role === 'REALESTATE' && data.agencyData) {
-        setForm({
-          firstName: data.firstName || "", 
-          lastName: data.lastName || "", 
-          phone: data.agencyData.phone || data.phone || "",
-          name: data.agencyData.agencyName || "", 
-          address: data.agencyData.address || "", 
-          website: data.agencyData.website || "",
-          auth_provider: provider,
-          isActive: data.isActive ?? true,
-        });
+} else if (role === 'REALESTATE' && data.agencyData) {
+  setForm({
+    phone: data.agencyData.phone || data.phone || "",
+    name: data.agencyData.agencyName || "", 
+    address: data.agencyData.address || "", 
+    website: data.agencyData.website || "",
+    instagram: data.agencyData.instagram || "", // Mapeo nuevo
+    bio: data.agencyData.bio || "",             // Mapeo nuevo
+    province: data.agencyData.province || "",   // Mapeo nuevo
+    city: data.agencyData.city || "",           // Mapeo nuevo
+    license: data.agencyData.license || "",     // Mapeo nuevo
+    auth_provider: provider,
+    isActive: data.isActive ?? true,
+  });
         setUserProperties(data.agencyData.properties || []); 
       }
       setMessage(""); 
@@ -104,7 +112,6 @@ export function useProfile(): UseProfileResult {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  // Función clave para que RealEstateForm actualice isActive
   const handleManualChange = (name: string, value: any) => {
     setForm(prev => ({ ...prev, [name]: value }));
   };
@@ -119,13 +126,17 @@ export function useProfile(): UseProfileResult {
     try {
       let payload: RealEstateFormFields | UserFormFields;
 
-      if (userRole === 'REALESTATE') {
-        payload = { 
-          name: form.name, 
-          address: form.address, 
-          phone: form.phone, 
-          website: form.website 
-        } as RealEstateFormFields;
+if (userRole === 'REALESTATE') {
+  payload = { 
+    name: form.name, 
+    address: form.address, 
+    phone: form.phone, 
+    website: form.website,
+    instagram: form.instagram,
+    bio: form.bio,            
+    province: form.province,
+    city: form.city
+  } as RealEstateFormFields;
       } else {
         payload = { 
           firstName: form.firstName, 
