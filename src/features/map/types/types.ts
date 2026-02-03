@@ -50,11 +50,9 @@ export interface MapProperty {
   area?: number;
 }
 
-// Definición unificada y flexible
 export interface SelectedParcel {
   CCA: string | null;
   PDA: string | null;
-  // Usamos 'any' o 'Geometry' para evitar conflictos estrictos con respuestas de API
   geometry: Geometry | any;
   lat: number;
   lon: number;

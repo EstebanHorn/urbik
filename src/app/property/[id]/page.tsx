@@ -13,6 +13,7 @@ import { notFound } from "next/navigation";
 import prisma from "@/libs/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import PropertyParcelWrapper from "../../../features/property/PropertyParcelWrapper";
 import AdminActions from "../../../features/administrate/components/AdminActions";
 import { 
   MapPin, 
@@ -59,6 +60,7 @@ async function getPropertyData(id: number, userId?: string) {
       include: {
         RealEstate: {
           include: {
+            
             properties: {
               where: {
                 NOT: { id: id },
@@ -140,6 +142,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   const images = property.images || [];
   const statusBadge = getStatusBadge(property);
 
+  const isBoth = property.operationType === "SALE_RENT";
+
   return (
     <main className="min-h-screen bg-white pb-20">
       <div className="max-w-7xl mx-auto px-6 pt-28 mb-8">
@@ -151,9 +155,13 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           Volver al listado
         </Link>
 
-        {isAdmin && (
-          <AdminActions propertyId={property.id} currentStatus={property.status} />
-        )}
+{isAdmin && (
+  <AdminActions 
+    id={property.id} 
+    currentStatus={property.status} 
+    type="property" 
+  />
+)}
       </div>
 
       <div className="max-w-7xl mx-auto px-6">
@@ -186,16 +194,30 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           </div>
 
           <div className="lg:text-right">
-            <p className="text-md font-bold italic text-urbik-black/50 mb-1 mr-4">
-              Valor de publicación
-            </p>
-            <div className="text-5xl md:text-7xl font-display font-bold tracking-tighter">
-              <span className="text-urbik-emerald mr-2 font-black">
-                {currencySymbol}
-              </span>
-              <span className="text-urbik-black">
-                {formatter.format(property.price)}
-              </span>
+
+            <div className={`flex flex-col ${isBoth ? 'gap-1' : ''}`}>
+              {(property.operationType === "SALE" || isBoth) && property.salePrice && (
+                <div>
+                  {isBoth && <span className="ml-2 text-md font-medium text-urbik-muted uppercase italic">Venta</span>}
+
+                <div className={`${isBoth ? "text-3xl md:text-4xl" : "text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline lg:justify-end`}>
+                  <span className="text-urbik-emerald mr-2 font-black">{property.saleCurrency}{currencySymbol}</span>
+                  <span className="text-urbik-black">{formatter.format(property.salePrice)}</span>
+                </div>
+                                </div>
+
+              )}
+              {(property.operationType === "RENT" || isBoth) && property.rentPrice && (
+                <div>
+                                    {isBoth && <span className="ml-2 text-md font-medium text-urbik-muted uppercase italic">Alquiler</span>}
+
+                <div className={`${isBoth ? "text-3xl md:text-4xl" : "text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline lg:justify-end`}>
+                  <span className="text-urbik-emerald mr-2 font-black">{property.rentCurrency}{currencySymbol}</span>
+                  <span className="text-urbik-black">{formatter.format(property.rentPrice)}</span>
+                </div>
+                
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -209,17 +231,20 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             )}
           </div>
           <div className="hidden md:flex md:col-span-4 flex-col gap-4">
-              <div className="h-1/2 rounded-md overflow-hidden bg-urbik-white border border-urbik-dark2/50">
-                {images[1] ? <img src={images[1]} className="w-full h-full object-cover" alt="Vista 2" /> : <div className="h-full" />}
-              </div>
               <div className="h-1/2 rounded-md overflow-hidden bg-urbik-white border border-urbik-dark2/50 relative">
-                {images[2] ? <img src={images[2]} className="w-full h-full object-cover" alt="Vista 3" /> : <div className="h-full" />}
-                {images.length > 3 && (
-                  <div className="absolute inset-0 bg-urbik-black/40 flex items-center justify-center backdrop-blur-[2px]">
-                     <span className="text-white font-black text-xl">+{images.length - 2} FOTOS</span>
-                  </div>
-                )}
-              </div>
+  {property.parcelGeom && property.latitude && property.longitude ? (
+    <PropertyParcelWrapper 
+      lat={property.latitude} 
+      lon={property.longitude} 
+      selectedGeom={property.parcelGeom} 
+      allProperties={otherProperties} // Pasamos las otras propiedades para ver sus parcelas
+    />
+  ) : images[2] ? (
+    <img src={images[2]} className="w-full h-full object-cover" alt="Vista 3" />
+  ) : (
+    <div className="h-full bg-urbik-white2 flex items-center justify-center" />
+  )}
+</div>
           </div>
         </div>
 
@@ -240,7 +265,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
-          {/* Sidebar */}
           <div className="relative">
             <div className="sticky top-28 space-y-6">
               <div className="bg-urbik-white2 rounded-md p-10 text-urbik-dark shadow-xl overflow-hidden relative">
@@ -251,8 +275,14 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                     </div>
                     <div>
                       <p className="text-md font-black text-urbik-dark">Comercializa</p>
-                      <h4 className="text-2xl font-bold leading-tight">{property.RealEstate?.agencyName || "Inmobiliaria"}</h4>
-                    </div>
+<Link 
+      href={`/realestate/${property.realEstateId}`} 
+      className="hover:text-urbik-emerald transition-colors"
+    >
+      <h4 className="text-2xl font-bold leading-tight">
+        {property.RealEstate?.agencyName || "Inmobiliaria"}
+      </h4>
+    </Link>                    </div>
                   </div>
                   <div className="space-y-4 mb-10 ">
                     <div className="flex items-center  text-xl justify-center py-3 text-urbik-black border-b border-urbik-g100/50">
@@ -265,7 +295,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                     </div>
                   </div>
                   <div className="w-full flex justify-center">
-                    <button className="px-10 bg-urbik-black hover:bg-white hover:text-urbik-emerald border border-urbik-black text-urbik-white font-bold py-4 rounded-full transition-all flex items-center justify-center gap-2 group">
+                    <button className="px-10 cursor-pointer bg-urbik-black hover:bg-white hover:text-urbik-emerald border border-urbik-black text-urbik-white font-bold py-4 rounded-full transition-all flex items-center justify-center gap-2 group">
                         Ver Perfil
                     </button>
                   </div>
@@ -330,9 +360,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
                       <div className="mt-auto">
                         <hr className="border-urbik-g100 mb-4" />
-                        <p className="text-xl font-black text-urbik-dark tracking-tighter text-right">
-                          {other.currency === "USD" ? "USD" : "$"} {other.price?.toLocaleString('es-AR')}
-                        </p>
+                        <div className="text-right">
+                          <p className="text-xl font-black text-urbik-dark tracking-tighter">
+                            {other.currency === "USD" ? "USD" : "$"} {(other.salePrice || other.rentPrice || 0).toLocaleString('es-AR')}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>

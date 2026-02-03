@@ -28,7 +28,7 @@ export function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
       <button
         type="button"
         onClick={() => onChange("USD")}
-        className={`relative z-10 px-8 py-2.5 font-bold text-sm rounded-full transition-colors flex-1  ${
+        className={`relative z-10 px-8 cursor-pointer py-2.5 font-bold text-sm rounded-full transition-colors flex-1  ${
           value === "USD" ? "text-urbik-g100" : "text-urbik-dark/50 hover:bg-urbik-g400/50 "
         }`}
       >
@@ -37,7 +37,7 @@ export function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
       <button
         type="button"
         onClick={() => onChange("ARS")}
-        className={`relative z-10 px-8 py-2.5 font-bold text-sm rounded-full transition-colors flex-1 ${
+        className={`relative z-10 cursor-pointer px-8 py-2.5 font-bold text-sm rounded-full transition-colors flex-1 ${
           value === "ARS" ? "text-urbik-g100" : "text-urbik-muted hover:bg-urbik-g400/50"
         }`}
       >

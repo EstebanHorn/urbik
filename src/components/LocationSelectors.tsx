@@ -26,6 +26,8 @@ interface LocationSelectorsProps {
   cityValue: string;
   onChange: (name: string, value: string) => void;
   onCityCoordsChange?: (coords: { lat: number; lon: number } | null) => void;
+  provinceLabel?: string;
+  cityLabel?: string;
 }
 
 export default function LocationSelectors({
@@ -33,22 +35,24 @@ export default function LocationSelectors({
   cityValue,
   onChange,
   onCityCoordsChange,
+  provinceLabel = "PROVINCIA",
+  cityLabel = "CIUDAD",
 }: LocationSelectorsProps) {
   const [provincias, setProvincias] = useState<GeorefItem[]>([]);
   const [ciudades, setCiudades] = useState<GeorefItem[]>([]);
   const [loadingCiudades, setLoadingCiudades] = useState(false);
-  const [openDropdown, setOpenDropdown] =
-    useState<"province" | "city" | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<"province" | "city" | null>(null);
 
   const provRef = useRef<HTMLDivElement>(null);
   const cityRef = useRef<HTMLDivElement>(null);
-  const menuContainerRef = useRef<HTMLDivElement>(null);
+  
+  const provMenuRef = useRef<HTMLDivElement>(null);
+  const cityMenuRef = useRef<HTMLDivElement>(null);
+  
   const scrollRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   useEffect(() => {
-    fetch(
-      "https://apis.datos.gob.ar/georef/api/provincias?campos=id,nombre"
-    )
+    fetch("https://apis.datos.gob.ar/georef/api/provincias?campos=id,nombre")
       .then((res) => res.json())
       .then((data) =>
         setProvincias(
@@ -70,15 +74,12 @@ export default function LocationSelectors({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
     if (!provinceValue) return;
-
     setLoadingCiudades(true);
-
     fetch(
       `https://apis.datos.gob.ar/georef/api/municipios?provincia=${provinceValue}&max=1000&campos=id,nombre,centroide`
     )
@@ -93,15 +94,21 @@ export default function LocationSelectors({
       });
   }, [provinceValue]);
 
+  useEffect(() => {
+    if (openDropdown === "province" && provMenuRef.current) {
+      provMenuRef.current.focus();
+    } else if (openDropdown === "city" && cityMenuRef.current) {
+      cityMenuRef.current.focus();
+    }
+  }, [openDropdown]);
+
   const handleSearchByKey = (
-    e: React.KeyboardEvent,
-    items: GeorefItem[]
+    e: React.KeyboardEvent, 
+    items: GeorefItem[], 
+    containerRef: React.RefObject<HTMLDivElement | null>
   ) => {
     const char = e.key.toLowerCase();
     if (char.length === 1 && /[a-zñ]/.test(char)) {
-      e.preventDefault();
-      e.stopPropagation();
-
       const target = items.find((item) =>
         item.nombre
           .toLowerCase()
@@ -110,11 +117,11 @@ export default function LocationSelectors({
           .startsWith(char)
       );
 
-      if (target && menuContainerRef.current) {
+      if (target && containerRef.current) {
         const el = scrollRefs.current[target.id];
         if (el) {
-          menuContainerRef.current.scrollTo({
-            top: el.offsetTop - 10,
+          containerRef.current.scrollTo({
+            top: el.offsetTop,
             behavior: "smooth",
           });
         }
@@ -126,15 +133,17 @@ export default function LocationSelectors({
     items,
     onSelect,
     isOpen,
+    menuRef,
   }: {
     items: GeorefItem[];
     onSelect: (item: GeorefItem) => void;
     isOpen: boolean;
+    menuRef: React.RefObject<HTMLDivElement | null>;
   }) => (
     <div
-      ref={menuContainerRef}
+      ref={menuRef}
       tabIndex={0}
-      onKeyDown={(e) => handleSearchByKey(e, items)}
+      onKeyDown={(e) => handleSearchByKey(e, items, menuRef)}
       className={`absolute z-50 left-0 mt-2 min-w-[280px] max-h-72 overflow-y-auto rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl transition-all duration-200 outline-none
       ${
         isOpen
@@ -151,7 +160,7 @@ export default function LocationSelectors({
           }}
           type="button"
           onClick={() => onSelect(item)}
-          className="w-full text-left px-5 py-3 text-md font-bold text-urbik-white hover:bg-white/10 transition"
+          className="w-full text-left cursor-pointer px-5 py-3 text-md font-bold text-urbik-white hover:bg-white/10 transition"
         >
           {item.nombre}
         </button>
@@ -161,24 +170,22 @@ export default function LocationSelectors({
 
   return (
     <div className="flex flex-col sm:flex-row gap-2 w-full">
-      {/* PROVINCIA */}
       <div className="relative flex-1" ref={provRef}>
         <button
           type="button"
           onClick={() =>
-            setOpenDropdown(
-              openDropdown === "province" ? null : "province"
-            )
+            setOpenDropdown(openDropdown === "province" ? null : "province")
           }
-          className="uppercase w-full flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold"
+          className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold"
         >
-          {provinceValue || "PROVINCIA"}
+          {provinceValue || provinceLabel}
           <ChevronDown />
         </button>
 
         <DropdownMenu
           items={provincias}
           isOpen={openDropdown === "province"}
+          menuRef={provMenuRef}
           onSelect={(item) => {
             onChange("province", item.nombre);
             onChange("city", "");
@@ -193,25 +200,23 @@ export default function LocationSelectors({
           type="button"
           disabled={!provinceValue}
           onClick={() =>
-            setOpenDropdown(
-              openDropdown === "city" ? null : "city"
-            )
+            setOpenDropdown(openDropdown === "city" ? null : "city")
           }
-          className="uppercase w-full flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold disabled:opacity-30"
+          className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold disabled:opacity-30"
         >
-          {loadingCiudades ? "..." : cityValue || "CIUDAD"}
+          {loadingCiudades ? "..." : cityValue || cityLabel}
           <ChevronDown />
         </button>
 
         <DropdownMenu
           items={ciudades}
           isOpen={openDropdown === "city"}
+          menuRef={cityMenuRef}
           onSelect={(item) => {
-              onChange("city", item.nombre);
-              // Ya no pasamos el centroide de Georef aquí para evitar errores de precisión
-              onCityCoordsChange?.(null); 
-              setOpenDropdown(null);
-            }}
+            onChange("city", item.nombre);
+            onCityCoordsChange?.(null);
+            setOpenDropdown(null);
+          }}
         />
       </div>
     </div>

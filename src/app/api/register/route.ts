@@ -11,12 +11,39 @@ y devuelve un error 400 con un mensaje descriptivo.
 import { NextResponse, NextRequest } from "next/server";
 import { registerUserAndAgency } from "@/features/register/service/registerService";
 
+const ALLOWED_DOMAINS = [
+  "gmail.com",
+  "outlook.com",
+  "hotmail.com",
+  "yahoo.com",
+  "icloud.com",
+  "protonmail.com",
+  "live.com",
+  "msn.com",
+  "me.com",
+  "aol.com"
+];
+
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
+    const email = data.email?.toLowerCase();
+
+    if (!email || !email.includes("@")) {
+      return NextResponse.json({ error: "Email inválido" }, { status: 400 });
+    }
+
+    const domain = email.split("@")[1];
+
+    if (!ALLOWED_DOMAINS.includes(domain)) {
+      return NextResponse.json(
+        { error: "El dominio de correo no está permitido. Usa un servicio conocido." },
+        { status: 400 }
+      );
+    }
 
     const user = await registerUserAndAgency({
-      email: data.email,
+      email: email,
       password: data.password,
       role: data.role,
       firstName: data.name, 

@@ -162,7 +162,7 @@ export default function MapPage() {
         
         <button 
           onClick={clearFilters}
-          className="h-10 px-4 text-md font-black text-urbik-black/50 hover:text-urbik-rose transition-colors flex items-center gap-1 shrink-0"
+          className="h-10 px-4 text-md font-black cursor-pointer text-urbik-black/50 hover:text-urbik-rose transition-colors flex items-center gap-1 shrink-0"
         >
           <X size={20} /> Limpiar filtros
         </button>
@@ -178,7 +178,7 @@ export default function MapPage() {
                   key={amenity.id}
                   onClick={() => toggleAmenity(amenity.id as keyof typeof filters)}
                   className={`
-                    flex items-center gap-1 px-2.5 py-1.5 rounded-full border text-[10px] font-bold transition-all
+                    flex items-center cursor-pointer gap-1 px-2.5 py-1.5 rounded-full border text-[10px] font-bold transition-all
                     ${isActive 
                       ? "bg-urbik-emerald text-white border-urbik-emerald shadow-sm" 
                       : "bg-white text-urbik-black/60 border-slate-300 hover:border-urbik-emerald/50"
@@ -274,7 +274,7 @@ export default function MapPage() {
             <h2 className="font-bold text-lg text-slate-800">
               Resultados ({properties.length})
             </h2>
-            <button onClick={() => setShowMobileList(false)} className="text-slate-500 p-2">✕</button>
+            <button onClick={() => setShowMobileList(false)} className=" cursor-pointer text-slate-500 p-2">✕</button>
           </div>
 
           <div className="flex-1 overflow-y-auto">
@@ -304,7 +304,7 @@ export default function MapPage() {
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[50] md:hidden pointer-events-auto w-max">
             <button
               onClick={() => setShowMobileList(!showMobileList)}
-              className="bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-medium active:scale-95 transition-transform"
+              className="bg-slate-900 text-white px-6 py-3 cursor-pointer rounded-full shadow-2xl flex items-center gap-3 font-medium active:scale-95 transition-transform"
             >
               {showMobileList ? (
                 <> <MapIcon className="w-4 h-4" /> Ver Mapa </>

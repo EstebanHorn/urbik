@@ -12,10 +12,11 @@ formateado.
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Heart, X, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import Versus from "../../components/SmartZone/SmartCompare";
+import FavoriteButton from "../../components/FavoritesButton";
 
 export default function GuardadosPage() {
   const { data: session } = useSession();
@@ -52,22 +53,6 @@ export default function GuardadosPage() {
         ? [...prev, id]
         : prev
     );
-  };
-
-  const removeFavorite = async (e: React.MouseEvent, propertyId: number) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setFavorites((prev) => prev.filter((p) => p.id !== propertyId));
-    try {
-      const res = await fetch("/api/properties/favorite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ propertyId }),
-      });
-      if (!res.ok) fetchFavorites();
-    } catch (error) {
-      console.error("Error:", error);
-    }
   };
 
   const getOperationLabel = (type: string) => {
@@ -135,14 +120,13 @@ export default function GuardadosPage() {
                         {!isSmartZone && <Link href={`/property/${prop.id}`} className="absolute inset-0 z-10" />}
                         
                         {!isSmartZone && (
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={(e) => removeFavorite(e, prop.id)}
-                            className="absolute top-3 right-3 z-20 p-2 bg-urbik-rose backdrop-blur-sm rounded-full shadow-md"
-                          >
-                            <Heart size={16} className="fill-white text-white" />
-                          </motion.button>
+                          <div className="absolute top-3 right-3 z-20">
+                            <FavoriteButton 
+                              propertyId={prop.id.toString()} 
+                              initialIsFavorite={true} 
+                              small={true} 
+                            />
+                          </div>
                         )}
 
                         <div className="relative h-40 bg-urbik-g200">

@@ -104,7 +104,7 @@ export default function SettingsPage() {
               </div>
               <button 
                 onClick={() => setIsScrollZoomEnabled(!isScrollZoomEnabled)}
-                className={`${toggleBase} ${isScrollZoomEnabled ? 'bg-urbik-black' : 'bg-gray-200'}`}
+                className={` cursor-pointer ${toggleBase} ${isScrollZoomEnabled ? 'bg-urbik-black' : 'bg-gray-200'}`}
               >
                 <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${isScrollZoomEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
@@ -126,7 +126,7 @@ export default function SettingsPage() {
               </div>
               <button 
                 onClick={() => setIsZoneAnalysisEnabled(!isZoneAnalysisEnabled)}
-                className={`${toggleBase} ${isZoneAnalysisEnabled ? 'bg-urbik-black' : 'bg-gray-200'}`}
+                className={`  cursor-pointer ${toggleBase} ${isZoneAnalysisEnabled ? 'bg-urbik-black' : 'bg-gray-200'}`}
               >
                 <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${isZoneAnalysisEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
@@ -140,7 +140,7 @@ export default function SettingsPage() {
                 <button
                   key={opt.id}
                   onClick={() => setColorMode(opt.id as ColorMode)}
-                  className={`flex flex-col p-6 rounded-[2rem] border transition-all text-left ${
+                  className={`cursor-pointer flex flex-col p-6 rounded-[2rem] border transition-all text-left ${
                     colorMode === opt.id 
                     ? "border-urbik-black bg-urbik-black text-white shadow-lg scale-[1.02]" 
                     : "border-gray-200 bg-white hover:border-urbik-black/40 text-urbik-black"
@@ -186,7 +186,7 @@ export default function SettingsPage() {
           setPropertiesLimit(opt.id);
           updateSizePill(e.currentTarget);
         }}
-        className={`relative z-10 flex-1 px-4 py-4 font-bold tracking-wide text-xs transition-colors duration-300 whitespace-nowrap rounded-full ${
+        className={`relative cursor-pointer z-10 flex-1 px-4 py-4 font-bold tracking-wide text-xs transition-colors duration-300 whitespace-nowrap rounded-full ${
           propertiesLimit === opt.id ? "text-urbik-white" : "text-urbik-muted hover:bg-urbik-g400/50"
         }`}
       >
@@ -202,7 +202,7 @@ export default function SettingsPage() {
                 <button
                   key={layer.id}
                   onClick={() => setBaseLayer(layer.id as BaseLayerId)}
-                  className={`flex w-full flex-col rounded-full border px-8 py-5 text-left transition-all ${
+                  className={`flex cursor-pointer w-full flex-col rounded-full border px-8 py-5 text-left transition-all ${
                     baseLayer === layer.id 
                     ? "border-urbik-black bg-urbik-black text-white shadow-xl" 
                     : "border-gray-200 bg-white text-urbik-black hover:bg-gray-50"

@@ -71,7 +71,8 @@ export async function GET(request: Request) {
       select: {
         id: true,
         title: true,
-        price: true,
+        salePrice: true, 
+        rentPrice: true,
         latitude: true,
         longitude: true,
         city: true,

@@ -46,14 +46,14 @@ function CustomZoomControls() {
       <button
         type="button"
         onClick={() => map.zoomIn()}
-        className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xl hover:bg-gray-50 active:scale-95 transition-all text-2xl font-bold text-gray-800 border border-gray-200"
+        className="flex cursor-pointer h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xl hover:bg-gray-50 active:scale-95 transition-all text-2xl font-bold text-gray-800 border border-gray-200"
       >
         +
       </button>
       <button
         type="button"
         onClick={() => map.zoomOut()}
-        className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xl hover:bg-gray-50 active:scale-95 transition-all text-2xl font-bold text-gray-800 border border-gray-200"
+        className="flex h-11 cursor-pointer w-11 items-center justify-center rounded-xl bg-white shadow-xl hover:bg-gray-50 active:scale-95 transition-all text-2xl font-bold text-gray-800 border border-gray-200"
       >
         −
       </button>

@@ -68,7 +68,7 @@ export default function DashboardHeader({
               Estado: <span className="text-urbik-emerald">Activo</span>
             </div>
               <Link href={`/profile`} className="w-full">
-                <button className="rounded-full bg-urbik-white1 w-full px-5 py-2 text-md font-bold text-urbik-black hover:text-urbik-black/60 cursor-pointer hover:bg-urbik-dark2 transition-colors shadow-lg">
+                <button className="rounded-full cursor-pointer bg-urbik-white1 w-full px-5 py-2 text-md font-bold text-urbik-black hover:text-urbik-black/60 cursor-pointer hover:bg-urbik-dark2 transition-colors shadow-lg">
                   Editar Perfil
                 </button>
               </Link>

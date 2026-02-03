@@ -35,7 +35,7 @@ const DangerZone = ({ itemName, onDelete }: DangerZoneProps) => {
           </p>
           <button 
             onClick={() => setShowDeleteModal(true)}
-            className="whitespace-nowrap px-5 py-2 border-2 border-urbik-rose text-urbik-rose font-bold rounded-full hover:bg-urbik-rose hover:text-white transition-all shadow-sm"
+            className="whitespace-nowrap cursor-pointer px-5 py-2 border-2 border-urbik-rose text-urbik-rose font-bold rounded-full hover:bg-urbik-rose hover:text-white transition-all shadow-sm"
           >
             Eliminar Cuenta
           </button>
@@ -59,7 +59,7 @@ const DangerZone = ({ itemName, onDelete }: DangerZoneProps) => {
               className="relative bg-white w-full max-w-lg p-10 rounded-[3rem] shadow-2xl"
             >
               <div className="" />
-              <button onClick={() => setShowDeleteModal(false)} className="absolute top-8 right-8 text-urbik-muted hover:text-urbik-black">
+              <button onClick={() => setShowDeleteModal(false)} className="absolute cursor-pointer top-8 right-8 text-urbik-muted hover:text-urbik-black">
                 <X size={28} />
               </button>
               <h3 className="text-2xl text-center font-display font-bold mb-4 text-urbik-black">¿Absolutamente seguro?</h3>
@@ -79,7 +79,7 @@ const DangerZone = ({ itemName, onDelete }: DangerZoneProps) => {
                    onDelete();
                    setShowDeleteModal(false);
                 }} 
-                className={`w-full py-4 rounded-full font-black tracking-tighter transition-all ${confirmText === DELETE_KEYWORD ? "bg-urbik-rose text-white shadow-xl shadow-red-200" : "bg-gray-100 text-gray-300 cursor-not-allowed"}`}
+                className={`w-full cursor-pointer py-4 rounded-full font-black tracking-tighter transition-all ${confirmText === DELETE_KEYWORD ? "bg-urbik-rose text-white shadow-xl shadow-red-200" : "bg-gray-100 text-gray-300 cursor-not-allowed"}`}
               >
                 SÍ, ELIMINAR DEFINITIVAMENTE
               </button>

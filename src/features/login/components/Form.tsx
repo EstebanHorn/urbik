@@ -58,7 +58,6 @@ export default function LoginForm() {
         </p>
       </div>
 
-      {/* Cartel de Error o Cuenta en Revisión */}
       {errorMessage && (
         <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 text-center">
           <p className="text-sm text-red-600 font-medium">
@@ -119,7 +118,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-[#00deff] text-white font-bold py-3 rounded-full text-lg shadow-sm hover:opacity-90 transition-opacity mt-6 disabled:opacity-60"
+          className="w-full cursor-pointer bg-[#00deff] text-white font-bold py-3 rounded-full text-lg shadow-sm hover:opacity-90 transition-opacity mt-6 disabled:opacity-60"
         >
           {isLoading ? "Ingresando..." : "INGRESAR"}
         </button>
@@ -138,7 +137,7 @@ export default function LoginForm() {
         type="button"
         onClick={handleGoogleSignIn}
         disabled={isLoading}
-        className="w-full bg-linear-to-r from-[#3E3E3E] via-black to-[#2E2E2E] text-white font-medium py-3 rounded-full text-md shadow-sm hover:opacity-95 transition-opacity flex items-center justify-center gap-3"
+        className="w-full cursor-pointer bg-linear-to-r from-[#3E3E3E] via-black to-[#2E2E2E] text-white font-medium py-3 rounded-full text-md shadow-sm hover:opacity-95 transition-opacity flex items-center justify-center gap-3"
       >
         <GoogleIcon />
         <span>Google</span>

@@ -82,7 +82,7 @@ export default function SmartDescription({ description, context }: SmartDescript
             </span>
             <button 
               onClick={() => setIsActive(!isActive)}
-              className={`w-10 h-5 flex items-center rounded-full p-1 transition-all duration-300 ${isActive ? 'bg-urbik-emerald shadow-[0_0_10px_rgba(16,185,129,0.4)]' : 'bg-white/10'}`}
+              className={`w-10 cursor-pointer h-5 flex items-center rounded-full p-1 transition-all duration-300 ${isActive ? 'bg-urbik-emerald shadow-[0_0_10px_rgba(16,185,129,0.4)]' : 'bg-white/10'}`}
             >
               <motion.div 
                 layout 

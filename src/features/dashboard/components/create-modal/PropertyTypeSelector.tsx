@@ -30,7 +30,7 @@ export function PropertyTypeSelector({ value, onChange }: Props) {
           key={opt.id}
           type="button"
           onClick={() => onChange(opt.id)}
-          className={`rounded-full px-4 py-3 font-bold text-sm border transition
+          className={`rounded-full cursor-pointer px-4 py-3 font-bold text-sm border transition
             ${value === opt.id
               ? "bg-urbik-black text-white"
               : "bg-white border-gray-200 text-gray-600"}

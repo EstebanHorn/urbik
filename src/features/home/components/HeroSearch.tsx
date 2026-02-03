@@ -43,7 +43,7 @@ export function HeroSearch() {
       <div className="flex border-b border-slate-100">
         <button
           onClick={() => setOperation("SALE")}
-          className={`flex-1 py-4 text-sm font-bold uppercase tracking-wider transition-colors ${
+          className={`flex-1 py-4 cursor-pointer text-sm font-bold uppercase tracking-wider transition-colors ${
             operation === "SALE"
               ? "bg-slate-900 text-white"
               : "bg-white text-slate-500 hover:bg-slate-50"
@@ -53,7 +53,7 @@ export function HeroSearch() {
         </button>
         <button
           onClick={() => setOperation("RENT")}
-          className={`flex-1 py-4 text-sm font-bold uppercase tracking-wider transition-colors ${
+          className={`flex-1 py-4 cursor-pointer text-sm font-bold uppercase tracking-wider transition-colors ${
             operation === "RENT"
               ? "bg-slate-900 text-white"
               : "bg-white text-slate-500 hover:bg-slate-50"
@@ -124,7 +124,7 @@ export function HeroSearch() {
 
         <button
           onClick={handleSearch}
-          className="w-full bg-[#00F0FF] hover:bg-[#00dbec] text-slate-900 font-black text-lg py-5 rounded-2xl shadow-lg shadow-cyan-500/30 transition-all transform active:scale-[0.99] uppercase tracking-wide flex items-center justify-center gap-2"
+          className="w-full bg-[#00F0FF] cursor-pointer hover:bg-[#00dbec] text-slate-900 font-black text-lg py-5 rounded-2xl shadow-lg shadow-cyan-500/30 transition-all transform active:scale-[0.99] uppercase tracking-wide flex items-center justify-center gap-2"
         >
           <Search className="w-6 h-6" />
           Buscar Propiedades
@@ -138,7 +138,7 @@ function FilterToggle({ active, onClick, icon, label }: any) {
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center justify-center gap-2 py-3 px-2 rounded-xl border-2 transition-all duration-200 ${
+      className={`flex flex-col cursor-pointer items-center justify-center gap-2 py-3 px-2 rounded-xl border-2 transition-all duration-200 ${
         active
           ? "border-slate-900 bg-slate-900 text-white shadow-md transform scale-105"
           : "border-slate-100 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"

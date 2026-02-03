@@ -109,14 +109,14 @@ export default function AdminPage() {
                           <div className="flex justify-end gap-3">
                             <button
                               onClick={() => handleAction(u.user_id, "APPROVE")}
-                              className="flex items-center gap-2 bg-urbik-emerald text-white border border-urbik-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-urbik-white hover:border-urbik-emerald hover:text-urbik-emerald transition-all active:scale-95"
+                              className=" cursor-pointer flex items-center gap-2 bg-urbik-emerald text-white border border-urbik-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-urbik-white hover:border-urbik-emerald hover:text-urbik-emerald transition-all active:scale-95"
                             >
                               <ShieldCheck size={18} />
                               Habilitar
                             </button>
                             <button
                               onClick={() => handleAction(u.user_id, "DELETE")}
-                              className="flex items-center gap-2 bg-urbik-rose text-white border border-urbik-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-urbik-white hover:border-urbik-rose hover:text-urbik-rose transition-all active:scale-95"
+                              className="  cursor-pointer flex items-center gap-2 bg-urbik-rose text-white border border-urbik-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-urbik-white hover:border-urbik-rose hover:text-urbik-rose transition-all active:scale-95"
                             >
                               <Trash2 size={18} />
                               Rechazar

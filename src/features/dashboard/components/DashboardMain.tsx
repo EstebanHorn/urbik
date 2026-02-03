@@ -65,7 +65,7 @@ export default function DashboardMain({
         <div className="flex items-center gap-2 justify-end">
           <button
             onClick={() => setCreateOpen(true)}
-            className="bg-urbik-cyan text-urbik-black/80 py-3 px-6 rounded-full border border-white font-black text-md hover:bg-urbik-white hover:border-urbik-cyan cursor-pointer hover:text-urbik-cyan transition-all shadow-cyan-500/20 transform active:scale-95"
+            className="bg-urbik-cyan cursor-pointer text-urbik-black/80 py-3 px-6 rounded-full border border-white font-black text-md hover:bg-urbik-white hover:border-urbik-cyan cursor-pointer hover:text-urbik-cyan transition-all shadow-cyan-500/20 transform active:scale-95"
           >
             Cargar propiedad
           </button>

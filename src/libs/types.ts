@@ -7,10 +7,17 @@ formularios, asegurando la integridad de los datos en toda la aplicación.
 export type UserRole = 'USER' | 'REALESTATE' | null;
 
 export interface RealEstateFormFields {
-  name: string;
+  name: string;   
   address: string;
   phone: string;
   website: string;
+  instagram: string; 
+  bio: string;  
+  license: string; 
+  province: string;  
+  city: string;    
+  logoUrl?: string; 
+  bannerUrl?: string;
   isActive: boolean;
 }
 

@@ -35,55 +35,57 @@ export async function POST(req: Request) {
         { status: 403 }
       );
     }
-const operationType =
-  body.operationType === "rent" || body.operationType === "RENT"
-    ? "RENT"
-    : body.operationType === "sale" || body.operationType === "SALE"
-    ? "SALE"
-    : body.operationType === "both" || body.operationType === "SALE_RENT"
-    ? "SALE_RENT"
-    : "RENT";
+
+    const operationType =
+      body.operationType === "rent" || body.operationType === "RENT"
+        ? "RENT"
+        : body.operationType === "sale" || body.operationType === "SALE"
+        ? "SALE"
+        : body.operationType === "both" || body.operationType === "SALE_RENT"
+        ? "SALE_RENT"
+        : "RENT";
 
     const newProperty = await prisma.property.create({
-  data: {
-    realEstateId: user.realEstate.user_id,
+      data: {
+        realEstateId: user.realEstate.user_id,
 
-    title: body.title,
-    description: body.description,
+        title: body.title,
+        description: body.description,
 
-    address: body.address ?? "Sin dirección",
-    city: body.city,
-    province: body.province,
-    country: body.country ?? "Argentina",
+        address: body.street || body.address || "Sin dirección", 
+        city: body.city,
+        province: body.province,
+        country: body.country ?? "Argentina",
 
-    type: body.type,
-    status: body.status ?? "AVAILABLE",
-    operationType,
+        type: body.type,
+        status: body.status ?? "AVAILABLE",
+        operationType,
 
-    price: Number(body.price),
-    currency: body.currency,
+        salePrice: body.salePrice ? Number(body.salePrice) : null,
+        rentPrice: body.rentPrice ? Number(body.rentPrice) : null,
+        saleCurrency: body.saleCurrency || "USD",
+        rentCurrency: body.rentCurrency || "ARS",
 
-    area: body.area,
-    rooms: body.rooms,
-    bathrooms: body.bathrooms,
+        area: body.areaM2 ? Number(body.areaM2) : (body.area ? Number(body.area) : null),
+        rooms: body.rooms ? Number(body.rooms) : null,
+        bathrooms: body.bathrooms ? Number(body.bathrooms) : null,
 
-    hasWater: body.hasWater,
-    hasElectricity: body.hasElectricity,
-    hasGas: body.hasGas,
-    hasInternet: body.hasInternet,
-    hasParking: body.hasParking,
-    hasPool: body.hasPool,
+        hasWater: !!body.hasWater,
+        hasElectricity: !!body.hasElectricity,
+        hasGas: !!body.hasGas,
+        hasInternet: !!body.hasInternet,
+        hasParking: !!body.hasParking,
+        hasPool: !!body.hasPool,
 
-    images: body.images ?? [],
+        images: body.images ?? [],
 
-    latitude: body.latitude,
-    longitude: body.longitude,
-    parcelCCA: body.parcelCCA,
-    parcelPDA: body.parcelPDA,
-    parcelGeom: body.parcelGeom,
-  },
-});
-
+        latitude: body.latitude ? Number(body.latitude) : null,
+        longitude: body.longitude ? Number(body.longitude) : null,
+        parcelCCA: body.parcelCCA,
+        parcelPDA: body.parcelPDA,
+        parcelGeom: body.parcelGeom,
+      },
+    });
 
     return NextResponse.json(newProperty);
   } catch (error) {

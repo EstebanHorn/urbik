@@ -16,6 +16,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { PropertySummary } from "../../../app/dashboard/page";
+import { deleteProperty } from "../service/dashboardService"; 
+import ConfirmationModal from "../components/ConfirmationModal";
 
 interface PropertiesListProps {
   properties: PropertySummary[];
@@ -29,32 +31,27 @@ export default function PropertiesList({
   onEdit,
 }: PropertiesListProps) {
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState<number | null>(null);
 const router = useRouter(); 
+  const triggerDelete = (id: number) => {
+    setPropertyToDelete(id);
+    setIsModalOpen(true);
+  };
 
-  const handleDelete = async (id: number) => {
-    if (
-      !confirm(
-        "¿Estás seguro de que querés eliminar esta propiedad? Esta acción no se puede deshacer."
-      )
-    )
-      return;
+  const handleConfirmDelete = async () => {
+    if (!propertyToDelete) return;
 
-    setDeletingId(id);
+    setDeletingId(propertyToDelete);
     try {
-      const res = await fetch(`/api/property/${id}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        onRefresh();
-      } else {
-        alert("Error al eliminar la propiedad");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Error de conexión");
+      await deleteProperty(propertyToDelete);
+      onRefresh();
+      setIsModalOpen(false); 
+    } catch (error: any) {
+      alert(error.message || "Error al eliminar");
     } finally {
       setDeletingId(null);
+      setPropertyToDelete(null);
     }
   };
 
@@ -150,23 +147,31 @@ const router = useRouter();
                       <Link
                         href={`/property/${prop.id}`}
                         target="_blank"
+                        onClick={(e) => e.stopPropagation()}
                         className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-urbik-cyan text-urbik-cyan hover:text-white hover:border-white hover:bg-urbik-cyan transition-colors disabled:opacity-50"
                         title="Ver publicación"
                       >↗
                       </Link>
 
-                      <button
-                        onClick={() => onEdit(prop)}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-urbik-emerald text-urbik-emerald hover:text-white hover:border-white hover:bg-urbik-emerald transition-colors disabled:opacity-50"
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    onEdit(prop);
+  }}
+                        className="w-8 h-8 cursor-pointer flex items-center justify-center rounded-full bg-white border border-urbik-emerald text-urbik-emerald hover:text-white hover:border-white hover:bg-urbik-emerald transition-colors disabled:opacity-50"
                         title="Editar"
+                        
                       >
                         ✎
                       </button>
 
-                      <button
-                        onClick={() => handleDelete(prop.id)}
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    triggerDelete(prop.id);
+  }}
                         disabled={deletingId === prop.id}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-urbik-rose text-urbik-rose hover:text-white hover:border-white hover:bg-urbik-rose transition-colors disabled:opacity-50"
+                        className="w-8 h-8 cursor-pointer flex items-center justify-center rounded-full bg-white border border-urbik-rose text-urbik-rose hover:text-white hover:border-white hover:bg-urbik-rose transition-colors disabled:opacity-50"
                         title="Eliminar"
                       >
                         {deletingId === prop.id ? "..." : "✕"}
@@ -175,6 +180,14 @@ const router = useRouter();
                   </td>
                 </tr>
               ))}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="¿Eliminar propiedad?"
+        message="Esta acción es permanente y la propiedad dejará de estar visible en el portal."
+        isLoading={deletingId !== null}
+      />
             </tbody>
           </table>
         </div>

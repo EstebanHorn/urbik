@@ -9,20 +9,22 @@ ubicación y descripción— permitiendo además que los usuarios con sesión in
 marquen propiedades como favoritas mediante un botón interactivo.
 */
 
+"use client";
+
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Heart, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { FeaturedProperty } from "../service/propertyService";
+import FavoriteButton from "../../../components/FavoritesButton";
 
 interface Props {
   properties: FeaturedProperty[];
   loading: boolean;
   currentIndex: number;
   session: any;
-  onToggleFavorite: (e: React.MouseEvent, id: string) => void;
 }
 
-export function FeaturedCarousel({ properties, loading, currentIndex, session, onToggleFavorite }: Props) {
+export function FeaturedCarousel({ properties, loading, currentIndex, session }: Props) {
   const getPropertyLabel = (type: string) => {
     const labels: Record<string, string> = {
       HOUSE: "Casa", APARTMENT: "Departamento", LAND: "Terreno",
@@ -37,6 +39,16 @@ export function FeaturedCarousel({ properties, loading, currentIndex, session, o
     if (p.rooms) parts.push(`${p.rooms} ambientes`);
     return parts.join(" repartidos en ") || "Consultar detalles";
   };
+
+  const PriceDisplay = ({ amount, currency, sizeClass, label }: { amount: number, currency: string, sizeClass: string, label?: string }) => (
+    <div className="flex flex-col items-end leading-none">
+      {label && <span className="text-[10px] font-bold text-urbik-muted/50 uppercase mb-1">{label}</span>}
+      <div className={`${sizeClass} font-black text-urbik-dark flex items-baseline gap-2`}>
+        <span className="text-urbik-emerald">{currency}</span>
+        <span>${amount.toLocaleString('es-AR')}</span>
+      </div>
+    </div>
+  );
 
   if (loading) return <div className="w-full h-[500px] bg-urbik-g300 animate-pulse rounded-md" />;
   if (properties.length === 0) return (
@@ -68,23 +80,20 @@ export function FeaturedCarousel({ properties, loading, currentIndex, session, o
               </div>
 
               <div className="w-full md:w-1/2 p-10 flex flex-col bg-urbik-white2 relative">
-                {session && (
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={(e) => onToggleFavorite(e, current.id)}
-                    className={`absolute top-6 right-6 z-30 p-3 backdrop-blur-sm rounded-full shadow-md ${current.isFavorite ? "bg-urbik-rose" : "bg-urbik-black"}`}
-                  >
-                    <Heart size={20} className={`text-white ${current.isFavorite ? "fill-white" : "fill-transparent"}`} />
-                  </motion.button>
-                )}
+                
+                <div className="absolute top-6 right-6 z-30">
+                  <FavoriteButton 
+                    propertyId={current.id} 
+                    initialIsFavorite={current.isFavorite} 
+                  />
+                </div>
 
                 <div className="flex items-center gap-2 mb-6">
                   <span className="bg-urbik-black text-white text-[11px] px-4 py-1.5 rounded-full font-bold uppercase">
                     {getPropertyLabel(current.type)}
                   </span>
                   <span className="bg-urbik-cyan text-urbik-muted text-[11px] px-4 py-1.5 rounded-full font-black uppercase">
-                    {current.operationType === "SALE" ? "VENTA" : "ALQUILER"}
+                    {current.operationType === "SALE" ? "VENTA" : current.operationType === "RENT" ? "ALQUILER" : "VENTA / ALQUILER"}
                   </span>
                 </div>
 
@@ -110,10 +119,29 @@ export function FeaturedCarousel({ properties, loading, currentIndex, session, o
 
                 <div className="mt-auto">
                   <hr className="border-urbik-g100 mb-6" />
-                  <div className="text-right w-full">
-                    <span className="text-5xl font-black text-urbik-dark">
-                      ${current.price?.toLocaleString('es-AR')}
-                    </span>
+                  <div className="text-right w-full flex flex-col items-end gap-3">
+                    
+                    {(current.operationType === "SALE" || current.operationType === "SALE_RENT") && current.salePrice && (
+                      <PriceDisplay 
+                        amount={current.salePrice} 
+                        currency={current.saleCurrency || "USD"} 
+                        sizeClass="text-5xl"
+                        label={current.operationType === "SALE_RENT" ? "Precio de Venta" : undefined}
+                      />
+                    )}
+                    
+                    {(current.operationType === "RENT" || current.operationType === "SALE_RENT") && current.rentPrice && (
+                      <PriceDisplay 
+                        amount={current.rentPrice} 
+                        currency={current.rentCurrency || "USD"} 
+                        sizeClass={current.operationType === "SALE_RENT" ? "text-3xl" : "text-5xl"}
+                        label={current.operationType === "SALE_RENT" ? "Precio de Alquiler" : undefined}
+                      />
+                    )}
+
+                    {!current.salePrice && !current.rentPrice && (
+                      <span className="text-3xl font-black text-urbik-dark italic">Consultar precio</span>
+                    )}
                   </div>
                 </div>
               </div>

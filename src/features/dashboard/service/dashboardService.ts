@@ -22,15 +22,33 @@ export const createProperty = async (payload: any) => {
   return res.json();
 };
 
-export const updateProperty = async (id: string, payload: any) => {
+export const updateProperty = async (id: string | number, payload: any) => {
+  if (!id) throw new Error("ID de propiedad no suministrado");
+
   const res = await fetch(`/api/property/${id}`, {
-    method: "PUT",
+    method: "PUT", 
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) {
     const data = await res.json();
-    throw new Error(data.error ?? "Error al actualizar la propiedad");
+    throw new Error(data.error ?? "Error al actualizar");
+  }
+  return res.json();
+};
+
+
+export const deleteProperty = async (id: string | number) => {
+  if (!id) throw new Error("ID de propiedad no suministrado");
+
+  const res = await fetch(`/api/property/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error ?? "Error al eliminar la propiedad");
   }
   return res.json();
 };

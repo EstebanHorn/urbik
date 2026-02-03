@@ -103,7 +103,7 @@ export default function Contact() {
                 <CheckCircle2 size={64} className="text-urbik-emerald" />
               </motion.div>
               <h2 className="text-3xl font-display font-bold mb-2">¡Mensaje enviado!</h2>
-              <button onClick={() => setSubmitted(false)} className="px-8 py-3 rounded-full bg-urbik-black text-white font-bold hover:bg-urbik-emerald transition-all">
+              <button onClick={() => setSubmitted(false)} className="px-8 cursor-pointer py-3 rounded-full bg-urbik-black text-white font-bold hover:bg-urbik-emerald transition-all">
                 Enviar otro mensaje
               </button>
             </div>
@@ -126,7 +126,7 @@ export default function Contact() {
                   <button
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}
-                    className="w-full px-6 py-4 rounded-full bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none flex items-center justify-between font-medium transition-all"
+                    className="w-full px-6 py-4 rounded-full cursor-pointer bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none flex items-center justify-between font-medium transition-all"
                   >
                     <span>{subject}</span>
                     <ChevronDown className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} size={20} />
@@ -148,7 +148,7 @@ export default function Contact() {
                               setSubject(option);
                               setIsOpen(false);
                             }}
-                            className="w-full text-left px-6 py-4 text-sm font-medium text-white hover:bg-white/10 transition-colors"
+                            className="w-full text-left px-6 py-4 text-sm  cursor-pointer font-medium text-white hover:bg-white/10 transition-colors"
                           >
                             {option}
                           </button>
@@ -168,7 +168,7 @@ export default function Contact() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-10 py-4 rounded-full font-bold transition-all flex items-center gap-3 active:scale-95 ${isSubmitting ? "bg-urbik-g300 text-urbik-muted cursor-not-allowed" : "bg-urbik-black text-white hover:bg-urbik-emerald hover:shadow-lg hover:shadow-urbik-emerald/20"}`}
+                  className={`px-10 py-4 rounded-full font-bold transition-all  cursor-pointer flex items-center gap-3 active:scale-95 ${isSubmitting ? "bg-urbik-g300 text-urbik-muted cursor-not-allowed" : "bg-urbik-black text-white hover:bg-urbik-emerald hover:shadow-lg hover:shadow-urbik-emerald/20"}`}
                 >
                   {isSubmitting ? "Enviando..." : "Enviar mensaje"}
                   
