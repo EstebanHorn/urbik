@@ -21,23 +21,26 @@ interface CustomDropdownProps {
   options: Option[];
   onChange: (value: string) => void;
   className?: string;
-  variant?: "white" | "white2"; 
+  variant?: "white" | "white2";
 }
 
-export function CustomDropdown({ 
-  label, 
-  value, 
-  options, 
-  onChange, 
-  className, 
-  variant = "white"
+export function CustomDropdown({
+  label,
+  value,
+  options,
+  onChange,
+  className,
+  variant = "white",
 }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -45,11 +48,14 @@ export function CustomDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedOption = options.find(opt => opt.value === value && opt.value !== "");
+  const selectedOption = options.find(
+    (opt) => opt.value === value && opt.value !== "",
+  );
 
   const variantStyles = {
     white: "bg-urbik-white1 text-urbik-black hover:bg-urbik-white",
-    white2: "bg-urbik-white text-urbik-black/50 border border-black/50 hover:bg-urbik-dark/20"
+    white2:
+      "bg-urbik-white text-urbik-black/50 border border-black/50 hover:bg-urbik-dark/20",
   };
 
   return (
@@ -64,9 +70,16 @@ export function CustomDropdown({
         </span>
         <svg
           className={`w-4 h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-          fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="4"
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
 
@@ -77,10 +90,10 @@ export function CustomDropdown({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-0 mt-3 w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-[1001] overflow-hidden"
+            className="absolute left-0 mt-3 w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-1001 overflow-hidden"
           >
             {options
-              .filter(opt => opt.value !== "") 
+              .filter((opt) => opt.value !== "")
               .map((opt) => (
                 <button
                   key={opt.value}
@@ -89,14 +102,14 @@ export function CustomDropdown({
                     setIsOpen(false);
                   }}
                   className={`w-full text-left cursor-pointer px-5 py-3 text-sm font-medium transition ${
-                    opt.value === "logout" 
-                      ? "text-urbik-rose hover:bg-urbik-rose/90 hover:text-urbik-white" 
+                    opt.value === "logout"
+                      ? "text-urbik-rose hover:bg-urbik-rose/90 hover:text-urbik-white"
                       : "text-urbik-white hover:bg-white/10"
                   }`}
                 >
                   {opt.label}
                 </button>
-            ))}
+              ))}
           </motion.div>
         )}
       </AnimatePresence>

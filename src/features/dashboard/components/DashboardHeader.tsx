@@ -13,7 +13,7 @@ escritorio.
 "use client";
 
 import React from "react";
-import Link from 'next/link';
+import Link from "next/link";
 import bgImage from "../../../assets/login_bg.png";
 
 export default function DashboardHeader({
@@ -33,14 +33,14 @@ export default function DashboardHeader({
   return (
     <div className="mb-8">
       <div className="relative overflow-hidden rounded-full border border-gray-100 p-5 shadow-sm group">
-  <div 
-    className="absolute inset-0 z-0 bg-cover bg-center"
-    style={{ backgroundImage: `url(${bgImage.src})` }}
-  />
-  
-  <div className="absolute inset-0 z-10 bg-gradient-to-l from-urbik-black/100 via-urbik-black/90 to-transparent" />
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${bgImage.src})` }}
+        />
 
-  <div className="relative z-20 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div className="absolute inset-0 z-10 bg-linear-to-l from-urbik-black via-urbik-black/90 to-transparent" />
+
+        <div className="relative z-20 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-6 min-w-0 w-full">
             <div className="w-24 h-24 shrink-0 rounded-full bg-black text-[#00F0FF] flex items-center justify-center font-black text-2xl shadow-lg">
               {initials || "U"}
@@ -58,8 +58,6 @@ export default function DashboardHeader({
                   ? "Gestioná publicaciones, medí rendimiento y mantené tus propiedades al día."
                   : "Gestioná tus propiedades y revisá tu actividad."}
               </p>
-
-
             </div>
           </div>
 
@@ -67,11 +65,11 @@ export default function DashboardHeader({
             <div className="text-md font-bold text-urbik-white/80">
               Estado: <span className="text-urbik-emerald">Activo</span>
             </div>
-              <Link href={`/profile`} className="w-full">
-                <button className="rounded-full cursor-pointer bg-urbik-white1 w-full px-5 py-2 text-md font-bold text-urbik-black hover:text-urbik-black/60 cursor-pointer hover:bg-urbik-dark2 transition-colors shadow-lg">
-                  Editar Perfil
-                </button>
-              </Link>
+            <Link href={`/profile`} className="w-full">
+              <button className="rounded-full  bg-urbik-white1 w-full px-5 py-2 text-md font-bold text-urbik-black hover:text-urbik-black/60 cursor-pointer hover:bg-urbik-dark2 transition-colors shadow-lg">
+                Editar Perfil
+              </button>
+            </Link>
           </div>
         </div>
       </div>

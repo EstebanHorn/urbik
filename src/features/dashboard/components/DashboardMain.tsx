@@ -13,7 +13,7 @@ inmobiliarios.
 "use client";
 
 import React, { useMemo, useState } from "react";
-import type { PropertySummary } from "./page";
+import type { PropertySummary } from "../../../app/dashboard/page";
 
 import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from "recharts";
 import CreatePropertyModal from "./CreatePropertyModal";
@@ -50,34 +50,32 @@ export default function DashboardMain({
   return (
     <>
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6 mt-20">
-       <div className="w-2/3 flex justify-between items-end">
-       <div>
-          <h2 className="text-xl font-black text-urbik-black/60 ml-5">Propiedades publicadas</h2>
-          <p className="text-sm text-gray-500  ml-5">
-            Administrá, editá o pausá tus publicaciones
-          </p>
+        <div className="w-2/3 flex justify-between items-end">
+          <div>
+            <h2 className="text-xl font-black text-urbik-black/60 ml-5">
+              Propiedades publicadas
+            </h2>
+            <p className="text-sm text-gray-500  ml-5">
+              Administrá, editá o pausá tus publicaciones
+            </p>
+          </div>
+          <div className=" px-4 py-2 text-sm font-bold text-gray-600">
+            {properties.length} propiedades en total
+          </div>
         </div>
-              <div className=" px-4 py-2 text-sm font-bold text-gray-600">
-                {properties.length} propiedades en total
-              </div>
-                            </div>
 
         <div className="flex items-center gap-2 justify-end">
           <button
             onClick={() => setCreateOpen(true)}
-            className="bg-urbik-cyan cursor-pointer text-urbik-black/80 py-3 px-6 rounded-full border border-white font-black text-md hover:bg-urbik-white hover:border-urbik-cyan cursor-pointer hover:text-urbik-cyan transition-all shadow-cyan-500/20 transform active:scale-95"
+            className="bg-urbik-cyan  text-urbik-black/80 py-3 px-6 rounded-full border border-white font-black text-md hover:bg-urbik-white hover:border-urbik-cyan cursor-pointer hover:text-urbik-cyan transition-all shadow-cyan-500/20 transform active:scale-95"
           >
             Cargar propiedad
           </button>
         </div>
-        
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        
         <div className="lg:col-span-2 md border border-gray-100 bg-white shadow-sm overflow-hidden">
-
-
           <div className="p-2 sm:p-4">
             <PropertiesList
               properties={properties}
@@ -156,7 +154,9 @@ export default function DashboardMain({
               <div className="text-md font-bold text-urbik-black/60 ml-2">
                 Tendencia
               </div>
-              <div className="text-2xl italic font-black text-urbik-black">Más vista</div>
+              <div className="text-2xl italic font-black text-urbik-black">
+                Más vista
+              </div>
             </div>
 
             <div className="h-40 bg-gray-100 relative">
@@ -171,7 +171,6 @@ export default function DashboardMain({
                   Sin imagen
                 </div>
               )}
-
             </div>
 
             <div className="p-5">

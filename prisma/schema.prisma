@@ -79,7 +79,7 @@ model Property {
 
   type            PropertyType
   operationType   OperationType
-  status          PropertyStatus
+  status           PropertyStatus
 
   salePrice       Float?
   saleCurrency  Currency? @default(USD)

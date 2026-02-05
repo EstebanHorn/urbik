@@ -7,45 +7,59 @@ inicio de sesión con Google y redirige automáticamente al usuario a la página
 un acceso exitoso, proporcionando una interfaz limpia para que cualquier componente de la UI
 interactúe con el proceso de login.
 */
-
-import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { authService } from '../service/authService';
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { authService } from "../service/authService";
 
 export const useLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false); // Nuevo estado
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
-    setIsLoading(true);
-
-    try {
-      const result = await authService.login(email, password);
-      
-      if (result.ok) {
-        router.push("/");
-      } else {
-
-        if (result.error) {
-          setErrorMessage(result.error);
-        } else {
-          setErrorMessage("Credenciales incorrectas. Verifica tu email y contraseña.");
-        }
-      }
-    } catch (error) {
-      setErrorMessage("Ocurrió un error inesperado al intentar iniciar sesión.");
-    } finally {
-      setIsLoading(false);
+  // Cargar email recordado al montar el hook
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("urbik_remember_email");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
     }
-  }, [email, password, router]);
+  }, []);
+
+  const handleLogin = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setErrorMessage(null);
+      setIsLoading(true);
+
+      try {
+        const result = await authService.login(email, password);
+
+        if (result.ok) {
+          // Lógica de persistencia
+          if (rememberMe) {
+            localStorage.setItem("urbik_remember_email", email);
+          } else {
+            localStorage.removeItem("urbik_remember_email");
+          }
+
+          router.push("/");
+        } else {
+          setErrorMessage(result.error || "Credenciales incorrectas.");
+        }
+      } catch (error) {
+        setErrorMessage("Ocurrió un error inesperado.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [email, password, rememberMe, router],
+  );
 
   const handleGoogleSignIn = useCallback(() => {
-    authService.signInWithGoogle('/');
+    authService.signInWithGoogle("/");
   }, []);
 
   return {
@@ -53,9 +67,11 @@ export const useLogin = () => {
     setEmail,
     password,
     setPassword,
+    rememberMe, // Exponer al componente
+    setRememberMe, // Exponer al componente
     handleLogin,
     handleGoogleSignIn,
     errorMessage,
-    isLoading
+    isLoading,
   };
 };

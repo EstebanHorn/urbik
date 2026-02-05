@@ -4,19 +4,19 @@ de los datos para usuarios, inmobiliarias, propiedades y los estados de los
 formularios, asegurando la integridad de los datos en toda la aplicación.
 */
 
-export type UserRole = 'USER' | 'REALESTATE' | null;
+export type UserRole = "USER" | "REALESTATE" | null;
 
 export interface RealEstateFormFields {
-  name: string;   
+  name: string;
   address: string;
   phone: string;
   website: string;
-  instagram: string; 
-  bio: string;  
-  license: string; 
-  province: string;  
-  city: string;    
-  logoUrl?: string; 
+  instagram: string;
+  bio: string;
+  license: string;
+  province: string;
+  city: string;
+  logoUrl?: string;
   bannerUrl?: string;
   isActive: boolean;
 }
@@ -54,18 +54,18 @@ export interface PropertyFormDataType {
 }
 
 export const initialPropertyFormState: PropertyFormDataType = {
-  title: '',
-  description: '',
-  address: '',
+  title: "",
+  description: "",
+  address: "",
   price: 0,
   rooms: 0,
   isAvailable: true,
-  images: '',
+  images: "",
 };
 
 export interface FormProps<T> {
-    form: T & { auth_provider: string };
-    handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleSubmit: (e: React.FormEvent) => Promise<void>;
-    loading: boolean;
+  form: T & { auth_provider: string };
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
+  loading: boolean;
 }

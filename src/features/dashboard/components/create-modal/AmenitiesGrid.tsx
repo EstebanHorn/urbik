@@ -34,14 +34,12 @@ export function AmenitiesGrid({ value, onChange }: AmenitiesGridProps) {
     <button
       type="button"
       onClick={() => toggle(k)}
-      className={`rounded-full border cursor-pointer  w-full focus:border-urbik-black outline-none transition-all px-4 py-2.5 text-left text-sm font-medium transition flex justify-between items-center group ${
+      className={`rounded-full border cursor-pointer  w-full focus:border-urbik-black outline-none transition-all px-4 py-2.5 text-left text-sm font-medium  flex justify-between items-center group ${
         value[k]
           ? "border-black/50 bg-urbik-black text-white shadow-md"
           : "border-black/20 bg-urbik-white text-urbik-black/50 hover:bg-gray-50"
       }`}
     >
-          
-
       <span>{label}</span>
       <div
         className={`w-2 h-2 rounded-full ${
@@ -53,7 +51,6 @@ export function AmenitiesGrid({ value, onChange }: AmenitiesGridProps) {
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      
       <Item k="agua" label="Agua Corriente" />
       <Item k="luz" label="Luz Eléctrica" />
       <Item k="gas" label="Gas Natural" />

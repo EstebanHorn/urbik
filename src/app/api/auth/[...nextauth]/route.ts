@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
           include: {
             userData: true,
             realEstate: true,
-          }
+          },
         });
 
         if (!user || !user.password) return null;
@@ -48,17 +48,20 @@ export const authOptions: NextAuthOptions = {
         if (!isValid) return null;
 
         if (user.role === "REALESTATE" && user.status === "PENDING") {
-          throw new Error("Tu cuenta está en revisión. Te avisaremos cuando sea habilitada.");
+          throw new Error(
+            "Tu cuenta está en revisión. Te avisaremos cuando sea habilitada.",
+          );
         }
 
-        const displayName = user.role === "REALESTATE" 
-          ? user.realEstate?.agencyName 
-          : user.userData?.firstName;
+        const displayName =
+          user.role === "REALESTATE"
+            ? user.realEstate?.agencyName
+            : user.userData?.firstName;
 
         return {
-          id: user.user_id.toString(), 
+          id: user.user_id.toString(),
           email: user.email,
-          name: displayName || user.email.split('@')[0],
+          name: displayName || user.email.split("@")[0],
           role: user.role as Role,
         };
       },
@@ -67,6 +70,7 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
 
   callbacks: {

@@ -31,6 +31,8 @@ export default function LoginForm() {
     setEmail,
     password,
     setPassword,
+    rememberMe, // Consumir del hook
+    setRememberMe, // Consumir del hook
     handleLogin,
     handleGoogleSignIn,
     errorMessage,
@@ -41,18 +43,14 @@ export default function LoginForm() {
     <div className="w-full max-w-md mx-auto px-4 lg:px-0">
       <div className="flex flex-col items-center text-center mb-12">
         <Link href="/" className="relative w-48 h-20 lg:w-64 lg:h-28 -mb-3">
-          <Image
+          <img
             src="/Urbik_Logo_Negro.svg"
             alt="Logo Urbik"
-            fill
-            priority
             className="object-contain"
           />
         </Link>
 
-        <h2 className="text-3xl font-display font-bold mb-2">
-          Iniciar sesión
-        </h2>
+        <h2 className="text-3xl font-display font-bold mb-2">Iniciar sesión</h2>
         <p className="text-urbik-muted text-sm">
           Ingresá tus credenciales para continuar
         </p>
@@ -60,9 +58,7 @@ export default function LoginForm() {
 
       {errorMessage && (
         <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 text-center">
-          <p className="text-sm text-red-600 font-medium">
-            {errorMessage}
-          </p>
+          <p className="text-sm text-red-600 font-medium">{errorMessage}</p>
         </div>
       )}
 
@@ -101,6 +97,8 @@ export default function LoginForm() {
           <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
             <input
               type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
               className="w-4 h-4 rounded-full border-gray-300 text-black focus:ring-black"
               disabled={isLoading}
             />
@@ -118,7 +116,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full cursor-pointer bg-[#00deff] text-white font-bold py-3 rounded-full text-lg shadow-sm hover:opacity-90 transition-opacity mt-6 disabled:opacity-60"
+          className="w-full cursor-pointer bg-urbik-cyan text-white font-bold py-3 rounded-full text-lg shadow-sm hover:opacity-90 transition-opacity mt-6 disabled:opacity-60"
         >
           {isLoading ? "Ingresando..." : "INGRESAR"}
         </button>
