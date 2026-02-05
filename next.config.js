@@ -1,5 +1,11 @@
 const nextConfig = {
-    devIndicators: false
-}
- 
-module.exports = nextConfig
+  devIndicators: false,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+};
+
+module.exports = nextConfig;

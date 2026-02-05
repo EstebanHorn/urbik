@@ -29,7 +29,7 @@ const InteractiveMap = dynamic(
       <div className="h-full w-full bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3 animate-pulse">
           <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-          <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">
+          <p className="text-xs font-bold text-urbik-black/40  tracking-widest">
             Cargando Mapa...
           </p>
         </div>
@@ -167,7 +167,7 @@ export default function CreatePropertyModal({
                   <h2 className="text-xl font-black text-urbik-black tracking-tight">
                     {isEditing ? "Editar Propiedad" : "Nueva Propiedad"}
                   </h2>
-                  <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">
+                  <p className="text-xs font-bold text-urbik-black/40  tracking-widest">
                     {step === 1
                       ? "Paso 1: Información"
                       : "Paso 2: Ubicación Catastral"}
@@ -195,7 +195,7 @@ export default function CreatePropertyModal({
                           <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-xs font-black">
                             1
                           </span>
-                          <h3 className="text-sm font-bold text-urbik-black uppercase tracking-widest">
+                          <h3 className="text-sm font-bold text-urbik-black  tracking-widest">
                             Ubicación Geográfica
                           </h3>
                         </div>
@@ -232,7 +232,7 @@ export default function CreatePropertyModal({
                             type="button"
                             disabled={!canSelectParcel || isSearchingCity}
                             onClick={handleGoToMap}
-                            className={`w-full py-4 px-6 rounded-xl border-2 border-dashed transition-all flex items-center justify-center gap-3 font-bold uppercase text-xs tracking-widest
+                            className={`w-full py-4 px-6 rounded-xl border-2 border-dashed transition-all flex items-center justify-center gap-3 font-bold  text-xs tracking-widest
                                  ${
                                    selectedParcel
                                      ? "border-emerald-500 text-emerald-700 bg-emerald-50"
@@ -242,18 +242,13 @@ export default function CreatePropertyModal({
                           >
                             {isSearchingCity ? (
                               <>
-                                <span className="animate-spin">⏳</span>{" "}
-                                Buscando zona...
+                                <span className="animate-spin"></span> Buscando
+                                zona...
                               </>
                             ) : selectedParcel ? (
-                              <>
-                                <span>✅</span> Parcela Vinculada (PDA:{" "}
-                                {selectedParcel.PDA})
-                              </>
+                              <>Parcela Vinculada (PDA: {selectedParcel.PDA})</>
                             ) : (
-                              <>
-                                <span>🗺️</span> Seleccionar Parcela en el Mapa
-                              </>
+                              <>Seleccionar Parcela en el Mapa</>
                             )}
                           </button>
                         </div>
@@ -267,7 +262,7 @@ export default function CreatePropertyModal({
                           <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-xs font-black">
                             2
                           </span>
-                          <h3 className="text-sm font-bold text-urbik-black uppercase tracking-widest">
+                          <h3 className="text-sm font-bold text-urbik-black  tracking-widest">
                             Detalles de la Propiedad
                           </h3>
                         </div>
@@ -279,7 +274,7 @@ export default function CreatePropertyModal({
                           />
 
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-urbik-black/50 uppercase tracking-widest ml-1">
+                            <label className="text-md font-bold text-urbik-black/50   ml-1">
                               Descripción
                             </label>
                             <textarea
@@ -289,7 +284,7 @@ export default function CreatePropertyModal({
                               onChange={(e) =>
                                 handleInputChange("description", e.target.value)
                               }
-                              className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-serif bg-gray-50 focus:bg-white resize-none"
+                              className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm bg-gray-50 focus:bg-white resize-none"
                             />
 
                             <SmartDescription
@@ -314,7 +309,7 @@ export default function CreatePropertyModal({
                           <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-xs font-black">
                             3
                           </span>
-                          <h3 className="text-sm font-bold text-urbik-black uppercase tracking-widest">
+                          <h3 className="text-sm font-bold text-urbik-black  tracking-widest">
                             Multimedia y Extras
                           </h3>
                         </div>
@@ -355,14 +350,14 @@ export default function CreatePropertyModal({
                       <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm py-6 border-t border-gray-100 flex justify-between items-center z-10">
                         <span className="text-xs font-bold text-gray-400">
                           {isFormComplete
-                            ? "✨ Todo listo para publicar"
+                            ? "Todo listo para publicar"
                             : "* Completá los campos obligatorios"}
                         </span>
                         <button
                           onClick={handleSave}
                           type="button"
                           disabled={saving || !isFormComplete}
-                          className="px-10 py-4 rounded-full bg-urbik-black text-white text-xs font-black uppercase tracking-widest shadow-xl hover:bg-gray-800 hover:shadow-2xl transition-all disabled:opacity-30 disabled:shadow-none transform active:scale-95"
+                          className="px-10 py-4 rounded-full bg-urbik-black text-white text-xs font-black  tracking-widest shadow-xl hover:bg-gray-800 hover:shadow-2xl transition-all disabled:opacity-30 disabled:shadow-none transform active:scale-95"
                         >
                           {saving
                             ? "Publicando..."
@@ -415,7 +410,7 @@ export default function CreatePropertyModal({
                       <button
                         onClick={() => setStep(1)}
                         type="button"
-                        className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-urbik-black transition-colors"
+                        className="group flex items-center gap-2 text-[10px] font-black  tracking-widest text-gray-400 hover:text-urbik-black transition-colors"
                       >
                         <span className="text-lg group-hover:-translate-x-1 transition-transform">
                           ←
@@ -442,7 +437,7 @@ export default function CreatePropertyModal({
                           <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 mb-6">
                             <div className="flex items-center gap-2 mb-2">
                               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                              <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">
+                              <p className="text-[10px] font-black text-emerald-700  tracking-widest">
                                 Parcela Detectada
                               </p>
                             </div>
@@ -480,7 +475,7 @@ export default function CreatePropertyModal({
                       disabled={!selectedParcel}
                       onClick={() => setStep(1)}
                       type="button"
-                      className="w-full bg-urbik-black text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-emerald-600 transition-all shadow-lg disabled:opacity-30 disabled:transform-none transform active:scale-95"
+                      className="w-full bg-urbik-black text-white py-4 rounded-xl font-black  text-xs tracking-widest hover:bg-emerald-600 transition-all shadow-lg disabled:opacity-30 disabled:transform-none transform active:scale-95"
                     >
                       Confirmar Selección
                     </button>
