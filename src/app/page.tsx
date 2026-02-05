@@ -23,13 +23,10 @@ export default function HomePage() {
   return (
     <div className="bg-urbik-white min-h-screen pt-16 font-sans">
       <div className="max-w-7xl mx-auto px-6 py-6">
-        <SearchSection 
-          {...search}
-          onSearch={search.handleSearch}
-        />
+        <SearchSection {...search} onSearch={search.handleSearch} />
       </div>
 
-      <FeaturedCarousel 
+      <FeaturedCarousel
         properties={search.featuredProperties}
         loading={search.loadingFeatured}
         currentIndex={search.currentIndex}
@@ -38,7 +35,7 @@ export default function HomePage() {
       />
 
       <PrecisionSection />
-      
+
       <SmartZoneSection />
     </div>
   );
