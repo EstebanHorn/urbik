@@ -1,21 +1,26 @@
-/*
-Este componente de React, denominado SearchSection, constituye la sección principal de búsqueda
-de una plataforma inmobiliaria y permite a los usuarios filtrar propiedades mediante una interfaz
-altamente interactiva y visual. El código gestiona múltiples estados de búsqueda, incluyendo
-consultas por texto, la elección entre compra o alquiler, la selección de tipos de propiedad
-(como casas o departamentos) y la ubicación geográfica, utilizando Framer Motion para crear
-transiciones fluidas y un indicador visual animado (pill) que resalta la opción seleccionada.
-Además de integrar un video promocional y selectores de ubicación personalizados, el componente
-sincroniza dinámicamente la posición de sus elementos visuales mediante un efecto de React para
-asegurar que la interfaz responda correctamente a las interacciones del usuario antes de ejecutar
-la función de búsqueda final.
-*/
-
 "use client";
 
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import LocationSelectors from "@/components/LocationSelectors";
+
+// Icono de Lupa simple (SVG) para evitar dependencias externas en este ejemplo
+const SearchIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2.5}
+    stroke="currentColor"
+    className="w-5 h-5"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+    />
+  </svg>
+);
 
 interface Props {
   query: string;
@@ -28,7 +33,6 @@ interface Props {
   city: string;
   setProvince: (v: string) => void;
   setCity: (v: string) => void;
-  // NUEVO: Prop para recibir las coordenadas
   setCoords: (coords: { lat: number; lon: number } | null) => void;
   buttonData: { width: number; x: number };
   updatePill: (el: HTMLButtonElement | null) => void;
@@ -46,20 +50,19 @@ export function SearchSection({
   city,
   setProvince,
   setCity,
-  setCoords, // Desestructuramos
+  setCoords,
   buttonData,
   updatePill,
   onSearch,
 }: Props) {
   const propertyOptions = [
-    { id: "COMMERCIAL_PROPERTY", label: "LOCAL COMERCIAL" }, // IDs corregidos para coincidir con tu DB
+    { id: "COMMERCIAL_PROPERTY", label: "LOCAL COMERCIAL" },
     { id: "HOUSE", label: "CASA" },
     { id: "APARTMENT", label: "DEPARTAMENTO" },
     { id: "LAND", label: "TERRENO" },
   ];
 
   useEffect(() => {
-    // Usamos requestAnimationFrame para asegurar que el DOM esté listo
     const frameId = requestAnimationFrame(() => {
       const initialButton = document.getElementById(
         `btn-${propertyType}`,
@@ -83,34 +86,47 @@ export function SearchSection({
           </div>
         </h1>
         <p className="text-urbik-dark2 mb-12 max-w-md font-medium mt-4">
-          La primer plataforma de búsqueda inmobiliaria que integra y visualiza
+          La primera plataforma de búsqueda inmobiliaria que integra y visualiza
           información catastral de cada propiedad.
         </p>
 
-        {/* Input de Búsqueda Libre */}
-        <div className="mb-2 ml-10 text-md font-medium text-urbik-black opacity-40 tracking-wide">
-          Busqueda por dirección o nombre de inmobiliaria
+        {/* --- SECCIÓN 1: BÚSQUEDA POR TEXTO (Mejorada) --- */}
+        <div className="mb-2 ml-4 text-md font-medium text-urbik-black opacity-60 tracking-wide">
+          Búsqueda rápida
         </div>
-        <div className="relative mb-8 flex justify-center">
-          <div className="border border-gray-300 flex items-center justify-center bg-urbik-white2 rounded-full px-10 w-full py-3 focus-within:ring-2 focus-within:ring-urbik-black transition-all shadow-sm">
+
+        <div className="relative mb-10 w-full">
+          {/* Contenedor del Input */}
+          <div className="relative flex items-center bg-urbik-white2 rounded-full border border-gray-300 shadow-sm focus-within:ring-2 focus-within:ring-urbik-black focus-within:border-transparent transition-all overflow-hidden">
             <input
               type="text"
-              placeholder="Escribe una dirección..."
-              className="bg-transparent outline-none text-center w-full placeholder:text-urbik-dark font-medium opacity-70"
+              placeholder="Dirección, barrio o nombre de inmobiliaria..."
+              className="w-full bg-transparent py-4 pl-6 pr-14 outline-none text-urbik-black font-medium placeholder:text-gray-400"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && onSearch()}
             />
+
+            {/* Botón de acción DIRECTA dentro del input */}
+            <button
+              onClick={onSearch}
+              className="absolute right-2 p-2 bg-urbik-black text-white rounded-full hover:bg-gray-800 transition-colors active:scale-95"
+              title="Buscar ahora"
+            >
+              <SearchIcon />
+            </button>
           </div>
         </div>
 
-        {/* Toggle Operación (Compra/Alquiler) */}
-        <div className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
-          Busqueda detallada
+        {/* --- SECCIÓN 2: BÚSQUEDA DETALLADA --- */}
+        <div className="mb-2 ml-4 text-md font-medium text-urbik-black opacity-60 tracking-wide">
+          Búsqueda detallada
         </div>
-        <div className="relative flex bg-gray-200 rounded-full w-fit mb-6 overflow-hidden cursor-pointer group p-1">
+
+        {/* Operación */}
+        <div className="relative flex bg-gray-100 rounded-full w-fit mb-6 overflow-hidden cursor-pointer p-1 border border-gray-200">
           <motion.div
-            className="absolute top-1 bottom-1 left-1 bg-urbik-black rounded-full"
+            className="absolute top-1 bottom-1 left-1 bg-urbik-black rounded-full shadow-sm"
             initial={false}
             animate={{ x: operation === "SALE" ? "0%" : "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -118,30 +134,30 @@ export function SearchSection({
           />
           <button
             onClick={() => setOperation("SALE")}
-            className={`relative z-10 px-8 py-2 font-bold text-sm rounded-full transition-colors duration-300 ${
+            className={`relative z-10 px-8 py-2 font-bold text-sm rounded-full transition-colors duration-200 ${
               operation === "SALE"
                 ? "text-white"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 hover:text-gray-900"
             }`}
           >
             COMPRAR
           </button>
           <button
             onClick={() => setOperation("RENT")}
-            className={`relative z-10 px-8 py-2 font-bold text-sm rounded-full transition-colors duration-300 ${
+            className={`relative z-10 px-8 py-2 font-bold text-sm rounded-full transition-colors duration-200 ${
               operation === "RENT"
                 ? "text-white"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 hover:text-gray-900"
             }`}
           >
             ALQUILAR
           </button>
         </div>
 
-        {/* Toggle Tipo de Propiedad */}
-        <div className="relative flex bg-gray-200 rounded-full w-fit mb-6 overflow-hidden p-1 gap-1">
+        {/* Tipo de Propiedad */}
+        <div className="relative flex bg-gray-100 rounded-full w-fit max-w-full flex-wrap mb-6 p-1 gap-1 border border-gray-200">
           <motion.div
-            className="absolute top-1 bottom-1 bg-urbik-black rounded-full shadow-md"
+            className="absolute top-1 bottom-1 bg-urbik-black rounded-full shadow-sm"
             initial={false}
             animate={{ width: buttonData.width, x: buttonData.x }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -154,10 +170,10 @@ export function SearchSection({
                 setPropertyType(opt.id);
                 updatePill(e.currentTarget);
               }}
-              className={`relative z-10 px-4 py-2 font-bold text-xs transition-colors duration-300 whitespace-nowrap rounded-full ${
+              className={`relative z-10 px-4 py-2 font-bold text-xs transition-colors duration-200 whitespace-nowrap rounded-full ${
                 propertyType === opt.id
                   ? "text-white"
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-gray-500 hover:text-gray-900"
               }`}
             >
               {opt.label}
@@ -165,8 +181,8 @@ export function SearchSection({
           ))}
         </div>
 
-        {/* Selectores de Ubicación */}
-        <div className="flex flex-wrap md:flex-nowrap gap-3 mb-8 w-full">
+        {/* Selectores Geográficos */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-8 w-full">
           <LocationSelectors
             provinceValue={province}
             cityValue={city}
@@ -174,24 +190,25 @@ export function SearchSection({
               if (name === "province") setProvince(val);
               if (name === "city") setCity(val);
             }}
-            // Conectamos el setter de coordenadas aquí
             onCityCoordsChange={(coords) => setCoords(coords)}
           />
         </div>
 
+        {/* Botón Principal de Búsqueda Detallada */}
         <div className="flex justify-start w-full">
           <button
             onClick={onSearch}
-            className="px-8 py-3 cursor-pointer rounded-full bg-urbik-black text-white font-bold transition-all flex items-center gap-2 active:scale-95 shadow-lg hover:bg-gray-800"
+            className="w-full sm:w-auto px-10 py-3.5 cursor-pointer rounded-full bg-urbik-black text-white font-bold text-lg transition-all flex items-center justify-center gap-3 active:scale-95 shadow-xl hover:bg-gray-800 hover:shadow-2xl"
           >
-            Buscar Propiedades
+            <SearchIcon />
+            <span>Buscar Propiedades</span>
           </button>
         </div>
       </div>
 
-      {/* Video */}
+      {/* Video / Visual */}
       <div className="hidden lg:flex flex-col items-center w-full relative">
-        <div className="rounded-3xl overflow-hidden shadow-2xl w-full aspect-[4/3] bg-gray-100 relative">
+        <div className="rounded-3xl w-full aspect-square bg-gray-100 relative">
           <video
             autoPlay
             loop

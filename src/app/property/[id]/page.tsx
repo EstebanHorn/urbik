@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import prisma from "@/libs/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import PropertyParcelWrapper from "../../../features/property/PropertyParcelWrapper";
 import AdminActions from "../../../features/administrate/components/AdminActions";
 import {
   MapPin,
@@ -27,10 +26,11 @@ import {
   Zap,
   Droplets,
   CheckCircle2,
-  Image as ImageIcon,
 } from "lucide-react";
 import SmartZoneSingle from "../../../components/SmartZone/SmartView";
 import FavoriteButton from "@/components/FavoritesButton";
+// IMPORTE NUEVO: El componente Cliente que maneja el Modal
+import ImageGallery from "@/features/property/components/ImageGallery";
 
 // --- TIPOS ---
 
@@ -206,7 +206,6 @@ async function getPropertyData(id: number, userId?: string) {
     if (!propertyRaw) return null;
 
     // Destructuring para separar las columnas booleanas del resto
-    // Esto evita el error de tipos y crea un objeto limpio para el componente
     const {
       hasElectricity,
       hasGas,
@@ -224,8 +223,6 @@ async function getPropertyData(id: number, userId?: string) {
       hasParking: !!hasParking,
       hasPool: !!hasPool,
       hasWater: !!hasWater,
-      // Si existiera un campo JSON 'amenities' en la DB, se fusionaría aquí:
-      // ...(propertyRaw.amenities as object || {})
     };
 
     const formattedProperty: Property = {
@@ -334,10 +331,6 @@ export default async function PropertyPage({
   const statusBadge = getStatusBadge(property);
   const isBoth = property.operationType === "SALE_RENT";
 
-  // Lógica de visualización de imágenes (Grid Bento: 1 grande + 4 chicas)
-  const displayImages = images.slice(0, 5);
-  const remainingImages = images.length > 5 ? images.length - 5 : 0;
-
   return (
     <main className="min-h-screen bg-white pb-20">
       {/* HEADER */}
@@ -392,7 +385,7 @@ export default async function PropertyPage({
             </div>
           </div>
 
-          <div className="lg:text-right w-full lg:w-auto p-4 bg-urbik-white2 rounded-2xl lg:bg-transparent lg:p-0">
+          <div className="lg:text-right w-full lg:w-auto p-4  rounded-2xl lg:bg-transparent lg:p-0">
             <div className={`flex flex-col ${isBoth ? "gap-2" : ""}`}>
               {(property.operationType === "SALE" || isBoth) &&
                 property.salePrice && (
@@ -438,82 +431,14 @@ export default async function PropertyPage({
           </div>
         </div>
 
-        {/* GALERÍA BENTO GRID */}
-        <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[400px] md:h-[600px] mb-12 rounded-2xl overflow-hidden">
-          {/* Imagen Principal */}
-          <div className="col-span-4 md:col-span-2 row-span-2 relative group overflow-hidden bg-gray-100">
-            {displayImages[0] ? (
-              <img
-                src={displayImages[0]}
-                alt="Principal"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-urbik-g300">
-                <Building2 size={64} />
-              </div>
-            )}
-          </div>
-
-          {/* Imágenes Secundarias */}
-          {displayImages.slice(1, 4).map((img, idx) => (
-            <div
-              key={idx}
-              className="hidden md:block col-span-1 row-span-1 relative overflow-hidden bg-gray-100"
-            >
-              <img
-                src={img}
-                className="w-full h-full object-cover hover:opacity-90 transition"
-                alt={`Vista ${idx + 2}`}
-              />
-            </div>
-          ))}
-
-          {/* Espacios vacíos si hay pocas fotos */}
-          {[...Array(Math.max(0, 4 - displayImages.length))].map((_, i) => (
-            <div
-              key={`empty-${i}`}
-              className="hidden md:block col-span-1 row-span-1 bg-urbik-g100/50"
-            />
-          ))}
-
-          {/* Última celda (5ta Img + Overflow o Mapa) */}
-          <div className="hidden md:block col-span-1 row-span-1 relative overflow-hidden bg-urbik-dark2/5 border border-urbik-dark2/10 group cursor-pointer">
-            {displayImages[4] ? (
-              <div className="relative w-full h-full">
-                <img
-                  src={displayImages[4]}
-                  className={`w-full h-full object-cover transition ${remainingImages > 0 ? "brightness-50" : "hover:opacity-90"}`}
-                  alt="Vista 5"
-                />
-                {remainingImages > 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center text-white font-black text-2xl drop-shadow-md">
-                    +{remainingImages}
-                  </div>
-                )}
-              </div>
-            ) : property.parcelGeom &&
-              property.latitude &&
-              property.longitude ? (
-              <div className="w-full h-full opacity-80 hover:opacity-100 transition-opacity relative">
-                <PropertyParcelWrapper
-                  lat={property.latitude}
-                  lon={property.longitude}
-                  selectedGeom={property.parcelGeom}
-                  allProperties={[]}
-                />
-                <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 text-[10px] font-bold rounded shadow flex items-center gap-1">
-                  <MapPin size={10} /> Ver Mapa
-                </div>
-              </div>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 font-bold text-xs uppercase flex-col gap-2">
-                <ImageIcon size={24} />
-                <span>Ver Galería</span>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* --- NUEVO COMPONENTE DE GALERÍA + MODAL --- */}
+        <ImageGallery
+          images={images}
+          title={property.title}
+          parcelGeom={property.parcelGeom}
+          latitude={property.latitude}
+          longitude={property.longitude}
+        />
 
         {/* CONTENIDO PRINCIPAL */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -559,10 +484,6 @@ export default async function PropertyPage({
             </div>
 
             <AmenitiesList data={property.amenities} />
-
-            <div className="mt-12 pt-12 border-t border-dashed border-urbik-g100 w-full">
-              <SmartZoneSingle property={property} />
-            </div>
           </div>
 
           {/* Derecha: Contacto */}
@@ -635,7 +556,9 @@ export default async function PropertyPage({
             </div>
           </div>
         </div>
-
+        <div className="mt-12 pt-12 border-t border-dashed border-urbik-g100 w-full">
+          <SmartZoneSingle property={property} />
+        </div>
         {/* --- OTRAS PROPIEDADES --- */}
         <div className="mt-24 pt-12 border-t border-urbik-g100">
           <h3 className="text-3xl font-display text-urbik-black tracking-tighter mb-8">

@@ -1,14 +1,3 @@
-/*
-Este hook personalizado de React, denominado useHomeSearch, centraliza la lógica de búsqueda
-y visualización de una página de inicio inmobiliaria mediante la gestión de estados para
-filtros (tipo de operación, ubicación y categoría), la obtención y rotación automática de
-propiedades destacadas cada siete segundos, y la funcionalidad de marcar favoritos de forma
-optimista. Además, facilita la navegación hacia una página de resultados mediante la
-construcción de parámetros de búsqueda en la URL y proporciona datos para elementos visuales
-de la interfaz, como el posicionamiento dinámico de indicadores en botones y el control de
-carga de datos externos a través de un servicio dedicado.
-*/
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FeaturedProperty, propertyService } from "../service/propertyService";
@@ -16,19 +5,18 @@ import { FeaturedProperty, propertyService } from "../service/propertyService";
 export function useHomeSearch() {
   const router = useRouter();
 
-  // Estados de Filtros
+  // Estados
   const [query, setQuery] = useState("");
   const [operation, setOperation] = useState<"SALE" | "RENT">("SALE");
-  const [propertyType, setPropertyType] = useState("HOUSE"); // Default más común
+  // SUGERENCIA: Si quieres buscar "cualquier cosa" por texto, considera que el default sea "" o maneja "HOUSE" como filtro activo.
+  const [propertyType, setPropertyType] = useState("HOUSE");
   const [province, setProvince] = useState("");
   const [city, setCity] = useState("");
-
-  // NUEVO: Estado para coordenadas (para centrar el mapa)
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(
     null,
   );
 
-  // Estados de UI / Datos
+  // Estados UI / Datos
   const [featuredProperties, setFeaturedProperties] = useState<
     FeaturedProperty[]
   >([]);
@@ -36,7 +24,7 @@ export function useHomeSearch() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [buttonData, setButtonData] = useState({ width: 0, x: 0 });
 
-  // Carga de propiedades destacadas
+  // Fetch inicial y Carrusel (Sin cambios)
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
@@ -51,7 +39,6 @@ export function useHomeSearch() {
     fetchFeatured();
   }, []);
 
-  // Rotación del carrusel
   useEffect(() => {
     if (featuredProperties.length > 1) {
       const interval = setInterval(() => {
@@ -61,25 +48,29 @@ export function useHomeSearch() {
     }
   }, [featuredProperties]);
 
-  // --- LÓGICA DE BÚSQUEDA ---
+  // --- LÓGICA DE BÚSQUEDA MEJORADA ---
   const handleSearch = () => {
     const params = new URLSearchParams();
 
-    // 1. Filtros básicos
-    params.set("operationType", operation);
-    params.set("propertyType", propertyType); // Corregido: 'type' -> 'propertyType'
+    // Siempre enviamos la operación y el tipo si existen (son filtros base)
+    if (operation) params.set("operationType", operation);
+    if (propertyType) params.set("propertyType", propertyType);
 
-    // 2. Ubicación (Texto y Coordenadas)
-    if (province) params.set("province", province);
-    if (city) params.set("city", city);
+    // Búsqueda por texto (Inmobiliaria / Dirección)
+    if (query.trim()) params.set("q", query.trim());
 
-    // Si tenemos coordenadas elegidas, las pasamos para centrar el mapa
+    // Ubicación: Priorizamos coordenadas si existen para mayor precisión
     if (coords) {
       params.set("lat", coords.lat.toString());
       params.set("lon", coords.lon.toString());
+      // Opcional: enviar ciudad/provincia como fallback visual o SEO
+      if (city) params.set("city", city);
+      if (province) params.set("province", province);
+    } else {
+      // Si no hay coordenadas exactas, usamos los strings
+      if (province) params.set("province", province);
+      if (city) params.set("city", city);
     }
-
-    if (query) params.set("q", query);
 
     router.push(`/map?${params.toString()}`);
   };
@@ -87,14 +78,12 @@ export function useHomeSearch() {
   const handleToggleFavorite = async (e: React.MouseEvent, id: string) => {
     e.preventDefault();
     e.stopPropagation();
-
+    // Optimistic UI update
     setFeaturedProperties((prev) =>
       prev.map((p) => (p.id === id ? { ...p, isFavorite: !p.isFavorite } : p)),
     );
-
     const success = await propertyService.toggleFavorite(id);
     if (!success) {
-      // Revertir si falla
       setFeaturedProperties((prev) =>
         prev.map((p) =>
           p.id === id ? { ...p, isFavorite: !p.isFavorite } : p,
@@ -121,7 +110,7 @@ export function useHomeSearch() {
     city,
     setCity,
     coords,
-    setCoords, // Exportamos esto para SearchSection
+    setCoords,
     featuredProperties,
     loadingFeatured,
     currentIndex,
