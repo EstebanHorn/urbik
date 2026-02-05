@@ -1,11 +1,6 @@
 /*
-Este código define un manejador de ruta GET en Next.js que consulta una base de datos mediante
-Prisma para buscar propiedades disponibles dentro de un área geográfica específica definida por
-coordenadas de latitud y longitud. El script extrae parámetros de búsqueda de la URL (incluyendo
-ubicación, tipo de operación, tipo de propiedad, cantidad mínima de habitaciones y rango de precios),
-valida que las coordenadas sean numéricas y construye dinámicamente una cláusula de filtrado para
-retornar un listado JSON con los detalles técnicos y espaciales de los inmuebles que coincidan con
-dichos criterios.
+ARCHIVO: src/app/api/properties/in-bounds/route.ts
+CORRECCIÓN: Eliminada la selección de 'price' que no existe en la BD.
 */
 
 import { NextResponse } from "next/server";
@@ -14,7 +9,7 @@ import { OperationType, PropertyType } from "@prisma/client";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  
+
   const minLat = parseFloat(searchParams.get("minLat") ?? "");
   const maxLat = parseFloat(searchParams.get("maxLat") ?? "");
   const minLon = parseFloat(searchParams.get("minLon") ?? "");
@@ -25,16 +20,24 @@ export async function GET(request: Request) {
   const maxPrice = searchParams.get("maxPrice");
   const rooms = searchParams.get("rooms");
 
+  // 1. EXTRAER PARAMETROS DE AMENITIES
+  const hasWater = searchParams.get("hasWater") === "true";
+  const hasElectricity = searchParams.get("hasElectricity") === "true";
+  const hasGas = searchParams.get("hasGas") === "true";
+  const hasInternet = searchParams.get("hasInternet") === "true";
+  const hasParking = searchParams.get("hasParking") === "true";
+  const hasPool = searchParams.get("hasPool") === "true";
+
   if (isNaN(minLat) || isNaN(maxLat) || isNaN(minLon) || isNaN(maxLon)) {
     return NextResponse.json(
       { error: "Coordenadas inválidas" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   try {
     const whereClause: any = {
-      status: 'AVAILABLE',
+      status: "AVAILABLE",
       latitude: {
         gte: minLat,
         lte: maxLat,
@@ -60,19 +63,41 @@ export async function GET(request: Request) {
     }
 
     if (minPrice || maxPrice) {
-      whereClause.price = {
-        ...(minPrice && { gte: parseFloat(minPrice) }),
-        ...(maxPrice && { lte: parseFloat(maxPrice) }),
-      };
+      // NOTA: Prisma no permite filtrar sobre un campo que no existe ("price").
+      // Asumimos que quieres filtrar por el precio relevante (venta o alquiler).
+      // Esta lógica busca si CUALQUIERA de los dos precios cumple el rango.
+      whereClause.OR = [
+        {
+          salePrice: {
+            ...(minPrice && { gte: parseFloat(minPrice) }),
+            ...(maxPrice && { lte: parseFloat(maxPrice) }),
+          },
+        },
+        {
+          rentPrice: {
+            ...(minPrice && { gte: parseFloat(minPrice) }),
+            ...(maxPrice && { lte: parseFloat(maxPrice) }),
+          },
+        },
+      ];
     }
+
+    // 2. AGREGAR AMENITIES AL FILTRO (WHERE)
+    if (hasWater) whereClause.hasWater = true;
+    if (hasElectricity) whereClause.hasElectricity = true;
+    if (hasGas) whereClause.hasGas = true;
+    if (hasInternet) whereClause.hasInternet = true;
+    if (hasParking) whereClause.hasParking = true;
+    if (hasPool) whereClause.hasPool = true;
 
     const properties = await prisma.property.findMany({
       where: whereClause,
       select: {
         id: true,
         title: true,
-        salePrice: true, 
+        salePrice: true,
         rentPrice: true,
+        // price: true, <--- ELIMINADO: ESTO CAUSABA EL ERROR 500
         latitude: true,
         longitude: true,
         city: true,
@@ -85,6 +110,14 @@ export async function GET(request: Request) {
         address: true,
         rooms: true,
         area: true,
+
+        // 3. SELECCIÓN EXPLÍCITA DE AMENITIES
+        hasWater: true,
+        hasElectricity: true,
+        hasGas: true,
+        hasInternet: true,
+        hasParking: true,
+        hasPool: true,
       },
     });
 
@@ -93,7 +126,7 @@ export async function GET(request: Request) {
     console.error("Error fetching properties in bounds:", error);
     return NextResponse.json(
       { error: "Error interno del servidor" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

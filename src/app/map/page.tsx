@@ -1,11 +1,6 @@
 /*
-Este código implementa una página de búsqueda inmobiliaria interactiva en que permite
-a los usuarios visualizar propiedades en un mapa dinámico y filtrarlas en tiempo real según
-criterios como tipo de operación, precio y cantidad de ambientes. El componente gestiona de
-manera asíncrona la obtención de datos desde una API basándose en los límites geográficos
-visibles del mapa (bounding box), integrando una barra lateral de resultados, un sistema de
-análisis de zonas y una interfaz adaptativa (responsive) que permite alternar entre la vista
-de mapa y la lista de propiedades en dispositivos móviles.
+Este código implementa una página de búsqueda inmobiliaria interactiva.
+SE AÑADIÓ: Normalización de datos para que la Sidebar muestre los precios correctamente.
 */
 
 "use client";
@@ -28,13 +23,13 @@ import {
   Wifi,
   Car,
   Waves,
-  Droplets
+  Droplets,
 } from "lucide-react";
 
 const InteractiveMap = dynamic(
   () =>
     import("../../features/map/components/InteractiveMapClient").then(
-      (mod) => mod.InteractiveMapClient
+      (mod) => mod.InteractiveMapClient,
     ),
   {
     ssr: false,
@@ -44,10 +39,31 @@ const InteractiveMap = dynamic(
         <span className="text-sm font-medium">Cargando mapa...</span>
       </div>
     ),
-  }
+  },
 );
 
-const AMENITIES_CONFIG = [
+// Definimos los tipos para los filtros para evitar errores de TS
+type FilterState = {
+  operationType: string;
+  propertyType: string;
+  minPrice: string;
+  maxPrice: string;
+  rooms: string;
+  hasWater: boolean;
+  hasElectricity: boolean;
+  hasGas: boolean;
+  hasInternet: boolean;
+  hasParking: boolean;
+  hasPool: boolean;
+};
+
+interface AmenityConfig {
+  id: keyof FilterState;
+  label: string;
+  icon: React.ElementType;
+}
+
+const AMENITIES_CONFIG: AmenityConfig[] = [
   { id: "hasElectricity", label: "Luz", icon: Zap },
   { id: "hasGas", label: "Gas", icon: Flame },
   { id: "hasInternet", label: "Internet", icon: Wifi },
@@ -63,15 +79,19 @@ export default function MapPage() {
 
   const defaultLat = -34.92145;
   const defaultLon = -57.95453;
-  const lat = searchParams.get("lat") ? parseFloat(searchParams.get("lat")!) : defaultLat;
-  const lon = searchParams.get("lon") ? parseFloat(searchParams.get("lon")!) : defaultLon;
+  const lat = searchParams.get("lat")
+    ? parseFloat(searchParams.get("lat")!)
+    : defaultLat;
+  const lon = searchParams.get("lon")
+    ? parseFloat(searchParams.get("lon")!)
+    : defaultLon;
 
   const [properties, setProperties] = useState<MapProperty[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showMobileList, setShowMobileList] = useState(false);
   const [currentZone, setCurrentZone] = useState<ZoneData | null>(null);
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterState>({
     operationType: "",
     propertyType: "",
     minPrice: "",
@@ -85,52 +105,86 @@ export default function MapPage() {
     hasPool: false,
   });
 
-  const fetchFilteredProperties = useCallback(async (bounds: MapBounds, currentFilters: typeof filters) => {
-    setIsLoading(true);
-    try {
-      const query = new URLSearchParams({
-        minLat: bounds.minLat.toString(),
-        maxLat: bounds.maxLat.toString(),
-        minLon: bounds.minLon.toString(),
-        maxLon: bounds.maxLon.toString(),
-      });
+  const fetchFilteredProperties = useCallback(
+    async (bounds: MapBounds, currentFilters: FilterState) => {
+      setIsLoading(true);
+      try {
+        const query = new URLSearchParams({
+          minLat: bounds.minLat.toString(),
+          maxLat: bounds.maxLat.toString(),
+          minLon: bounds.minLon.toString(),
+          maxLon: bounds.maxLon.toString(),
+        });
 
-      if (currentFilters.operationType) query.append("operationType", currentFilters.operationType);
-      if (currentFilters.propertyType) query.append("propertyType", currentFilters.propertyType);
-      if (currentFilters.minPrice) query.append("minPrice", currentFilters.minPrice);
-      if (currentFilters.maxPrice) query.append("maxPrice", currentFilters.maxPrice);
-      if (currentFilters.rooms) query.append("rooms", currentFilters.rooms);
-      
-      if (currentFilters.hasWater) query.append("hasWater", "true");
-      if (currentFilters.hasElectricity) query.append("hasElectricity", "true");
-      if (currentFilters.hasGas) query.append("hasGas", "true");
-      if (currentFilters.hasInternet) query.append("hasInternet", "true");
-      if (currentFilters.hasParking) query.append("hasParking", "true");
-      if (currentFilters.hasPool) query.append("hasPool", "true");
+        if (currentFilters.operationType)
+          query.append("operationType", currentFilters.operationType);
+        if (currentFilters.propertyType)
+          query.append("propertyType", currentFilters.propertyType);
+        if (currentFilters.minPrice)
+          query.append("minPrice", currentFilters.minPrice);
+        if (currentFilters.maxPrice)
+          query.append("maxPrice", currentFilters.maxPrice);
+        if (currentFilters.rooms) query.append("rooms", currentFilters.rooms);
 
-      const res = await fetch(`/api/properties/in-bounds?${query}`);
-      if (!res.ok) throw new Error("Error fetching properties");
-      const data = await res.json();
-      setProperties(data.properties || []);
-    } catch (error) {
-      console.error("Error al filtrar propiedades:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        if (currentFilters.hasWater) query.append("hasWater", "true");
+        if (currentFilters.hasElectricity)
+          query.append("hasElectricity", "true");
+        if (currentFilters.hasGas) query.append("hasGas", "true");
+        if (currentFilters.hasInternet) query.append("hasInternet", "true");
+        if (currentFilters.hasParking) query.append("hasParking", "true");
+        if (currentFilters.hasPool) query.append("hasPool", "true");
 
-  const handleBoundsChange = useCallback((bounds: MapBounds) => {
-    boundsRef.current = bounds;
-    fetchFilteredProperties(bounds, filters);
-  }, [fetchFilteredProperties, filters]);
+        const res = await fetch(`/api/properties/in-bounds?${query}`);
+        if (!res.ok) throw new Error("Error fetching properties");
+
+        const data = await res.json();
+        const rawList = data.properties || [];
+
+        // --- AQUÍ ESTÁ LA SOLUCIÓN: NORMALIZACIÓN DE DATOS ---
+        // Esto crea el campo 'price' que la Sidebar necesita leer
+        const normalizedList = rawList.map((p: any) => {
+          // Si existe salePrice, úsalo. Si no, rentPrice. Si no, 0.
+          const resolvedPrice = p.salePrice ?? p.rentPrice ?? p.price ?? 0;
+
+          return {
+            ...p,
+            price: resolvedPrice, // <--- Esto hace que el precio aparezca en la Sidebar
+
+            // Aseguramos que las amenities sean booleanas
+            hasWater: Boolean(p.hasWater),
+            hasElectricity: Boolean(p.hasElectricity),
+            hasGas: Boolean(p.hasGas),
+            hasInternet: Boolean(p.hasInternet),
+            hasParking: Boolean(p.hasParking),
+            hasPool: Boolean(p.hasPool),
+          };
+        });
+
+        setProperties(normalizedList);
+      } catch (error) {
+        console.error("Error al filtrar propiedades:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
+
+  const handleBoundsChange = useCallback(
+    (bounds: MapBounds) => {
+      boundsRef.current = bounds;
+      fetchFilteredProperties(bounds, filters);
+    },
+    [fetchFilteredProperties, filters],
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const toggleAmenity = (key: keyof typeof filters) => {
-    setFilters(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleAmenity = (key: keyof FilterState) => {
+    setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   useEffect(() => {
@@ -157,10 +211,8 @@ export default function MapPage() {
 
   return (
     <div className="fixed top-16 left-0 right-0 bottom-0 z-0 flex flex-col bg-slate-100 overflow-hidden">
-      
       <div className="w-full bg-white border-b border-slate-200 z-40 px-6 py-3 shadow-sm flex items-center justify-between">
-        
-        <button 
+        <button
           onClick={clearFilters}
           className="h-10 px-4 text-md font-black cursor-pointer text-urbik-black/50 hover:text-urbik-rose transition-colors flex items-center gap-1 shrink-0"
         >
@@ -168,20 +220,20 @@ export default function MapPage() {
         </button>
 
         <div className="flex flex-wrap gap-4 items-center justify-end">
-          
           <div className="flex flex-wrap gap-1.5 border-r border-slate-200 pr-4 mr-2">
             {AMENITIES_CONFIG.map((amenity) => {
               const Icon = amenity.icon;
-              const isActive = filters[amenity.id as keyof typeof filters];
+              const isActive = filters[amenity.id];
               return (
                 <button
                   key={amenity.id}
-                  onClick={() => toggleAmenity(amenity.id as keyof typeof filters)}
+                  onClick={() => toggleAmenity(amenity.id)}
                   className={`
                     flex items-center cursor-pointer gap-1 px-2.5 py-1.5 rounded-full border text-[10px] font-bold transition-all
-                    ${isActive 
-                      ? "bg-urbik-emerald text-white border-urbik-emerald shadow-sm" 
-                      : "bg-white text-urbik-black/60 border-slate-300 hover:border-urbik-emerald/50"
+                    ${
+                      isActive
+                        ? "bg-urbik-emerald text-white border-urbik-emerald shadow-sm"
+                        : "bg-white text-urbik-black/60 border-slate-300 hover:border-urbik-emerald/50"
                     }
                   `}
                 >
@@ -193,11 +245,13 @@ export default function MapPage() {
           </div>
 
           <div className="flex flex-wrap gap-2 items-center">
-            <CustomDropdown 
+            <CustomDropdown
               label="Operación"
               variant="white2"
               value={filters.operationType}
-              onChange={(val) => setFilters(f => ({ ...f, operationType: val }))}
+              onChange={(val) =>
+                setFilters((f) => ({ ...f, operationType: val }))
+              }
               options={[
                 { label: "Operación", value: "" },
                 { label: "Venta", value: "SALE" },
@@ -206,11 +260,13 @@ export default function MapPage() {
               ]}
             />
 
-            <CustomDropdown 
+            <CustomDropdown
               label="Tipo"
               variant="white2"
               value={filters.propertyType}
-              onChange={(val) => setFilters(f => ({ ...f, propertyType: val }))}
+              onChange={(val) =>
+                setFilters((f) => ({ ...f, propertyType: val }))
+              }
               options={[
                 { label: "Tipo", value: "" },
                 { label: "Casa", value: "HOUSE" },
@@ -223,33 +279,33 @@ export default function MapPage() {
 
             <div className="flex items-center gap-1.5">
               <div className="flex items-center bg-urbik-white border border-black/50 hover:bg-slate-50 rounded-full px-3 h-10">
-                <input 
-                  type="number" 
-                  name="minPrice" 
-                  placeholder="Mín $" 
-                  value={filters.minPrice} 
+                <input
+                  type="number"
+                  name="minPrice"
+                  placeholder="Mín $"
+                  value={filters.minPrice}
                   onChange={handleInputChange}
                   className="w-16 bg-transparent text-urbik-black text-[10px] font-bold outline-none placeholder:text-urbik-black/50"
                 />
               </div>
 
               <div className="flex items-center bg-urbik-white border border-black/50 hover:bg-slate-50 rounded-full px-3 h-10">
-                <input 
-                  type="number" 
-                  name="maxPrice" 
-                  placeholder="Máx $" 
-                  value={filters.maxPrice} 
+                <input
+                  type="number"
+                  name="maxPrice"
+                  placeholder="Máx $"
+                  value={filters.maxPrice}
                   onChange={handleInputChange}
                   className="w-16 bg-transparent text-urbik-black text-[10px] font-bold outline-none placeholder:text-urbik-black/50"
                 />
               </div>
             </div>
 
-            <CustomDropdown 
+            <CustomDropdown
               label="Ambientes"
               variant="white2"
               value={filters.rooms}
-              onChange={(val) => setFilters(f => ({ ...f, rooms: val }))}
+              onChange={(val) => setFilters((f) => ({ ...f, rooms: val }))}
               options={[
                 { label: "Ambientes", value: "" },
                 { label: "1+ amb", value: "1" },
@@ -274,14 +330,19 @@ export default function MapPage() {
             <h2 className="font-bold text-lg text-slate-800">
               Resultados ({properties.length})
             </h2>
-            <button onClick={() => setShowMobileList(false)} className=" cursor-pointer text-slate-500 p-2">✕</button>
+            <button
+              onClick={() => setShowMobileList(false)}
+              className=" cursor-pointer text-slate-500 p-2"
+            >
+              ✕
+            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            <PropertiesSidebar 
-              properties={properties} 
-              visualLimit={propertiesLimit} 
-              isLoading={isLoading} 
+            <PropertiesSidebar
+              properties={properties}
+              visualLimit={propertiesLimit}
+              isLoading={isLoading}
             />
           </div>
         </aside>
@@ -307,7 +368,10 @@ export default function MapPage() {
               className="bg-slate-900 text-white px-6 py-3 cursor-pointer rounded-full shadow-2xl flex items-center gap-3 font-medium active:scale-95 transition-transform"
             >
               {showMobileList ? (
-                <> <MapIcon className="w-4 h-4" /> Ver Mapa </>
+                <>
+                  {" "}
+                  <MapIcon className="w-4 h-4" /> Ver Mapa{" "}
+                </>
               ) : (
                 <>
                   <List className="w-4 h-4" /> Ver Lista{" "}
