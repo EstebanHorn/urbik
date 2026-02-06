@@ -1,16 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Building2,
-  MapPin,
-  ImageIcon,
-  X,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Building2, MapPin, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PropertyParcelWrapper from "../../property/PropertyParcelWrapper";
+import { GeoJsonObject } from "geojson";
 
 interface ImageGalleryProps {
   images: string[];
@@ -30,10 +24,7 @@ export default function ImageGallery({
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Calculamos cuántas imágenes sobran después de las 4 que mostramos en la grilla
   const extraImagesCount = images.length > 4 ? images.length - 4 : 0;
-
-  // --- HANDLERS DEL MODAL ---
 
   const openModal = (index: number) => {
     setCurrentIndex(index);
@@ -62,7 +53,6 @@ export default function ImageGallery({
     [images.length],
   );
 
-  // Manejo de Teclado
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
@@ -76,9 +66,6 @@ export default function ImageGallery({
 
   return (
     <>
-      {/* --- BENTO GRID --- 
-          Estructura: 1 Grande + 3 Pequeñas (Imágenes) + 1 Pequeña (Mapa) 
-      */}
       <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[400px] md:h-[600px] mb-12 rounded-2xl overflow-hidden">
         {/* 1. IMAGEN PRINCIPAL (Grande - Izquierda) */}
         <div
@@ -86,6 +73,7 @@ export default function ImageGallery({
           onClick={() => images[0] && openModal(0)}
         >
           {images[0] ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={images[0]}
               alt={`Principal ${title}`}
@@ -105,6 +93,7 @@ export default function ImageGallery({
           onClick={() => images[1] && openModal(1)}
         >
           {images[1] ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={images[1]}
               className="w-full h-full object-cover group-hover:opacity-90 transition duration-300 group-hover:scale-105"
@@ -121,6 +110,7 @@ export default function ImageGallery({
           onClick={() => images[2] && openModal(2)}
         >
           {images[2] ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={images[2]}
               className="w-full h-full object-cover group-hover:opacity-90 transition duration-300 group-hover:scale-105"
@@ -138,6 +128,7 @@ export default function ImageGallery({
         >
           {images[3] ? (
             <div className="relative w-full h-full">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={images[3]}
                 className={`w-full h-full object-cover transition duration-300 group-hover:scale-105 ${
@@ -145,7 +136,6 @@ export default function ImageGallery({
                 }`}
                 alt="Vista 4"
               />
-              {/* Overlay si hay más de 4 imágenes */}
               {extraImagesCount > 0 && (
                 <div className="absolute inset-0 flex items-center justify-center text-white font-black text-2xl drop-shadow-md pointer-events-none">
                   +{extraImagesCount}
@@ -164,16 +154,14 @@ export default function ImageGallery({
               <PropertyParcelWrapper
                 lat={latitude}
                 lon={longitude}
-                selectedGeom={parcelGeom}
+                selectedGeom={parcelGeom as GeoJsonObject}
                 allProperties={[]}
               />
-              {/* Etiqueta flotante */}
-              <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 text-[10px] font-bold rounded shadow flex items-center gap-1 pointer-events-none z-[400]">
+              <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 text-[10px] font-bold rounded shadow flex items-center gap-1 pointer-events-none z-400">
                 <MapPin size={10} /> Ubicación
               </div>
             </div>
           ) : (
-            // Placeholder si falla la carga del mapa
             <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 font-bold text-xs uppercase flex-col gap-2">
               <MapPin size={24} />
               <span>Sin ubicación</span>
@@ -182,14 +170,13 @@ export default function ImageGallery({
         </div>
       </div>
 
-      {/* --- MODAL CAROUSEL (Muestra TODAS las imágenes) --- */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-sm"
+            className="fixed inset-0 z-9999 flex items-center justify-center bg-black/95 backdrop-blur-sm"
             onClick={closeModal}
           >
             <button
@@ -256,6 +243,7 @@ export default function ImageGallery({
                       : "border-transparent opacity-50 hover:opacity-100"
                   }`}
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={img}
                     className="w-full h-full object-cover"

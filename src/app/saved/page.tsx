@@ -1,14 +1,3 @@
-/*
-Este código define una página que gestiona y visualiza las propiedades marcadas como favoritas
-por un usuario autenticado, permitiendo cargarlas desde una API, eliminarlas de la lista y
-seleccionarlas (hasta un máximo de cinco) para realizar comparaciones mediante un modo
-interactivo denominado "SmartZone". La interfaz implementa estados de carga, validación de
-sesión, animaciones con Framer Motion y una disposición adaptable que transforma las tarjetas
-de propiedades en elementos seleccionables cuando se activa el componente de comparación,
-integrando etiquetas personalizadas para el tipo de inmueble y operación junto con el precio
-formateado.
-*/
-
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -17,6 +6,7 @@ import { useSession } from "next-auth/react";
 import Versus from "../../components/SmartZone/SmartCompare";
 import FavoriteButton from "../../components/FavoritesButton";
 
+// Extendemos la interfaz para cumplir con lo que espera el componente Versus (SmartCompare)
 interface FavoriteProperty {
   id: number;
   title: string;
@@ -26,6 +16,30 @@ interface FavoriteProperty {
   currency?: string | null;
   images: string[];
   city: string;
+  // Propiedades requeridas por Versus
+  area?: number;
+  rooms?: number;
+  bathrooms?: number;
+  address?: string;
+  province?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+// Interfaz local para adaptar los datos al componente Versus si es necesario
+interface VersusProperty {
+  id: number;
+  title: string;
+  price: number;
+  area: number;
+  rooms: number;
+  bathrooms: number;
+  images: string[];
+  address: string;
+  city: string;
+  province: string;
+  latitude: number;
+  longitude: number;
 }
 
 export default function GuardadosPage() {
@@ -43,7 +57,7 @@ export default function GuardadosPage() {
         const data = await res.json();
         setFavorites(data);
       }
-    } catch (error) {
+    } catch {
       console.error("Error cargando favoritos");
     } finally {
       setLoading(false);
@@ -95,6 +109,26 @@ export default function GuardadosPage() {
     }
   };
 
+  // Función para adaptar las propiedades favoritas al formato que espera Versus
+  const getSelectedPropertiesForVersus = (): VersusProperty[] => {
+    return favorites
+      .filter((p) => selectedIds.includes(p.id))
+      .map((p) => ({
+        id: p.id,
+        title: p.title,
+        price: p.price || 0,
+        area: p.area || 0,
+        rooms: p.rooms || 0,
+        bathrooms: p.bathrooms || 0,
+        images: p.images,
+        address: p.address || "",
+        city: p.city,
+        province: p.province || "",
+        latitude: p.latitude || 0,
+        longitude: p.longitude || 0,
+      }));
+  };
+
   if (!session)
     return (
       <div className="pt-20 text-center font-medium">
@@ -123,7 +157,6 @@ export default function GuardadosPage() {
             ))}
           </div>
         ) : favorites.length === 0 ? (
-          // CORRECCIÓN: Clase Tailwind rounded-4xl
           <div className="text-center py-20 mt-10 bg-urbik-white2 rounded-4xl border border-dashed border-urbik-black/10">
             <p className="text-urbik-muted font-medium">
               Aún no has guardado ninguna propiedad.
@@ -172,10 +205,11 @@ export default function GuardadosPage() {
                         )}
 
                         <div className="relative h-40 bg-urbik-g200">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={prop.images[0] || "/placeholder-property.jpg"}
                             alt={prop.title}
-                            className="object-cover"
+                            className="object-cover w-full h-full"
                           />
                         </div>
 
@@ -215,9 +249,7 @@ export default function GuardadosPage() {
             </div>
 
             <Versus
-              selectedProperties={favorites.filter((p) =>
-                selectedIds.includes(p.id),
-              )}
+              selectedProperties={getSelectedPropertiesForVersus()}
               isVersusMode={isSmartZone}
               setIsVersusMode={setIsSmartZone}
               hasFavorites={favorites.length > 1}

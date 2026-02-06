@@ -41,6 +41,8 @@ interface UpdatePropertyPayload {
   amenities: PropertyAmenities;
   salePrice?: number | null;
   rentPrice?: number | null;
+  // CORRECCIÓN: Index signature necesaria para ser compatible con PropertyPayload del servicio
+  [key: string]: unknown;
 }
 
 export function useEditProperty(

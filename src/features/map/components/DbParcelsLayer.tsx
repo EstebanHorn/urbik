@@ -98,8 +98,11 @@ export function DbParcelsLayer({ properties }: DbParcelsLayerProps) {
 
         if (!geometry) return null;
 
-        // Corrección: Eliminado 'as any' innecesario
-        const dynamicStyle = getDynamicParcelStyle(prop, colorMode);
+        // Corrección: Usamos any explícitamente y desactivamos la regla porque getDynamicParcelStyle
+        // espera un objeto Property completo (DB) y aquí tenemos una versión optimizada (MapProperty)
+        // que es suficiente para el estilo pero no satisface la interfaz estricta.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dynamicStyle = getDynamicParcelStyle(prop as any, colorMode);
 
         const displayPrice = getDisplayPrice(prop);
         const shortPrice = formatPriceShort(displayPrice);
