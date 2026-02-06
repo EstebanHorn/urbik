@@ -6,12 +6,11 @@ y utiliza el modelo Llama 3.1 para generar un informe profesional y crítico sob
 la accesibilidad, el transporte y la seguridad de una ubicación determinada, retornando finalmente
 el resultado en formato JSON.
 */
-
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
-const groq = new Groq({ 
-  apiKey: process.env.GROQ_API_KEY || '' 
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY || "",
 });
 
 export async function POST(req: Request) {
@@ -38,18 +37,25 @@ export async function POST(req: Request) {
 
     const completion = await groq.chat.completions.create({
       messages: [
-        { role: "system", content: "Eres un analista inmobiliario experto y conciso." },
+        {
+          role: "system",
+          content: "Eres un analista inmobiliario experto y conciso.",
+        },
         { role: "user", content: prompt },
       ],
       model: "llama-3.1-8b-instant",
       temperature: 0.5,
     });
 
-    return NextResponse.json({ 
-      text: completion.choices[0]?.message?.content || "Análisis no disponible." 
+    return NextResponse.json({
+      text:
+        completion.choices[0]?.message?.content || "Análisis no disponible.",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error en Zone Analysis:", error);
-    return NextResponse.json({ error: "Error en el servidor" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error en el servidor" },
+      { status: 500 },
+    );
   }
 }

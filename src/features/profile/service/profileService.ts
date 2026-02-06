@@ -8,10 +8,10 @@ datos sensibles como contraseñas y la validación de credenciales mediante
 encriptación para cambios de clave seguros.
 */
 
-
 import { RealEstateFormFields, UserFormFields } from "../../../libs/types";
 import prisma from "@/libs/db";
 import bcrypt from "bcryptjs";
+
 export async function fetchProfileData() {
   const res = await fetch("/api/user");
 
@@ -25,7 +25,8 @@ export async function fetchProfileData() {
 
 export async function updateProfile(
   payload: RealEstateFormFields | UserFormFields,
-  _userRole: "USER" | "REALESTATE"
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _userRole: "USER" | "REALESTATE",
 ) {
   const res = await fetch("/api/user", {
     method: "PUT",
@@ -43,8 +44,11 @@ export async function updateProfile(
 }
 
 export async function toggleAccountPause(isActive: boolean) {
-  console.log("2. Service -> Enviando PATCH con body:", JSON.stringify({ isActive }));
-  
+  console.log(
+    "2. Service -> Enviando PATCH con body:",
+    JSON.stringify({ isActive }),
+  );
+
   const res = await fetch("/api/user", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -60,49 +64,55 @@ export async function getServerUserProfile(email: string) {
     where: { email },
     include: {
       realEstate: { include: { properties: true } },
+      userData: true, // Incluimos userData explícitamente para tipado
     },
   });
 
   if (!user) throw new Error("Usuario no encontrado");
 
-  const { password: _password, ...userSafe } = user;
+  // Eliminamos variable _password que no se usaba
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { password, ...userSafe } = user;
 
   return {
     ...userSafe,
     isActive: user.isActive,
     agencyData: user.role === "REALESTATE" ? user.realEstate : null,
+    // TypeScript ahora sabe que userData existe en user
     personalData: user.role === "USER" ? user.userData : null,
   };
 }
 
+// Actualizado para reflejar agencyName que es lo que espera el hook
 type UpdateServerProfileBody = {
   firstName?: string;
   lastName?: string;
   phone?: string;
-  name?: string;
+  agencyName?: string; // Cambiado de name a agencyName
+  name?: string; // Mantenemos name opcional por si acaso el payload viejo llega
   address?: string;
   website?: string;
   instagram?: string;
-  bio?: string;    
-  province?: string; 
-  city?: string;    
+  bio?: string;
+  province?: string;
+  city?: string;
 };
 
 export async function updateServerProfile(
   email: string,
-  body: UpdateServerProfileBody
+  body: UpdateServerProfileBody,
 ) {
-  const authUser = await prisma.allUsers.findUnique({ 
-    where: { email } 
+  const authUser = await prisma.allUsers.findUnique({
+    where: { email },
   });
 
   if (!authUser) throw new Error("Usuario no encontrado");
 
   return await prisma.$transaction(async (tx) => {
-    
     if (authUser.role === "USER") {
-      const { firstName, lastName, phone } = body;
-      if (!firstName || !lastName) throw new Error("Nombre y apellido requeridos");
+      const { firstName, lastName } = body;
+      if (!firstName || !lastName)
+        throw new Error("Nombre y apellido requeridos");
 
       return await tx.user.update({
         where: { user_id: authUser.user_id },
@@ -110,24 +120,39 @@ export async function updateServerProfile(
       });
     }
 
-if (authUser.role === "REALESTATE") {
-    const { name, address, website, phone, instagram, bio, province, city } = body;
-    if (!name) throw new Error("El nombre de la inmobiliaria es requerido");
-
-    return await tx.realEstate.update({
-      where: { user_id: authUser.user_id },
-      data: { 
-        agencyName: name,
-        address, 
-        phone,
+    if (authUser.role === "REALESTATE") {
+      // Permitimos agencyName o name
+      const {
+        agencyName,
+        name,
+        address,
         website,
+        phone,
         instagram,
-        bio,      
-        province, 
-        city      
-      },
-    });
-  }
+        bio,
+        province,
+        city,
+      } = body;
+      const finalName = agencyName || name;
+
+      if (!finalName)
+        throw new Error("El nombre de la inmobiliaria es requerido");
+
+      return await tx.realEstate.update({
+        where: { user_id: authUser.user_id },
+        data: {
+          agencyName: finalName,
+          address,
+          // Eliminamos 'phone' de aquí si el esquema no lo permite o lo dejamos si es necesario
+          phone,
+          website,
+          instagram,
+          bio,
+          province,
+          city,
+        },
+      });
+    }
 
     throw new Error("Rol no soportado");
   });
@@ -136,7 +161,7 @@ if (authUser.role === "REALESTATE") {
 export async function updateServerPassword(
   email: string,
   currentPassword: string,
-  newPassword: string
+  newPassword: string,
 ) {
   const user = await prisma.allUsers.findUnique({
     where: { email },

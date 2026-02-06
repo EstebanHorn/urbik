@@ -11,11 +11,44 @@ de retroalimentación (onUpdated y onClose) para cerrar el flujo de edición exi
 
 import { useState } from "react";
 import { updateProperty } from "../service/dashboardService";
+import { PropertyFormData } from "../components/create-modal/PropertyFormField";
 
-export function useEditProperty(property: any, onUpdated: () => void, onClose: () => void) {
-  const [form, setForm] = useState({
-    ...property,
-    areaM2: property.area?.toString() || "",
+// Interfaz para la propiedad que llega al hook
+interface EditPropertyData extends Partial<PropertyFormData> {
+  id: number | string;
+  area?: number | string;
+}
+
+export function useEditProperty(
+  property: EditPropertyData,
+  onUpdated: () => void,
+  onClose: () => void,
+) {
+  const [form, setForm] = useState<PropertyFormData>({
+    // Valores por defecto seguros
+    title: "",
+    description: "",
+    province: "",
+    city: "",
+    street: "",
+    number: "",
+    type: "HOUSE",
+    operationType: "RENT",
+    status: "AVAILABLE",
+    saleCurrency: "USD",
+    rentCurrency: "ARS",
+    currency: "USD",
+    images: [],
+    amenities: {
+      agua: false,
+      luz: false,
+      gas: false,
+      internet: false,
+      cochera: false,
+      pileta: false,
+    },
+    ...property, // Sobreescribimos con lo que viene
+    areaM2: property.areaM2?.toString() || property.area?.toString() || "",
     rooms: property.rooms?.toString() || "",
     bathrooms: property.bathrooms?.toString() || "",
     salePrice: property.salePrice?.toString() || "",
@@ -30,7 +63,8 @@ export function useEditProperty(property: any, onUpdated: () => void, onClose: (
     setSaving(true);
     setMessage("");
 
-    const updateData: any = {
+    // Usamos Record<string, unknown> en lugar de any
+    const updateData: Record<string, unknown> = {
       title: form.title,
       description: form.description,
       images: form.images,
@@ -60,9 +94,11 @@ export function useEditProperty(property: any, onUpdated: () => void, onClose: (
       console.log("CLIENT-LOG: Respuesta del servidor:", res);
       onUpdated();
       onClose();
-    } catch (e: any) {
-      console.error("CLIENT-LOG: Error capturado:", e.message);
-      setMessage(e.message || "Error al actualizar");
+    } catch (e) {
+      // CORRECCIÓN: Eliminado ': any'
+      const errorMsg = e instanceof Error ? e.message : "Error al actualizar";
+      console.error("CLIENT-LOG: Error capturado:", errorMsg);
+      setMessage(errorMsg);
     } finally {
       setSaving(false);
     }

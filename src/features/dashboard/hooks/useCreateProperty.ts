@@ -9,12 +9,30 @@ previos o por defecto, y finalmente expone una función handleSave que procesa l
 envía a los servicios de API correspondientes (createProperty o updateProperty) y gestiona los
 estados de carga y error de la operación asíncrona.
 */
-
 import { useState, useEffect } from "react";
 import { createProperty, updateProperty } from "../service/dashboardService";
 import type { SelectedParcel } from "@/features/map/types/types";
+import { PropertyFormData } from "../components/create-modal/PropertyFormField";
 
-const createEmptyForm = () => ({
+// Definimos una interfaz extendida para initialData
+interface ExtendedInitialData extends Partial<PropertyFormData> {
+  id?: number | string;
+  parcelCCA?: string;
+  parcelPDA?: string;
+  parcelGeom?: unknown;
+  latitude?: number;
+  longitude?: number;
+  area?: number; // Puede venir como area en lugar de areaM2
+  address?: string;
+  hasWater?: boolean;
+  hasElectricity?: boolean;
+  hasGas?: boolean;
+  hasInternet?: boolean;
+  hasParking?: boolean;
+  hasPool?: boolean;
+}
+
+const createEmptyForm = (): PropertyFormData => ({
   title: "",
   description: "",
   province: "",
@@ -24,14 +42,15 @@ const createEmptyForm = () => ({
   type: "HOUSE",
   operationType: "RENT",
   status: "AVAILABLE",
-  
-  salePrice: "", 
+
+  salePrice: "",
   saleCurrency: "USD",
   rentPrice: "",
   rentCurrency: "ARS",
-  
+
   currency: "USD",
   areaM2: "",
+  area: "", // Compatibilidad
   rooms: "",
   bathrooms: "",
   amenities: {
@@ -46,9 +65,10 @@ const createEmptyForm = () => ({
 });
 
 export function useCreateProperty(
-  initialData: any,
+  initialData: ExtendedInitialData,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onCreated: (data?: any) => void,
-  onClose: () => void
+  onClose: () => void,
 ) {
   const isEditing = !!initialData;
 
@@ -62,13 +82,13 @@ export function useCreateProperty(
           CCA: initialData.parcelCCA ?? "S/D",
           PDA: initialData.parcelPDA ?? "S/D",
           geometry: initialData.parcelGeom ?? {},
-          lat: initialData.latitude,
-          lon: initialData.longitude,
+          lat: initialData.latitude ?? 0,
+          lon: initialData.longitude ?? 0,
         }
-      : null
+      : null,
   );
 
-  const [form, setForm] = useState(() => {
+  const [form, setForm] = useState<PropertyFormData>(() => {
     if (!isEditing) return createEmptyForm();
 
     return {
@@ -77,17 +97,17 @@ export function useCreateProperty(
       description: initialData.description ?? "",
       province: initialData.province ?? "",
       city: initialData.city ?? "",
-      street: initialData.address?.split(' ')[0] ?? "",
-      number: initialData.address?.split(' ')[1] ?? "",
+      street: initialData.address?.split(" ")[0] ?? "",
+      number: initialData.address?.split(" ")[1] ?? "",
       type: initialData.type ?? "HOUSE",
       operationType: initialData.operationType ?? "RENT",
       status: initialData.status ?? "AVAILABLE",
-      
+
       salePrice: initialData.salePrice?.toString() ?? "",
       saleCurrency: initialData.saleCurrency ?? "USD",
       rentPrice: initialData.rentPrice?.toString() ?? "",
       rentCurrency: initialData.rentCurrency ?? "ARS",
-      
+
       areaM2: initialData.area?.toString() ?? "",
       rooms: initialData.rooms?.toString() ?? "",
       bathrooms: initialData.bathrooms?.toString() ?? "",
@@ -116,9 +136,10 @@ export function useCreateProperty(
     setSaving(true);
     setMessage(null);
 
-    const fullAddress = form.street || form.number
-      ? `${form.street ?? ""} ${form.number ?? ""}`.trim()
-      : form.city;
+    const fullAddress =
+      form.street || form.number
+        ? `${form.street ?? ""} ${form.number ?? ""}`.trim()
+        : form.city;
 
     const payload = {
       title: form.title,
@@ -158,7 +179,7 @@ export function useCreateProperty(
 
     try {
       let result;
-      if (isEditing) {
+      if (isEditing && initialData.id) {
         result = await updateProperty(initialData.id, payload);
       } else {
         result = await createProperty(payload);
@@ -166,8 +187,11 @@ export function useCreateProperty(
 
       if (onCreated) onCreated(result);
       onClose();
-    } catch (e: any) {
-      setMessage(e.message ?? "Error al guardar la propiedad");
+    } catch (e) {
+      // CORRECCIÓN: Eliminado ': any'
+      const errorMsg =
+        e instanceof Error ? e.message : "Error al guardar la propiedad";
+      setMessage(errorMsg);
     } finally {
       setSaving(false);
     }

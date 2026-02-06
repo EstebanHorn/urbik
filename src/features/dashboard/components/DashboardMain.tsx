@@ -14,6 +14,7 @@ inmobiliarios.
 
 import React, { useMemo, useState } from "react";
 import type { PropertySummary } from "../../../app/dashboard/page";
+import Image from "next/image"; // Importamos Image
 
 import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from "recharts";
 import CreatePropertyModal from "./CreatePropertyModal";
@@ -161,10 +162,11 @@ export default function DashboardMain({
 
             <div className="h-40 bg-gray-100 relative">
               {mostViewed?.images?.[0] ? (
-                <img
+                <Image
                   src={mostViewed.images[0]}
-                  className="w-full h-full object-cover"
                   alt="Most viewed"
+                  fill
+                  className="object-cover"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400 font-bold bg-gray-50">
@@ -183,6 +185,8 @@ export default function DashboardMain({
 
               <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
                 <div className="text-lg font-black text-gray-900">
+                  {/* Aquí deberías ajustar si usas salePrice/rentPrice en PropertySummary, 
+                      por ahora mantengo .price para no romper lógica existente si no cambiaste PropertySummary */}
                   {typeof mostViewed?.price === "number"
                     ? `USD ${mostViewed.price.toLocaleString("es-AR")}`
                     : "—"}
@@ -205,7 +209,13 @@ export default function DashboardMain({
       {editingProperty && (
         <EditPropertyModal
           open={true}
-          property={editingProperty}
+          // CORRECCIÓN: Ajustamos el objeto para que coincida con lo que espera el Modal (undefined en lugar de null)
+          property={{
+            ...editingProperty,
+            type: editingProperty.type || undefined,
+            description: editingProperty.description || "",
+            // Aseguramos compatibilidad de otros campos opcionales si es necesario
+          }}
           onClose={() => setEditingProperty(null)}
           onUpdated={onRefresh}
         />

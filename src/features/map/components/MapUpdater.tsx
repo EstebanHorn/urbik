@@ -7,8 +7,10 @@ solo cuando detecta un cambio real; además, implementa un breve retraso mediant
 limpieza de efectos para asegurar que el contenedor del mapa esté listo antes de la animación y prevenir
 errores de ejecución si las coordenadas cambian rápidamente.
 */
+import React, { useEffect } from "react";
+import { useMap } from "react-leaflet";
 
-function MapUpdater({ center }: { center: [number, number] }) {
+export function MapUpdater({ center }: { center: [number, number] }) {
   const map = useMap();
   const lastCenterRef = React.useRef<string>("");
 

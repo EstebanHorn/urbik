@@ -8,7 +8,6 @@ la API de Nominatim para transformar las coordenadas centrales en una dirección
 de zona (barrio o ciudad), asegurando mediante un useRef que no se realicen actualizaciones de estado
 si el componente se ha desmontado.
 */
-
 "use client";
 
 import { useMapEvents } from "react-leaflet";
@@ -28,7 +27,10 @@ interface MapEventsHandlerProps {
   onCenterChange: (data: ZoneData) => void;
 }
 
-export function MapEventsHandler({ onBoundsChange, onCenterChange }: MapEventsHandlerProps) {
+export function MapEventsHandler({
+  onBoundsChange,
+  onCenterChange,
+}: MapEventsHandlerProps) {
   const { isZoneAnalysisEnabled } = useMapSettings();
   const isMountedRef = useRef(true);
 
@@ -39,33 +41,38 @@ export function MapEventsHandler({ onBoundsChange, onCenterChange }: MapEventsHa
     };
   }, []);
 
-  const fetchAddress = useCallback(async (lat: number, lng: number) => {
-    if (!isZoneAnalysisEnabled || !isMountedRef.current) return;
+  const fetchAddress = useCallback(
+    async (lat: number, lng: number) => {
+      if (!isZoneAnalysisEnabled || !isMountedRef.current) return;
 
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`,
-        { headers: { "Accept-Language": "es" } }
-      );
-      const data = await response.json();
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`,
+          { headers: { "Accept-Language": "es" } },
+        );
+        const data = await response.json();
 
-      if (data && data.address && isMountedRef.current) {
-        const { road, house_number, suburb, city, town, village } = data.address;
-        const street = road || "Calle desconocida";
-        const number = house_number ? ` ${house_number}` : "";
-        const neighborhood = suburb || city || town || village || "Zona no identificada";
-        
-        onCenterChange({
-          lat,
-          lng,
-          address: `${street}${number}`,
-          zone: neighborhood
-        });
+        if (data && data.address && isMountedRef.current) {
+          const { road, house_number, suburb, city, town, village } =
+            data.address;
+          const street = road || "Calle desconocida";
+          const number = house_number ? ` ${house_number}` : "";
+          const neighborhood =
+            suburb || city || town || village || "Zona no identificada";
+
+          onCenterChange({
+            lat,
+            lng,
+            address: `${street}${number}`,
+            zone: neighborhood,
+          });
+        }
+      } catch (error) {
+        console.error("Error al obtener la dirección:", error);
       }
-    } catch (error) {
-      console.error("Error al obtener la dirección:", error);
-    }
-  }, [onCenterChange, isZoneAnalysisEnabled]);
+    },
+    [onCenterChange, isZoneAnalysisEnabled],
+  );
 
   const map = useMapEvents({
     load: (e) => {
@@ -81,8 +88,9 @@ export function MapEventsHandler({ onBoundsChange, onCenterChange }: MapEventsHa
       });
     },
     moveend: () => {
-
-      if (!map || !map._loaded) return;
+      // CORRECCIÓN: Casting seguro para acceder a propiedad interna _loaded
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!map || !(map as any)._loaded) return;
 
       const center = map.getCenter();
       const bounds = map.getBounds();

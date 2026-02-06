@@ -8,112 +8,118 @@ controladores para cambios manuales, carga de propiedades asociadas y una funci�
 envío que comunica los cambios con el servicio backend, facilitando así una interfaz
 reactiva y coherente para la gestión del perfil.
 */
-
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { fetchProfileData, updateProfile } from "../service/profileService"; 
-import { 
-  UserRole, 
-  FormState, 
-  Property, 
-  RealEstateFormFields, 
-  UserFormFields 
+import { fetchProfileData, updateProfile } from "../service/profileService";
+import {
+  Role as UserRole, // Importamos Role y lo renombramos a UserRole para compatibilidad
+  FormState,
+  Property,
+  RealEstateFormFields,
+  UserFormFields,
 } from "../../../libs/types";
 
 interface UseProfileResult {
-  userRole: UserRole;
+  userRole: UserRole | null;
   form: FormState;
   userProperties: Property[];
   loading: boolean;
   message: string;
   refetchData: () => Promise<void>;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleManualChange: (name: string, value: any) => void; // Agregado para actualizar isActive
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
+  handleManualChange: (name: string, value: any) => void;
   handleSubmit: (e: React.FormEvent) => Promise<void>;
 }
 
 const initialFormState: FormState = {
-  firstName: "", 
-  lastName: "", 
-  phone: "", 
-  name: "", 
-  address: "", 
-  website: "", 
+  firstName: "",
+  lastName: "",
+  phone: "",
+  agencyName: "", // Usamos agencyName que es lo correcto según types.ts
+  address: "",
+  street: "",
+  website: "",
   auth_provider: "",
   isActive: true,
-  instagram: "", 
+  instagram: "",
   bio: "",
   province: "",
   city: "",
-  license: ""
+  license: "",
+  logoUrl: "",
+  bannerUrl: "",
 };
 
 export function useProfile(): UseProfileResult {
   const { data: session, status } = useSession();
-  const [userRole, setUserRole] = useState<UserRole>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [form, setForm] = useState<FormState>(initialFormState);
   const [userProperties, setUserProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const refetchData = useCallback(async () => {
-    if (status !== "authenticated") return; 
+    if (status !== "authenticated") return;
     setLoading(true);
     try {
       const data = await fetchProfileData();
       const role = data.role as UserRole;
       setUserRole(role);
-      
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const provider = (session?.user as any)?.provider || "email";
-      
-      if (role === 'USER') {
-        setForm({
-          firstName: data.firstName || "", 
-          lastName: data.lastName || "", 
-          phone: data.phone || "", 
-          isActive: data.isActive ?? true, 
-          name: "", 
-          address: "", 
-          website: "",
-          auth_provider: provider
-        });
-        setUserProperties(data.properties || []); 
-} else if (role === 'REALESTATE' && data.agencyData) {
-  setForm({
-    phone: data.agencyData.phone || data.phone || "",
-    name: data.agencyData.agencyName || "", 
-    address: data.agencyData.address || "", 
-    website: data.agencyData.website || "",
-    instagram: data.agencyData.instagram || "", // Mapeo nuevo
-    bio: data.agencyData.bio || "",             // Mapeo nuevo
-    province: data.agencyData.province || "",   // Mapeo nuevo
-    city: data.agencyData.city || "",           // Mapeo nuevo
-    license: data.agencyData.license || "",     // Mapeo nuevo
-    auth_provider: provider,
-    isActive: data.isActive ?? true,
-  });
-        setUserProperties(data.agencyData.properties || []); 
+
+      if (role === "USER") {
+        setForm((prev) => ({
+          ...prev, // Mantenemos estructura base
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          phone: data.phone || "",
+          isActive: data.isActive ?? true,
+          auth_provider: provider,
+        }));
+        setUserProperties(data.properties || []);
+      } else if (role === "REALESTATE" && data.agencyData) {
+        setForm((prev) => ({
+          ...prev,
+          phone: data.agencyData.phone || data.phone || "",
+          agencyName: data.agencyData.agencyName || "", // Mapeo correcto
+          address: data.agencyData.address || "",
+          website: data.agencyData.website || "",
+          instagram: data.agencyData.instagram || "",
+          bio: data.agencyData.bio || "",
+          province: data.agencyData.province || "",
+          city: data.agencyData.city || "",
+          license: data.agencyData.license || "",
+          auth_provider: provider,
+          isActive: data.isActive ?? true,
+        }));
+        setUserProperties(data.agencyData.properties || []);
       }
-      setMessage(""); 
+      setMessage("");
     } catch (error: any) {
       console.error("Error al cargar datos:", error);
       setMessage(`Error al cargar el perfil: ${error.message}`);
     } finally {
       setLoading(false);
     }
-  }, [session?.user, status]); 
+  }, [session?.user, status]);
 
   useEffect(() => {
     if (status === "authenticated") {
       refetchData();
     }
-  }, [status, refetchData]); 
+  }, [status, refetchData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleManualChange = (name: string, value: any) => {
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -126,31 +132,40 @@ export function useProfile(): UseProfileResult {
     try {
       let payload: RealEstateFormFields | UserFormFields;
 
-if (userRole === 'REALESTATE') {
-  payload = { 
-    name: form.name, 
-    address: form.address, 
-    phone: form.phone, 
-    website: form.website,
-    instagram: form.instagram,
-    bio: form.bio,            
-    province: form.province,
-    city: form.city
-  } as RealEstateFormFields;
+      if (userRole === "REALESTATE") {
+        // Aseguramos que payload coincida con lo que espera el servicio y types
+        const rePayload: RealEstateFormFields = {
+          agencyName: form.agencyName,
+          address: form.address,
+          phone: form.phone,
+          website: form.website,
+          instagram: form.instagram,
+          bio: form.bio,
+          province: form.province,
+          city: form.city,
+          license: form.license,
+          isActive: form.isActive,
+        };
+        payload = rePayload;
       } else {
-        payload = { 
-          firstName: form.firstName, 
-          lastName: form.lastName, 
-          phone: form.phone 
-        } as UserFormFields;
+        const userPayload: UserFormFields = {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          phone: form.phone,
+          isActive: form.isActive,
+        };
+        payload = userPayload;
       }
-      
-      await updateProfile(payload, userRole);
-      setMessage("✅ Perfil actualizado correctamente");
-      await refetchData(); 
+
+      // Casting a any temporal si el servicio tiene una firma estricta que no coincide exactamente con los tipos importados
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await updateProfile(payload as any, userRole as any);
+
+      setMessage("Perfil actualizado correctamente");
+      await refetchData();
     } catch (err: any) {
       console.error("Error al actualizar:", err);
-      setMessage(`⚠️ ${err.message || "Error en la petición de actualización"}`);
+      setMessage(` ${err.message || "Error en la petición de actualización"}`);
     } finally {
       setLoading(false);
     }
@@ -165,6 +180,6 @@ if (userRole === 'REALESTATE') {
     refetchData,
     handleChange,
     handleManualChange,
-    handleSubmit
+    handleSubmit,
   };
 }

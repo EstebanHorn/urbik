@@ -7,7 +7,6 @@ campos esenciales para su visualización en un mapa —como ubicación, precio y
 y devolviendo finalmente estos datos en formato JSON con un manejo de errores básico que responde
 con un código de estado 500 en caso de fallo.
 */
-
 import { NextResponse } from "next/server";
 import prisma from "@/libs/db";
 
@@ -15,14 +14,18 @@ export async function GET() {
   try {
     const properties = await prisma.property.findMany({
       where: {
-        isAvailable: true,
+        status: "AVAILABLE",
         latitude: { not: null },
         longitude: { not: null },
       },
       select: {
         id: true,
         title: true,
-        price: true,
+        salePrice: true,
+        rentPrice: true,
+        saleCurrency: true,
+        rentCurrency: true,
+
         latitude: true,
         longitude: true,
         city: true,
@@ -38,7 +41,7 @@ export async function GET() {
     console.error("Error fetching properties for map:", error);
     return NextResponse.json(
       { error: "Error interno del servidor" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

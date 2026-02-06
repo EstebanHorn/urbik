@@ -15,8 +15,17 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ShieldCheck, Trash2, Users, AlertCircle } from "lucide-react";
 
+interface PendingUser {
+  user_id: number;
+  email: string;
+  realEstate?: {
+    agencyName: string;
+    license: string;
+  };
+}
+
 export default function AdminPage() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<PendingUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchPending = async () => {
@@ -61,7 +70,8 @@ export default function AdminPage() {
           className="mb-12"
         >
           <h1 className="text-right text-5xl font-display font-bold text-urbik-black tracking-tighter">
-            Panel de <span className="italic font-black text-6xl">Control.</span>
+            Panel de{" "}
+            <span className="italic font-black text-6xl">Control.</span>
           </h1>
           <p className="text-right text-urbik-muted mt-2 font-medium">
             Gestión de cuentas en revisión
@@ -87,7 +97,8 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   <AnimatePresence mode="popLayout">
-                    {users.map((u: any) => (
+                    {/* CORRECCIÓN: Usamos el tipo PendingUser */}
+                    {users.map((u) => (
                       <motion.tr
                         key={u.user_id}
                         layout
@@ -134,15 +145,22 @@ export default function AdminPage() {
               <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
                 <Users className="text-urbik-muted" size={32} />
               </div>
-              <h3 className="text-2xl font-display font-bold text-urbik-black">Todo al día</h3>
-              <p className="text-urbik-muted mt-2 font-medium">No hay solicitudes de inmobiliarias pendientes de revisión.</p>
+              <h3 className="text-2xl font-display font-bold text-urbik-black">
+                Todo al día
+              </h3>
+              <p className="text-urbik-muted mt-2 font-medium">
+                No hay solicitudes de inmobiliarias pendientes de revisión.
+              </p>
             </div>
           )}
         </motion.div>
 
         <div className="mt-8 flex items-center gap-2 text-urbik-muted text-sm px-6">
           <AlertCircle size={16} />
-          <span>Las cuentas aprobadas recibirán una notificación automática por correo.</span>
+          <span>
+            Las cuentas aprobadas recibirán una notificación automática por
+            correo.
+          </span>
         </div>
       </div>
     </div>

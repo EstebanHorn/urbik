@@ -20,10 +20,22 @@ import "leaflet/dist/leaflet.css";
 
 import { StaticParcelsLayer } from "./StaticParcelsLayer";
 import { DbParcelsLayer } from "./DbParcelsLayer";
-import { MapEventsHandler } from "./MapEventsHandler";
+import { MapEventsHandler, ZoneData } from "./MapEventsHandler";
 import { SelectedParcelLayer } from "./SelectedParcelLayer";
 import { mapBaseLayers } from "@/features/map/config/baseLayers";
 import { useMapSettings } from "@/features/map/context/MapSettingsProvider";
+import { MapProperty, MapBounds, SelectedParcel } from "../types/types";
+
+export interface InteractiveMapProps {
+  lat: number;
+  lon: number;
+  properties?: MapProperty[];
+  selectedParcel?: SelectedParcel | null; // Tipado específico
+  onBoundsChange?: (bounds: MapBounds) => void;
+  onCenterChange?: (data: ZoneData) => void;
+  children?: React.ReactNode;
+  height?: string;
+}
 
 function SafeMapChildren({ children }: { children: React.ReactNode }) {
   const map = useMap();
@@ -42,7 +54,7 @@ function CustomZoomControls() {
   const map = useMap();
 
   return (
-    <div className="absolute bottom-6 left-6 z-[1000] flex flex-col gap-2">
+    <div className="absolute bottom-6 left-6 z-1000 flex flex-col gap-2">
       <button
         type="button"
         onClick={() => map.zoomIn()}
@@ -66,7 +78,11 @@ function ScrollHandler({ enabled }: { enabled: boolean }) {
 
   useEffect(() => {
     if (!map) return;
-    enabled ? map.scrollWheelZoom.enable() : map.scrollWheelZoom.disable();
+    if (enabled) {
+      map.scrollWheelZoom.enable();
+    } else {
+      map.scrollWheelZoom.disable();
+    }
   }, [enabled, map]);
 
   return null;
@@ -77,7 +93,8 @@ function MapUpdater({ center }: { center: [number, number] }) {
 
   useEffect(() => {
     if (!map || !center) return;
-    if (map._loaded) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((map as any)._loaded) {
       map.flyTo(center, map.getZoom(), {
         animate: true,
         duration: 1.5,
@@ -97,7 +114,7 @@ export function InteractiveMapClient({
   onCenterChange,
   children,
   height = "100%",
-}: any) {
+}: InteractiveMapProps) {
   const { baseLayer, isScrollZoomEnabled } = useMapSettings();
   const [mounted, setMounted] = useState(false);
 
@@ -109,11 +126,11 @@ export function InteractiveMapClient({
     return sLat && sLon
       ? [parseFloat(sLat), parseFloat(sLon)]
       : [initialLat, initialLon];
-  }, []);
+  }, [searchParams, initialLat, initialLon]);
 
   const currentBaseLayer = useMemo(
     () => mapBaseLayers[baseLayer] ?? mapBaseLayers.cartoLight,
-    [baseLayer]
+    [baseLayer],
   );
 
   useEffect(() => {

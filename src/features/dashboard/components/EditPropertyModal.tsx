@@ -2,7 +2,6 @@
 
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
 import ImageUpload from "@/components/ImageUpload";
 import { useEditProperty } from "../hooks/useEditProperty";
 import { AmenitiesGrid } from "./create-modal/AmenitiesGrid";
@@ -113,7 +112,8 @@ export default function EditPropertyModal({
                     placeholder="Escribe una descripción detallada..."
                     value={form.description || ""}
                     onChange={(e) =>
-                      setForm((prev: any) => ({
+                      // CORRECCIÓN: Eliminado 'any' en prev
+                      setForm((prev) => ({
                         ...prev,
                         description: e.target.value,
                       }))
@@ -140,7 +140,8 @@ export default function EditPropertyModal({
                   <AmenitiesGrid
                     value={form.amenities || []}
                     onChange={(val) =>
-                      setForm((prev: any) => ({ ...prev, amenities: val }))
+                      // CORRECCIÓN: Eliminado 'any' en prev
+                      setForm((prev) => ({ ...prev, amenities: val }))
                     }
                   />
                 </div>
@@ -149,14 +150,14 @@ export default function EditPropertyModal({
                   <ImageUpload
                     value={form.images || []}
                     onChange={(urls) =>
-                      setForm((prev: any) => ({ ...prev, images: urls }))
+                      // CORRECCIÓN: Eliminado 'any' en prev
+                      setForm((prev) => ({ ...prev, images: urls }))
                     }
                     onRemove={(url) =>
-                      setForm((prev: any) => ({
+                      // CORRECCIÓN: Eliminado 'any' en prev y en filter
+                      setForm((prev) => ({
                         ...prev,
-                        images: (prev.images || []).filter(
-                          (i: any) => i !== url,
-                        ),
+                        images: (prev.images || []).filter((i) => i !== url),
                       }))
                     }
                   />

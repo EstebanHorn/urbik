@@ -25,7 +25,11 @@ interface PropertyRequestBody {
   type: PropertyType;
   salePrice?: number | string;
   rentPrice?: number | string;
-  currency: Currency;
+
+  // Estos campos faltaban:
+  saleCurrency?: Currency;
+  rentCurrency?: Currency;
+
   areaM2?: number | string;
   rooms?: number | string;
   bathrooms?: number | string;
@@ -41,13 +45,16 @@ export async function POST(req: NextRequest) {
 
   const email = session.user?.email;
   if (!email) {
-    return NextResponse.json({ error: "Email de sesión no encontrado" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Email de sesión no encontrado" },
+      { status: 401 },
+    );
   }
 
   try {
     const user = await prisma.allUsers.findUnique({
       where: { email },
-      include: { realEstate: true }
+      include: { realEstate: true },
     });
 
     if (!user || user.role !== "REALESTATE") {
@@ -76,7 +83,10 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!title || !city || !operationType) {
-      return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Faltan campos obligatorios" },
+        { status: 400 },
+      );
     }
 
     const newProperty = await prisma.property.create({
@@ -108,7 +118,7 @@ export async function POST(req: NextRequest) {
     console.error("Error al crear propiedad:", error);
     return NextResponse.json(
       { error: "Error al crear la propiedad", detail: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

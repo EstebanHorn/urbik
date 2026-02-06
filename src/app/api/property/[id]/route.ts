@@ -9,15 +9,15 @@ efectivamente el propietario del registro antes de permitir cualquier modificaci
 respuestas en formato JSON con los códigos de estado HTTP correspondientes para manejar errores
 de validación, autorización o fallos internos del servidor.
 */
-
 import { NextResponse } from "next/server";
 import prisma from "@/libs/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Prisma } from "@prisma/client";
 
 export async function PUT(
   req: Request,
-  { params }: { params: Promise<{ id: string }> } 
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getServerSession(authOptions);
 
@@ -48,27 +48,33 @@ export async function PUT(
     const isAdmin = userAccount.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {
-      console.log("LOG: Usuario no tiene permisos. Owner:", isOwner, "Admin:", isAdmin);
+      console.log("LOG: No autorizado");
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
-    const updateData: any = {
+    const updateData: Prisma.PropertyUpdateInput = {
       title: body.title,
       description: body.description,
       status: body.status,
       operationType: body.operationType,
-      area: body.area ? Number(body.area) : null,
-      rooms: body.rooms ? Number(body.rooms) : null,
-      bathrooms: body.bathrooms ? Number(body.bathrooms) : null,
+      area: body.area ? Number(body.area) : undefined,
+      rooms: body.rooms ? Number(body.rooms) : undefined,
+      bathrooms: body.bathrooms ? Number(body.bathrooms) : undefined,
       images: body.images,
-      amenities: body.amenities,
-      salePrice: body.salePrice !== undefined ? Number(body.salePrice) : undefined,
-      rentPrice: body.rentPrice !== undefined ? Number(body.rentPrice) : undefined,
+      salePrice:
+        body.salePrice !== undefined ? Number(body.salePrice) : undefined,
+      rentPrice:
+        body.rentPrice !== undefined ? Number(body.rentPrice) : undefined,
     };
 
-    Object.keys(updateData).forEach(key => 
-      updateData[key] === undefined && delete updateData[key]
-    );
+    // CORRECCIÓN: Usamos Record<string, unknown> en lugar de any para iterar de forma segura
+    const safeUpdateData = updateData as Record<string, unknown>;
+
+    Object.keys(safeUpdateData).forEach((key) => {
+      if (safeUpdateData[key] === undefined) {
+        delete safeUpdateData[key];
+      }
+    });
 
     console.log("LOG: Datos preparados para Prisma:", updateData);
 
@@ -79,18 +85,20 @@ export async function PUT(
 
     console.log("LOG: Actualización exitosa");
     return NextResponse.json(updated);
-  } catch (error: any) {
+  } catch (error) {
     console.error("ERROR CRÍTICO EN PUT PROPERTY:", error);
-    return NextResponse.json({ 
-      error: "Error interno", 
-      message: error.message 
-    }, { status: 500 });
+    const message =
+      error instanceof Error ? error.message : "Error desconocido";
+    return NextResponse.json(
+      { error: "Error interno", message: message },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getServerSession(authOptions);
 
