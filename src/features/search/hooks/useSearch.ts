@@ -7,13 +7,20 @@ inteligente la navegación: si el usuario selecciona una dirección, lo redirige
 coordenadas específicas, y si selecciona un perfil inmobiliario, lo envía a la página del
 usuario correspondiente.
 */
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+interface SearchSuggestion {
+  type: "ADDRESS" | "REALESTATE_USER" | string;
+  lat?: number;
+  lon?: number;
+  id?: string | number;
+  [key: string]: unknown;
+}
+
 export const useSearch = () => {
   const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -26,7 +33,9 @@ export const useSearch = () => {
 
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(query)}`,
+        );
         const data = await response.json();
         setSuggestions(data.suggestions || []);
       } catch (error) {
@@ -40,13 +49,13 @@ export const useSearch = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
 
-  const onSelectSuggestion = (suggestion: any) => {
+  const onSelectSuggestion = (suggestion: SearchSuggestion) => {
     setQuery("");
     setSuggestions([]);
 
-    if (suggestion.type === "ADDRESS") {
+    if (suggestion.type === "ADDRESS" && suggestion.lat && suggestion.lon) {
       router.push(`/map?lat=${suggestion.lat}&lon=${suggestion.lon}&zoom=16`);
-    } else if (suggestion.type === "REALESTATE_USER") {
+    } else if (suggestion.type === "REALESTATE_USER" && suggestion.id) {
       router.push(`/profile/${suggestion.id}`);
     }
   };

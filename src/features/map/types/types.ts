@@ -39,7 +39,8 @@ export interface MapProperty {
   currency?: string;
   latitude: number;
   longitude: number;
-  parcelGeom?: any;
+  // Corrección: Tipado flexible pero seguro para la geometría
+  parcelGeom?: Geometry | string | Record<string, unknown> | null;
   parcelCCA?: string;
   operationType: string;
   images?: string[];
@@ -53,7 +54,8 @@ export interface MapProperty {
 export interface SelectedParcel {
   CCA: string | null;
   PDA: string | null;
-  geometry: Geometry | any;
+  // Corrección: Uso estricto de Geometry
+  geometry: Geometry;
   lat: number;
   lon: number;
 }

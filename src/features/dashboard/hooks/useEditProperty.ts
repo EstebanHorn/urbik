@@ -1,54 +1,56 @@
-/*
-Este código define un hook personalizado de React llamado useEditProperty diseñado para gestionar
-la lógica de edición de una propiedad inmobiliaria, centralizando tanto el estado de sus atributos
-(como título, precio, descripción y coordenadas geográficas) como las funciones para actualizarlos.
-Al inicializarse con los datos existentes de una propiedad, el hook expone un conjunto de estados
-controlados y una función asíncrona handleUpdate que, al ejecutarse, envía la información procesada
-—incluyendo conversiones de tipos y datos de geolocalización— hacia un servicio externo; finalmente,
-gestiona los estados de carga, maneja errores mediante alertas y coordina la ejecución de funciones
-de retroalimentación (onUpdated y onClose) para cerrar el flujo de edición exitosamente.
-*/
-
 import { useState } from "react";
 import { updateProperty } from "../service/dashboardService";
-import { PropertyFormData } from "../components/create-modal/PropertyFormField";
 
-// Interfaz para la propiedad que llega al hook
-interface EditPropertyData extends Partial<PropertyFormData> {
-  id: number | string;
-  area?: number | string;
+interface PropertyAmenities {
+  [key: string]: boolean;
+}
+
+// Definición completa del estado del formulario para edición
+export interface EditPropertyFormState {
+  title: string;
+  description: string;
+  images: string[];
+  operationType: string;
+  status: string;
+  salePrice: string | number | null;
+  rentPrice: string | number | null;
+  areaM2?: string | number;
+  area?: string | number;
+  rooms: string | number;
+  bathrooms: string | number;
+  amenities: PropertyAmenities;
+  // Campos geográficos adicionales pueden ser necesarios
+  address?: string;
+  street?: string;
+  number?: string;
+  city?: string;
+  province?: string;
+  [key: string]: unknown; // Flexibilidad controlada para otros campos
+}
+
+// Interfaz para el objeto que se envía a la API
+interface UpdatePropertyPayload {
+  title: string;
+  description: string;
+  images: string[];
+  operationType: string;
+  status: string;
+  area: number;
+  rooms: number;
+  bathrooms: number;
+  amenities: PropertyAmenities;
+  salePrice?: number | null;
+  rentPrice?: number | null;
 }
 
 export function useEditProperty(
-  property: EditPropertyData,
+  property: EditPropertyFormState & { id: number | string },
   onUpdated: () => void,
   onClose: () => void,
 ) {
-  const [form, setForm] = useState<PropertyFormData>({
-    // Valores por defecto seguros
-    title: "",
-    description: "",
-    province: "",
-    city: "",
-    street: "",
-    number: "",
-    type: "HOUSE",
-    operationType: "RENT",
-    status: "AVAILABLE",
-    saleCurrency: "USD",
-    rentCurrency: "ARS",
-    currency: "USD",
-    images: [],
-    amenities: {
-      agua: false,
-      luz: false,
-      gas: false,
-      internet: false,
-      cochera: false,
-      pileta: false,
-    },
-    ...property, // Sobreescribimos con lo que viene
-    areaM2: property.areaM2?.toString() || property.area?.toString() || "",
+  const [form, setForm] = useState<EditPropertyFormState>({
+    ...property,
+    areaM2: property.area?.toString() || property.areaM2?.toString() || "",
     rooms: property.rooms?.toString() || "",
     bathrooms: property.bathrooms?.toString() || "",
     salePrice: property.salePrice?.toString() || "",
@@ -63,14 +65,13 @@ export function useEditProperty(
     setSaving(true);
     setMessage("");
 
-    // Usamos Record<string, unknown> en lugar de any
-    const updateData: Record<string, unknown> = {
+    const updateData: UpdatePropertyPayload = {
       title: form.title,
       description: form.description,
       images: form.images,
       operationType: form.operationType,
       status: form.status,
-      area: Number(form.areaM2),
+      area: Number(form.areaM2 || form.area),
       rooms: Number(form.rooms),
       bathrooms: Number(form.bathrooms),
       amenities: form.amenities,
@@ -94,11 +95,15 @@ export function useEditProperty(
       console.log("CLIENT-LOG: Respuesta del servidor:", res);
       onUpdated();
       onClose();
-    } catch (e) {
-      // CORRECCIÓN: Eliminado ': any'
-      const errorMsg = e instanceof Error ? e.message : "Error al actualizar";
-      console.error("CLIENT-LOG: Error capturado:", errorMsg);
-      setMessage(errorMsg);
+    } catch (e: unknown) {
+      let errorMessage = "Error al actualizar";
+      if (e instanceof Error) {
+        errorMessage = e.message;
+        console.error("CLIENT-LOG: Error capturado:", e.message);
+      } else if (typeof e === "string") {
+        errorMessage = e;
+      }
+      setMessage(errorMessage);
     } finally {
       setSaving(false);
     }

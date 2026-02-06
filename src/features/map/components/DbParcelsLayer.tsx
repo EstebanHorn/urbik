@@ -21,12 +21,17 @@ import type { MapProperty } from "../types/types";
 import { getDynamicParcelStyle } from "../utils/parcelStyles";
 import { useMapSettings } from "@/features/map/context/MapSettingsProvider";
 import { motion, AnimatePresence } from "framer-motion";
-import { Geometry, GeoJsonObject } from "geojson";
+import {
+  Geometry,
+  GeoJsonObject,
+  Polygon,
+  MultiPolygon,
+  Position,
+} from "geojson";
 
 interface ExtendedMapProperty extends MapProperty {
   salePrice?: number | null;
   rentPrice?: number | null;
-  parcelGeom?: string | object | null;
 }
 
 const getDisplayPrice = (prop: ExtendedMapProperty) => {
@@ -40,25 +45,26 @@ const formatPriceShort = (price: number) => {
   return price.toString();
 };
 
-const getCenterOfGeometry = (geometry: any): [number, number] | null => {
+const getCenterOfGeometry = (geometry: Geometry): [number, number] | null => {
   try {
-    const coords =
-      geometry.type === "Polygon"
-        ? geometry.coordinates[0]
-        : geometry.coordinates[0][0];
+    if (geometry.type !== "Polygon" && geometry.type !== "MultiPolygon")
+      return null;
+
+    const poly = geometry as Polygon | MultiPolygon;
+    // Normalizamos para obtener siempre una lista de coordenadas lineales del primer anillo
+    const coords: Position[] =
+      poly.type === "Polygon" ? poly.coordinates[0] : poly.coordinates[0][0];
 
     let latSum = 0;
     let lngSum = 0;
 
-    // CORRECCIÓN: Tipado estricto para coordenadas
-    coords.forEach((c: number[]) => {
-      lngSum += c[0];
+    coords.forEach((c) => {
+      lngSum += c[0]; // GeoJSON es [long, lat]
       latSum += c[1];
     });
 
     return [latSum / coords.length, lngSum / coords.length];
   } catch {
-    // CORRECCIÓN: Eliminada variable _e no usada
     return null;
   }
 };
@@ -87,12 +93,13 @@ export function DbParcelsLayer({ properties }: DbParcelsLayerProps) {
               ? JSON.parse(prop.parcelGeom)
               : (prop.parcelGeom as Geometry);
         } catch {
-          // CORRECCIÓN: Eliminada variable _e no usada
           return null;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dynamicStyle = getDynamicParcelStyle(prop as any, colorMode);
+        if (!geometry) return null;
+
+        // Corrección: Eliminado 'as any' innecesario
+        const dynamicStyle = getDynamicParcelStyle(prop, colorMode);
 
         const displayPrice = getDisplayPrice(prop);
         const shortPrice = formatPriceShort(displayPrice);
@@ -115,14 +122,17 @@ export function DbParcelsLayer({ properties }: DbParcelsLayerProps) {
             />
 
             <GeoJSON
-              // CORRECCIÓN: Tipado correcto para GeoJSON data
               data={geometry as GeoJsonObject}
               style={dynamicStyle}
               eventHandlers={{
                 click: () => router.push(`/property/${prop.id}`),
                 mouseover: (e) => {
                   const layer = e.target;
-                  layer.setStyle({ fillOpacity: 1, weight: 2, color: "#fff" });
+                  layer.setStyle({
+                    fillOpacity: 1,
+                    weight: 2,
+                    color: "#fff",
+                  });
                   layer.bringToFront();
                 },
                 mouseout: (e) => {

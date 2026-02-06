@@ -5,17 +5,33 @@ import SecuritySection from "./ChangePassword";
 import DangerZone from "./DeleteAccount";
 import PauseAccountZone from "./PauseAccount";
 import LocationSelectors from "../../../components/LocationSelectors";
-import ProfileMediaUploader from "./ProfileMediaUploader"; // <--- IMPORTAR EL NUEVO COMPONENTE
+import ProfileMediaUploader from "./ProfileMediaUploader";
 import { toggleAccountPause } from "@/features/profile/service/profileService";
-import { useRouter } from "next/navigation";
 import { Globe, Instagram, MapPin, Save, Lock, Phone } from "lucide-react";
 
+// Definimos una interfaz para el estado del formulario
+interface RealEstateFormData {
+  name: string;
+  phone: string;
+  address: string;
+  license: string;
+  bio: string;
+  website: string;
+  instagram: string;
+  province: string;
+  city: string;
+  bannerUrl: string;
+  logoUrl: string;
+  isActive: boolean;
+  [key: string]: unknown;
+}
+
 interface RealEstateFormProps {
-  form: any;
+  form: RealEstateFormData;
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
-  handleManualChange?: (name: string, value: any) => void;
+  handleManualChange?: (name: string, value: string | boolean) => void;
   handleSubmit: (e: React.FormEvent) => void;
   loading: boolean;
 }
@@ -27,7 +43,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
   loading,
   handleManualChange,
 }) => {
-  const router = useRouter();
+  // Se eliminó useRouter porque no se utilizaba
   const [isPausing, setIsPausing] = useState(false);
 
   useEffect(() => {
@@ -38,8 +54,9 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
     "italic w-full px-6 py-4 rounded-full bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium text-urbik-black placeholder:text-gray-400";
   const readonlyClasses =
     "bg-urbik-black w-full px-6 py-4 rounded-full bg-urbik-g300 font-bold text-urbik-white cursor-not-allowed select-none";
+  // Corrección: rounded-[2rem] -> rounded-4xl
   const textareaClasses =
-    "w-full px-6 py-4 rounded-[2rem] bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium resize-none text-urbik-black";
+    "w-full px-6 py-4 rounded-4xl bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium resize-none text-urbik-black";
 
   const handleTogglePause = async (isRequestingPause: boolean) => {
     const nextActiveState = !isRequestingPause;
@@ -63,7 +80,11 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
     if (handleManualChange) {
       handleManualChange(name, value);
     } else {
-      handleChange({ target: { name, value } } as any);
+      // Fallback seguro si no existe handleManualChange
+      const event = {
+        target: { name, value },
+      } as React.ChangeEvent<HTMLInputElement>;
+      handleChange(event);
     }
   };
 
@@ -75,7 +96,6 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
           className="flex flex-col gap-6 text-urbik-black"
         >
           {/* --- SECCIÓN VISUAL (BANNER + LOGO) --- */}
-          {/* Contenedor principal con estilo de tarjeta */}
           <div className="bg-white rounded-[2rem] border border-urbik-g200 shadow-sm overflow-hidden relative mb-4">
             {/* 1. AREA DEL BANNER */}
             <div className="h-48 md:h-64 w-full bg-urbik-g50 relative">
