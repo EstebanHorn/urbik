@@ -33,7 +33,7 @@ export const SearchBar: React.FC = () => {
       </div>
 
       <ResultList
-        suggestions={suggestions as SearchSuggestion[]} // Corrección de tipo
+        suggestions={suggestions as SearchSuggestion[]}
         isLoading={isLoading}
         onSelect={onSelectSuggestion as (suggestion: SearchSuggestion) => void} // Corrección de tipo
       />
