@@ -9,9 +9,15 @@ conjuntos de resultados en un único arreglo de objetos con formatos estandariza
 tipo ("REALESTATE_USER" o "ADDRESS") y lo retorna como una respuesta JSON, incluyendo un manejo
 de errores básico que devuelve una lista vacía en caso de fallos.
 */
-
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/db";
+
+interface OsmResult {
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +32,11 @@ export async function GET(request: NextRequest) {
       where: {
         role: "REALESTATE",
         OR: [
-          { realEstate: { agencyName: { contains: query, mode: "insensitive" } } },
+          {
+            realEstate: {
+              agencyName: { contains: query, mode: "insensitive" },
+            },
+          },
         ],
       },
       include: { realEstate: true },
@@ -35,27 +45,29 @@ export async function GET(request: NextRequest) {
 
     const osmResponse = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ar&addressdetails=1&limit=6`,
-      { headers: { "User-Agent": "Urbik-App-v2" } }
+      { headers: { "User-Agent": "Urbik-App-v2" } },
     );
-    const osmResults = await osmResponse.json();
+
+    const osmResults = (await osmResponse.json()) as OsmResult[];
 
     const suggestions = [
-      ...dbResults.map(user => ({
+      ...dbResults.map((user) => ({
         type: "REALESTATE_USER",
-        id: suggestion.id, 
+        id: user.user_id,
         display_name: user.realEstate?.agencyName || user.email,
       })),
-      ...osmResults.map((res: any) => ({
+      ...osmResults.map((res) => ({
         type: "ADDRESS",
         id: res.place_id,
         display_name: res.display_name,
         lat: res.lat,
         lon: res.lon,
-      }))
+      })),
     ];
 
     return NextResponse.json({ suggestions });
-  } catch (error) {
+  } catch (_error) {
+    console.error("Search error:", _error);
     return NextResponse.json({ suggestions: [] }, { status: 500 });
   }
 }

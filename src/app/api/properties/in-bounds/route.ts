@@ -1,11 +1,11 @@
 /*
 ARCHIVO: src/app/api/properties/in-bounds/route.ts
-CORRECCIÓN: Eliminada la selección de 'price' que no existe en la BD.
+CORRECCIÓN: Eliminada la selección de 'price' que no existe en la BD y uso de Prisma.PropertyWhereInput.
 */
 
 import { NextResponse } from "next/server";
 import prisma from "@/libs/db";
-import { OperationType, PropertyType } from "@prisma/client";
+import { OperationType, PropertyType, Prisma } from "@prisma/client";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -20,7 +20,6 @@ export async function GET(request: Request) {
   const maxPrice = searchParams.get("maxPrice");
   const rooms = searchParams.get("rooms");
 
-  // 1. EXTRAER PARAMETROS DE AMENITIES
   const hasWater = searchParams.get("hasWater") === "true";
   const hasElectricity = searchParams.get("hasElectricity") === "true";
   const hasGas = searchParams.get("hasGas") === "true";
@@ -36,7 +35,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const whereClause: any = {
+    // CORRECCIÓN: Tipado de Prisma para evitar 'any'
+    const whereClause: Prisma.PropertyWhereInput = {
       status: "AVAILABLE",
       latitude: {
         gte: minLat,
@@ -63,9 +63,6 @@ export async function GET(request: Request) {
     }
 
     if (minPrice || maxPrice) {
-      // NOTA: Prisma no permite filtrar sobre un campo que no existe ("price").
-      // Asumimos que quieres filtrar por el precio relevante (venta o alquiler).
-      // Esta lógica busca si CUALQUIERA de los dos precios cumple el rango.
       whereClause.OR = [
         {
           salePrice: {
@@ -82,7 +79,6 @@ export async function GET(request: Request) {
       ];
     }
 
-    // 2. AGREGAR AMENITIES AL FILTRO (WHERE)
     if (hasWater) whereClause.hasWater = true;
     if (hasElectricity) whereClause.hasElectricity = true;
     if (hasGas) whereClause.hasGas = true;
@@ -97,7 +93,7 @@ export async function GET(request: Request) {
         title: true,
         salePrice: true,
         rentPrice: true,
-        // price: true, <--- ELIMINADO: ESTO CAUSABA EL ERROR 500
+        // price: true, // Eliminado correctamente
         latitude: true,
         longitude: true,
         city: true,
@@ -111,7 +107,6 @@ export async function GET(request: Request) {
         rooms: true,
         area: true,
 
-        // 3. SELECCIÓN EXPLÍCITA DE AMENITIES
         hasWater: true,
         hasElectricity: true,
         hasGas: true,

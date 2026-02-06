@@ -4,21 +4,33 @@ la información personal del usuario (nombre, apellido y teléfono) mediante inp
 incluyendo además una sección de seguridad, un botón de guardado con estado de carga y una
 "zona de peligro" para acciones críticas como eliminar la cuenta.
 */
+import React from "react";
+import { Save, User, UserPlus, Phone } from "lucide-react"; // Eliminado ShieldCheck
+import SecuritySection from "./ChangePassword";
+import DangerZone from "./DeleteAccount";
+import { UserFormFields } from "@/libs/types";
 
-import React from 'react';
-import { Save, User, UserPlus, Phone, ShieldCheck } from 'lucide-react';
-import SecuritySection from './ChangePassword';
-import DangerZone from './DeleteAccount';
+// Definimos la interfaz de props
+interface UserFormProps {
+  form: Partial<UserFormFields>; // Partial porque al inicio puede estar vacío
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmit: (e: React.FormEvent) => void;
+  loading: boolean;
+}
 
-const UserForm = ({ form, handleChange, handleSubmit, loading }) => {
-  const inputBaseClasses = 
+const UserForm = ({
+  form,
+  handleChange,
+  handleSubmit,
+  loading,
+}: UserFormProps) => {
+  const inputBaseClasses =
     "italic w-full px-6 py-4 rounded-full bg-urbik-white border border-gray-300 " +
     "focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium text-urbik-black placeholder:text-gray-400";
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-10">
       <div className="p-8 md:p-12">
-        
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-3">
             <div className="bg-urbik-black p-2 rounded-full text-white">
@@ -28,23 +40,27 @@ const UserForm = ({ form, handleChange, handleSubmit, loading }) => {
               Información Personal
             </h2>
           </div>
-
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 text-urbik-black">
-          
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-6 text-urbik-black"
+        >
           <div className="space-y-2">
             <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
               Nombre
             </label>
             <div className="relative">
-              <UserPlus className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
-              <input 
-                name="firstName" 
-                value={form.firstName || ""} 
-                onChange={handleChange} 
+              <UserPlus
+                className="absolute left-6 top-5 text-urbik-black opacity-40"
+                size={18}
+              />
+              <input
+                name="firstName"
+                value={form.firstName || ""}
+                onChange={handleChange}
                 className={`${inputBaseClasses} pl-14`}
-                required 
+                required
                 placeholder="Tu nombre"
               />
             </div>
@@ -55,13 +71,16 @@ const UserForm = ({ form, handleChange, handleSubmit, loading }) => {
               Apellido
             </label>
             <div className="relative">
-              <UserPlus className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
-              <input 
-                name="lastName" 
-                value={form.lastName || ""} 
-                onChange={handleChange} 
+              <UserPlus
+                className="absolute left-6 top-5 text-urbik-black opacity-40"
+                size={18}
+              />
+              <input
+                name="lastName"
+                value={form.lastName || ""}
+                onChange={handleChange}
                 className={`${inputBaseClasses} pl-14`}
-                required 
+                required
                 placeholder="Tu apellido"
               />
             </div>
@@ -72,14 +91,17 @@ const UserForm = ({ form, handleChange, handleSubmit, loading }) => {
               Teléfono de Contacto
             </label>
             <div className="relative">
-              <Phone className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
-              <input 
+              <Phone
+                className="absolute left-6 top-5 text-urbik-black opacity-40"
+                size={18}
+              />
+              <input
                 type="tel"
-                name="phone" 
-                value={form.phone || ""} 
-                onChange={handleChange} 
-                className={`${inputBaseClasses} pl-14`} 
-                placeholder="+54 9 11 ..." 
+                name="phone"
+                value={form.phone || ""}
+                onChange={handleChange}
+                className={`${inputBaseClasses} pl-14`}
+                placeholder="+54 9 11 ..."
               />
             </div>
           </div>
@@ -94,9 +116,10 @@ const UserForm = ({ form, handleChange, handleSubmit, loading }) => {
               disabled={loading}
               className={`
                 px-10 py-5 font-bold rounded-full cursor-pointer transition-all flex items-center justify-center gap-3 active:scale-95 shadow-xl
-                ${loading 
-                  ? 'bg-urbik-g300 text-urbik-muted cursor-not-allowed' 
-                  : 'bg-urbik-black text-white hover:bg-urbik-emerald'
+                ${
+                  loading
+                    ? "bg-urbik-g300 text-urbik-muted cursor-not-allowed"
+                    : "bg-urbik-black text-white hover:bg-urbik-emerald"
                 }
               `}
             >
@@ -108,9 +131,9 @@ const UserForm = ({ form, handleChange, handleSubmit, loading }) => {
       </div>
 
       <div className="pt-10">
-        <DangerZone 
-          itemName="tu cuenta personal" 
-          onDelete={() => console.log("Usuario eliminado")} 
+        <DangerZone
+          itemName="tu cuenta personal"
+          onDelete={() => console.log("Usuario eliminado")}
         />
       </div>
     </div>

@@ -10,12 +10,16 @@ usuario, dentro de la sesión de la aplicación, redirigiendo los intentos de ac
 autorizados a una página de login personalizada.
 */
 
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions, User } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import prisma from "@/libs/db";
 import type { Role } from "@prisma/client";
+
+interface CustomUser extends User {
+  role?: Role;
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -77,7 +81,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as any).role;
+        token.role = (user as CustomUser).role;
       }
       return token;
     },

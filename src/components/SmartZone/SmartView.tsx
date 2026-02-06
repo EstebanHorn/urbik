@@ -13,7 +13,20 @@ animaciones de carga en video y un diseño responsivo con estilos de Tailwind CS
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function SmartZoneSingle({ property }: { property: any }) {
+interface PropertyForAnalysis {
+  address: string;
+  city: string;
+  province: string;
+  latitude: number;
+  longitude: number;
+  [key: string]: unknown;
+}
+
+interface SmartViewProps {
+  property: PropertyForAnalysis;
+}
+
+export default function SmartZoneSingle({ property }: SmartViewProps) {
   const [analysis, setAnalysis] = useState<{
     score: number;
     verdict: string;
@@ -57,12 +70,12 @@ export default function SmartZoneSingle({ property }: { property: any }) {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-urbik-emerald/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto">
-        <div className="bg-gradient-to-br from-gray-900 to-black rounded-3xl p-8 md:p-12 border border-urbik-emerald/30 shadow-[0_0_50px_-12px_rgba(16,185,129,0.2)] relative overflow-hidden">
-          <div className="absolute top-8 right-8">
+        <div className="bg-linear-to-br from-gray-900 to-black rounded-3xl p-8 md:p-12 border border-urbik-emerald/30 shadow-[0_0_50px_-12px_rgba(16,185,129,0.2)] relative overflow-hidden">
+          <div className="absolute top-8 right-8 w-10 h-10 ">
             <img
               src="/Urbik_Logo_Smart_Zone.svg"
               alt="Smart Zone"
-              className="h-10 w-auto drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+              className="object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]"
             />
           </div>
 

@@ -1,34 +1,60 @@
 /*
-Este código define un componente de React llamado FeaturedCarousel que renderiza un
-carrusel animado para mostrar propiedades inmobiliarias destacadas utilizando Framer
-Motion para las transiciones y Next.js para la navegación. El componente gestiona
-diferentes estados (carga, lista vacía o visualización de datos), formatea etiquetas
-de tipo de propiedad y especificaciones técnicas (como metros cuadrados y ambientes),
-y presenta la información detallada de cada propiedad —incluyendo imagen, precio,
-ubicación y descripción— permitiendo además que los usuarios con sesión iniciada
-marquen propiedades como favoritas mediante un botón interactivo.
+Este componente de React define un carrusel animado para mostrar propiedades destacadas.
+Se han corregido los tipos para incluir precios de venta/alquiler y monedas, se ha
+optimizado la carga de imágenes con next/image y se han solucionado advertencias de linter
+eliminando tipos 'any' explícitos.
 */
 
 "use client";
 
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin } from "lucide-react";
 import { FeaturedProperty } from "../service/propertyService";
 import FavoriteButton from "../../../components/FavoritesButton";
+import { Session } from "next-auth";
+
+// CORRECCIÓN 1: Eliminamos el [key: string]: any para evitar el error de lint.
+// Definimos explícitamente solo los campos que necesitamos sobreescribir o añadir.
+interface ExtendedFeaturedProperty extends Omit<
+  FeaturedProperty,
+  "salePrice" | "rentPrice" | "saleCurrency" | "rentCurrency"
+> {
+  salePrice?: number | null;
+  rentPrice?: number | null;
+  saleCurrency?: string | null;
+  rentCurrency?: string | null;
+}
 
 interface Props {
   properties: FeaturedProperty[];
   loading: boolean;
   currentIndex: number;
-  session: any;
+  session: Session | null;
+  // CORRECCIÓN 2: Tipado estricto del evento en lugar de 'any'
+  onToggleFavorite?: (
+    e: React.MouseEvent<HTMLButtonElement>,
+    id: string,
+  ) => Promise<void>;
 }
 
-export function FeaturedCarousel({ properties, loading, currentIndex, session }: Props) {
+// CORRECCIÓN 3: Usamos '_session' para indicar que no se usa y callar al linter
+export function FeaturedCarousel({
+  properties,
+  loading,
+  currentIndex,
+  session: _session,
+}: Props) {
   const getPropertyLabel = (type: string) => {
     const labels: Record<string, string> = {
-      HOUSE: "Casa", APARTMENT: "Departamento", LAND: "Terreno",
-      COMMERCIAL_PROPERTY: "Local", OFFICE: "Oficina", COMMERCIAL: "Local Comercial"
+      HOUSE: "Casa",
+      APARTMENT: "Departamento",
+      LAND: "Terreno",
+      COMMERCIAL_PROPERTY: "Local",
+      OFFICE: "Oficina",
+      COMMERCIAL: "Local Comercial",
     };
     return labels[type] || type;
   };
@@ -40,30 +66,59 @@ export function FeaturedCarousel({ properties, loading, currentIndex, session }:
     return parts.join(" repartidos en ") || "Consultar detalles";
   };
 
-  const PriceDisplay = ({ amount, currency, sizeClass, label }: { amount: number, currency: string, sizeClass: string, label?: string }) => (
+  const PriceDisplay = ({
+    amount,
+    currency,
+    sizeClass,
+    label,
+  }: {
+    amount: number;
+    currency: string;
+    sizeClass: string;
+    label?: string;
+  }) => (
     <div className="flex flex-col items-end leading-none">
-      {label && <span className="text-[10px] font-bold text-urbik-muted/50 uppercase mb-1">{label}</span>}
-      <div className={`${sizeClass} font-black text-urbik-dark flex items-baseline gap-2`}>
+      {label && (
+        <span className="text-[10px] font-bold text-urbik-muted/50 uppercase mb-1">
+          {label}
+        </span>
+      )}
+      <div
+        className={`${sizeClass} font-black text-urbik-dark flex items-baseline gap-2`}
+      >
         <span className="text-urbik-emerald">{currency}</span>
-        <span>${amount.toLocaleString('es-AR')}</span>
+        <span>${amount.toLocaleString("es-AR")}</span>
       </div>
     </div>
   );
 
-  if (loading) return <div className="w-full h-[500px] bg-urbik-g300 animate-pulse rounded-md" />;
-  if (properties.length === 0) return (
-    <div className="w-full h-[500px] flex items-center justify-center border rounded-md">
-      <p className="text-urbik-muted font-bold">No hay propiedades destacadas.</p>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="w-full h-[500px] bg-urbik-g300 animate-pulse rounded-md" />
+    );
+  if (properties.length === 0)
+    return (
+      <div className="w-full h-[500px] flex items-center justify-center border rounded-md">
+        <p className="text-urbik-muted font-bold">
+          No hay propiedades destacadas.
+        </p>
+      </div>
+    );
 
-  const current = properties[currentIndex];
+  // Casteamos a la interfaz extendida de forma segura
+  const current = properties[
+    currentIndex
+  ] as unknown as ExtendedFeaturedProperty;
 
   return (
     <div className="max-w-7xl mx-auto pb-20">
-      <h2 className="text-2xl font-display font-bold text-urbik-muted text-right mr-12 italic">Propiedades destacadas.</h2>
-      <p className="text-urbik-black opacity-50 text-md font-med mb-3 text-right mr-10">Oportunidades seleccionadas por nuestro algoritmo.</p>
-      
+      <h2 className="text-2xl font-display font-bold text-urbik-muted text-right mr-12 italic">
+        Propiedades destacadas.
+      </h2>
+      <p className="text-urbik-black opacity-50 text-md font-med mb-3 text-right mr-10">
+        Oportunidades seleccionadas por nuestro algoritmo.
+      </p>
+
       <div className="relative overflow-hidden w-full h-[500px] rounded-md border border-urbik-g200 bg-white hover:scale-105 hover:brightness-105 transition-all">
         <AnimatePresence mode="wait">
           <motion.div
@@ -74,17 +129,24 @@ export function FeaturedCarousel({ properties, loading, currentIndex, session }:
             transition={{ duration: 0.6, ease: "easeInOut" }}
             className="absolute inset-0 w-full h-full"
           >
-            <Link href={`/property/${current.id}`} className="flex flex-col md:flex-row h-full group">
+            <Link
+              href={`/property/${current.id}`}
+              className="flex flex-col md:flex-row h-full group"
+            >
               <div className="relative w-full md:w-1/2 h-64 md:h-full overflow-hidden bg-urbik-g200">
-                <img src={current.images[0]} alt={current.title} className="w-full h-full object-cover" />
+                <Image
+                  src={current.images[0]}
+                  alt={current.title}
+                  fill
+                  className="object-cover"
+                />
               </div>
 
               <div className="w-full md:w-1/2 p-10 flex flex-col bg-urbik-white2 relative">
-                
                 <div className="absolute top-6 right-6 z-30">
-                  <FavoriteButton 
-                    propertyId={current.id} 
-                    initialIsFavorite={current.isFavorite} 
+                  <FavoriteButton
+                    propertyId={current.id.toString()}
+                    initialIsFavorite={!!current.isFavorite}
                   />
                 </div>
 
@@ -93,7 +155,11 @@ export function FeaturedCarousel({ properties, loading, currentIndex, session }:
                     {getPropertyLabel(current.type)}
                   </span>
                   <span className="bg-urbik-cyan text-urbik-muted text-[11px] px-4 py-1.5 rounded-full font-black uppercase">
-                    {current.operationType === "SALE" ? "VENTA" : current.operationType === "RENT" ? "ALQUILER" : "VENTA / ALQUILER"}
+                    {current.operationType === "SALE"
+                      ? "VENTA"
+                      : current.operationType === "RENT"
+                        ? "ALQUILER"
+                        : "VENTA / ALQUILER"}
                   </span>
                 </div>
 
@@ -104,43 +170,66 @@ export function FeaturedCarousel({ properties, loading, currentIndex, session }:
                 <div className="flex items-center gap-1 text-urbik-dark/60 mb-6">
                   <MapPin size={16} strokeWidth={3} />
                   <p className="text-sm font-bold text-urbik-dark uppercase tracking-tight">
-                    {current.city} — <span className="opacity-70">{current.address}</span>
+                    {current.city} —{" "}
+                    <span className="opacity-70">{current.address}</span>
                   </p>
                 </div>
 
                 <p className="text-urbik-muted text-md line-clamp-4 font-medium mb-8 max-w-sm">
-                  {current.description || "Una oportunidad única seleccionada por nuestro algoritmo."}
+                  {current.description ||
+                    "Una oportunidad única seleccionada por nuestro algoritmo."}
                 </p>
 
                 <div className="flex flex-col text-right mt-18">
-                  <span className="text-md font-medium italic mr-2 text-urbik-black/50">Especificaciones</span>
-                  <span className="text-lg font-bold text-urbik-muted">{getSpecsLabel(current)}</span>
+                  <span className="text-md font-medium italic mr-2 text-urbik-black/50">
+                    Especificaciones
+                  </span>
+                  <span className="text-lg font-bold text-urbik-muted">
+                    {getSpecsLabel(current)}
+                  </span>
                 </div>
 
                 <div className="mt-auto">
                   <hr className="border-urbik-g100 mb-6" />
                   <div className="text-right w-full flex flex-col items-end gap-3">
-                    
-                    {(current.operationType === "SALE" || current.operationType === "SALE_RENT") && current.salePrice && (
-                      <PriceDisplay 
-                        amount={current.salePrice} 
-                        currency={current.saleCurrency || "USD"} 
-                        sizeClass="text-5xl"
-                        label={current.operationType === "SALE_RENT" ? "Precio de Venta" : undefined}
-                      />
-                    )}
-                    
-                    {(current.operationType === "RENT" || current.operationType === "SALE_RENT") && current.rentPrice && (
-                      <PriceDisplay 
-                        amount={current.rentPrice} 
-                        currency={current.rentCurrency || "USD"} 
-                        sizeClass={current.operationType === "SALE_RENT" ? "text-3xl" : "text-5xl"}
-                        label={current.operationType === "SALE_RENT" ? "Precio de Alquiler" : undefined}
-                      />
-                    )}
+                    {(current.operationType === "SALE" ||
+                      current.operationType === "SALE_RENT") &&
+                      current.salePrice && (
+                        <PriceDisplay
+                          amount={current.salePrice}
+                          currency={current.saleCurrency || "USD"}
+                          sizeClass="text-5xl"
+                          label={
+                            current.operationType === "SALE_RENT"
+                              ? "Precio de Venta"
+                              : undefined
+                          }
+                        />
+                      )}
+
+                    {(current.operationType === "RENT" ||
+                      current.operationType === "SALE_RENT") &&
+                      current.rentPrice && (
+                        <PriceDisplay
+                          amount={current.rentPrice}
+                          currency={current.rentCurrency || "USD"}
+                          sizeClass={
+                            current.operationType === "SALE_RENT"
+                              ? "text-3xl"
+                              : "text-5xl"
+                          }
+                          label={
+                            current.operationType === "SALE_RENT"
+                              ? "Precio de Alquiler"
+                              : undefined
+                          }
+                        />
+                      )}
 
                     {!current.salePrice && !current.rentPrice && (
-                      <span className="text-3xl font-black text-urbik-dark italic">Consultar precio</span>
+                      <span className="text-3xl font-black text-urbik-dark italic">
+                        Consultar precio
+                      </span>
                     )}
                   </div>
                 </div>

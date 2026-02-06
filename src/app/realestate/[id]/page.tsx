@@ -13,11 +13,19 @@ import React from "react";
 import prisma from "../../../libs/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image"; // Importamos Image
 import { MapPin } from "lucide-react";
 import bgImage from "../../../assets/login_bg.png";
-import AdminActions from "../../../features/administrate/components/AdminActions"; 
+import AdminActions from "../../../features/administrate/components/AdminActions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+// Definimos un tipo parcial para la propiedad en este contexto
+interface PartialProperty {
+  area?: number | null;
+  rooms?: number | null;
+  type: string;
+}
 
 const getPropertyLabel = (type: string) => {
   const labels: Record<string, string> = {
@@ -30,7 +38,7 @@ const getPropertyLabel = (type: string) => {
   return labels[type] || type;
 };
 
-const getSpecsLabel = (p: any) => {
+const getSpecsLabel = (p: PartialProperty) => {
   const parts = [];
   if (p.area) parts.push(`${p.area} m²`);
   if (p.rooms) parts.push(`${p.rooms} ambientes`);
@@ -43,7 +51,8 @@ export default async function RealEstatePage({
   params: { id: string };
 }) {
   const realEstateId = parseInt(params.id);
-  const session = await getServerSession(authOptions) as any; 
+  const session = await getServerSession(authOptions);
+  const user = session?.user as { role?: string } | undefined;
 
   if (isNaN(realEstateId)) notFound();
 
@@ -60,12 +69,11 @@ export default async function RealEstatePage({
 
   if (!realEstate) notFound();
 
-  const isAdmin = session?.user?.role === "ADMIN";
+  const isAdmin = user?.role === "ADMIN";
 
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8 mt-20">
-        
         {isAdmin && (
           <div className="mb-6">
             <AdminActions id={realEstate.user_id} type="user" />
@@ -77,24 +85,25 @@ export default async function RealEstatePage({
             className="absolute inset-0 z-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${bgImage.src})` }}
           />
-          <div className="absolute inset-0 z-10 bg-gradient-to-l from-urbik-black/100 via-urbik-black/90 to-transparent" />
+          {/* Corrección de clase Tailwind */}
+          <div className="absolute inset-0 z-10 bg-linear-to-l from-urbik-black via-urbik-black/90 to-transparent" />
 
           <div className="relative z-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="flex items-center gap-8 min-w-0 w-full">
-              <div 
+              <div
                 className="w-28 h-28 shrink-0 rounded-full flex items-center justify-center bg-cover bg-center"
                 style={{ backgroundImage: `url(${bgImage.src})` }}
-              >
-              </div>
+              ></div>
 
               <div className="min-w-0 w-full flex flex-col items-center justify-center -mr-20">
-                  <h1 className="text-3xl md:text-4xl font-black text-white italic uppercase tracking-tighter mb-3">
-                    {realEstate.agencyName}
-                  </h1>
-                  <p className="flex items-center gap-2 text-urbik-white font-medium">
-                    <MapPin size={16} />
-                    {realEstate.city}, {realEstate.province}. {realEstate.street} {realEstate.address}
-                  </p>
+                <h1 className="text-3xl md:text-4xl font-black text-white italic uppercase tracking-tighter mb-3">
+                  {realEstate.agencyName}
+                </h1>
+                <p className="flex items-center gap-2 text-urbik-white font-medium">
+                  <MapPin size={16} />
+                  {realEstate.city}, {realEstate.province}. {realEstate.street}{" "}
+                  {realEstate.address}
+                </p>
               </div>
             </div>
 
@@ -124,71 +133,99 @@ export default async function RealEstatePage({
         </div>
 
         <div className="grid grid-cols-1 gap-12">
-          {realEstate.properties.map((property) => (
-            <div
-              key={property.id}
-              className="relative overflow-hidden w-full h-auto md:h-[450px] rounded-md border border-urbik-g200 bg-white hover:shadow-2xl transition-all group"
-            >
-              <Link
-                href={`/property/${property.id}`}
-                className="flex flex-col md:flex-row h-full"
+          {realEstate.properties.map((property) => {
+            // Lógica para determinar el precio a mostrar
+            const isSale =
+              property.operationType === "SALE" ||
+              property.operationType === "SALE_RENT";
+            const isRent =
+              property.operationType === "RENT" ||
+              property.operationType === "SALE_RENT";
+
+            // Priorizamos venta si tiene ambos, o mostramos el que tenga
+            const showPrice =
+              isSale && property.salePrice
+                ? property.salePrice
+                : property.rentPrice;
+            const showCurrency =
+              isSale && property.saleCurrency
+                ? property.saleCurrency
+                : property.rentCurrency;
+
+            return (
+              <div
+                key={property.id}
+                className="relative overflow-hidden w-full h-auto md:h-[450px] rounded-md border border-urbik-g200 bg-white hover:shadow-2xl transition-all group"
               >
-                <div className="relative w-full md:w-2/5 h-64 md:h-full overflow-hidden bg-urbik-g200">
-                  <img
-                    src={property.images[0] || "/placeholder-property.jpg"}
-                    alt={property.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                </div>
-
-                <div className="w-full md:w-3/5 p-8 flex flex-col bg-urbik-white2 relative">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="bg-urbik-black text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase">
-                      {getPropertyLabel(property.type)}
-                    </span>
-                    <span className="bg-urbik-cyan text-urbik-muted text-[10px] px-3 py-1 rounded-full font-black uppercase">
-                      {property.operationType === "SALE" ? "VENTA" : "ALQUILER"}
-                    </span>
+                <Link
+                  href={`/property/${property.id}`}
+                  className="flex flex-col md:flex-row h-full"
+                >
+                  <div className="relative w-full md:w-2/5 h-64 md:h-full overflow-hidden bg-urbik-g200">
+                    <Image
+                      src={property.images[0] || "/placeholder-property.jpg"}
+                      alt={property.title}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
                   </div>
 
-                  <h3 className="text-3xl font-black mb-2 text-urbik-dark uppercase leading-none tracking-tighter">
-                    {property.title}
-                  </h3>
+                  <div className="w-full md:w-3/5 p-8 flex flex-col bg-urbik-white2 relative">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="bg-urbik-black text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase">
+                        {getPropertyLabel(property.type)}
+                      </span>
+                      <span className="bg-urbik-cyan text-urbik-muted text-[10px] px-3 py-1 rounded-full font-black uppercase">
+                        {property.operationType === "SALE"
+                          ? "VENTA"
+                          : "ALQUILER"}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center gap-1 text-urbik-dark/60 mb-4">
-                    <MapPin size={14} strokeWidth={3} className="text-urbik-cyan" />
-                    <p className="text-xs font-bold text-urbik-dark uppercase tracking-tight">
-                      {property.city} — <span className="opacity-70">{property.address}</span>
+                    <h3 className="text-3xl font-black mb-2 text-urbik-dark uppercase leading-none tracking-tighter">
+                      {property.title}
+                    </h3>
+
+                    <div className="flex items-center gap-1 text-urbik-dark/60 mb-4">
+                      <MapPin
+                        size={14}
+                        strokeWidth={3}
+                        className="text-urbik-cyan"
+                      />
+                      <p className="text-xs font-bold text-urbik-dark uppercase tracking-tight">
+                        {property.city} —{" "}
+                        <span className="opacity-70">{property.address}</span>
+                      </p>
+                    </div>
+
+                    <p className="text-urbik-muted text-sm line-clamp-3 font-medium mb-6">
+                      {property.description}
                     </p>
-                  </div>
 
-                  <p className="text-urbik-muted text-sm line-clamp-3 font-medium mb-6">
-                    {property.description}
-                  </p>
+                    <div className="mt-auto flex justify-between items-end">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-urbik-black/40">
+                          Especificaciones
+                        </span>
+                        <span className="text-md font-bold text-urbik-muted">
+                          {getSpecsLabel(property)}
+                        </span>
+                      </div>
 
-                  <div className="mt-auto flex justify-between items-end">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-urbik-black/40">
-                        Especificaciones
-                      </span>
-                      <span className="text-md font-bold text-urbik-muted">
-                        {getSpecsLabel(property)}
-                      </span>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="text-4xl font-black text-urbik-emerald">
-                        {property.currency === "USD" ? "USD" : "ARS"}
-                      </span>
-                      <span className="text-4xl font-bold text-urbik-dark ml-3">
-                        ${property.price?.toLocaleString("es-AR")}
-                      </span>
+                      <div className="text-right">
+                        <span className="text-4xl font-black text-urbik-emerald">
+                          {showCurrency || "USD"}
+                        </span>
+                        <span className="text-4xl font-bold text-urbik-dark ml-3">
+                          ${showPrice?.toLocaleString("es-AR")}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            </div>
-          ))}
+                </Link>
+              </div>
+            );
+          })}
 
           {realEstate.properties.length === 0 && (
             <div className="py-20 text-center border-2 border-dashed border-gray-200 rounded-md">

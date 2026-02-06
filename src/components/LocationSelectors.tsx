@@ -58,7 +58,7 @@ export default function LocationSelectors({
       .then((res) => res.json())
       .then((data) =>
         setProvincias(
-          data.provincias.sort((a: any, b: any) =>
+          data.provincias.sort((a: GeorefItem, b: GeorefItem) =>
             a.nombre.localeCompare(b.nombre),
           ),
         ),
@@ -88,7 +88,7 @@ export default function LocationSelectors({
       .then((res) => res.json())
       .then((data) => {
         setCiudades(
-          data.municipios.sort((a: any, b: any) =>
+          data.municipios.sort((a: GeorefItem, b: GeorefItem) =>
             a.nombre.localeCompare(b.nombre),
           ),
         );

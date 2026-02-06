@@ -7,12 +7,14 @@ propiedad), formatea precios a moneda local y presenta cada propiedad en tarjeta
 Framer Motion que incluyen imágenes, ubicación y un botón funcional para marcar favoritos, todo
 integrado con navegación dinámica mediante Next.js.
 */
-
 "use client";
+
+/* eslint-disable @next/next/no-img-element */
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
-import { motion } from "framer-motion";
+// CORRECCIÓN: Eliminado motion que no se usaba
 import type { MapProperty } from "../types/types";
 import FavoriteButton from "../../../components/FavoritesButton";
 import { useSession } from "next-auth/react";
@@ -21,6 +23,11 @@ interface PropertiesSidebarProps {
   properties: MapProperty[];
   isLoading: boolean;
   visualLimit: number;
+}
+
+// CORRECCIÓN: Extendemos la interfaz localmente para incluir 'type' que faltaba
+interface ExtendedMapProperty extends MapProperty {
+  type: string;
 }
 
 export function PropertiesSidebar({
@@ -50,28 +57,40 @@ export function PropertiesSidebar({
 
   const getOperationLabel = (type: string) => {
     switch (type) {
-      case "SALE": return "Venta";
-      case "RENT": return "Alquiler";
-      case "SALE_RENT": return "Venta y Alquiler";
-      default: return type;
+      case "SALE":
+        return "Venta";
+      case "RENT":
+        return "Alquiler";
+      case "SALE_RENT":
+        return "Venta y Alquiler";
+      default:
+        return type;
     }
   };
 
   const getPropertyLabel = (type: string) => {
     switch (type) {
-      case "HOUSE": return "CASA";
-      case "APARTMENT": return "DPTO";
-      case "LAND": return "TERRENO";
-      case "COMMERCIAL_PROPERTY": return "LOCAL";
-      case "OFFICE": return "OFICINA";
-      default: return type;
+      case "HOUSE":
+        return "CASA";
+      case "APARTMENT":
+        return "DPTO";
+      case "LAND":
+        return "TERRENO";
+      case "COMMERCIAL_PROPERTY":
+        return "LOCAL";
+      case "OFFICE":
+        return "OFICINA";
+      default:
+        return type;
     }
   };
 
   if (isLoading) {
     return (
       <div className="h-full w-full p-4 flex items-center justify-center text-slate-500">
-        <span className="animate-pulse font-medium">Buscando propiedades...</span>
+        <span className="animate-pulse font-medium">
+          Buscando propiedades...
+        </span>
       </div>
     );
   }
@@ -86,44 +105,52 @@ export function PropertiesSidebar({
   }
 
   const gridConfig = visualLimit > 4 ? "grid-cols-2" : "grid-cols-1";
-  
+
   return (
     <div className="h-full overflow-y-auto bg-white p-4 scrollbar-thin scrollbar-thumb-slate-200">
       <h2 className="text-xs font-black mb-4 text-urbik-dark uppercase tracking-widest sticky top-0 bg-white z-10 py-2 border-b border-urbik-g100">
         {properties.length} Propiedades Encontradas
       </h2>
-      
+
       <div className={`grid gap-4 ${gridConfig}`}>
-        {properties.map((prop) => {
-          const isInitiallyFavorite = favoriteIds.includes(prop.id);
+        {properties.map((rawProp) => {
+          // CORRECCIÓN: Casteo a la interfaz extendida
+          const prop = rawProp as ExtendedMapProperty;
+          // CORRECCIÓN: Aseguramos que el ID sea número para la comparación
+          const isInitiallyFavorite = favoriteIds.includes(Number(prop.id));
 
           return (
             <div key={prop.id} className="relative group">
               <div className="bg-urbik-white2 rounded-md border border-urbik-g100 overflow-hidden hover:scale-[1.02] hover:brightness-105 hover:shadow-lg transition-all h-full flex flex-col relative">
-                
-                <Link href={`/property/${prop.id}`} className="absolute inset-0 z-10" />
+                <Link
+                  href={`/property/${prop.id}`}
+                  className="absolute inset-0 z-10"
+                />
 
                 <div className="absolute top-3 right-3 z-20">
-                  <FavoriteButton 
-                    propertyId={prop.id.toString()} 
-                    initialIsFavorite={isInitiallyFavorite} 
+                  <FavoriteButton
+                    propertyId={prop.id.toString()}
+                    initialIsFavorite={isInitiallyFavorite}
                     small={true}
                   />
                 </div>
 
                 <div className="relative h-32 bg-urbik-g200 overflow-hidden">
                   {prop.images && prop.images[0] ? (
-                    <img 
-                      src={prop.images[0]} 
-                      alt={prop.title} 
-                      className="w-full h-full object-cover transition-transform duration-500" 
+                    <img
+                      src={prop.images[0]}
+                      alt={prop.title}
+                      className="w-full h-full object-cover transition-transform duration-500"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center text-urbik-muted text-[10px]">Sin imagen</div>
+                    <div className="flex h-full items-center justify-center text-urbik-muted text-[10px]">
+                      Sin imagen
+                    </div>
                   )}
                 </div>
 
-                <div className="p-3 flex flex-col flex-grow">
+                {/* CORRECCIÓN: flex-grow actualizado a grow (Tailwind moderno) */}
+                <div className="p-3 flex flex-col grow">
                   <div className="flex items-center justify-between mb-2 gap-1">
                     <span className="bg-urbik-black text-white text-[9px] px-2 py-0.5 rounded-full font-bold tracking-tight whitespace-nowrap">
                       {getPropertyLabel(prop.type)}
@@ -148,7 +175,7 @@ export function PropertiesSidebar({
                   <div className="mt-auto">
                     <hr className="border-urbik-g100 mb-2" />
                     <p className="text-base font-black text-urbik-dark tracking-tighter text-right">
-                      $ {prop.price?.toLocaleString('es-AR')}
+                      $ {prop.price?.toLocaleString("es-AR")}
                     </p>
                   </div>
                 </div>

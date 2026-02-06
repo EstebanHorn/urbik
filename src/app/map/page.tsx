@@ -42,7 +42,7 @@ const InteractiveMap = dynamic(
   },
 );
 
-// Definimos los tipos para los filtros para evitar errores de TS
+// Definimos tipos para los filtros
 type FilterState = {
   operationType: string;
   propertyType: string;
@@ -56,6 +56,20 @@ type FilterState = {
   hasParking: boolean;
   hasPool: boolean;
 };
+
+// CORRECCIÓN: Interfaz para la propiedad cruda de la API para evitar 'any'
+interface RawProperty {
+  salePrice?: number;
+  rentPrice?: number;
+  price?: number;
+  hasWater?: boolean;
+  hasElectricity?: boolean;
+  hasGas?: boolean;
+  hasInternet?: boolean;
+  hasParking?: boolean;
+  hasPool?: boolean;
+  [key: string]: unknown; // Permitir otras propiedades
+}
 
 interface AmenityConfig {
   id: keyof FilterState;
@@ -140,17 +154,13 @@ export default function MapPage() {
         const data = await res.json();
         const rawList = data.properties || [];
 
-        // --- AQUÍ ESTÁ LA SOLUCIÓN: NORMALIZACIÓN DE DATOS ---
-        // Esto crea el campo 'price' que la Sidebar necesita leer
-        const normalizedList = rawList.map((p: any) => {
-          // Si existe salePrice, úsalo. Si no, rentPrice. Si no, 0.
+        // CORRECCIÓN: Uso de interfaz RawProperty en lugar de 'any'
+        const normalizedList = rawList.map((p: RawProperty) => {
           const resolvedPrice = p.salePrice ?? p.rentPrice ?? p.price ?? 0;
 
           return {
             ...p,
-            price: resolvedPrice, // <--- Esto hace que el precio aparezca en la Sidebar
-
-            // Aseguramos que las amenities sean booleanas
+            price: resolvedPrice,
             hasWater: Boolean(p.hasWater),
             hasElectricity: Boolean(p.hasElectricity),
             hasGas: Boolean(p.hasGas),
@@ -160,7 +170,7 @@ export default function MapPage() {
           };
         });
 
-        setProperties(normalizedList);
+        setProperties(normalizedList as MapProperty[]);
       } catch (error) {
         console.error("Error al filtrar propiedades:", error);
       } finally {
@@ -358,11 +368,12 @@ export default function MapPage() {
             height="100%"
           />
 
-          <div className="absolute bottom-10 right-10 z-[9999] pointer-events-auto hidden md:block">
+          {/* CORRECCIÓN: Clases Tailwind sintaxis canónica */}
+          <div className="absolute bottom-10 right-10 z-9999 pointer-events-auto hidden md:block">
             <ZoneAnalysis data={currentZone} />
           </div>
 
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[50] md:hidden pointer-events-auto w-max">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden pointer-events-auto w-max">
             <button
               onClick={() => setShowMobileList(!showMobileList)}
               className="bg-slate-900 text-white px-6 py-3 cursor-pointer rounded-full shadow-2xl flex items-center gap-3 font-medium active:scale-95 transition-transform"

@@ -10,13 +10,18 @@ de información geográfica.
 
 import { NextResponse } from "next/server";
 import prisma from "@/libs/db";
+import { Prisma } from "@prisma/client"; // Importamos Prisma para usar DbNull si es necesario
 
 export async function GET() {
   try {
     const properties = await prisma.property.findMany({
       where: {
-        isAvailable: true,
-        parcelGeom: { not: null },
+        // CORRECCIÓN 1: Usamos 'status' en lugar de 'isAvailable'
+        status: "AVAILABLE",
+        // CORRECCIÓN 2: Filtrado estricto para JSON no nulo
+        parcelGeom: {
+          not: Prisma.DbNull,
+        },
       },
       select: {
         parcelGeom: true,
@@ -26,7 +31,8 @@ export async function GET() {
     });
 
     const features = properties
-      .filter((p) => p.parcelGeom)
+      // Validación extra en JS por si acaso
+      .filter((p) => p.parcelGeom && typeof p.parcelGeom === "object")
       .map((p) => ({
         type: "Feature",
         geometry: p.parcelGeom,
@@ -44,7 +50,7 @@ export async function GET() {
     console.error("Error en /api/parcels:", error);
     return NextResponse.json(
       { type: "FeatureCollection", features: [] },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

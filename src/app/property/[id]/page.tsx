@@ -29,7 +29,6 @@ import {
 } from "lucide-react";
 import SmartZoneSingle from "../../../components/SmartZone/SmartView";
 import FavoriteButton from "@/components/FavoritesButton";
-// IMPORTE NUEVO: El componente Cliente que maneja el Modal
 import ImageGallery from "@/features/property/components/ImageGallery";
 
 // --- TIPOS ---
@@ -46,6 +45,7 @@ interface PropertySummary {
   province: string | null;
   images: string[];
   favorites?: { userId: number }[];
+  isFavorite?: boolean; // Agregado para el map de otras propiedades
 }
 
 interface RealEstateProfile {
@@ -71,15 +71,25 @@ interface Property {
   rooms: number | null;
   bathrooms: number | null;
   images: string[];
-  // Tipado estricto para amenities
   amenities: Record<string, boolean>;
   latitude: number | null;
   longitude: number | null;
-  parcelGeom: unknown; // GeoJSON
+  parcelGeom: unknown;
   realEstateId: number;
   RealEstate: RealEstateProfile | null;
   favorites?: { id: number }[];
   isFavorite: boolean;
+}
+
+// Interfaz auxiliar para el tipado de datos crudos de la DB
+interface RawPropertyData {
+  hasElectricity: boolean;
+  hasGas: boolean;
+  hasInternet: boolean;
+  hasParking: boolean;
+  hasPool: boolean;
+  hasWater: boolean;
+  [key: string]: unknown;
 }
 
 export const dynamic = "force-dynamic";
@@ -92,7 +102,6 @@ const AMENITIES_CONFIG = [
   { id: "hasParking", label: "Cochera", icon: <Car size={18} /> },
   { id: "hasPool", label: "Pileta", icon: <Waves size={18} /> },
   { id: "hasWater", label: "Agua Corriente", icon: <Droplets size={18} /> },
-  // Extras detectados dinámicamente si vienen en un JSON
   { id: "aire", label: "Aire Acondicionado", icon: <Snowflake size={18} /> },
   { id: "jardin", label: "Jardín", icon: <Trees size={18} /> },
   { id: "seguridad", label: "Seguridad", icon: <ShieldCheck size={18} /> },
@@ -133,12 +142,10 @@ const getPropertyLabel = (type: string) => {
 function AmenitiesList({ data }: { data: Record<string, boolean> }) {
   if (!data || typeof data !== "object") return null;
 
-  // 1. Filtramos las amenities configuradas que están en true
   const activeAmenities = AMENITIES_CONFIG.filter(
     (config) => data[config.id] === true,
   );
 
-  // 2. Buscamos keys extra que no estén en la config pero sean true (dinámicas)
   const extraKeys = Object.entries(data)
     .filter(
       ([key, value]) =>
@@ -205,7 +212,6 @@ async function getPropertyData(id: number, userId?: string) {
 
     if (!propertyRaw) return null;
 
-    // Destructuring para separar las columnas booleanas del resto
     const {
       hasElectricity,
       hasGas,
@@ -214,7 +220,7 @@ async function getPropertyData(id: number, userId?: string) {
       hasPool,
       hasWater,
       ...rest
-    } = propertyRaw as any;
+    } = propertyRaw as unknown as RawPropertyData;
 
     const amenitiesObj: Record<string, boolean> = {
       hasElectricity: !!hasElectricity,
@@ -225,17 +231,39 @@ async function getPropertyData(id: number, userId?: string) {
       hasWater: !!hasWater,
     };
 
+    // Reconstruimos el objeto con los tipos correctos para la interfaz Property
     const formattedProperty: Property = {
-      ...rest,
+      id: propertyRaw.id,
+      title: propertyRaw.title,
+      description: propertyRaw.description,
+      address: propertyRaw.address,
+      city: propertyRaw.city,
+      province: propertyRaw.province,
+      status: propertyRaw.status,
+      type: propertyRaw.type,
+      operationType: propertyRaw.operationType,
+      salePrice: propertyRaw.salePrice,
+      rentPrice: propertyRaw.rentPrice,
+      currency: (rest as Record<string, unknown>).currency as string | null, // Asumiendo que en DB puede venir string
+      area: propertyRaw.area,
+      rooms: propertyRaw.rooms,
+      bathrooms: propertyRaw.bathrooms,
+      latitude: propertyRaw.latitude,
+      longitude: propertyRaw.longitude,
+      parcelGeom: propertyRaw.parcelGeom,
+      realEstateId: propertyRaw.realEstateId,
+
       amenities: amenitiesObj,
       images: propertyRaw.images || [],
       isFavorite: propertyRaw.favorites
         ? propertyRaw.favorites.length > 0
         : false,
+
       RealEstate: propertyRaw.RealEstate
         ? {
             agencyName: propertyRaw.RealEstate.agencyName,
             phone: propertyRaw.RealEstate.phone,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             properties: propertyRaw.RealEstate.properties.map((p: any) => ({
               id: p.id,
               title: p.title,
@@ -321,7 +349,10 @@ export default async function PropertyPage({
   if (!data) return notFound();
 
   const { property, otherProperties } = data;
-  const isAdmin = session?.user?.role === "ADMIN";
+
+  // CORRECCIÓN: Tipado de session user de forma segura
+  const user = session?.user as { role?: string } | undefined;
+  const isAdmin = user?.role === "ADMIN";
 
   const formatter = new Intl.NumberFormat("es-AR", {
     maximumFractionDigits: 0,
@@ -570,7 +601,8 @@ export default async function PropertyPage({
 
           {otherProperties.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {otherProperties.map((other: any) => (
+              {/* CORRECCIÓN: Eliminado any en el map */}
+              {otherProperties.map((other: PropertySummary) => (
                 <div
                   key={other.id}
                   className="group relative flex flex-col h-full bg-white rounded-xl border border-urbik-g100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
@@ -582,7 +614,7 @@ export default async function PropertyPage({
                   <div className="absolute top-3 right-3 z-20">
                     <FavoriteButton
                       propertyId={other.id.toString()}
-                      initialIsFavorite={other.isFavorite}
+                      initialIsFavorite={!!other.isFavorite} // Aseguramos booleano
                       small
                     />
                   </div>

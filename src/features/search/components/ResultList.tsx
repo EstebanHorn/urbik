@@ -10,14 +10,12 @@ seleccionar una opción a través de la propiedad onSelect.
 
 import React from "react";
 import { SearchSuggestion } from "../service/searchService";
-import { SearchAction } from "../hooks/useSearch";
 
 interface ResultListProps {
   suggestions: SearchSuggestion[];
   isLoading: boolean;
-  onSelect: SearchAction["onSelectSuggestion"];
+  onSelect: (suggestion: SearchSuggestion) => void;
 }
-
 
 function getStringField(obj: unknown, key: string): string | null {
   if (!obj || typeof obj !== "object") return null;
@@ -75,10 +73,12 @@ export const ResultList: React.FC<ResultListProps> = ({
                 {getLabel(suggestion)}
               </span>
             </div>
-            
-            <span className={`
-              flex-shrink-0 ml-2 text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded
-            `}>
+
+            <span
+              className={`
+              shrink-0 ml-2 text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded
+            `}
+            >
               {badge}
             </span>
           </li>

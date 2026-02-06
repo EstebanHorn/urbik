@@ -21,7 +21,7 @@ const ALLOWED_DOMAINS = [
   "live.com",
   "msn.com",
   "me.com",
-  "aol.com"
+  "aol.com",
 ];
 
 export async function POST(req: NextRequest) {
@@ -37,8 +37,11 @@ export async function POST(req: NextRequest) {
 
     if (!ALLOWED_DOMAINS.includes(domain)) {
       return NextResponse.json(
-        { error: "El dominio de correo no está permitido. Usa un servicio conocido." },
-        { status: 400 }
+        {
+          error:
+            "El dominio de correo no está permitido. Usa un servicio conocido.",
+        },
+        { status: 400 },
       );
     }
 
@@ -46,7 +49,7 @@ export async function POST(req: NextRequest) {
       email: email,
       password: data.password,
       role: data.role,
-      firstName: data.name, 
+      firstName: data.name,
       lastName: data.lastName,
       agencyName: data.name,
       license: data.license,
@@ -58,11 +61,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(user, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Registration error:", error);
-    return NextResponse.json(
-      { error: error.message || "Error interno" },
-      { status: 400 }
-    );
+    const message = error instanceof Error ? error.message : "Error interno";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

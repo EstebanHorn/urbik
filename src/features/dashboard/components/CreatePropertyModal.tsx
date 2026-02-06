@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-// No importamos next/image para usar img nativo
+/* eslint-disable @next/next/no-img-element */
 import ImageUpload from "@/components/ImageUpload";
 import { MapLayersProvider } from "@/features/map/components/MapLayersProvider";
 import { ClickToCreateProperty } from "@/features/map/components/ClickToCreateProperty";
@@ -68,10 +68,8 @@ export default function CreatePropertyModal({
     isEditing,
   } = useCreateProperty(initialData, onCreated, onClose);
 
-  // Casting seguro para asegurar compatibilidad con la interfaz UI
   const safeForm = form as unknown as PropertyFormData;
 
-  // Wrapper para setForm
   const handleSetForm = setForm as React.Dispatch<
     React.SetStateAction<PropertyFormData>
   >;
@@ -87,9 +85,8 @@ export default function CreatePropertyModal({
   const canSelectParcel = isBuenosAires && hasCity;
 
   const handleInputChange = (name: string, value: string) => {
-    // Casting a any temporal en prev para flexibilidad en actualización dinámica
-    // Esto es seguro aquí porque sabemos que 'name' es una key válida
-    setForm((prev: any) => ({ ...prev, [name]: value }));
+    // CORRECCIÓN: Eliminado 'any'. TS infiere 'prev' correctamente desde el hook.
+    setForm((prev) => ({ ...prev, [name]: value }));
     if (name === "city" || name === "province") {
       setCityCoords(null);
     }
@@ -157,7 +154,6 @@ export default function CreatePropertyModal({
             {/* HEADER */}
             <div className="shrink-0 py-5 px-8 flex items-center justify-between border-b border-gray-100 bg-white z-20">
               <div className="flex items-center gap-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/Urbik_Logo_Mini.svg"
                   alt="Urbik"
@@ -317,9 +313,9 @@ export default function CreatePropertyModal({
                         <div className="pl-9 space-y-8">
                           <AmenitiesGrid
                             value={form.amenities || {}}
-                            // Fix TS2345: Tipado explícito de prev en setForm
+                            // CORRECCIÓN: Eliminado 'any'. TS infiere 'prev'.
                             onChange={(val) =>
-                              setForm((prev: any) => ({
+                              setForm((prev) => ({
                                 ...prev,
                                 amenities: val,
                               }))
@@ -329,13 +325,13 @@ export default function CreatePropertyModal({
                           <ImageUpload
                             value={form.images || []}
                             onChange={(urls) =>
-                              setForm((prev: any) => ({
+                              setForm((prev) => ({
                                 ...prev,
                                 images: urls,
                               }))
                             }
                             onRemove={(url) =>
-                              setForm((prev: any) => ({
+                              setForm((prev) => ({
                                 ...prev,
                                 images: (prev.images || []).filter(
                                   (i: string) => i !== url,
@@ -388,7 +384,10 @@ export default function CreatePropertyModal({
                         lat={selectedParcel?.lat ?? cityCoords?.lat ?? -34.9214}
                         lon={selectedParcel?.lon ?? cityCoords?.lon ?? -57.9545}
                         height="100%"
-                        selectedParcel={selectedParcel}
+                        // CORRECCIÓN: Casteo a tipo genérico Record para satisfacer la interfaz del componente dinámico
+                        selectedParcel={
+                          selectedParcel as unknown as Record<string, unknown>
+                        }
                       >
                         <ClickToCreateProperty
                           onParcelPicked={setSelectedParcel}
@@ -420,7 +419,6 @@ export default function CreatePropertyModal({
 
                       {!selectedParcel ? (
                         <div className="mt-10 text-center opacity-50">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src="/Urbik_Logo_Smart_Zone.svg"
                             alt="Select"
