@@ -38,11 +38,23 @@ const InteractiveMap = dynamic(
   },
 );
 
+// CORRECCIÓN: Definir PropertyInitialData localmente con parcelGeom compatible
+// Asumiremos una interfaz compatible basada en PropertyFormData para el modal.
+interface PropertyInitialData extends Partial<PropertyFormData> {
+  id?: number | string;
+  parcelCCA?: string;
+  parcelPDA?: string;
+  // Corrección: Usar Record<string, unknown> o Geometry para compatibilidad
+  parcelGeom?: Record<string, unknown>;
+  latitude?: number;
+  longitude?: number;
+}
+
 interface CreatePropertyModalProps {
   open: boolean;
   onClose: () => void;
   onCreated: () => void;
-  initialData?: Partial<PropertyFormData>;
+  initialData?: PropertyInitialData;
 }
 
 interface ExtendedSelectedParcel extends SelectedParcel {
@@ -66,7 +78,12 @@ export default function CreatePropertyModal({
     message,
     handleSave,
     isEditing,
-  } = useCreateProperty(initialData, onCreated, onClose);
+  } = useCreateProperty(
+    // Corrección: Cast seguro
+    (initialData as PropertyInitialData) || null,
+    onCreated,
+    onClose,
+  );
 
   const safeForm = form as unknown as PropertyFormData;
 
@@ -154,6 +171,7 @@ export default function CreatePropertyModal({
             {/* HEADER */}
             <div className="shrink-0 py-5 px-8 flex items-center justify-between border-b border-gray-100 bg-white z-20">
               <div className="flex items-center gap-4">
+                {}
                 <img
                   src="/Urbik_Logo_Mini.svg"
                   alt="Urbik"
@@ -384,10 +402,8 @@ export default function CreatePropertyModal({
                         lat={selectedParcel?.lat ?? cityCoords?.lat ?? -34.9214}
                         lon={selectedParcel?.lon ?? cityCoords?.lon ?? -57.9545}
                         height="100%"
-                        // CORRECCIÓN: Casteo a tipo genérico Record para satisfacer la interfaz del componente dinámico
-                        selectedParcel={
-                          selectedParcel as unknown as Record<string, unknown>
-                        }
+                        // CORRECCIÓN: Se pasa selectedParcel directamente sin castear a Record<string, unknown>
+                        selectedParcel={selectedParcel}
                       >
                         <ClickToCreateProperty
                           onParcelPicked={setSelectedParcel}
@@ -419,6 +435,7 @@ export default function CreatePropertyModal({
 
                       {!selectedParcel ? (
                         <div className="mt-10 text-center opacity-50">
+                          {}
                           <img
                             src="/Urbik_Logo_Smart_Zone.svg"
                             alt="Select"
@@ -426,9 +443,7 @@ export default function CreatePropertyModal({
                             height={80}
                             className="mx-auto mb-4 grayscale"
                           />
-                          <p className="text-sm font-bold text-gray-900">
-                            Esperando selección...
-                          </p>
+                          <p className="text-sm font-bold text-gray-900"></p>
                         </div>
                       ) : (
                         <div className="animate-in slide-in-from-right-4 duration-500">

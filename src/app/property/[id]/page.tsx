@@ -588,7 +588,17 @@ export default async function PropertyPage({
           </div>
         </div>
         <div className="mt-12 pt-12 border-t border-dashed border-urbik-g100 w-full">
-          <SmartZoneSingle property={property} />
+          {/* CORRECCIÓN: Pasar una copia del objeto property asegurando tipos correctos para SmartZoneSingle */}
+          <SmartZoneSingle
+            property={{
+              ...property,
+              address: property.address || "", // Fallback para null
+              city: property.city || "", // Fallback para null
+              province: property.province || "", // Fallback para null
+              latitude: property.latitude || 0, // Fallback numérico para null
+              longitude: property.longitude || 0, // Fallback numérico para null
+            }}
+          />
         </div>
         {/* --- OTRAS PROPIEDADES --- */}
         <div className="mt-24 pt-12 border-t border-urbik-g100">
