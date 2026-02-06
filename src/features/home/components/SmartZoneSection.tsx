@@ -18,6 +18,7 @@ export function SmartZoneSection() {
 
       <div className="max-w-7xl mx-auto border border-urbik-emerald/30 bg-linear-to-br from-gray-900 to-black rounded-3xl p-8 md:p-16 relative z-10 shadow-[0_0_50px_-12px_rgba(16,185,129,0.2)]">
         <div className="absolute top-8 right-8 z-20 opacity-80 hover:opacity-100 transition-opacity">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/Urbik_Logo_Smart_Zone.svg"
             alt="Smart Zone Logo"
@@ -31,7 +32,7 @@ export function SmartZoneSection() {
               <span className="bg-urbik-emerald text-black text-sm font-bold px-3 py-1 rounded-full uppercase tracking-widest">
                 Exclusivo Urbik
               </span>
-              <div className="h-[1px] w-20 bg-urbik-emerald/50" />
+              <div className="h-px w-20 bg-urbik-emerald/50" />
             </div>
 
             <h2 className="text-4xl md:text-6xl font-black text-white mb-6 leading-none tracking-tighter">
@@ -79,6 +80,7 @@ export function SmartZoneSection() {
             <div className="absolute -inset-1 bg-linear-to-r from-urbik-emerald/50 to-emerald-900/30 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
             <div className="relative bg-black rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
               <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/Urbik_Logo_Smart_Zone.svg"
                   alt="Smart Zone"
@@ -113,8 +115,8 @@ export function SmartZoneSection() {
                   </div>
                   <div className="mt-6 p-4 rounded-lg bg-emerald-500/5 border border-urbik-emerald/20">
                     <p className="text-[12px] italic text-emerald-200/70 text-center">
-                      "Esta propiedad presenta un precio un 12% inferior al
-                      promedio de la zona..."
+                      &quot;Esta propiedad presenta un precio un 12% inferior al
+                      promedio de la zona...&quot;
                     </p>
                   </div>
                 </div>

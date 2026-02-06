@@ -1,29 +1,40 @@
-/*
-Este código define un hook personalizado de React llamado useCreateProperty que gestiona la
-lógica de negocio para crear o editar propiedades inmobiliarias a través de un formulario.
-El hook centraliza el estado de los datos (título, precio, ubicación, servicios, etc.), maneja
-la transición entre pasos del proceso, y normaliza la información geográfica proveniente de un
-mapa mediante el objeto selectedParcel. Dependiendo de si recibe datos iniciales (initialData),
-el hook determina si está en modo edición o creación, inicializando el formulario con valores
-previos o por defecto, y finalmente expone una función handleSave que procesa los datos, los
-envía a los servicios de API correspondientes (createProperty o updateProperty) y gestiona los
-estados de carga y error de la operación asíncrona.
-*/
 import { useState, useEffect } from "react";
 import { createProperty, updateProperty } from "../service/dashboardService";
 import type { SelectedParcel } from "@/features/map/types/types";
-import { PropertyFormData } from "../components/create-modal/PropertyFormField";
 
-// Definimos una interfaz extendida para initialData
-interface ExtendedInitialData extends Partial<PropertyFormData> {
+interface PropertyAmenities {
+  agua: boolean;
+  luz: boolean;
+  gas: boolean;
+  internet: boolean;
+  cochera: boolean;
+  pileta: boolean;
+}
+
+// Interfaz para mapear los datos que vienen del backend o edición
+interface PropertyInitialData {
   id?: number | string;
   parcelCCA?: string;
   parcelPDA?: string;
-  parcelGeom?: unknown;
+  parcelGeom?: object;
   latitude?: number;
   longitude?: number;
-  area?: number; // Puede venir como area en lugar de areaM2
+  title?: string;
+  description?: string;
+  province?: string;
+  city?: string;
   address?: string;
+  type?: string;
+  operationType?: string;
+  status?: string;
+  salePrice?: number | string;
+  saleCurrency?: string;
+  rentPrice?: number | string;
+  rentCurrency?: string;
+  area?: number | string;
+  rooms?: number | string;
+  bathrooms?: number | string;
+  images?: string[];
   hasWater?: boolean;
   hasElectricity?: boolean;
   hasGas?: boolean;
@@ -32,7 +43,7 @@ interface ExtendedInitialData extends Partial<PropertyFormData> {
   hasPool?: boolean;
 }
 
-const createEmptyForm = (): PropertyFormData => ({
+const createEmptyForm = () => ({
   title: "",
   description: "",
   province: "",
@@ -50,7 +61,6 @@ const createEmptyForm = (): PropertyFormData => ({
 
   currency: "USD",
   areaM2: "",
-  area: "", // Compatibilidad
   rooms: "",
   bathrooms: "",
   amenities: {
@@ -61,13 +71,12 @@ const createEmptyForm = (): PropertyFormData => ({
     cochera: false,
     pileta: false,
   },
-  images: [],
+  images: [] as string[],
 });
 
 export function useCreateProperty(
-  initialData: ExtendedInitialData,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onCreated: (data?: any) => void,
+  initialData: PropertyInitialData | null,
+  onCreated: (data?: unknown) => void,
   onClose: () => void,
 ) {
   const isEditing = !!initialData;
@@ -77,7 +86,7 @@ export function useCreateProperty(
   const [message, setMessage] = useState<string | null>(null);
 
   const [selectedParcel, setSelectedParcel] = useState<SelectedParcel | null>(
-    isEditing
+    isEditing && initialData
       ? {
           CCA: initialData.parcelCCA ?? "S/D",
           PDA: initialData.parcelPDA ?? "S/D",
@@ -88,8 +97,8 @@ export function useCreateProperty(
       : null,
   );
 
-  const [form, setForm] = useState<PropertyFormData>(() => {
-    if (!isEditing) return createEmptyForm();
+  const [form, setForm] = useState(() => {
+    if (!isEditing || !initialData) return createEmptyForm();
 
     return {
       ...createEmptyForm(),
@@ -179,7 +188,7 @@ export function useCreateProperty(
 
     try {
       let result;
-      if (isEditing && initialData.id) {
+      if (isEditing && initialData?.id) {
         result = await updateProperty(initialData.id, payload);
       } else {
         result = await createProperty(payload);
@@ -187,10 +196,13 @@ export function useCreateProperty(
 
       if (onCreated) onCreated(result);
       onClose();
-    } catch (e) {
-      // CORRECCIÓN: Eliminado ': any'
-      const errorMsg =
-        e instanceof Error ? e.message : "Error al guardar la propiedad";
+    } catch (error: unknown) {
+      let errorMsg = "Error al guardar la propiedad";
+      if (error instanceof Error) {
+        errorMsg = error.message;
+      } else if (typeof error === "string") {
+        errorMsg = error;
+      }
       setMessage(errorMsg);
     } finally {
       setSaving(false);

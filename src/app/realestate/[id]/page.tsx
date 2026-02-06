@@ -13,7 +13,6 @@ import React from "react";
 import prisma from "../../../libs/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image"; // Importamos Image
 import { MapPin } from "lucide-react";
 import bgImage from "../../../assets/login_bg.png";
 import AdminActions from "../../../features/administrate/components/AdminActions";
@@ -162,10 +161,9 @@ export default async function RealEstatePage({
                   className="flex flex-col md:flex-row h-full"
                 >
                   <div className="relative w-full md:w-2/5 h-64 md:h-full overflow-hidden bg-urbik-g200">
-                    <Image
+                    <img
                       src={property.images[0] || "/placeholder-property.jpg"}
                       alt={property.title}
-                      fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   </div>

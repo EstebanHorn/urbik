@@ -14,7 +14,6 @@ integrado con navegación dinámica mediante Next.js.
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
-// CORRECCIÓN: Eliminado motion que no se usaba
 import type { MapProperty } from "../types/types";
 import FavoriteButton from "../../../components/FavoritesButton";
 import { useSession } from "next-auth/react";
@@ -25,9 +24,14 @@ interface PropertiesSidebarProps {
   visualLimit: number;
 }
 
-// CORRECCIÓN: Extendemos la interfaz localmente para incluir 'type' que faltaba
 interface ExtendedMapProperty extends MapProperty {
   type: string;
+}
+
+// Interfaz para la respuesta de la API de favoritos
+interface FavoriteProperty {
+  id: number;
+  [key: string]: unknown;
 }
 
 export function PropertiesSidebar({
@@ -44,8 +48,9 @@ export function PropertiesSidebar({
         try {
           const res = await fetch("/api/properties/favorites");
           if (res.ok) {
-            const data = await res.json();
-            setFavoriteIds(data.map((fav: any) => fav.id));
+            const data: FavoriteProperty[] = await res.json();
+            // Corrección: Tipado explícito para fav
+            setFavoriteIds(data.map((fav) => fav.id));
           }
         } catch (error) {
           console.error("Error cargando favoritos:", error);
@@ -114,9 +119,7 @@ export function PropertiesSidebar({
 
       <div className={`grid gap-4 ${gridConfig}`}>
         {properties.map((rawProp) => {
-          // CORRECCIÓN: Casteo a la interfaz extendida
           const prop = rawProp as ExtendedMapProperty;
-          // CORRECCIÓN: Aseguramos que el ID sea número para la comparación
           const isInitiallyFavorite = favoriteIds.includes(Number(prop.id));
 
           return (
@@ -149,7 +152,6 @@ export function PropertiesSidebar({
                   )}
                 </div>
 
-                {/* CORRECCIÓN: flex-grow actualizado a grow (Tailwind moderno) */}
                 <div className="p-3 flex flex-col grow">
                   <div className="flex items-center justify-between mb-2 gap-1">
                     <span className="bg-urbik-black text-white text-[9px] px-2 py-0.5 rounded-full font-bold tracking-tight whitespace-nowrap">

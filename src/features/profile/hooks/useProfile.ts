@@ -12,12 +12,17 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { fetchProfileData, updateProfile } from "../service/profileService";
 import {
-  Role as UserRole, // Importamos Role y lo renombramos a UserRole para compatibilidad
+  Role as UserRole,
   FormState,
   Property,
   RealEstateFormFields,
   UserFormFields,
 } from "../../../libs/types";
+
+interface UserWithProvider {
+  provider?: string;
+  [key: string]: unknown;
+}
 
 interface UseProfileResult {
   userRole: UserRole | null;
@@ -29,7 +34,10 @@ interface UseProfileResult {
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
-  handleManualChange: (name: string, value: any) => void;
+  handleManualChange: (
+    name: string,
+    value: string | boolean | number | null,
+  ) => void;
   handleSubmit: (e: React.FormEvent) => Promise<void>;
 }
 
@@ -37,7 +45,7 @@ const initialFormState: FormState = {
   firstName: "",
   lastName: "",
   phone: "",
-  agencyName: "", // Usamos agencyName que es lo correcto según types.ts
+  agencyName: "",
   address: "",
   street: "",
   website: "",
@@ -68,12 +76,12 @@ export function useProfile(): UseProfileResult {
       const role = data.role as UserRole;
       setUserRole(role);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const provider = (session?.user as any)?.provider || "email";
+      const user = session?.user as UserWithProvider;
+      const provider = user?.provider || "email";
 
       if (role === "USER") {
         setForm((prev) => ({
-          ...prev, // Mantenemos estructura base
+          ...prev,
           firstName: data.firstName || "",
           lastName: data.lastName || "",
           phone: data.phone || "",
@@ -85,7 +93,7 @@ export function useProfile(): UseProfileResult {
         setForm((prev) => ({
           ...prev,
           phone: data.agencyData.phone || data.phone || "",
-          agencyName: data.agencyData.agencyName || "", // Mapeo correcto
+          agencyName: data.agencyData.agencyName || "",
           address: data.agencyData.address || "",
           website: data.agencyData.website || "",
           instagram: data.agencyData.instagram || "",
@@ -99,9 +107,13 @@ export function useProfile(): UseProfileResult {
         setUserProperties(data.agencyData.properties || []);
       }
       setMessage("");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error al cargar datos:", error);
-      setMessage(`Error al cargar el perfil: ${error.message}`);
+      let errorMessage = "Error desconocido";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setMessage(`Error al cargar el perfil: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -117,8 +129,10 @@ export function useProfile(): UseProfileResult {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleManualChange = (name: string, value: any) => {
+  const handleManualChange = (
+    name: string,
+    value: string | boolean | number | null,
+  ) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -133,7 +147,6 @@ export function useProfile(): UseProfileResult {
       let payload: RealEstateFormFields | UserFormFields;
 
       if (userRole === "REALESTATE") {
-        // Aseguramos que payload coincida con lo que espera el servicio y types
         const rePayload: RealEstateFormFields = {
           agencyName: form.agencyName,
           address: form.address,
@@ -157,15 +170,18 @@ export function useProfile(): UseProfileResult {
         payload = userPayload;
       }
 
-      // Casting a any temporal si el servicio tiene una firma estricta que no coincide exactamente con los tipos importados
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await updateProfile(payload as any, userRole as any);
 
       setMessage("Perfil actualizado correctamente");
       await refetchData();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error al actualizar:", err);
-      setMessage(` ${err.message || "Error en la petición de actualización"}`);
+      let errorMsg = "Error en la petición de actualización";
+      if (err instanceof Error) {
+        errorMsg = err.message;
+      }
+      setMessage(` ${errorMsg}`);
     } finally {
       setLoading(false);
     }

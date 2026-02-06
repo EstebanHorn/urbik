@@ -2,8 +2,31 @@
 
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import type { GeoJsonObject } from "geojson";
 
-export default function PropertyParcelView({ lat, lon, selectedGeom, allProperties }: any) {
+// Definimos un tipo seguro que extiende GeoJsonObject para incluir 'id' opcional
+// y evitar el uso de 'any' al comparar IDs.
+type SafeGeoJSON = GeoJsonObject & { id?: string | number };
+
+interface PropertyData {
+  id: string | number;
+  parcelGeom?: SafeGeoJSON | null;
+  [key: string]: unknown;
+}
+
+interface PropertyParcelViewProps {
+  lat: number;
+  lon: number;
+  selectedGeom?: SafeGeoJSON | null;
+  allProperties: PropertyData[];
+}
+
+export default function PropertyParcelView({
+  lat,
+  lon,
+  selectedGeom,
+  allProperties,
+}: PropertyParcelViewProps) {
   return (
     <MapContainer
       center={[lat, lon]}
@@ -18,30 +41,33 @@ export default function PropertyParcelView({ lat, lon, selectedGeom, allProperti
     >
       <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
 
-      {allProperties.map((prop: any) => (
-        prop.parcelGeom && prop.id !== selectedGeom?.id && (
-          <GeoJSON 
-            key={prop.id}
-            data={prop.parcelGeom} 
-            style={{
-              color: "#94a3b8",
-              weight: 1,
-              fillColor: "#cbd5e1",
-              fillOpacity: 0.1
-            }} 
-          />
-        )
-      ))}
+      {allProperties.map(
+        (prop) =>
+          prop.parcelGeom &&
+          // Comparación segura sin castear a 'any'
+          prop.id !== selectedGeom?.id && (
+            <GeoJSON
+              key={prop.id}
+              data={prop.parcelGeom}
+              style={{
+                color: "#94a3b8",
+                weight: 1,
+                fillColor: "#cbd5e1",
+                fillOpacity: 0.1,
+              }}
+            />
+          ),
+      )}
 
       {selectedGeom && (
-        <GeoJSON 
-          data={selectedGeom} 
+        <GeoJSON
+          data={selectedGeom}
           style={{
-            color: "#00E5FF", 
+            color: "#00E5FF",
             weight: 3,
             fillColor: "#00E5FF",
-            fillOpacity: 0.3
-          }} 
+            fillOpacity: 0.3,
+          }}
         />
       )}
     </MapContainer>

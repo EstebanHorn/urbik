@@ -10,12 +10,19 @@ resultados en el mapa.
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Home, Building2, Map as MapIcon, Store } from "lucide-react";
 
 type OperationType = "SALE" | "RENT" | "SALE_RENT";
 type PropertyType = "HOUSE" | "APARTMENT" | "LAND" | "COMMERCIAL";
+
+interface FilterToggleProps {
+  active: boolean;
+  onClick: () => void;
+  icon: ReactNode;
+  label: string;
+}
 
 export function HeroSearch() {
   const router = useRouter();
@@ -95,7 +102,7 @@ export function HeroSearch() {
               active={propertyType === "APARTMENT"}
               onClick={() =>
                 setPropertyType(
-                  propertyType === "APARTMENT" ? null : "APARTMENT"
+                  propertyType === "APARTMENT" ? null : "APARTMENT",
                 )
               }
               icon={<Building2 size={18} />}
@@ -113,7 +120,7 @@ export function HeroSearch() {
               active={propertyType === "COMMERCIAL"}
               onClick={() =>
                 setPropertyType(
-                  propertyType === "COMMERCIAL" ? null : "COMMERCIAL"
+                  propertyType === "COMMERCIAL" ? null : "COMMERCIAL",
                 )
               }
               icon={<Store size={18} />}
@@ -134,7 +141,7 @@ export function HeroSearch() {
   );
 }
 
-function FilterToggle({ active, onClick, icon, label }: any) {
+function FilterToggle({ active, onClick, icon, label }: FilterToggleProps) {
   return (
     <button
       onClick={onClick}

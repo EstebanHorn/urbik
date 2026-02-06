@@ -14,7 +14,6 @@ inmobiliarios.
 
 import React, { useMemo, useState } from "react";
 import type { PropertySummary } from "../../../app/dashboard/page";
-import Image from "next/image"; // Importamos Image
 
 import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from "recharts";
 import CreatePropertyModal from "./CreatePropertyModal";
@@ -162,10 +161,9 @@ export default function DashboardMain({
 
             <div className="h-40 bg-gray-100 relative">
               {mostViewed?.images?.[0] ? (
-                <Image
+                <img
                   src={mostViewed.images[0]}
                   alt="Most viewed"
-                  fill
                   className="object-cover"
                 />
               ) : (

@@ -61,6 +61,7 @@ export default function EditPropertyModal({
           >
             <div className="shrink-0 py-5 px-10 flex items-center justify-between shadow-xl z-30">
               <div className="relative w-10 h-10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/Urbik_Logo_Mini.svg"
                   alt="Logo"
@@ -112,8 +113,7 @@ export default function EditPropertyModal({
                     placeholder="Escribe una descripción detallada..."
                     value={form.description || ""}
                     onChange={(e) =>
-                      // CORRECCIÓN: Eliminado 'any' en prev
-                      setForm((prev) => ({
+                      handleSetForm((prev: PropertyFormData) => ({
                         ...prev,
                         description: e.target.value,
                       }))
@@ -140,8 +140,10 @@ export default function EditPropertyModal({
                   <AmenitiesGrid
                     value={form.amenities || []}
                     onChange={(val) =>
-                      // CORRECCIÓN: Eliminado 'any' en prev
-                      setForm((prev) => ({ ...prev, amenities: val }))
+                      handleSetForm((prev: PropertyFormData) => ({
+                        ...prev,
+                        amenities: val,
+                      }))
                     }
                   />
                 </div>
@@ -150,14 +152,17 @@ export default function EditPropertyModal({
                   <ImageUpload
                     value={form.images || []}
                     onChange={(urls) =>
-                      // CORRECCIÓN: Eliminado 'any' en prev
-                      setForm((prev) => ({ ...prev, images: urls }))
+                      handleSetForm((prev: PropertyFormData) => ({
+                        ...prev,
+                        images: urls,
+                      }))
                     }
                     onRemove={(url) =>
-                      // CORRECCIÓN: Eliminado 'any' en prev y en filter
-                      setForm((prev) => ({
+                      handleSetForm((prev: PropertyFormData) => ({
                         ...prev,
-                        images: (prev.images || []).filter((i) => i !== url),
+                        images: (prev.images || []).filter(
+                          (i: string) => i !== url,
+                        ),
                       }))
                     }
                   />

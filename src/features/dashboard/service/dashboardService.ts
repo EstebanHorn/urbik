@@ -9,7 +9,11 @@ si la respuesta del servidor no es exitosa, retornando finalmente la respuesta p
 de éxito.
 */
 
-export const createProperty = async (payload: any) => {
+interface PropertyPayload {
+  [key: string]: unknown;
+}
+
+export const createProperty = async (payload: PropertyPayload) => {
   const res = await fetch("/api/property/parcel", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -22,11 +26,14 @@ export const createProperty = async (payload: any) => {
   return res.json();
 };
 
-export const updateProperty = async (id: string | number, payload: any) => {
+export const updateProperty = async (
+  id: string | number,
+  payload: PropertyPayload,
+) => {
   if (!id) throw new Error("ID de propiedad no suministrado");
 
   const res = await fetch(`/api/property/${id}`, {
-    method: "PUT", 
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
@@ -37,7 +44,6 @@ export const updateProperty = async (id: string | number, payload: any) => {
   }
   return res.json();
 };
-
 
 export const deleteProperty = async (id: string | number) => {
   if (!id) throw new Error("ID de propiedad no suministrado");

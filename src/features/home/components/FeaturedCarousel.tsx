@@ -10,7 +10,6 @@ eliminando tipos 'any' explícitos.
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 import { MapPin } from "lucide-react";
 import { FeaturedProperty } from "../service/propertyService";
 import FavoriteButton from "../../../components/FavoritesButton";
@@ -134,10 +133,9 @@ export function FeaturedCarousel({
               className="flex flex-col md:flex-row h-full group"
             >
               <div className="relative w-full md:w-1/2 h-64 md:h-full overflow-hidden bg-urbik-g200">
-                <Image
+                <img
                   src={current.images[0]}
                   alt={current.title}
-                  fill
                   className="object-cover"
                 />
               </div>

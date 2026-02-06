@@ -8,6 +8,7 @@ internacionales. Al enviar los datos, el componente concatena el código de paí
 teléfono y procesa el registro, ofreciendo además una interfaz visual pulida con Tailwind
 CSS que permite alternar fácilmente entre los dos tipos de roles de usuario.
 */
+
 /* eslint-disable @next/next/no-img-element */
 
 "use client";
@@ -53,10 +54,11 @@ export default function RegisterForm() {
   const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const filteredValue = value.replace(/\D/g, "");
+    // Corrección: Casteo correcto al evento de React en lugar de any
     handleInputChange({
       ...e,
       target: { ...e.target, name, value: filteredValue },
-    } as any);
+    });
   };
 
   const OnFormSubmit = (e: React.FormEvent) => {
@@ -167,7 +169,10 @@ export default function RegisterForm() {
               provinceValue={form.province}
               cityValue={form.city}
               onChange={(name, val) =>
-                handleInputChange({ target: { name, value: val } } as any)
+                // Corrección: Creación de un evento sintético seguro
+                handleInputChange({
+                  target: { name, value: val },
+                } as React.ChangeEvent<HTMLInputElement>)
               }
             />
 
