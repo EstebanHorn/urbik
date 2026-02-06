@@ -9,9 +9,9 @@ import ProfileMediaUploader from "./ProfileMediaUploader";
 import { toggleAccountPause } from "@/features/profile/service/profileService";
 import { Globe, Instagram, MapPin, Save, Lock, Phone } from "lucide-react";
 
-// Definimos una interfaz para el estado del formulario
-interface RealEstateFormData {
-  name: string;
+// Definimos una interfaz para el estado del formulario alineada con los tipos globales
+export interface RealEstateFormData {
+  agencyName: string;
   phone: string;
   address: string;
   license: string;
@@ -20,8 +20,8 @@ interface RealEstateFormData {
   instagram: string;
   province: string;
   city: string;
-  bannerUrl: string;
-  logoUrl: string;
+  bannerUrl?: string | null;
+  logoUrl?: string | null;
   isActive: boolean;
   [key: string]: unknown;
 }
@@ -43,7 +43,6 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
   loading,
   handleManualChange,
 }) => {
-  // Se eliminó useRouter porque no se utilizaba
   const [isPausing, setIsPausing] = useState(false);
 
   useEffect(() => {
@@ -54,7 +53,6 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
     "italic w-full px-6 py-4 rounded-full bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium text-urbik-black placeholder:text-gray-400";
   const readonlyClasses =
     "bg-urbik-black w-full px-6 py-4 rounded-full bg-urbik-g300 font-bold text-urbik-white cursor-not-allowed select-none";
-  // Corrección: rounded-[2rem] -> rounded-4xl
   const textareaClasses =
     "w-full px-6 py-4 rounded-4xl bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium resize-none text-urbik-black";
 
@@ -80,7 +78,6 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
     if (handleManualChange) {
       handleManualChange(name, value);
     } else {
-      // Fallback seguro si no existe handleManualChange
       const event = {
         target: { name, value },
       } as React.ChangeEvent<HTMLInputElement>;
@@ -101,7 +98,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
             <div className="h-48 md:h-64 w-full bg-urbik-g50 relative">
               <ProfileMediaUploader
                 variant="banner"
-                currentUrl={form.bannerUrl}
+                currentUrl={form.bannerUrl || ""}
                 onImageChange={(url) => handleManualChange?.("bannerUrl", url)}
                 disabled={loading}
               />
@@ -112,7 +109,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               <div className="relative -mt-16 mb-4 w-32 h-32 md:w-40 md:h-40 z-10">
                 <ProfileMediaUploader
                   variant="logo"
-                  currentUrl={form.logoUrl}
+                  currentUrl={form.logoUrl || ""}
                   onImageChange={(url) => handleManualChange?.("logoUrl", url)}
                   disabled={loading}
                 />
@@ -122,7 +119,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <h2 className="text-2xl font-display font-bold text-urbik-black">
-                    {form.name || "Tu Inmobiliaria"}
+                    {form.agencyName || "Tu Inmobiliaria"}
                   </h2>
                   <div className="text-urbik-muted font-medium flex items-center gap-2 mt-1 text-sm">
                     <span
@@ -141,8 +138,8 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               Nombre Comercial
             </label>
             <input
-              name="name"
-              value={form.name}
+              name="agencyName"
+              value={form.agencyName || ""}
               onChange={handleChange}
               className={inputBaseClasses}
               placeholder="Nombre de la inmobiliaria"
@@ -162,7 +159,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               <input
                 type="tel"
                 name="phone"
-                value={form.phone}
+                value={form.phone || ""}
                 onChange={handleChange}
                 className={`${inputBaseClasses} pl-14`}
                 placeholder="+54 9 11 ..."
@@ -175,8 +172,8 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               Ubicación
             </label>
             <LocationSelectors
-              provinceValue={form.province}
-              cityValue={form.city}
+              provinceValue={form.province || ""}
+              cityValue={form.city || ""}
               onChange={onLocationChange}
               provinceLabel="Provincia"
               cityLabel={form.city}
@@ -194,7 +191,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               />
               <input
                 name="address"
-                value={form.address}
+                value={form.address || ""}
                 onChange={handleChange}
                 className={`${inputBaseClasses} pl-14`}
                 placeholder="Calle y número..."
@@ -227,7 +224,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
             </label>
             <textarea
               name="bio"
-              value={form.bio}
+              value={form.bio || ""}
               onChange={handleChange}
               rows={3}
               className={textareaClasses}
@@ -247,7 +244,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
                 />
                 <input
                   name="website"
-                  value={form.website}
+                  value={form.website || ""}
                   onChange={handleChange}
                   className={`${inputBaseClasses} pl-14`}
                   placeholder="www.tuagencia.com"
@@ -266,7 +263,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
                 />
                 <input
                   name="instagram"
-                  value={form.instagram}
+                  value={form.instagram || ""}
                   onChange={handleChange}
                   className={`${inputBaseClasses} pl-14`}
                   placeholder="@tu.inmo"
@@ -306,7 +303,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
       </div>
 
       <DangerZone
-        itemName={`la inmobiliaria ${form?.name || "sin nombre"}`}
+        itemName={`la inmobiliaria ${form?.agencyName || "sin nombre"}`}
         onDelete={() => console.log("Cuenta eliminada")}
       />
     </div>
