@@ -1,6 +1,6 @@
 {
   "name": "urbik-back",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -21,8 +21,8 @@
     "leaflet.vectorgrid": "^1.3.0",
     "lucide-react": "^0.561.0",
     "mapbox-gl": "^3.16.0",
-    "next": "^16.1.6",
-    "next-auth": "^4.24.11",
+    "next": "16.0.10",
+    "next-auth": "^4.24.13",
     "next-cloudinary": "^6.17.5",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -47,5 +47,13 @@
     "prisma": "^6.19.0",
     "tailwindcss": "^4.1.17",
     "typescript": "^5"
+  },
+  "overrides": {
+    "next-auth": {
+      "next": "$next"
+    },
+    "next-cloudinary": {
+      "next": "$next"
+    }
   }
 }
