@@ -1,8 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import LocationSelectors from "@/components/LocationSelectors";
+
+const ROTATING_PROVINCES = [
+  "La Pampa",
+  "Catamarca",
+  "Mendoza",
+  "Córdoba",
+  "Santa Fe",
+  "Neuquén",
+];
 
 // Icono de Lupa simple (SVG) para evitar dependencias externas en este ejemplo
 const SearchIcon = () => (
@@ -55,6 +64,7 @@ export function SearchSection({
   updatePill,
   onSearch,
 }: Props) {
+  const [currentProvinceIndex, setCurrentProvinceIndex] = useState(0);
   const propertyOptions = [
     { id: "COMMERCIAL_PROPERTY", label: "LOCAL COMERCIAL" },
     { id: "HOUSE", label: "CASA" },
@@ -72,16 +82,35 @@ export function SearchSection({
     return () => cancelAnimationFrame(frameId);
   }, [propertyType, updatePill]);
 
+  useEffect(() => {
+    const rotationId = window.setInterval(() => {
+      setCurrentProvinceIndex(
+        (prevIndex) => (prevIndex + 1) % ROTATING_PROVINCES.length,
+      );
+    }, 2200);
+
+    return () => window.clearInterval(rotationId);
+  }, []);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start mt-10 lg:mt-20">
       <div>
         <h1 className="text-6xl font-display font-bold text-urbik-black leading-[0.8] tracking-tighter">
-          <span>Encontrá tu lugar</span>
+          <span>Encontrá tu lugar en...</span>
           <br />
           <div className="flex flex-wrap items-baseline gap-x-3">
-            <span>en el</span>
-            <span className="font-black italic text-7xl text-urbik-black">
-              mundo.
+            <span className="font-black italic text-7xl text-urbik-black inline-flex min-w-[12ch]">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={ROTATING_PROVINCES[currentProvinceIndex]}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                >
+                  {ROTATING_PROVINCES[currentProvinceIndex]}
+                </motion.span>
+              </AnimatePresence>
             </span>
           </div>
         </h1>
