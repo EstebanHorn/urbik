@@ -1,14 +1,46 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FeaturedProperty, propertyService } from "../service/propertyService";
+import { useSearchAutocomplete } from "@/features/search/hooks/useSearchAutocomplete";
+
+interface ParsedSearchFilters {
+  propertyType: string | null;
+  operationType: string | null;
+  minPrice: number | null;
+  maxPrice: number | null;
+  city: string | null;
+  province: string | null;
+  rooms: number | null;
+  bathrooms: number | null;
+  amenities: Partial<
+    Record<
+      | "hasWater"
+      | "hasElectricity"
+      | "hasGas"
+      | "hasInternet"
+      | "hasParking"
+      | "hasPool"
+      | "hasBalcony"
+      | "hasGrill"
+      | "hasGarden"
+      | "hasLaundry"
+      | "hasAirConditioning",
+      boolean
+    >
+  >;
+}
 
 export function useHomeSearch() {
   const router = useRouter();
+  const {
+    query,
+    setQuery,
+    suggestions,
+    isLoading,
+    onSelectSuggestion,
+  } = useSearchAutocomplete();
 
-  // Estados
-  const [query, setQuery] = useState("");
   const [operation, setOperation] = useState<"SALE" | "RENT">("SALE");
-  // SUGERENCIA: Si quieres buscar "cualquier cosa" por texto, considera que el default sea "" o maneja "HOUSE" como filtro activo.
   const [propertyType, setPropertyType] = useState("HOUSE");
   const [province, setProvince] = useState("");
   const [city, setCity] = useState("");
@@ -16,7 +48,6 @@ export function useHomeSearch() {
     null,
   );
 
-  // Estados UI / Datos
   const [featuredProperties, setFeaturedProperties] = useState<
     FeaturedProperty[]
   >([]);
@@ -24,7 +55,6 @@ export function useHomeSearch() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [buttonData, setButtonData] = useState({ width: 0, x: 0 });
 
-  // Fetch inicial y Carrusel (Sin cambios)
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
@@ -36,6 +66,7 @@ export function useHomeSearch() {
         setLoadingFeatured(false);
       }
     };
+
     fetchFeatured();
   }, []);
 
@@ -48,28 +79,96 @@ export function useHomeSearch() {
     }
   }, [featuredProperties]);
 
-  // --- LÓGICA DE BÚSQUEDA MEJORADA ---
-  const handleSearch = () => {
+  const handleSearch = async () => {
     const params = new URLSearchParams();
+    const trimmedQuery = query.trim();
 
-    // Siempre enviamos la operación y el tipo si existen (son filtros base)
-    if (operation) params.set("operationType", operation);
-    if (propertyType) params.set("propertyType", propertyType);
+    let parsed: ParsedSearchFilters | null = null;
 
-    // Búsqueda por texto (Inmobiliaria / Dirección)
-    if (query.trim()) params.set("q", query.trim());
+    if (trimmedQuery) {
+      try {
+        const response = await fetch(
+          `/api/search/parse?q=${encodeURIComponent(trimmedQuery)}`,
+        );
 
-    // Ubicación: Priorizamos coordenadas si existen para mayor precisión
-    if (coords) {
+        if (response.ok) {
+          const data = await response.json();
+          parsed = data.parsed as ParsedSearchFilters;
+        }
+      } catch (error) {
+        console.error("Error parsing search query:", error);
+      }
+    }
+
+    const resolvedOperation = parsed?.operationType || operation;
+    const resolvedPropertyType = parsed?.propertyType || propertyType;
+    const resolvedCity = parsed?.city || city;
+    const resolvedProvince = parsed?.province || province;
+    const hasDetectedLocation = Boolean(parsed?.city || parsed?.province);
+
+    if (resolvedOperation) params.set("operationType", resolvedOperation);
+    if (resolvedPropertyType) params.set("propertyType", resolvedPropertyType);
+
+    if (parsed?.minPrice) params.set("minPrice", parsed.minPrice.toString());
+    if (parsed?.maxPrice) params.set("maxPrice", parsed.maxPrice.toString());
+    if (parsed?.rooms) params.set("rooms", parsed.rooms.toString());
+    if (parsed?.bathrooms)
+      params.append("bathrooms", parsed.bathrooms.toString());
+
+    if (parsed?.amenities) {
+      Object.entries(parsed.amenities).forEach(([key, value]) => {
+        if (value) params.set(key, "true");
+      });
+    }
+
+    if (trimmedQuery) params.set("q", trimmedQuery);
+
+    let resolvedCoords = coords;
+
+    if (!resolvedCoords && hasDetectedLocation) {
+      const locationQuery = [resolvedCity, resolvedProvince]
+        .filter(Boolean)
+        .join(", ");
+
+      if (locationQuery) {
+        try {
+          const response = await fetch(
+            `/api/search?q=${encodeURIComponent(locationQuery)}`,
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            const firstAddress = (data.suggestions || []).find(
+              (item: { type?: string; lat?: number; lon?: number }) =>
+                item.type === "ADDRESS" && item.lat && item.lon,
+            );
+
+            if (firstAddress) {
+              resolvedCoords = {
+                lat: Number(firstAddress.lat),
+                lon: Number(firstAddress.lon),
+              };
+            }
+          }
+        } catch (error) {
+          console.error("Error resolving detected location:", error);
+        }
+      }
+    }
+
+    if (resolvedCoords) {
+      params.set("lat", resolvedCoords.lat.toString());
+      params.set("lon", resolvedCoords.lon.toString());
+      if (resolvedCity) params.set("city", resolvedCity);
+      if (resolvedProvince) params.set("province", resolvedProvince);
+    } else if (coords && !hasDetectedLocation) {
       params.set("lat", coords.lat.toString());
       params.set("lon", coords.lon.toString());
-      // Opcional: enviar ciudad/provincia como fallback visual o SEO
-      if (city) params.set("city", city);
-      if (province) params.set("province", province);
+      if (resolvedCity) params.set("city", resolvedCity);
+      if (resolvedProvince) params.set("province", resolvedProvince);
     } else {
-      // Si no hay coordenadas exactas, usamos los strings
-      if (province) params.set("province", province);
-      if (city) params.set("city", city);
+      if (resolvedProvince) params.set("province", resolvedProvince);
+      if (resolvedCity) params.set("city", resolvedCity);
     }
 
     router.push(`/map?${params.toString()}`);
@@ -78,11 +177,13 @@ export function useHomeSearch() {
   const handleToggleFavorite = async (e: React.MouseEvent, id: string) => {
     e.preventDefault();
     e.stopPropagation();
-    // Optimistic UI update
+
     setFeaturedProperties((prev) =>
       prev.map((p) => (p.id === id ? { ...p, isFavorite: !p.isFavorite } : p)),
     );
+
     const success = await propertyService.toggleFavorite(id);
+
     if (!success) {
       setFeaturedProperties((prev) =>
         prev.map((p) =>
@@ -116,6 +217,9 @@ export function useHomeSearch() {
     currentIndex,
     buttonData,
     updatePill,
+    suggestions,
+    isLoading,
+    onSelectSuggestion,
     handleSearch,
     handleToggleFavorite,
   };

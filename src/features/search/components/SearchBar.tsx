@@ -3,7 +3,6 @@
 import React from "react";
 import { useSearch } from "../hooks/useSearch";
 import { ResultList } from "./ResultList";
-import { SearchSuggestion } from "../service/searchService"; // Importar el tipo correcto
 
 export const SearchBar: React.FC = () => {
   const { query, setQuery, suggestions, isLoading, onSelectSuggestion } =
@@ -33,9 +32,9 @@ export const SearchBar: React.FC = () => {
       </div>
 
       <ResultList
-        suggestions={suggestions as SearchSuggestion[]}
+        suggestions={suggestions}
         isLoading={isLoading}
-        onSelect={onSelectSuggestion as (suggestion: SearchSuggestion) => void} // Corrección de tipo
+        onSelect={onSelectSuggestion}
       />
     </div>
   );

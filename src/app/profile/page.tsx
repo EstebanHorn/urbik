@@ -28,14 +28,13 @@ export default function Profile() {
     // userProperties y refetchData eliminados para limpiar warnings
     loading,
     message,
+    hasLoadedProfile,
     handleChange,
     handleManualChange,
     handleSubmit,
   } = useProfile();
 
-  console.log(form);
-
-  if (status === "loading" || userRole === null) {
+  if (status === "loading" || (status === "authenticated" && !hasLoadedProfile)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-urbik-white">
         <Loader2 className="animate-spin text-urbik-black" size={40} />
@@ -59,6 +58,27 @@ export default function Profile() {
             className="w-full cursor-pointer py-4 bg-urbik-black text-white rounded-full font-bold hover:bg-urbik-emerald transition-all active:scale-95"
           >
             Iniciar sesión
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "authenticated" && userRole === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-urbik-white px-6">
+        <div className="bg-urbik-g300 p-8 rounded-[3rem] text-center max-w-md">
+          <h1 className="text-2xl font-display font-bold mb-3">
+            No pudimos cargar tu perfil
+          </h1>
+          <p className="text-urbik-muted font-medium mb-6">
+            Probá recargar la página en unos segundos.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full cursor-pointer py-4 bg-urbik-black text-white rounded-full font-bold hover:bg-urbik-emerald transition-all active:scale-95"
+          >
+            Reintentar
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
@@ -17,7 +17,7 @@ import LocationSelectors from "@/components/LocationSelectors";
 import SmartDescription from "@/components/SmartZone/SmartDescription";
 import { SelectedParcel } from "@/features/map/types/types";
 
-// Carga dinámica del mapa
+// Carga dinÃ¡mica del mapa
 const InteractiveMap = dynamic(
   () =>
     import("@/features/map/components/InteractiveMapClient").then(
@@ -38,13 +38,13 @@ const InteractiveMap = dynamic(
   },
 );
 
-// CORRECCIÓN: Definir PropertyInitialData localmente con parcelGeom compatible
+// CORRECCIÃ“N: Definir PropertyInitialData localmente con parcelGeom compatible
 // Asumiremos una interfaz compatible basada en PropertyFormData para el modal.
 interface PropertyInitialData extends Partial<PropertyFormData> {
   id?: number | string;
   parcelCCA?: string;
   parcelPDA?: string;
-  // Corrección: Usar Record<string, unknown> o Geometry para compatibilidad
+  // CorrecciÃ³n: Usar Record<string, unknown> o Geometry para compatibilidad
   parcelGeom?: Record<string, unknown>;
   latitude?: number;
   longitude?: number;
@@ -79,7 +79,7 @@ export default function CreatePropertyModal({
     handleSave,
     isEditing,
   } = useCreateProperty(
-    // Corrección: Cast seguro
+    // CorrecciÃ³n: Cast seguro
     (initialData as PropertyInitialData) || null,
     onCreated,
     onClose,
@@ -102,7 +102,7 @@ export default function CreatePropertyModal({
   const canSelectParcel = isBuenosAires && hasCity;
 
   const handleInputChange = (name: string, value: string) => {
-    // CORRECCIÓN: Eliminado 'any'. TS infiere 'prev' correctamente desde el hook.
+    // CORRECCIÃ“N: Eliminado 'any'. TS infiere 'prev' correctamente desde el hook.
     setForm((prev) => ({ ...prev, [name]: value }));
     if (name === "city" || name === "province") {
       setCityCoords(null);
@@ -111,14 +111,18 @@ export default function CreatePropertyModal({
 
   const isFormComplete =
     !!form.title?.trim() &&
+    !!form.type &&
     !!form.operationType &&
+    !!form.status &&
+    !!form.country &&
     !!form.street?.trim() &&
-    (form.operationType === "SALE"
-      ? !!form.salePrice
-      : form.operationType === "RENT"
-        ? !!form.rentPrice
-        : !!form.salePrice && !!form.rentPrice) &&
-    !!form.areaM2 &&
+    !!form.number?.toString().trim() &&
+    (Boolean(form.isPriceHidden) ||
+      (form.operationType === "SALE"
+        ? !!form.salePrice
+        : form.operationType === "RENT" || form.operationType === "TEMP_RENT"
+          ? !!form.rentPrice
+          : !!form.salePrice && !!form.rentPrice)) &&
     !!form.province &&
     !!form.city &&
     (form.images?.length ?? 0) > 0;
@@ -183,8 +187,8 @@ export default function CreatePropertyModal({
                   </h2>
                   <p className="text-xs font-bold text-urbik-black/40  tracking-widest">
                     {step === 1
-                      ? "Paso 1: Información"
-                      : "Paso 2: Ubicación Catastral"}
+                      ? "Paso 1: InformaciÃ³n"
+                      : "Paso 2: UbicaciÃ³n Catastral"}
                   </p>
                 </div>
               </div>
@@ -193,7 +197,7 @@ export default function CreatePropertyModal({
                 type="button"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all font-black text-sm"
               >
-                ✕
+                âœ•
               </button>
             </div>
 
@@ -203,14 +207,14 @@ export default function CreatePropertyModal({
                 <div className="h-full overflow-y-auto custom-scrollbar">
                   <div className="max-w-4xl mx-auto p-8 lg:p-12">
                     <div className="flex flex-col gap-12">
-                      {/* SECCIÓN 1 */}
+                      {/* SECCIÃ“N 1 */}
                       <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
                           <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-xs font-black">
                             1
                           </span>
                           <h3 className="text-sm font-bold text-urbik-black  tracking-widest">
-                            Ubicación Geográfica
+                            UbicaciÃ³n GeogrÃ¡fica
                           </h3>
                         </div>
 
@@ -224,6 +228,42 @@ export default function CreatePropertyModal({
                           <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-4">
                             <input
                               type="text"
+                              placeholder="País"
+                              value={form.country || "Argentina"}
+                              onChange={(e) =>
+                                handleInputChange("country", e.target.value)
+                              }
+                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Partido"
+                              value={form.city || ""}
+                              onChange={(e) =>
+                                handleInputChange("city", e.target.value)
+                              }
+                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Localidad"
+                              value={form.locality || ""}
+                              onChange={(e) =>
+                                handleInputChange("locality", e.target.value)
+                              }
+                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Barrio"
+                              value={form.neighborhood || ""}
+                              onChange={(e) =>
+                                handleInputChange("neighborhood", e.target.value)
+                              }
+                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
+                            />
+                            <input
+                              type="text"
                               placeholder="Calle / Dirección"
                               value={form.street || ""}
                               onChange={(e) =>
@@ -232,11 +272,29 @@ export default function CreatePropertyModal({
                               className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
                             />
                             <input
-                              type="number"
-                              placeholder="Altura (Opcional)"
+                              type="text"
+                              placeholder="Altura"
                               value={form.number || ""}
                               onChange={(e) =>
                                 handleInputChange("number", e.target.value)
+                              }
+                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Piso (Opcional)"
+                              value={form.floor || ""}
+                              onChange={(e) =>
+                                handleInputChange("floor", e.target.value)
+                              }
+                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Unidad (Opcional)"
+                              value={form.unitNumber || ""}
+                              onChange={(e) =>
+                                handleInputChange("unitNumber", e.target.value)
                               }
                               className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
                             />
@@ -270,7 +328,7 @@ export default function CreatePropertyModal({
 
                       <hr className="border-gray-100" />
 
-                      {/* SECCIÓN 2 */}
+                      {/* SECCIÃ“N 2 */}
                       <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
                           <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-xs font-black">
@@ -289,11 +347,11 @@ export default function CreatePropertyModal({
 
                           <div className="space-y-2">
                             <label className="text-md font-bold text-urbik-black/50   ml-1">
-                              Descripción
+                              DescripciÃ³n
                             </label>
                             <textarea
                               rows={5}
-                              placeholder="Describí los puntos fuertes de la propiedad..."
+                              placeholder="DescribÃ­ los puntos fuertes de la propiedad..."
                               value={form.description || ""}
                               onChange={(e) =>
                                 handleInputChange("description", e.target.value)
@@ -317,7 +375,7 @@ export default function CreatePropertyModal({
 
                       <hr className="border-gray-100" />
 
-                      {/* SECCIÓN 3 */}
+                      {/* SECCIÃ“N 3 */}
                       <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
                           <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-xs font-black">
@@ -331,7 +389,13 @@ export default function CreatePropertyModal({
                         <div className="pl-9 space-y-8">
                           <AmenitiesGrid
                             value={form.amenities || {}}
-                            // CORRECCIÓN: Eliminado 'any'. TS infiere 'prev'.
+                            featureGroups={form.featureGroups || {}}
+                            onFeatureGroupsChange={(groups) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                featureGroups: groups,
+                              }))
+                            }
                             onChange={(val) =>
                               setForm((prev) => ({
                                 ...prev,
@@ -365,7 +429,7 @@ export default function CreatePropertyModal({
                         <span className="text-xs font-bold text-gray-400">
                           {isFormComplete
                             ? "Todo listo para publicar"
-                            : "* Completá los campos obligatorios"}
+                            : "* CompletÃ¡ los campos obligatorios"}
                         </span>
                         <button
                           onClick={handleSave}
@@ -402,7 +466,7 @@ export default function CreatePropertyModal({
                         lat={selectedParcel?.lat ?? cityCoords?.lat ?? -34.9214}
                         lon={selectedParcel?.lon ?? cityCoords?.lon ?? -57.9545}
                         height="100%"
-                        // CORRECCIÓN: Se pasa selectedParcel directamente sin castear a Record<string, unknown>
+                        // CORRECCIÃ“N: Se pasa selectedParcel directamente sin castear a Record<string, unknown>
                         selectedParcel={selectedParcel}
                       >
                         <ClickToCreateProperty
@@ -414,7 +478,7 @@ export default function CreatePropertyModal({
                     {!selectedParcel && (
                       <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-urbik-black/10 z-10 pointer-events-none">
                         <p className="text-xs font-bold text-urbik-black animate-pulse">
-                          👇 Hacé clic sobre una parcela para seleccionarla
+                          ðŸ‘‡ HacÃ© clic sobre una parcela para seleccionarla
                         </p>
                       </div>
                     )}
@@ -428,7 +492,7 @@ export default function CreatePropertyModal({
                         className="group flex items-center gap-2 text-[10px] font-black  tracking-widest text-gray-400 hover:text-urbik-black transition-colors"
                       >
                         <span className="text-lg group-hover:-translate-x-1 transition-transform">
-                          ←
+                          â†
                         </span>{" "}
                         Volver
                       </button>
@@ -490,7 +554,7 @@ export default function CreatePropertyModal({
                       type="button"
                       className="w-full bg-urbik-black text-white py-4 rounded-xl font-black  text-xs tracking-widest hover:bg-emerald-600 transition-all shadow-lg disabled:opacity-30 disabled:transform-none transform active:scale-95"
                     >
-                      Confirmar Selección
+                      Confirmar SelecciÃ³n
                     </button>
                   </div>
                 </div>
@@ -502,3 +566,5 @@ export default function CreatePropertyModal({
     </AnimatePresence>
   );
 }
+
+

@@ -38,9 +38,33 @@ interface UpdatePropertyPayload {
   area: number;
   rooms: number;
   bathrooms: number;
+  unitType?: string | null;
+  country?: string;
+  district?: string | null;
+  locality?: string | null;
+  neighborhood?: string | null;
+  streetName?: string | null;
+  streetNumber?: string | null;
+  floor?: string | null;
+  unitNumber?: string | null;
+  toilets?: number | null;
+  garages?: number | null;
+  plants?: number | null;
+  coveredArea?: number | null;
+  semiCoveredArea?: number | null;
+  uncoveredArea?: number | null;
+  frontLength?: number | null;
+  backLength?: number | null;
+  expenses?: number | null;
   amenities: PropertyAmenities;
   salePrice?: number | null;
   rentPrice?: number | null;
+  propertySubtype?: string | null;
+  youtubeUrl?: string | null;
+  tour360Url?: string | null;
+  isPriceHidden?: boolean;
+  featureGroups?: Record<string, Record<string, boolean>>;
+  extraData?: Record<string, unknown>;
   // CORRECCIÓN: Index signature necesaria para ser compatible con PropertyPayload del servicio
   [key: string]: unknown;
 }
@@ -76,13 +100,38 @@ export function useEditProperty(
       area: Number(form.areaM2 || form.area),
       rooms: Number(form.rooms),
       bathrooms: Number(form.bathrooms),
+      unitType: (form.unitType as string) || null,
+      country: (form.country as string) || "Argentina",
+      district: (form.district as string) || null,
+      locality: (form.locality as string) || null,
+      neighborhood: (form.neighborhood as string) || null,
+      streetName: (form.street as string) || null,
+      streetNumber: (form.number as string) || null,
+      floor: (form.floor as string) || null,
+      unitNumber: (form.unitNumber as string) || null,
+      toilets: form.toilets ? Number(form.toilets) : null,
+      garages: form.garages ? Number(form.garages) : null,
+      plants: form.plants ? Number(form.plants) : null,
+      coveredArea: form.coveredArea ? Number(form.coveredArea) : null,
+      semiCoveredArea: form.semiCoveredArea ? Number(form.semiCoveredArea) : null,
+      uncoveredArea: form.uncoveredArea ? Number(form.uncoveredArea) : null,
+      frontLength: form.frontLength ? Number(form.frontLength) : null,
+      backLength: form.backLength ? Number(form.backLength) : null,
+      expenses: form.expenses ? Number(form.expenses) : null,
       amenities: form.amenities,
+      propertySubtype: (form.propertySubtype as string) || null,
+      youtubeUrl: (form.youtubeUrl as string) || null,
+      tour360Url: (form.tour360Url as string) || null,
+      isPriceHidden: Boolean(form.isPriceHidden),
+      featureGroups:
+        (form.featureGroups as Record<string, Record<string, boolean>>) || {},
+      extraData: (form.extraData as Record<string, unknown>) || {},
     };
 
     if (form.operationType === "SALE") {
       updateData.salePrice = Number(form.salePrice);
       updateData.rentPrice = null;
-    } else if (form.operationType === "RENT") {
+    } else if (form.operationType === "RENT" || form.operationType === "TEMP_RENT") {
       updateData.rentPrice = Number(form.rentPrice);
       updateData.salePrice = null;
     } else {

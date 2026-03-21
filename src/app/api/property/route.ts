@@ -35,6 +35,11 @@ interface PropertyRequestBody {
   bathrooms?: number | string;
   operationType: OperationType;
   images?: string[];
+  propertySubtype?: string;
+  youtubeUrl?: string;
+  tour360Url?: string;
+  isPriceHidden?: boolean;
+  featureGroups?: Record<string, Record<string, boolean>>;
 }
 
 export async function POST(req: NextRequest) {
@@ -80,6 +85,11 @@ export async function POST(req: NextRequest) {
       bathrooms,
       operationType,
       images,
+      propertySubtype,
+      youtubeUrl,
+      tour360Url,
+      isPriceHidden,
+      featureGroups,
     } = body;
 
     if (!title || !city || !operationType) {
@@ -98,8 +108,10 @@ export async function POST(req: NextRequest) {
         province: province ?? "",
         country: country ?? "Argentina",
         type,
+        propertySubtype: propertySubtype || null,
         operationType,
         status: "AVAILABLE",
+        isPriceHidden: Boolean(isPriceHidden),
         salePrice: salePrice ? parseFloat(salePrice.toString()) : null,
         saleCurrency: saleCurrency || "USD",
         rentPrice: rentPrice ? parseFloat(rentPrice.toString()) : null,
@@ -108,6 +120,9 @@ export async function POST(req: NextRequest) {
         rooms: rooms ? parseInt(rooms.toString()) : null,
         bathrooms: bathrooms ? parseInt(bathrooms.toString()) : null,
         images: images || [],
+        youtubeUrl: youtubeUrl || null,
+        tour360Url: tour360Url || null,
+        featureGroups: featureGroups || {},
         realEstateId: user.user_id,
       },
     });

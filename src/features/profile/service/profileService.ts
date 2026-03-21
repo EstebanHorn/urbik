@@ -1,11 +1,6 @@
-/*
-Este archivo actúa como un servicio de gestión de usuarios que centraliza la
-lógica para obtener, actualizar y pausar perfiles tanto desde el cliente (vía API)
-como directamente en el servidor (usando Prisma). El código permite manejar de
-forma diferenciada a usuarios comunes e inmobiliarias, gestionando transacciones
-en la base de datos para asegurar la integridad de la información, el filtrado de
-datos sensibles como contraseñas y la validación de credenciales mediante
-encriptación para cambios de clave seguros.
+﻿/*
+Servicio de perfil: lectura/actualizacion de usuario e inmobiliaria,
+incluyendo matrices legales (matriculas) y oficinas.
 */
 
 import { RealEstateFormFields, UserFormFields } from "../../../libs/types";
@@ -25,7 +20,6 @@ export async function fetchProfileData() {
 
 export async function updateProfile(
   payload: RealEstateFormFields | UserFormFields,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _userRole: "USER" | "REALESTATE",
 ) {
   const res = await fetch("/api/user", {
@@ -44,11 +38,6 @@ export async function updateProfile(
 }
 
 export async function toggleAccountPause(isActive: boolean) {
-  console.log(
-    "2. Service -> Enviando PATCH con body:",
-    JSON.stringify({ isActive }),
-  );
-
   const res = await fetch("/api/user", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -63,39 +52,62 @@ export async function getServerUserProfile(email: string) {
   const user = await prisma.allUsers.findUnique({
     where: { email },
     include: {
-      realEstate: { include: { properties: true } },
-      userData: true, // Incluimos userData explícitamente para tipado
+      realEstate: {
+        include: {
+          properties: true,
+          licenses: {
+            orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
+          },
+          offices: {
+            orderBy: { createdAt: "asc" },
+          },
+        },
+      },
+      userData: true,
     },
   });
 
   if (!user) throw new Error("Usuario no encontrado");
 
-  // Eliminamos variable _password que no se usaba
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password, ...userSafe } = user;
 
   return {
     ...userSafe,
     isActive: user.isActive,
     agencyData: user.role === "REALESTATE" ? user.realEstate : null,
-    // TypeScript ahora sabe que userData existe en user
     personalData: user.role === "USER" ? user.userData : null,
   };
 }
 
-// Actualizado para reflejar agencyName que es lo que espera el hook
 type UpdateServerProfileBody = {
   firstName?: string;
   lastName?: string;
   phone?: string;
-  agencyName?: string; // Cambiado de name a agencyName
-  name?: string; // Mantenemos name opcional por si acaso el payload viejo llega
+  agencyName?: string;
+  name?: string;
   address?: string;
   website?: string;
   instagram?: string;
   bio?: string;
   province?: string;
   city?: string;
+  licenses?: Array<{
+    id?: number;
+    licenseNumber: string;
+    province: string;
+    jurisdiction?: string | null;
+    responsibleName: string;
+    isPrimary?: boolean;
+  }>;
+  offices?: Array<{
+    id?: number;
+    name: string;
+    province: string;
+    city: string;
+    street: string;
+    number: string;
+    phone?: string | null;
+  }>;
 };
 
 export async function updateServerProfile(
@@ -111,17 +123,19 @@ export async function updateServerProfile(
   return await prisma.$transaction(async (tx) => {
     if (authUser.role === "USER") {
       const { firstName, lastName } = body;
-      if (!firstName || !lastName)
+      if (!firstName || !lastName) {
         throw new Error("Nombre y apellido requeridos");
+      }
 
-      return await tx.user.update({
+      await tx.user.update({
         where: { user_id: authUser.user_id },
         data: { firstName, lastName },
       });
+
+      return { ok: true };
     }
 
     if (authUser.role === "REALESTATE") {
-      // Permitimos agencyName o name
       const {
         agencyName,
         name,
@@ -132,18 +146,20 @@ export async function updateServerProfile(
         bio,
         province,
         city,
+        licenses,
+        offices,
       } = body;
       const finalName = agencyName || name;
 
-      if (!finalName)
+      if (!finalName) {
         throw new Error("El nombre de la inmobiliaria es requerido");
+      }
 
-      return await tx.realEstate.update({
+      const updatedRealEstate = await tx.realEstate.update({
         where: { user_id: authUser.user_id },
         data: {
           agencyName: finalName,
           address,
-          // Eliminamos 'phone' de aquí si el esquema no lo permite o lo dejamos si es necesario
           phone,
           website,
           instagram,
@@ -152,6 +168,71 @@ export async function updateServerProfile(
           city,
         },
       });
+
+      const validLicenses =
+        licenses?.filter(
+          (item) =>
+            item.licenseNumber?.trim() &&
+            item.province?.trim() &&
+            item.responsibleName?.trim(),
+        ) ?? [];
+
+      if (validLicenses.length > 0) {
+        await tx.realEstateLicense.deleteMany({
+          where: { realEstateId: authUser.user_id },
+        });
+
+        await tx.realEstateLicense.createMany({
+          data: validLicenses.map((item, index) => ({
+            realEstateId: authUser.user_id,
+            licenseNumber: item.licenseNumber.trim(),
+            province: item.province.trim(),
+            jurisdiction: item.jurisdiction?.trim() || null,
+            responsibleName: item.responsibleName.trim(),
+            isPrimary:
+              typeof item.isPrimary === "boolean" ? item.isPrimary : index === 0,
+          })),
+        });
+
+        const firstPrimary =
+          validLicenses.find((item) => item.isPrimary) ?? validLicenses[0];
+        if (firstPrimary) {
+          await tx.realEstate.update({
+            where: { user_id: authUser.user_id },
+            data: { license: firstPrimary.licenseNumber.trim() },
+          });
+        }
+      }
+
+      const validOffices =
+        offices?.filter(
+          (item) =>
+            item.name?.trim() &&
+            item.province?.trim() &&
+            item.city?.trim() &&
+            item.street?.trim() &&
+            item.number?.trim(),
+        ) ?? [];
+
+      if (validOffices.length > 0) {
+        await tx.realEstateOffice.deleteMany({
+          where: { realEstateId: authUser.user_id },
+        });
+
+        await tx.realEstateOffice.createMany({
+          data: validOffices.map((item) => ({
+            realEstateId: authUser.user_id,
+            name: item.name.trim(),
+            province: item.province.trim(),
+            city: item.city.trim(),
+            street: item.street.trim(),
+            number: item.number.trim(),
+            phone: item.phone?.trim() || null,
+          })),
+        });
+      }
+
+      return updatedRealEstate;
     }
 
     throw new Error("Rol no soportado");
@@ -171,7 +252,7 @@ export async function updateServerPassword(
 
   const isMatch = await bcrypt.compare(currentPassword, user.password);
   if (!isMatch) {
-    throw new Error("La contraseña actual es incorrecta");
+    throw new Error("La contrasena actual es incorrecta");
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -181,3 +262,4 @@ export async function updateServerPassword(
     data: { password: hashedPassword },
   });
 }
+

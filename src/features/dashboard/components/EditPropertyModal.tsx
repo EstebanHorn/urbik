@@ -54,9 +54,18 @@ export default function EditPropertyModal({
     setForm(value as any);
   };
 
+  const hasValidPrice = Boolean(safeForm.isPriceHidden)
+    ? true
+    : safeForm.operationType === "SALE_RENT"
+      ? Boolean(safeForm.salePrice || safeForm.rentPrice)
+      : safeForm.operationType === "SALE"
+        ? Boolean(safeForm.salePrice)
+        : Boolean(safeForm.rentPrice);
+
   const isFormComplete =
     !!safeForm.title?.trim() &&
     !!safeForm.operationType &&
+    !!hasValidPrice &&
     (!!safeForm.areaM2 || !!safeForm.area) &&
     (safeForm.images?.length ?? 0) > 0;
 
@@ -169,6 +178,13 @@ export default function EditPropertyModal({
                   {/* Corrección 2: Uso de la variable con tipo explícito y cast en el onChange */}
                   <AmenitiesGrid
                     value={currentAmenities}
+                    featureGroups={safeForm.featureGroups || {}}
+                    onFeatureGroupsChange={(groups) =>
+                      handleSetForm((prev: PropertyFormData) => ({
+                        ...prev,
+                        featureGroups: groups,
+                      }))
+                    }
                     onChange={(val) =>
                       handleSetForm((prev: PropertyFormData) => ({
                         ...prev,

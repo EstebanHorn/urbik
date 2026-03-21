@@ -9,7 +9,7 @@ seleccionar una opción a través de la propiedad onSelect.
 */
 
 import React from "react";
-import { SearchSuggestion } from "../service/searchService";
+import { SearchSuggestion } from "../hooks/useAutocompleteSuggestions";
 
 interface ResultListProps {
   suggestions: SearchSuggestion[];

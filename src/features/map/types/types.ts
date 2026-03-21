@@ -16,12 +16,19 @@ export type Overlay = {
   label?: string;
 };
 
-export type OperationType = "RENT" | "SALE";
+export type OperationType = "RENT" | "SALE" | "TEMP_RENT" | "SALE_RENT";
 
 export type PropertyType =
   | "HOUSE"
   | "APARTMENT"
+  | "PH"
+  | "COUNTRY"
   | "LAND"
+  | "FIELD"
+  | "BUSINESS_BACKGROUND"
+  | "GARAGE"
+  | "WAREHOUSE"
+  | "DEVELOPMENT"
   | "COMMERCIAL_PROPERTY"
   | "OFFICE";
 
@@ -49,6 +56,17 @@ export interface MapProperty {
   rooms?: number;
   bathrooms?: number;
   area?: number;
+  hasWater?: boolean;
+  hasElectricity?: boolean;
+  hasGas?: boolean;
+  hasInternet?: boolean;
+  hasParking?: boolean;
+  hasPool?: boolean;
+  hasBalcony?: boolean;
+  hasGrill?: boolean;
+  hasGarden?: boolean;
+  hasLaundry?: boolean;
+  hasAirConditioning?: boolean;
 }
 
 export interface SelectedParcel {

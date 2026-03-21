@@ -212,6 +212,10 @@ export default function DashboardMain({
             ...editingProperty,
             type: editingProperty.type || undefined,
             description: editingProperty.description || "",
+            propertySubtype: editingProperty.propertySubtype || undefined,
+            featureGroups: editingProperty.featureGroups || undefined,
+            youtubeUrl: editingProperty.youtubeUrl || undefined,
+            tour360Url: editingProperty.tour360Url || undefined,
             // Aseguramos compatibilidad de otros campos opcionales si es necesario
           }}
           onClose={() => setEditingProperty(null)}
