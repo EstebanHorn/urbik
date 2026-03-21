@@ -19,13 +19,24 @@ export type Role = "USER" | "REALESTATE" | "ADMIN" | "AGENT";
 export type PropertyType =
   | "HOUSE"
   | "APARTMENT"
+  | "PH"
+  | "COUNTRY"
   | "LAND"
+  | "FIELD"
+  | "BUSINESS_BACKGROUND"
+  | "GARAGE"
+  | "WAREHOUSE"
+  | "DEVELOPMENT"
   | "COMMERCIAL_PROPERTY"
   | "OFFICE";
-export type OperationType = "RENT" | "SALE" | "SALE_RENT";
+export type OperationType = "RENT" | "SALE" | "TEMP_RENT" | "SALE_RENT";
 export type PropertyStatus =
   | "AVAILABLE"
+  | "ACTIVE"
   | "RESERVED"
+  | "SUSPENDED"
+  | "HISTORIC"
+  | "APPRAISAL"
   | "SOLD"
   | "RENTED"
   | "PAUSED";
@@ -42,6 +53,23 @@ export interface RealEstateFormFields {
   instagram: string;
   bio: string;
   license: string;
+  licenses?: Array<{
+    id?: number;
+    licenseNumber: string;
+    province: string;
+    jurisdiction?: string;
+    responsibleName: string;
+    isPrimary?: boolean;
+  }>;
+  offices?: Array<{
+    id?: number;
+    name: string;
+    province: string;
+    city: string;
+    street: string;
+    number: string;
+    phone?: string;
+  }>;
   province: string;
   city: string;
   logoUrl?: string;
@@ -97,6 +125,11 @@ export interface Property {
   hasInternet: boolean;
   hasParking: boolean;
   hasPool: boolean;
+  propertySubtype?: string | null;
+  youtubeUrl?: string | null;
+  tour360Url?: string | null;
+  isPriceHidden?: boolean;
+  featureGroups?: JsonValue | null;
 
   // Geo / Parcelas
   latitude?: number | null;

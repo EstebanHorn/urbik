@@ -40,6 +40,11 @@ export type PropertySummary = {
   area?: number;
   rooms?: number;
   bathrooms?: number;
+  propertySubtype?: string | null;
+  youtubeUrl?: string | null;
+  tour360Url?: string | null;
+  isPriceHidden?: boolean;
+  featureGroups?: Record<string, Record<string, boolean>> | null;
 
   RealEstateAgency?: { name: string; phone?: string };
 

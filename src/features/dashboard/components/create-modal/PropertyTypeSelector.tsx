@@ -18,9 +18,16 @@ export function PropertyTypeSelector({ value, onChange }: Props) {
   const options = [
     { id: "HOUSE", label: "Casa" },
     { id: "APARTMENT", label: "Departamento" },
-    { id: "LAND", label: "Lote / Terreno" },
-    { id: "COMMERCIAL_PROPERTY", label: "Local Comercial" },
+    { id: "COMMERCIAL_PROPERTY", label: "Local" },
+    { id: "PH", label: "PH" },
+    { id: "LAND", label: "Terreno" },
+    { id: "FIELD", label: "Campo" },
+    { id: "BUSINESS_BACKGROUND", label: "Fondo de comercio" },
     { id: "OFFICE", label: "Oficina" },
+    { id: "GARAGE", label: "Cochera" },
+    { id: "WAREHOUSE", label: "Galpón" },
+    { id: "DEVELOPMENT", label: "Desarrollo" },
+    { id: "COUNTRY", label: "Country" },
   ];
 
   return (

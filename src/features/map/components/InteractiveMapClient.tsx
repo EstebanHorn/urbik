@@ -13,7 +13,7 @@ una limpieza adecuada de la instancia del mapa en el cliente para evitar fugas d
 
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import { useSearchParams } from "next/navigation";
 import "leaflet/dist/leaflet.css";
@@ -22,7 +22,7 @@ import { StaticParcelsLayer } from "./StaticParcelsLayer";
 import { DbParcelsLayer } from "./DbParcelsLayer";
 import { MapEventsHandler, ZoneData } from "./MapEventsHandler";
 import { SelectedParcelLayer } from "./SelectedParcelLayer";
-import { mapBaseLayers } from "@/features/map/config/baseLayers";
+import { mapBaseLayers, type BaseLayerId } from "@/features/map/config/baseLayers";
 import { useMapSettings } from "@/features/map/context/MapSettingsProvider";
 import { MapProperty, MapBounds, SelectedParcel } from "../types/types";
 
@@ -88,6 +88,60 @@ function ScrollHandler({ enabled }: { enabled: boolean }) {
   return null;
 }
 
+function AutoSatelliteOnParcelZoom({
+  zoomThreshold = 16,
+}: {
+  zoomThreshold?: number;
+}) {
+  const map = useMap();
+  const { baseLayer, setBaseLayer } = useMapSettings();
+  const previousLayerRef = useRef<BaseLayerId | null>(null);
+  const forcedSatelliteRef = useRef(false);
+  const baseLayerRef = useRef<BaseLayerId>(baseLayer);
+
+  useEffect(() => {
+    baseLayerRef.current = baseLayer;
+  }, [baseLayer]);
+
+  useEffect(() => {
+    if (!map) return;
+
+    const onZoom = () => {
+      const currentZoom = map.getZoom();
+
+      if (currentZoom >= zoomThreshold) {
+        if (!forcedSatelliteRef.current) {
+          forcedSatelliteRef.current = true;
+          if (baseLayerRef.current !== "satellite") {
+            previousLayerRef.current = baseLayerRef.current;
+          }
+        }
+        if (baseLayerRef.current !== "satellite") {
+          setBaseLayer("satellite");
+        }
+        return;
+      }
+
+      if (forcedSatelliteRef.current) {
+        forcedSatelliteRef.current = false;
+        const fallbackLayer = previousLayerRef.current || "cartoLight";
+        previousLayerRef.current = null;
+        if (baseLayerRef.current !== fallbackLayer) {
+          setBaseLayer(fallbackLayer);
+        }
+      }
+    };
+
+    onZoom();
+    map.on("zoomend", onZoom);
+    return () => {
+      map.off("zoomend", onZoom);
+    };
+  }, [map, setBaseLayer, zoomThreshold]);
+
+  return null;
+}
+
 function MapUpdater({ center }: { center: [number, number] }) {
   const map = useMap();
 
@@ -119,14 +173,21 @@ export function InteractiveMapClient({
   const [mounted, setMounted] = useState(false);
 
   const searchParams = useSearchParams();
+  const searchLat = searchParams.get("lat");
+  const searchLon = searchParams.get("lon");
+  const searchZoom = searchParams.get("zoom");
+
+  const initialZoom = useMemo(() => {
+    const parsedZoom = searchZoom ? Number(searchZoom) : 15;
+    if (Number.isNaN(parsedZoom)) return 15;
+    return Math.min(19, Math.max(4, parsedZoom));
+  }, [searchZoom]);
 
   const initialCenter = useMemo<[number, number]>(() => {
-    const sLat = searchParams.get("lat");
-    const sLon = searchParams.get("lon");
-    return sLat && sLon
-      ? [parseFloat(sLat), parseFloat(sLon)]
+    return searchLat && searchLon
+      ? [parseFloat(searchLat), parseFloat(searchLon)]
       : [initialLat, initialLon];
-  }, [searchParams, initialLat, initialLon]);
+  }, [searchLat, searchLon, initialLat, initialLon]);
 
   const currentBaseLayer = useMemo(
     () => mapBaseLayers[baseLayer] ?? mapBaseLayers.cartoLight,
@@ -145,9 +206,9 @@ export function InteractiveMapClient({
     <div className="relative w-full overflow-hidden" style={{ height }}>
       <MapContainer
         center={initialCenter}
-        zoom={15}
-        minZoom={14}
-        maxZoom={18}
+        zoom={initialZoom}
+        minZoom={4}
+        maxZoom={19}
         scrollWheelZoom={isScrollZoomEnabled}
         style={{ height: "100%", width: "100%" }}
         zoomControl={false}
@@ -157,10 +218,15 @@ export function InteractiveMapClient({
           <TileLayer
             url={currentBaseLayer.url}
             attribution={currentBaseLayer.attribution}
+            maxNativeZoom={currentBaseLayer.id === "satellite" ? 19 : 20}
+            updateWhenIdle={true}
+            updateWhenZooming={false}
+            keepBuffer={4}
           />
 
           <CustomZoomControls />
           <ScrollHandler enabled={isScrollZoomEnabled} />
+          <AutoSatelliteOnParcelZoom zoomThreshold={16} />
           <MapUpdater center={initialCenter} />
 
           <MapEventsHandler

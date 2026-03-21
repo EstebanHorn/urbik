@@ -1,30 +1,48 @@
-"use client";
+﻿"use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { CurrencySelector } from "./CurrencySelector";
 import { CustomDropdown } from "../../../../components/CustomDropdown";
 
-// Definición estricta y completa del formulario
 export interface PropertyFormData {
   id?: number | string;
   title?: string;
   type?: string;
+  propertySubtype?: string;
+  unitType?: string;
   operationType?: string;
-  // Precios
+  status?: string;
   rentPrice?: number;
   salePrice?: number;
   rentCurrency?: "USD" | "ARS";
   saleCurrency?: "USD" | "ARS";
-  currency?: string; // Agregado para satisfacer TS2345
-  // Dimensiones y Características
+  currency?: string;
+  isPriceHidden?: boolean;
   areaM2?: number;
   area?: number;
   rooms?: number;
   bathrooms?: number;
-  // Amenities como objeto para coincidir con el hook
+  toilets?: number;
+  garages?: number;
+  plants?: number;
+  coveredArea?: number;
+  semiCoveredArea?: number;
+  uncoveredArea?: number;
+  frontLength?: number;
+  backLength?: number;
+  expenses?: number;
   amenities?: Record<string, boolean>;
-  // Ubicación
+  featureGroups?: Record<string, Record<string, boolean>>;
+  extraData?: Record<string, unknown>;
+  youtubeUrl?: string;
+  tour360Url?: string;
+  country?: string;
+  district?: string;
+  locality?: string;
+  neighborhood?: string;
+  floor?: string;
+  unitNumber?: string;
   address?: string;
   street?: string;
   number?: string;
@@ -32,14 +50,126 @@ export interface PropertyFormData {
   province?: string;
   description?: string;
   images?: string[];
-  // Estado
-  status?: string;
 }
 
 interface FormFieldsProps {
   form: PropertyFormData;
   setForm: React.Dispatch<React.SetStateAction<PropertyFormData>>;
 }
+
+type DynamicField = {
+  key:
+    | "areaM2"
+    | "rooms"
+    | "bathrooms"
+    | "toilets"
+    | "garages"
+    | "plants"
+    | "coveredArea"
+    | "semiCoveredArea"
+    | "uncoveredArea"
+    | "frontLength"
+    | "backLength"
+    | "expenses";
+  label: string;
+  required?: boolean;
+};
+
+const DYNAMIC_FIELDS_BY_TYPE: Record<string, DynamicField[]> = {
+  HOUSE: [
+    { key: "areaM2", label: "M² Totales", required: true },
+    { key: "rooms", label: "Ambientes", required: true },
+    { key: "bathrooms", label: "Baños", required: true },
+    { key: "toilets", label: "Toilettes" },
+    { key: "garages", label: "Cocheras" },
+    { key: "plants", label: "Plantas" },
+    { key: "coveredArea", label: "Sup. cubierta (m²)" },
+    { key: "semiCoveredArea", label: "Sup. semicubierta (m²)" },
+    { key: "uncoveredArea", label: "Sup. descubierta (m²)" },
+    { key: "frontLength", label: "Frente (m)" },
+    { key: "backLength", label: "Fondo (m)" },
+  ],
+  APARTMENT: [
+    { key: "areaM2", label: "M² Cubiertos", required: true },
+    { key: "rooms", label: "Ambientes", required: true },
+    { key: "bathrooms", label: "Baños", required: true },
+    { key: "toilets", label: "Toilettes" },
+    { key: "garages", label: "Cocheras" },
+    { key: "expenses", label: "Expensas" },
+    { key: "coveredArea", label: "Sup. cubierta (m²)" },
+    { key: "semiCoveredArea", label: "Sup. semicubierta (m²)" },
+    { key: "uncoveredArea", label: "Sup. descubierta (m²)" },
+  ],
+  PH: [
+    { key: "areaM2", label: "M² Totales", required: true },
+    { key: "rooms", label: "Ambientes", required: true },
+    { key: "bathrooms", label: "Baños", required: true },
+  ],
+  COUNTRY: [
+    { key: "areaM2", label: "M² Totales", required: true },
+    { key: "rooms", label: "Ambientes", required: true },
+    { key: "bathrooms", label: "Baños", required: true },
+  ],
+  LAND: [{ key: "areaM2", label: "M² del terreno", required: true }],
+  FIELD: [{ key: "areaM2", label: "Hectáreas / m²", required: true }],
+  BUSINESS_BACKGROUND: [{ key: "areaM2", label: "M² Totales" }],
+  GARAGE: [{ key: "garages", label: "Cantidad de cocheras", required: true }],
+  WAREHOUSE: [
+    { key: "areaM2", label: "M² Totales", required: true },
+    { key: "bathrooms", label: "Baños" },
+  ],
+  DEVELOPMENT: [{ key: "areaM2", label: "M² del desarrollo" }],
+  OFFICE: [
+    { key: "areaM2", label: "M² Totales", required: true },
+    { key: "bathrooms", label: "Baños" },
+  ],
+  COMMERCIAL_PROPERTY: [
+    { key: "areaM2", label: "M² Totales", required: true },
+    { key: "bathrooms", label: "Baños" },
+  ],
+};
+
+const SUBTYPE_BY_TYPE: Record<string, Array<{ value: string; label: string }>> = {
+  APARTMENT: [
+    { value: "monoambiente", label: "Monoambiente" },
+    { value: "semipiso", label: "Semipiso" },
+    { value: "departamento", label: "Departamento" },
+    { value: "piso", label: "Piso" },
+    { value: "semipiso", label: "Semipiso" },
+    { value: "duplex", label: "Dúplex" },
+    { value: "triplex", label: "Tríplex" },
+    { value: "loft", label: "Loft" },
+    { value: "penthouse", label: "Penthouse" },
+    { value: "ph", label: "PH" },
+  ],
+  HOUSE: [
+    { value: "chalet", label: "Chalet" },
+    { value: "duplex", label: "Dúplex" },
+    { value: "triplex", label: "Tríplex" },
+  ],
+  PH: [
+    { value: "al_frente", label: "Al frente" },
+    { value: "interno", label: "Interno" },
+  ],
+  COUNTRY: [
+    { value: "lote_casa", label: "Lote + Casa" },
+    { value: "lote", label: "Solo Lote" },
+  ],
+};
+
+const UNIT_TYPE_BY_PROPERTY: Record<string, Array<{ value: string; label: string }>> = {
+  APARTMENT: SUBTYPE_BY_TYPE.APARTMENT,
+  HOUSE: [
+    { value: "casa", label: "Casa" },
+    { value: "chalet", label: "Chalet" },
+    { value: "duplex", label: "Dúplex" },
+    { value: "triplex", label: "Tríplex" },
+  ],
+  LAND: [
+    { value: "terreno", label: "Terreno" },
+    { value: "lote", label: "Lote" },
+  ],
+};
 
 export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
   const [opPill, setOpPill] = useState({ width: 0, x: 0 });
@@ -48,14 +178,8 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const { name, value } = e.target;
-    // Conversión segura de números
-    const val =
-      e.target.type === "number"
-        ? value === ""
-          ? 0
-          : parseFloat(value)
-        : value;
+    const { name, value, type } = e.target;
+    const val = type === "number" ? (value === "" ? undefined : parseFloat(value)) : value;
 
     setForm((prev) => ({ ...prev, [name]: val }));
   };
@@ -79,21 +203,59 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
   const operationOptions = [
     { id: "SALE", label: "VENTA" },
     { id: "RENT", label: "ALQUILER" },
+    { id: "TEMP_RENT", label: "TEMPORAL" },
     { id: "SALE_RENT", label: "AMBOS" },
   ];
 
   const propertyTypes = [
     { value: "HOUSE", label: "Casa" },
     { value: "APARTMENT", label: "Departamento" },
-    { value: "LAND", label: "Terreno" },
     { value: "COMMERCIAL_PROPERTY", label: "Local" },
+    { value: "PH", label: "PH" },
+    { value: "LAND", label: "Terreno" },
+    { value: "FIELD", label: "Campo" },
+    { value: "BUSINESS_BACKGROUND", label: "Fondo de comercio" },
     { value: "OFFICE", label: "Oficina" },
+    { value: "GARAGE", label: "Cochera" },
+    { value: "WAREHOUSE", label: "Galpón" },
+    { value: "DEVELOPMENT", label: "Desarrollo" },
+    { value: "COUNTRY", label: "Country" },
+  ];
+
+  const statusOptions = [
+    { value: "AVAILABLE", label: "Vigente / Disponible" },
+    { value: "RESERVED", label: "Reservado" },
+    { value: "SUSPENDED", label: "Suspendido" },
+    { value: "HISTORIC", label: "Histórico" },
+    { value: "APPRAISAL", label: "En tasación" },
+    { value: "SOLD", label: "Vendido" },
+    { value: "RENTED", label: "Alquilado" },
   ];
 
   const showSalePrice =
     form.operationType === "SALE" || form.operationType === "SALE_RENT";
   const showRentPrice =
-    form.operationType === "RENT" || form.operationType === "SALE_RENT";
+    form.operationType === "RENT" ||
+    form.operationType === "TEMP_RENT" ||
+    form.operationType === "SALE_RENT";
+
+  const dynamicFields =
+    DYNAMIC_FIELDS_BY_TYPE[form.type || "HOUSE"] || DYNAMIC_FIELDS_BY_TYPE.HOUSE;
+
+  const subtypeOptions = useMemo(
+    () => SUBTYPE_BY_TYPE[form.type || ""] || [],
+    [form.type],
+  );
+  const unitTypeOptions = useMemo(
+    () => UNIT_TYPE_BY_PROPERTY[form.type || ""] || [],
+    [form.type],
+  );
+
+  const titleTips = [
+    "Corto: entre 25 y 60 caracteres.",
+    "Descriptivo: mencioná tipo + zona + diferencial.",
+    "Sin abreviaturas confusas ni mayúsculas excesivas.",
+  ];
 
   return (
     <div className="space-y-8">
@@ -106,9 +268,19 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
           name="title"
           value={form.title || ""}
           onChange={handleChange}
-          placeholder="Ej: Hermoso departamento en Recoleta"
-          className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+          placeholder="Ej: Departamento 3 amb con pileta en La Plata"
+          className="bg-urbik-white text-urbik-black/60 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
         />
+        <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3">
+          <p className="text-[10px] font-black uppercase text-amber-700 tracking-wider mb-1">
+            Guía rápida para un buen título
+          </p>
+          <ul className="text-xs text-amber-800 font-medium space-y-0.5">
+            {titleTips.map((tip) => (
+              <li key={tip}>• {tip}</li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-5 items-end justify-between">
@@ -120,7 +292,9 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             label="Seleccionar tipo"
             options={propertyTypes}
             value={form.type || ""}
-            onChange={(val) => setForm((prev) => ({ ...prev, type: val }))}
+            onChange={(val) =>
+              setForm((prev) => ({ ...prev, type: val, propertySubtype: "" }))
+            }
             className="w-full"
             variant="white2"
           />
@@ -159,92 +333,165 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-5">
-        {showRentPrice && (
-          <div className="flex flex-col w-full">
-            <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
-              Precio Alquiler
+      <div className="flex flex-wrap gap-5 items-end">
+        {unitTypeOptions.length > 0 && (
+          <div className="flex flex-col w-full md:w-[45%]">
+            <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
+              Tipo de Unidad
             </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                name="rentPrice"
-                value={form.rentPrice || ""}
-                onChange={handleChange}
-                placeholder="0"
-                className="bg-urbik-white text-urbik-black/50 border border-black/50 flex-1 px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
-              />
-              <CurrencySelector
-                value={form.rentCurrency || "ARS"}
-                onChange={(val) =>
-                  setForm((prev) => ({ ...prev, rentCurrency: val }))
-                }
-              />
-            </div>
+            <CustomDropdown
+              label="Seleccionar unidad"
+              options={unitTypeOptions}
+              value={form.unitType || ""}
+              onChange={(val) => setForm((prev) => ({ ...prev, unitType: val }))}
+              className="w-full"
+              variant="white2"
+            />
           </div>
         )}
 
-        {showSalePrice && (
-          <div className="flex flex-col w-full">
-            <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
-              Precio Venta
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                name="salePrice"
-                value={form.salePrice || ""}
-                onChange={handleChange}
-                placeholder="0"
-                className="bg-urbik-white text-urbik-black/50 border border-black/50 flex-1 px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
-              />
-              <CurrencySelector
-                value={form.saleCurrency || "USD"}
-                onChange={(val) =>
-                  setForm((prev) => ({ ...prev, saleCurrency: val }))
-                }
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="flex flex-col w-full md:w-1/3 mt-2">
-          <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
-            M² Totales
+        <div className="flex flex-col w-full md:w-[45%]">
+          <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
+            Estado
           </label>
-          <input
-            type="number"
-            name="areaM2"
-            value={form.areaM2 || ""}
-            onChange={handleChange}
-            className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+          <CustomDropdown
+            label="Seleccionar estado"
+            options={statusOptions}
+            value={form.status || "AVAILABLE"}
+            onChange={(val) => setForm((prev) => ({ ...prev, status: val }))}
+            className="w-full"
+            variant="white2"
           />
         </div>
       </div>
 
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <label className="block text-md ml-5 font-bold text-urbik-black/50">
-            Ambientes
+      {subtypeOptions.length > 0 && (
+        <div className="flex flex-col w-full md:w-[45%]">
+          <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
+            Subtipo
           </label>
-          <input
-            type="number"
-            name="rooms"
-            value={form.rooms || ""}
-            onChange={handleChange}
-            className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-2 rounded-full focus:border-urbik-black outline-none transition-all"
+          <CustomDropdown
+            label="Seleccionar subtipo"
+            options={subtypeOptions}
+            value={form.propertySubtype || ""}
+            onChange={(val) => setForm((prev) => ({ ...prev, propertySubtype: val }))}
+            className="w-full"
+            variant="white2"
           />
         </div>
-        <div className="flex-1">
-          <label className="block text-md ml-5 font-bold text-urbik-black/50">
-            Baños
+      )}
+
+      <div className="flex items-center gap-2">
+        <input
+          id="sinPrecio"
+          type="checkbox"
+          checked={Boolean(form.isPriceHidden)}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              isPriceHidden: e.target.checked,
+            }))
+          }
+        />
+        <label htmlFor="sinPrecio" className="text-sm font-semibold text-urbik-black/70">
+          Publicar como "Sin precio"
+        </label>
+      </div>
+
+      {!form.isPriceHidden && (
+        <div className="flex flex-col gap-5">
+          {showRentPrice && (
+            <div className="flex flex-col w-full">
+              <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
+                Precio Alquiler
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  name="rentPrice"
+                  value={form.rentPrice || ""}
+                  onChange={handleChange}
+                  placeholder="0"
+                  className="bg-urbik-white text-urbik-black/50 border border-black/50 flex-1 px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+                />
+                <CurrencySelector
+                  value={form.rentCurrency || "ARS"}
+                  onChange={(val) =>
+                    setForm((prev) => ({ ...prev, rentCurrency: val }))
+                  }
+                />
+              </div>
+            </div>
+          )}
+
+          {showSalePrice && (
+            <div className="flex flex-col w-full">
+              <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
+                Precio Venta
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  name="salePrice"
+                  value={form.salePrice || ""}
+                  onChange={handleChange}
+                  placeholder="0"
+                  className="bg-urbik-white text-urbik-black/50 border border-black/50 flex-1 px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+                />
+                <CurrencySelector
+                  value={form.saleCurrency || "USD"}
+                  onChange={(val) =>
+                    setForm((prev) => ({ ...prev, saleCurrency: val }))
+                  }
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {dynamicFields.map((field) => (
+          <div key={field.key}>
+            <label className="block text-md ml-5 font-bold text-urbik-black/50">
+              {field.label} {field.required ? "*" : ""}
+            </label>
+            <input
+              type="number"
+              name={field.key}
+              value={form[field.key] || ""}
+              onChange={handleChange}
+              className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-2 rounded-full focus:border-urbik-black outline-none transition-all"
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
+            Video de YouTube
           </label>
           <input
-            type="number"
-            name="bathrooms"
-            value={form.bathrooms || ""}
+            type="url"
+            name="youtubeUrl"
+            value={form.youtubeUrl || ""}
             onChange={handleChange}
-            className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-2 rounded-full focus:border-urbik-black outline-none transition-all"
+            placeholder="https://www.youtube.com/watch?v=..."
+            className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+          />
+        </div>
+        <div>
+          <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
+            Tour 360
+          </label>
+          <input
+            type="url"
+            name="tour360Url"
+            value={form.tour360Url || ""}
+            onChange={handleChange}
+            placeholder="https://..."
+            className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
           />
         </div>
       </div>

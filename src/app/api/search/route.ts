@@ -1,52 +1,108 @@
-/*
-Este código define una ruta de API en Next.js que implementa un buscador de sugerencias
-combinando datos internos y externos: primero valida que la consulta tenga al menos dos
-caracteres y luego realiza una búsqueda concurrente en la base de datos local (vía Prisma)
-para encontrar hasta tres inmobiliarias cuyo nombre coincida con el texto, integrando
-simultáneamente hasta seis resultados de localización geográfica obtenidos desde la API
-de OpenStreetMap (Nominatim) limitados a Argentina. Finalmente, el manejador unifica ambos
-conjuntos de resultados en un único arreglo de objetos con formatos estandarizados según su
-tipo ("REALESTATE_USER" o "ADDRESS") y lo retorna como una respuesta JSON, incluyendo un manejo
-de errores básico que devuelve una lista vacía en caso de fallos.
-*/
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/db";
+
+interface OsmAddress {
+  house_number?: string;
+  road?: string;
+  pedestrian?: string;
+  path?: string;
+  neighbourhood?: string;
+  suburb?: string;
+  hamlet?: string;
+  city_district?: string;
+  city?: string;
+  town?: string;
+  village?: string;
+  municipality?: string;
+  county?: string;
+  state_district?: string;
+  state?: string;
+  province?: string;
+  region?: string;
+}
 
 interface OsmResult {
   place_id: number;
   display_name: string;
   lat: string;
   lon: string;
+  address?: OsmAddress;
+}
+
+function pickFirst(...values: Array<string | undefined>) {
+  return values.find((value) => Boolean(value?.trim()))?.trim();
+}
+
+function buildAddressLabel(result: OsmResult) {
+  const address = result.address;
+
+  const streetName = pickFirst(
+    address?.road,
+    address?.pedestrian,
+    address?.path,
+    address?.neighbourhood,
+    result.display_name.split(",")[0],
+  );
+
+  const houseNumber = address?.house_number?.trim();
+  const street = [streetName, houseNumber].filter(Boolean).join(" ") || "Direccion";
+
+  const city =
+    pickFirst(
+      address?.city,
+      address?.town,
+      address?.village,
+      address?.municipality,
+      address?.city_district,
+      address?.suburb,
+      address?.hamlet,
+      address?.county,
+    ) || "Ciudad";
+
+  const province =
+    pickFirst(
+      address?.state,
+      address?.province,
+      address?.region,
+      address?.state_district,
+    ) || "Provincia";
+
+  return {
+    city,
+    province,
+    fullLabel: `${street}, ${city}, ${province}`,
+  };
 }
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get("q");
+    const query = searchParams.get("q")?.trim();
 
     if (!query || query.length < 2) {
       return NextResponse.json({ suggestions: [] });
     }
 
-    const dbResults = await prisma.allUsers.findMany({
-      where: {
-        role: "REALESTATE",
-        OR: [
-          {
-            realEstate: {
-              agencyName: { contains: query, mode: "insensitive" },
+    const [dbResults, osmResponse] = await Promise.all([
+      prisma.allUsers.findMany({
+        where: {
+          role: "REALESTATE",
+          OR: [
+            {
+              realEstate: {
+                agencyName: { contains: query, mode: "insensitive" },
+              },
             },
-          },
-        ],
-      },
-      include: { realEstate: true },
-      take: 3,
-    });
-
-    const osmResponse = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ar&addressdetails=1&limit=6`,
-      { headers: { "User-Agent": "Urbik-App-v2" } },
-    );
+          ],
+        },
+        include: { realEstate: true },
+        take: 3,
+      }),
+      fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ar&addressdetails=1&limit=6`,
+        { headers: { "User-Agent": "Urbik-App-v2" } },
+      ),
+    ]);
 
     const osmResults = (await osmResponse.json()) as OsmResult[];
 
@@ -56,18 +112,19 @@ export async function GET(request: NextRequest) {
         id: user.user_id,
         display_name: user.realEstate?.agencyName || user.email,
       })),
-      ...osmResults.map((res) => ({
+      ...osmResults.map((result) => ({
         type: "ADDRESS",
-        id: res.place_id,
-        display_name: res.display_name,
-        lat: res.lat,
-        lon: res.lon,
+        id: result.place_id,
+        display_name: result.display_name,
+        lat: Number(result.lat),
+        lon: Number(result.lon),
+        ...buildAddressLabel(result),
       })),
     ];
 
     return NextResponse.json({ suggestions });
-  } catch (_error) {
-    console.error("Search error:", _error);
+  } catch (error) {
+    console.error("Search error:", error);
     return NextResponse.json({ suggestions: [] }, { status: 500 });
   }
 }

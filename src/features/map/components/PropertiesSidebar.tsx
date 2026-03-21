@@ -66,6 +66,8 @@ export function PropertiesSidebar({
         return "Venta";
       case "RENT":
         return "Alquiler";
+      case "TEMP_RENT":
+        return "Alquiler temporal";
       case "SALE_RENT":
         return "Venta y Alquiler";
       default:
@@ -81,6 +83,20 @@ export function PropertiesSidebar({
         return "DPTO";
       case "LAND":
         return "TERRENO";
+      case "FIELD":
+        return "CAMPO";
+      case "BUSINESS_BACKGROUND":
+        return "FONDO DE COM.";
+      case "GARAGE":
+        return "COCHERA";
+      case "WAREHOUSE":
+        return "GALPÓN";
+      case "DEVELOPMENT":
+        return "DESARROLLO";
+      case "PH":
+        return "PH";
+      case "COUNTRY":
+        return "COUNTRY";
       case "COMMERCIAL_PROPERTY":
         return "LOCAL";
       case "OFFICE":

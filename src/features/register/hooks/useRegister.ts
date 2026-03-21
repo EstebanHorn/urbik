@@ -1,14 +1,25 @@
-/*
-Este código define un hook personalizado de React llamado useRegisterForm que gestiona
-la lógica de un formulario de registro con dos perfiles de usuario (USER y REALESTATE).
-Incluye la funcionalidad de Auto-Login tras un registro exitoso para mejorar la UX.
-*/
-
-import { useState, useRef, useEffect } from "react";
+﻿import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 type Role = "USER" | "REALESTATE";
+
+export interface RegisterLicenseForm {
+  licenseNumber: string;
+  province: string;
+  jurisdiction: string;
+  responsibleName: string;
+  isPrimary: boolean;
+}
+
+export interface RegisterOfficeForm {
+  name: string;
+  province: string;
+  city: string;
+  street: string;
+  number: string;
+  phone: string;
+}
 
 interface RegistrationForm {
   name: string;
@@ -17,12 +28,33 @@ interface RegistrationForm {
   password: string;
   role: Role;
   license: string;
+  responsibleName: string;
+  jurisdiction: string;
   phone: string;
   province: string;
   city: string;
   street: string;
   address: string;
+  licenses: RegisterLicenseForm[];
+  offices: RegisterOfficeForm[];
 }
+
+const EMPTY_LICENSE: RegisterLicenseForm = {
+  licenseNumber: "",
+  province: "",
+  jurisdiction: "",
+  responsibleName: "",
+  isPrimary: true,
+};
+
+const EMPTY_OFFICE: RegisterOfficeForm = {
+  name: "Casa central",
+  province: "",
+  city: "",
+  street: "",
+  number: "",
+  phone: "",
+};
 
 export function useRegisterForm() {
   const router = useRouter();
@@ -34,29 +66,16 @@ export function useRegisterForm() {
     password: "",
     role: "USER",
     license: "",
+    responsibleName: "",
+    jurisdiction: "",
     phone: "",
     province: "",
     city: "",
     street: "",
     address: "",
+    licenses: [{ ...EMPTY_LICENSE }],
+    offices: [{ ...EMPTY_OFFICE }],
   });
-
-  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Cerrar el dropdown si se hace clic fuera
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsRoleDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -67,7 +86,71 @@ export function useRegisterForm() {
 
   const handleRoleSelection = (role: Role) => {
     setForm((prev) => ({ ...prev, role }));
-    setIsRoleDropdownOpen(false);
+  };
+
+  const updateLicense = (
+    index: number,
+    field: keyof RegisterLicenseForm,
+    value: string | boolean,
+  ) => {
+    setForm((prev) => {
+      const next = [...prev.licenses];
+      next[index] = { ...next[index], [field]: value };
+      if (field === "isPrimary" && value === true) {
+        return {
+          ...prev,
+          licenses: next.map((item, i) => ({
+            ...item,
+            isPrimary: i === index,
+          })),
+        };
+      }
+      return { ...prev, licenses: next };
+    });
+  };
+
+  const addLicense = () => {
+    setForm((prev) => ({
+      ...prev,
+      licenses: [...prev.licenses, { ...EMPTY_LICENSE, isPrimary: false }],
+    }));
+  };
+
+  const removeLicense = (index: number) => {
+    setForm((prev) => {
+      const next = prev.licenses.filter((_, i) => i !== index);
+      if (next.length === 0) return prev;
+      if (!next.some((item) => item.isPrimary)) {
+        next[0].isPrimary = true;
+      }
+      return { ...prev, licenses: next };
+    });
+  };
+
+  const updateOffice = (
+    index: number,
+    field: keyof RegisterOfficeForm,
+    value: string,
+  ) => {
+    setForm((prev) => {
+      const next = [...prev.offices];
+      next[index] = { ...next[index], [field]: value };
+      return { ...prev, offices: next };
+    });
+  };
+
+  const addOffice = () => {
+    setForm((prev) => ({
+      ...prev,
+      offices: [...prev.offices, { ...EMPTY_OFFICE, name: "Sucursal" }],
+    }));
+  };
+
+  const removeOffice = (index: number) => {
+    setForm((prev) => {
+      const next = prev.offices.filter((_, i) => i !== index);
+      return { ...prev, offices: next.length > 0 ? next : prev.offices };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,42 +160,74 @@ export function useRegisterForm() {
     setIsLoading(true);
 
     try {
-      // 1. Petición de registro a la API
+      const normalizedLicenses = form.licenses
+        .map((item) => ({
+          ...item,
+          licenseNumber: item.licenseNumber.trim(),
+          province: item.province.trim(),
+          jurisdiction: item.jurisdiction.trim(),
+          responsibleName: item.responsibleName.trim(),
+        }))
+        .filter(
+          (item) =>
+            item.licenseNumber && item.province && item.responsibleName,
+        );
+
+      const normalizedOffices = form.offices
+        .map((item) => ({
+          ...item,
+          name: item.name.trim(),
+          province: item.province.trim(),
+          city: item.city.trim(),
+          street: item.street.trim(),
+          number: item.number.trim(),
+          phone: item.phone.trim(),
+        }))
+        .filter(
+          (item) =>
+            item.name && item.province && item.city && item.street && item.number,
+        );
+
+      const primaryLicense =
+        normalizedLicenses.find((item) => item.isPrimary) || normalizedLicenses[0];
+
+      const payload = {
+        ...form,
+        license: primaryLicense?.licenseNumber || form.license,
+        responsibleName: primaryLicense?.responsibleName || form.responsibleName,
+        jurisdiction: primaryLicense?.jurisdiction || form.jurisdiction,
+        licenses: normalizedLicenses,
+        offices: normalizedOffices,
+      };
+
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // 2. LOGICA DE AUTO-LOGIN
-        // Intentamos iniciar sesión automáticamente con las credenciales que el usuario acaba de crear
         const loginResult = await signIn("credentials", {
-          redirect: false, // No redirigir automáticamente para manejar la lógica aquí
+          redirect: false,
           email: form.email,
           password: form.password,
         });
 
         if (loginResult?.error) {
-          // Si el registro fue exitoso pero el login falló (ej: cuenta REALESTATE requiere aprobación manual)
-          console.error("Login error:", loginResult.error);
-          alert(
-            "Cuenta creada con éxito. Por favor, inicia sesión manualmente.",
-          );
+          alert("Cuenta creada con exito. Inicia sesion manualmente.");
           router.push("/login");
         } else {
-          // Login exitoso, redirigimos al inicio o dashboard
           router.push("/");
-          router.refresh(); // Refrescar componentes de servidor para actualizar el estado de la sesión
+          router.refresh();
         }
       } else {
         alert(`Error: ${data.error || "No se pudo registrar"}`);
       }
     } catch (error) {
       console.error("Registration Error:", error);
-      alert("Error de conexión al intentar procesar el registro.");
+      alert("Error de conexion al intentar procesar el registro.");
     } finally {
       setIsLoading(false);
     }
@@ -120,12 +235,16 @@ export function useRegisterForm() {
 
   return {
     form,
-    dropdownRef,
     handleInputChange,
     handleRoleSelection,
     handleSubmit,
-    setIsRoleDropdownOpen,
-    isRoleDropdownOpen,
-    isLoading, // Exponemos el estado de carga para deshabilitar el botón en el componente
+    isLoading,
+    updateLicense,
+    addLicense,
+    removeLicense,
+    updateOffice,
+    addOffice,
+    removeOffice,
   };
 }
+

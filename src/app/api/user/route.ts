@@ -1,14 +1,4 @@
-/*
-Este código implementa un manejador de rutas de API en Next.js para la gestión del perfil de
-usuario, proporcionando endpoints para obtener la información del perfil (GET), actualizar
-campos específicos como el estado de actividad mediante Prisma (PATCH), realizar una actualización
-integral de los datos personales (PUT) y eliminar la cuenta de forma permanente (DELETE). El script
-asegura la integridad de las operaciones mediante la validación de la sesión con NextAuth, la
-gestión de errores centralizada y la interacción directa con la base de datos a través de Prisma y
-servicios externos de perfil, garantizando que solo los usuarios autenticados puedan acceder o
-modificar su propia información.
-*/
-import { getServerSession } from "next-auth/next";
+﻿import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import {
@@ -17,24 +7,36 @@ import {
 } from "../../../features/profile/service/profileService";
 import prisma from "@/libs/db";
 
-interface SessionUser {
-  email?: string | null;
-  name?: string | null;
-  image?: string | null;
-}
-
-interface ExtendedSession {
-  user?: SessionUser;
-}
-
-interface UserProfile {
-  name: string;
-  lastName: string;
-  phone: string;
-  isActive?: boolean;
-}
-
-type ProfileUpdatePayload = Partial<UserProfile>;
+type ProfileUpdatePayload = {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  agencyName?: string;
+  name?: string;
+  address?: string;
+  website?: string;
+  instagram?: string;
+  bio?: string;
+  province?: string;
+  city?: string;
+  licenses?: Array<{
+    id?: number;
+    licenseNumber: string;
+    province: string;
+    jurisdiction?: string | null;
+    responsibleName: string;
+    isPrimary?: boolean;
+  }>;
+  offices?: Array<{
+    id?: number;
+    name: string;
+    province: string;
+    city: string;
+    street: string;
+    number: string;
+    phone?: string | null;
+  }>;
+};
 
 function handleServiceError(err: unknown, status: number = 500): Response {
   const message = err instanceof Error ? err.message : "Error desconocido";
@@ -79,11 +81,8 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    console.log("3. Backend -> Email de sesión:", session.user.email);
-    console.log("3. Backend -> Body recibido:", body);
 
     if (body.isActive === undefined) {
-      console.error("3. Backend -> Error: isActive es undefined");
       return NextResponse.json(
         { error: "Campo isActive requerido" },
         { status: 400 },
@@ -97,13 +96,9 @@ export async function PATCH(req: NextRequest) {
       },
     });
 
-    console.log("3. Backend -> Resultado de Prisma (DB):", updatedUser);
-
     return new Response(JSON.stringify(updatedUser), { status: 200 });
   } catch (err) {
-    console.error("3. Backend -> CRASH en Prisma:", err);
-    const errorMessage =
-      err instanceof Error ? err.message : "Error desconocido";
+    const errorMessage = err instanceof Error ? err.message : "Error desconocido";
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
     });
@@ -159,3 +154,4 @@ export async function DELETE(_req: NextRequest): Promise<Response> {
     return handleServiceError(err, 500);
   }
 }
+

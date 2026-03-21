@@ -52,7 +52,7 @@ model RealEstate {
   user_id    Int      @id
   agencyName String
   phone      String?
-  license    String   @unique
+  license    String   @default("")
   province   String
   city       String
   street     String
@@ -66,6 +66,8 @@ model RealEstate {
 
   allUser    AllUsers @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   properties Property[]
+  licenses   RealEstateLicense[]
+  offices    RealEstateOffice[]
 }
 
 model Property {
@@ -76,8 +78,16 @@ model Property {
   city            String
   province        String
   country         String   @default("Argentina")
+  district        String?
+  locality        String?
+  neighborhood    String?
+  streetName      String?
+  streetNumber    String?
+  floor           String?
+  unitNumber      String?
 
   type            PropertyType
+  unitType        String?
   operationType   OperationType
   status           PropertyStatus
 
@@ -86,11 +96,26 @@ model Property {
 
   rentPrice       Float?
   rentCurrency  Currency? @default(ARS)
+  isPriceHidden   Boolean  @default(false)
 
   area            Float?
+  expenses        Float?
 
   rooms           Int?
   bathrooms       Int?
+  toilets         Int?
+  garages         Int?
+  plants          Int?
+  coveredArea     Float?
+  semiCoveredArea Float?
+  uncoveredArea   Float?
+  frontLength     Float?
+  backLength      Float?
+  propertySubtype String?
+  youtubeUrl      String?
+  tour360Url      String?
+  featureGroups   Json?
+  extraData       Json?
 
   hasWater        Boolean  @default(false)
   hasElectricity  Boolean  @default(false)
@@ -98,6 +123,11 @@ model Property {
   hasInternet     Boolean  @default(false)
   hasParking      Boolean  @default(false)
   hasPool         Boolean  @default(false)
+  hasBalcony      Boolean  @default(false)
+  hasGrill        Boolean  @default(false)
+  hasGarden       Boolean  @default(false)
+  hasLaundry      Boolean  @default(false)
+  hasAirConditioning Boolean @default(false)
 
   latitude        Float?
   longitude       Float?
@@ -115,6 +145,40 @@ model Property {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model RealEstateLicense {
+  id              Int        @id @default(autoincrement())
+  realEstateId    Int
+  licenseNumber   String
+  province        String
+  jurisdiction    String?
+  responsibleName String
+  isPrimary       Boolean    @default(false)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  realEstate      RealEstate @relation(fields: [realEstateId], references: [user_id], onDelete: Cascade)
+
+  @@index([realEstateId])
+  @@unique([licenseNumber, province, jurisdiction])
+}
+
+model RealEstateOffice {
+  id           Int        @id @default(autoincrement())
+  realEstateId Int
+  name         String
+  province     String
+  city         String
+  street       String
+  number       String
+  phone        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  realEstate   RealEstate @relation(fields: [realEstateId], references: [user_id], onDelete: Cascade)
+
+  @@index([realEstateId])
 }
 
 
@@ -188,7 +252,14 @@ model Alert {
 enum PropertyType {
   HOUSE
   APARTMENT
+  PH
+  COUNTRY
   LAND
+  FIELD
+  BUSINESS_BACKGROUND
+  GARAGE
+  WAREHOUSE
+  DEVELOPMENT
   COMMERCIAL_PROPERTY
   OFFICE
 }
@@ -196,12 +267,17 @@ enum PropertyType {
 enum OperationType {
   RENT
   SALE
+  TEMP_RENT
   SALE_RENT
 }
 
 enum PropertyStatus {
   AVAILABLE
+  ACTIVE
   RESERVED
+  SUSPENDED
+  HISTORIC
+  APPRAISAL
   SOLD
   RENTED
   PAUSED

@@ -1,15 +1,4 @@
-/*
-Este código define un componente de React para un formulario de registro dinámico que
-adapta sus campos y validaciones según si el usuario es un particular o una inmobiliaria
-("REALESTATE"). Utiliza hooks personalizados para gestionar la lógica del estado,
-permitiendo filtrar entradas de texto (solo letras) o numéricas en tiempo real, e integra
-componentes específicos para la selección de ubicación y el ingreso de números telefónicos
-internacionales. Al enviar los datos, el componente concatena el código de país con el
-teléfono y procesa el registro, ofreciendo además una interfaz visual pulida con Tailwind
-CSS que permite alternar fácilmente entre los dos tipos de roles de usuario.
-*/
-
-/* eslint-disable @next/next/no-img-element */
+﻿/* eslint-disable @next/next/no-img-element */
 
 "use client";
 import React, { useState } from "react";
@@ -18,28 +7,30 @@ import { useRegisterForm } from "../hooks/useRegister";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import LocationSelectors from "../../../components/LocationSelectors";
+import { getJurisdictionsByProvince } from "@/libs/jurisdictions";
 
 export default function RegisterForm() {
-  const { form, handleInputChange, handleSubmit, handleRoleSelection } =
-    useRegisterForm();
+  const {
+    form,
+    handleInputChange,
+    handleSubmit,
+    handleRoleSelection,
+    isLoading,
+    updateLicense,
+    addLicense,
+    removeLicense,
+    updateOffice,
+    addOffice,
+    removeOffice,
+  } = useRegisterForm();
+
   const isAgency = form.role === "REALESTATE";
   const [dialCode, setDialCode] = useState("54");
-
-  const isFormInvalid =
-    isAgency &&
-    (!form.province ||
-      !form.city ||
-      !form.street?.trim() ||
-      !form.address?.trim() ||
-      !form.name?.trim() ||
-      !form.email?.trim() ||
-      !form.password?.trim() ||
-      !form.license?.trim() ||
-      !form.phone?.trim());
 
   const inputStyles =
     "w-full rounded-full px-5 py-3 text-sm outline-none bg-linear-to-r from-gray-100 via-gray-100 to-white focus:ring-2 focus:ring-black/20";
   const labelStyles = "block text-md font-medium mb-2 ml-5 text-urbik-muted";
+  const cardTitle = "text-sm font-black text-urbik-black/70 mb-3 uppercase tracking-wider";
 
   const handleTextOnlyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -54,18 +45,14 @@ export default function RegisterForm() {
   const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const filteredValue = value.replace(/\D/g, "");
-    // Corrección: Casteo correcto al evento de React en lugar de any
     handleInputChange({
       ...e,
       target: { ...e.target, name, value: filteredValue },
     });
   };
 
-  const OnFormSubmit = (e: React.FormEvent) => {
+  const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormInvalid) return;
-
-    form.phone = `${dialCode}${form.phone}`;
     handleSubmit(e);
   };
 
@@ -82,17 +69,11 @@ export default function RegisterForm() {
         <h2 className="text-3xl font-display font-bold mb-2">
           {isAgency ? "Registrar Inmobiliaria" : "Crear cuenta"}
         </h2>
-        <p className="text-urbik-muted text-sm">
-          Completá tus datos para continuar
-        </p>
+        <p className="text-urbik-muted text-sm">Completá tus datos para continuar</p>
       </div>
 
-      <form onSubmit={OnFormSubmit} className="space-y-4">
-        <div
-          className={
-            isAgency ? "block" : "grid grid-cols-1 md:grid-cols-2 gap-4"
-          }
-        >
+      <form onSubmit={onFormSubmit} className="space-y-6">
+        <div className={isAgency ? "block" : "grid grid-cols-1 md:grid-cols-2 gap-4"}>
           <div>
             <label className={labelStyles}>
               {isAgency ? "Nombre de la Inmobiliaria" : "Nombre"}
@@ -114,7 +95,7 @@ export default function RegisterForm() {
                 value={form.lastName || ""}
                 onChange={handleTextOnlyChange}
                 className={inputStyles}
-                placeholder="Pérez"
+                placeholder="Perez"
                 required
               />
             </div>
@@ -122,79 +103,180 @@ export default function RegisterForm() {
         </div>
 
         {isAgency && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className={labelStyles}>Matrícula</label>
-                <input
-                  name="license"
-                  value={form.license}
-                  onChange={handleNumericChange}
-                  className={inputStyles}
-                  placeholder="12345"
-                  required
-                />
-              </div>
-              <div>
-                <label className={labelStyles}>Teléfono</label>
-                <div className="flex gap-2">
-                  <div className="w-12">
-                    <PhoneInput
-                      country={"ar"}
-                      value={dialCode}
-                      onChange={setDialCode}
-                      containerClass="!h-[46px]"
-                      inputClass="!hidden"
-                      buttonClass="!w-full !h-full !rounded-full !bg-gray-100 !border-none"
-                    />
-                  </div>
-                  <div className="relative flex-1">
-                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-                      +{dialCode}
-                    </span>
-                    <input
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleNumericChange}
-                      className={`${inputStyles} pl-14`}
-                      placeholder="12345678"
-                      required
-                    />
+          <div className="space-y-6">
+            <div>
+              <p className={cardTitle}>Datos de contacto</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelStyles}>Teléfono</label>
+                  <div className="flex gap-2">
+                    <div className="w-12">
+                      <PhoneInput
+                        country={"ar"}
+                        value={dialCode}
+                        onChange={setDialCode}
+                        containerClass="!h-[46px]"
+                        inputClass="!hidden"
+                        buttonClass="!w-full !h-full !rounded-full !bg-gray-100 !border-none"
+                      />
+                    </div>
+                    <div className="relative flex-1">
+                      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                        +{dialCode}
+                      </span>
+                      <input
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleNumericChange}
+                        className={`${inputStyles} pl-14`}
+                        placeholder="12345678"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <LocationSelectors
-              provinceValue={form.province}
-              cityValue={form.city}
-              onChange={(name, val) =>
-                // Corrección: Creación de un evento sintético seguro
-                handleInputChange({
-                  target: { name, value: val },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-            />
+            <div>
+              <p className={cardTitle}>Matrículas</p>
+              <div className="space-y-4">
+                {form.licenses.map((license, index) => {
+                  const jurisdictions = getJurisdictionsByProvince(license.province);
+                  return (
+                    <div key={`license-${index}`} className="border border-gray-200 rounded-3xl p-4 space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <input
+                          value={license.licenseNumber}
+                          onChange={(e) => updateLicense(index, "licenseNumber", e.target.value.replace(/\D/g, ""))}
+                          placeholder="Número de matrícula"
+                          className={inputStyles}
+                          required
+                        />
+                        <input
+                          value={license.responsibleName}
+                          onChange={(e) => updateLicense(index, "responsibleName", e.target.value)}
+                          placeholder="Responsable"
+                          className={inputStyles}
+                          required
+                        />
+                      </div>
+
+                      <LocationSelectors
+                        provinceValue={license.province}
+                        cityValue=""
+                        cityLabel="SIN CIUDAD"
+                        onChange={(name, val) => {
+                          if (name === "province") {
+                            updateLicense(index, "province", val);
+                            updateLicense(index, "jurisdiction", "");
+                          }
+                        }}
+                      />
+
+                      {jurisdictions.length > 0 && (
+                        <select
+                          value={license.jurisdiction}
+                          onChange={(e) => updateLicense(index, "jurisdiction", e.target.value)}
+                          className="w-full rounded-full px-5 py-3 text-sm outline-none bg-linear-to-r from-gray-100 via-gray-100 to-white focus:ring-2 focus:ring-black/20"
+                        >
+                          <option value="">Seleccionar jurisdicción</option>
+                          {jurisdictions.map((jurisdiction) => (
+                            <option key={jurisdiction} value={jurisdiction}>
+                              {jurisdiction}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <label className="flex items-center gap-2 text-xs font-bold text-urbik-black/60">
+                          <input
+                            type="radio"
+                            checked={Boolean(license.isPrimary)}
+                            onChange={() => updateLicense(index, "isPrimary", true)}
+                          />
+                          Matrícula principal
+                        </label>
+                        {form.licenses.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeLicense(index)}
+                            className="text-xs font-bold text-red-500"
+                          >
+                            Quitar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                <button type="button" onClick={addLicense} className="text-sm font-bold text-urbik-cyan">
+                  + Agregar matrícula
+                </button>
+              </div>
+            </div>
 
             <div>
-              <label className={labelStyles}>Dirección</label>
-              <div className="grid grid-cols-3 gap-2">
-                <input
-                  name="street"
-                  value={form.street}
-                  onChange={handleInputChange}
-                  placeholder="Calle"
-                  className={`${inputStyles} col-span-2`}
-                  required
-                />
-                <input
-                  name="address"
-                  value={form.address}
-                  onChange={handleNumericChange}
-                  placeholder="N°"
-                  className={inputStyles}
-                  required
-                />
+              <p className={cardTitle}>Oficinas</p>
+              <div className="space-y-4">
+                {form.offices.map((office, index) => (
+                  <div key={`office-${index}`} className="border border-gray-200 rounded-3xl p-4 space-y-3">
+                    <input
+                      value={office.name}
+                      onChange={(e) => updateOffice(index, "name", e.target.value)}
+                      placeholder="Nombre de oficina"
+                      className={inputStyles}
+                      required
+                    />
+
+                    <LocationSelectors
+                      provinceValue={office.province}
+                      cityValue={office.city}
+                      onChange={(name, val) => {
+                        if (name === "province") updateOffice(index, "province", val);
+                        if (name === "city") updateOffice(index, "city", val);
+                      }}
+                    />
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <input
+                        value={office.street}
+                        onChange={(e) => updateOffice(index, "street", e.target.value)}
+                        placeholder="Calle"
+                        className={`${inputStyles} col-span-2`}
+                        required
+                      />
+                      <input
+                        value={office.number}
+                        onChange={(e) => updateOffice(index, "number", e.target.value)}
+                        placeholder="N°"
+                        className={inputStyles}
+                        required
+                      />
+                    </div>
+
+                    <input
+                      value={office.phone}
+                      onChange={(e) => updateOffice(index, "phone", e.target.value.replace(/\D/g, ""))}
+                      placeholder="Teléfono oficina"
+                      className={inputStyles}
+                    />
+
+                    {form.offices.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeOffice(index)}
+                        className="text-xs font-bold text-red-500"
+                      >
+                        Quitar oficina
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button type="button" onClick={addOffice} className="text-sm font-bold text-urbik-cyan">
+                  + Agregar oficina
+                </button>
               </div>
             </div>
           </div>
@@ -212,6 +294,7 @@ export default function RegisterForm() {
             required
           />
         </div>
+
         <div>
           <label className={labelStyles}>Contraseña</label>
           <input
@@ -227,23 +310,20 @@ export default function RegisterForm() {
 
         <button
           type="submit"
-          disabled={isFormInvalid}
-          className={`w-full font-bold py-3 cursor-pointer rounded-full text-lg shadow-sm transition-all mt-16 
-            ${
-              isFormInvalid
-                ? "bg-gray-300 cursor-not-allowed opacity-70"
-                : "bg-urbik-cyan text-white hover:opacity-90"
-            }`}
+          disabled={isLoading}
+          className="w-full font-bold py-3 cursor-pointer rounded-full text-lg shadow-sm transition-all mt-10 bg-urbik-cyan text-white hover:opacity-90 disabled:opacity-60"
         >
-          {isAgency ? "REGISTRAR INMOBILIARIA" : "CREAR CUENTA"}
+          {isLoading
+            ? "Procesando..."
+            : isAgency
+              ? "REGISTRAR INMOBILIARIA"
+              : "CREAR CUENTA"}
         </button>
 
         <div className="text-center mt-10">
           <button
             type="button"
-            onClick={() =>
-              handleRoleSelection(isAgency ? "USER" : "REALESTATE")
-            }
+            onClick={() => handleRoleSelection(isAgency ? "USER" : "REALESTATE")}
             className="text-urbik-cyan cursor-pointer text-sm font-medium hover:underline"
           >
             {isAgency
@@ -251,12 +331,10 @@ export default function RegisterForm() {
               : "¿Sos una inmobiliaria? Registrate acá"}
           </button>
         </div>
+
         <div className="text-center text-sm text-gray-500">
           ¿Ya tenés cuenta?{" "}
-          <Link
-            href="/login"
-            className="text-urbik-cyan font-medium hover:underline"
-          >
+          <Link href="/login" className="text-urbik-cyan font-medium hover:underline">
             Iniciá sesión
           </Link>
         </div>
@@ -264,3 +342,4 @@ export default function RegisterForm() {
     </div>
   );
 }
+

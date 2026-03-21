@@ -53,11 +53,15 @@ export async function POST(req: NextRequest) {
       lastName: data.lastName,
       agencyName: data.name,
       license: data.license,
+      responsibleName: data.responsibleName,
+      jurisdiction: data.jurisdiction,
       phone: data.phone,
       province: data.province,
       city: data.city,
       street: data.street,
       address: data.address,
+      licenses: data.licenses,
+      offices: data.offices,
     });
 
     return NextResponse.json(user, { status: 201 });

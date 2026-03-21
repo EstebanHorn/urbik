@@ -1,40 +1,80 @@
-/*
-Este componente de React, denominado AmenitiesGrid, genera una interfaz interactiva de cuadrícula
-para seleccionar y deseleccionar servicios básicos (como agua, luz o internet) mediante botones de
-tipo conmutador. Utiliza TypeScript para definir una estructura de datos booleana y recibe a través
-de sus "props" el estado actual de estos servicios y una función onChange para actualizarlos.
-Internamente, define una función toggle que invierte el valor de una propiedad específica sin mutar
-el objeto original, y renderiza un subcomponente Item para cada servicio que cambia dinámicamente su
-apariencia visual (colores de fondo, bordes y un indicador circular) basándose en si el servicio está
-activo o no.
-*/
+﻿import React from "react";
 
-import React from "react";
-
-interface Amenities {
+type LegacyAmenities = {
   agua: boolean;
   luz: boolean;
   gas: boolean;
   internet: boolean;
   cochera: boolean;
   pileta: boolean;
-}
+  [key: string]: boolean;
+};
+
+type FeatureGroups = Record<string, Record<string, boolean>>;
 
 interface AmenitiesGridProps {
-  value: Amenities;
-  onChange: (next: Amenities) => void;
+  value: LegacyAmenities;
+  featureGroups?: FeatureGroups;
+  onChange: (next: LegacyAmenities) => void;
+  onFeatureGroupsChange?: (next: FeatureGroups) => void;
 }
 
-export function AmenitiesGrid({ value, onChange }: AmenitiesGridProps) {
-  const toggle = (k: keyof Amenities) => {
+const GROUPS: Array<{ key: string; label: string; items: string[] }> = [
+  {
+    key: "ambientes",
+    label: "Ambientes",
+    items: ["Suite", "Escritorio", "Toilette", "Playroom"],
+  },
+  {
+    key: "exteriores",
+    label: "Exteriores",
+    items: ["Patio", "Terraza", "Balcón", "Jardín"],
+  },
+  {
+    key: "instalaciones",
+    label: "Instalaciones",
+    items: ["Calefacción", "Aire acondicionado", "Losa radiante", "Ascensor"],
+  },
+  {
+    key: "infraestructura",
+    label: "Infraestructura",
+    items: ["Seguridad 24h", "SUM", "Gimnasio", "Laundry"],
+  },
+  {
+    key: "materiales",
+    label: "Materiales",
+    items: ["Aberturas DVH", "Pisos de madera", "Mesada de granito", "Parrilla"],
+  },
+];
+
+export function AmenitiesGrid({
+  value,
+  featureGroups = {},
+  onChange,
+  onFeatureGroupsChange,
+}: AmenitiesGridProps) {
+  const toggleLegacy = (k: keyof LegacyAmenities) => {
     onChange({ ...value, [k]: !value[k] });
   };
 
-  const Item = ({ k, label }: { k: keyof Amenities; label: string }) => (
+  const toggleGroup = (groupKey: string, item: string) => {
+    if (!onFeatureGroupsChange) return;
+
+    const currentGroup = featureGroups[groupKey] || {};
+    onFeatureGroupsChange({
+      ...featureGroups,
+      [groupKey]: {
+        ...currentGroup,
+        [item]: !currentGroup[item],
+      },
+    });
+  };
+
+  const LegacyItem = ({ k, label }: { k: keyof LegacyAmenities; label: string }) => (
     <button
       type="button"
-      onClick={() => toggle(k)}
-      className={`rounded-full border cursor-pointer  w-full focus:border-urbik-black outline-none transition-all px-4 py-2.5 text-left text-sm font-medium  flex justify-between items-center group ${
+      onClick={() => toggleLegacy(k)}
+      className={`rounded-full border cursor-pointer w-full focus:border-urbik-black outline-none transition-all px-4 py-2.5 text-left text-sm font-medium flex justify-between items-center group ${
         value[k]
           ? "border-black/50 bg-urbik-black text-white shadow-md"
           : "border-black/20 bg-urbik-white text-urbik-black/50 hover:bg-gray-50"
@@ -50,13 +90,54 @@ export function AmenitiesGrid({ value, onChange }: AmenitiesGridProps) {
   );
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      <Item k="agua" label="Agua Corriente" />
-      <Item k="luz" label="Luz Eléctrica" />
-      <Item k="gas" label="Gas Natural" />
-      <Item k="internet" label="Internet" />
-      <Item k="cochera" label="Cochera" />
-      <Item k="pileta" label="Pileta" />
+    <div className="space-y-5">
+      <div>
+        <p className="text-xs font-black uppercase tracking-wider text-urbik-black/60 mb-2">
+          Servicios básicos
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <LegacyItem k="agua" label="Agua Corriente" />
+          <LegacyItem k="luz" label="Luz Eléctrica" />
+          <LegacyItem k="gas" label="Gas Natural" />
+          <LegacyItem k="internet" label="Internet" />
+          <LegacyItem k="cochera" label="Cochera" />
+          <LegacyItem k="pileta" label="Pileta" />
+        </div>
+      </div>
+
+      {onFeatureGroupsChange && (
+        <div className="space-y-3">
+          {GROUPS.map((group) => {
+            const groupValue = featureGroups[group.key] || {};
+            return (
+              <div key={group.key} className="rounded-2xl border border-gray-200 p-3">
+                <p className="text-[11px] font-black uppercase tracking-wider text-urbik-black/60 mb-2">
+                  {group.label}
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {group.items.map((item) => {
+                    const isActive = Boolean(groupValue[item]);
+                    return (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => toggleGroup(group.key, item)}
+                        className={`rounded-full border px-3 py-2 text-xs font-bold transition-all ${
+                          isActive
+                            ? "bg-urbik-emerald text-white border-urbik-emerald"
+                            : "border-gray-300 text-urbik-black/70 bg-white"
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

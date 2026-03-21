@@ -30,6 +30,8 @@ const getPropertyLabel = (type: string) => {
   const labels: Record<string, string> = {
     HOUSE: "Casa",
     APARTMENT: "Departamento",
+    PH: "PH",
+    COUNTRY: "Country",
     LAND: "Terreno",
     COMMERCIAL_PROPERTY: "Local",
     OFFICE: "Oficina",

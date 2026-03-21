@@ -1,15 +1,15 @@
-"use client";
+﻿"use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import SecuritySection from "./ChangePassword";
 import DangerZone from "./DeleteAccount";
 import PauseAccountZone from "./PauseAccount";
 import LocationSelectors from "../../../components/LocationSelectors";
 import ProfileMediaUploader from "./ProfileMediaUploader";
 import { toggleAccountPause } from "@/features/profile/service/profileService";
-import { Globe, Instagram, MapPin, Save, Lock, Phone } from "lucide-react";
+import { getJurisdictionsByProvince } from "@/libs/jurisdictions";
+import { Globe, Instagram, MapPin, Save, Phone } from "lucide-react";
 
-// Definimos una interfaz para el estado del formulario alineada con los tipos globales
 export interface RealEstateFormData {
   agencyName: string;
   phone: string;
@@ -22,6 +22,23 @@ export interface RealEstateFormData {
   city: string;
   bannerUrl?: string | null;
   logoUrl?: string | null;
+  licenses?: Array<{
+    id?: number;
+    licenseNumber: string;
+    province: string;
+    jurisdiction?: string;
+    responsibleName: string;
+    isPrimary?: boolean;
+  }>;
+  offices?: Array<{
+    id?: number;
+    name: string;
+    province: string;
+    city: string;
+    street: string;
+    number: string;
+    phone?: string;
+  }>;
   isActive: boolean;
   [key: string]: unknown;
 }
@@ -31,7 +48,31 @@ interface RealEstateFormProps {
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
-  handleManualChange?: (name: string, value: string | boolean) => void;
+  handleManualChange?: (
+    name: string,
+    value:
+      | string
+      | boolean
+      | number
+      | null
+      | Array<{
+          id?: number;
+          licenseNumber: string;
+          province: string;
+          jurisdiction?: string;
+          responsibleName: string;
+          isPrimary?: boolean;
+        }>
+      | Array<{
+          id?: number;
+          name: string;
+          province: string;
+          city: string;
+          street: string;
+          number: string;
+          phone?: string;
+        }>,
+  ) => void;
   handleSubmit: (e: React.FormEvent) => void;
   loading: boolean;
 }
@@ -45,16 +86,13 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
 }) => {
   const [isPausing, setIsPausing] = useState(false);
 
-  useEffect(() => {
-    console.log("Status changed:", form.isActive);
-  }, [form.isActive]);
-
   const inputBaseClasses =
     "italic w-full px-6 py-4 rounded-full bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium text-urbik-black placeholder:text-gray-400";
-  const readonlyClasses =
-    "bg-urbik-black w-full px-6 py-4 rounded-full bg-urbik-g300 font-bold text-urbik-white cursor-not-allowed select-none";
   const textareaClasses =
     "w-full px-6 py-4 rounded-4xl bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium resize-none text-urbik-black";
+
+  const licenses = form.licenses || [];
+  const offices = form.offices || [];
 
   const handleTogglePause = async (isRequestingPause: boolean) => {
     const nextActiveState = !isRequestingPause;
@@ -62,9 +100,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
     try {
       const response = await toggleAccountPause(nextActiveState);
       if (response && typeof response.isActive !== "undefined") {
-        if (handleManualChange) {
-          handleManualChange("isActive", response.isActive);
-        }
+        handleManualChange?.("isActive", response.isActive);
       }
     } catch (error) {
       console.error("Error en toggle:", error);
@@ -75,14 +111,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
   };
 
   const onLocationChange = (name: string, value: string) => {
-    if (handleManualChange) {
-      handleManualChange(name, value);
-    } else {
-      const event = {
-        target: { name, value },
-      } as React.ChangeEvent<HTMLInputElement>;
-      handleChange(event);
-    }
+    handleManualChange?.(name, value);
   };
 
   return (
@@ -92,9 +121,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
           onSubmit={handleSubmit}
           className="flex flex-col gap-6 text-urbik-black"
         >
-          {/* --- SECCIÓN VISUAL (BANNER + LOGO) --- */}
           <div className="bg-white rounded-[2rem] border border-urbik-g200 shadow-sm overflow-hidden relative mb-4">
-            {/* 1. AREA DEL BANNER */}
             <div className="h-48 md:h-64 w-full bg-urbik-g50 relative">
               <ProfileMediaUploader
                 variant="banner"
@@ -104,7 +131,6 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               />
             </div>
 
-            {/* 2. AREA DEL LOGO (Superpuesta) */}
             <div className="px-8 pb-6 relative">
               <div className="relative -mt-16 mb-4 w-32 h-32 md:w-40 md:h-40 z-10">
                 <ProfileMediaUploader
@@ -115,7 +141,6 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
                 />
               </div>
 
-              {/* Información de cabecera */}
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <h2 className="text-2xl font-display font-bold text-urbik-black">
@@ -131,7 +156,6 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               </div>
             </div>
           </div>
-          {/* --- FIN SECCIÓN VISUAL --- */}
 
           <div className="space-y-2">
             <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
@@ -152,10 +176,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               Teléfono de Contacto
             </label>
             <div className="relative">
-              <Phone
-                className="absolute left-6 top-5 text-urbik-black opacity-40"
-                size={18}
-              />
+              <Phone className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
               <input
                 type="tel"
                 name="phone"
@@ -185,10 +206,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               Dirección de la Oficina
             </label>
             <div className="relative">
-              <MapPin
-                className="absolute left-6 top-5 text-urbik-black opacity-40"
-                size={18}
-              />
+              <MapPin className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
               <input
                 name="address"
                 value={form.address || ""}
@@ -201,18 +219,189 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
 
           <div className="space-y-2">
             <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
-              Matrícula
+              Matrículas
             </label>
-            <div className="relative">
-              <input
-                value={form.license || "MAT-7829-X"}
-                readOnly
-                className={readonlyClasses}
-              />
-              <Lock
-                className="absolute right-6 top-5 text-gray-400"
-                size={18}
-              />
+            <div className="space-y-3">
+              {licenses.map((license, index) => {
+                const jurisdictions = getJurisdictionsByProvince(license.province);
+                return (
+                  <div key={`license-${index}`} className="rounded-3xl border border-gray-200 p-4 space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <input
+                        className={inputBaseClasses}
+                        value={license.licenseNumber}
+                        onChange={(e) =>
+                          handleManualChange?.(
+                            "licenses",
+                            licenses.map((item, i) =>
+                              i === index ? { ...item, licenseNumber: e.target.value } : item,
+                            ),
+                          )
+                        }
+                        placeholder="Número de matrícula"
+                      />
+                      <input
+                        className={inputBaseClasses}
+                        value={license.responsibleName}
+                        onChange={(e) =>
+                          handleManualChange?.(
+                            "licenses",
+                            licenses.map((item, i) =>
+                              i === index ? { ...item, responsibleName: e.target.value } : item,
+                            ),
+                          )
+                        }
+                        placeholder="Responsable"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <input
+                        className={inputBaseClasses}
+                        value={license.province}
+                        onChange={(e) =>
+                          handleManualChange?.(
+                            "licenses",
+                            licenses.map((item, i) =>
+                              i === index
+                                ? { ...item, province: e.target.value, jurisdiction: "" }
+                                : item,
+                            ),
+                          )
+                        }
+                        placeholder="Provincia"
+                      />
+
+                      {jurisdictions.length > 0 ? (
+                        <select
+                          className={inputBaseClasses}
+                          value={license.jurisdiction || ""}
+                          onChange={(e) =>
+                            handleManualChange?.(
+                              "licenses",
+                              licenses.map((item, i) =>
+                                i === index ? { ...item, jurisdiction: e.target.value } : item,
+                              ),
+                            )
+                          }
+                        >
+                          <option value="">Seleccionar jurisdicción</option>
+                          {jurisdictions.map((jurisdiction) => (
+                            <option key={jurisdiction} value={jurisdiction}>
+                              {jurisdiction}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          className={inputBaseClasses}
+                          value={license.jurisdiction || ""}
+                          onChange={(e) =>
+                            handleManualChange?.(
+                              "licenses",
+                              licenses.map((item, i) =>
+                                i === index ? { ...item, jurisdiction: e.target.value } : item,
+                              ),
+                            )
+                          }
+                          placeholder="Jurisdicción (opcional)"
+                        />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              <button
+                type="button"
+                className="text-sm font-bold text-urbik-cyan"
+                onClick={() =>
+                  handleManualChange?.("licenses", [
+                    ...licenses,
+                    {
+                      licenseNumber: "",
+                      province: form.province || "",
+                      jurisdiction: "",
+                      responsibleName: "",
+                      isPrimary: licenses.length === 0,
+                    },
+                  ])
+                }
+              >
+                + Agregar matrícula
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
+              Oficinas
+            </label>
+            <div className="space-y-3">
+              {offices.map((office, index) => (
+                <div key={`office-${index}`} className="rounded-3xl border border-gray-200 p-4 space-y-2">
+                  <input
+                    className={inputBaseClasses}
+                    value={office.name}
+                    onChange={(e) =>
+                      handleManualChange?.(
+                        "offices",
+                        offices.map((item, i) =>
+                          i === index ? { ...item, name: e.target.value } : item,
+                        ),
+                      )
+                    }
+                    placeholder="Nombre oficina"
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      className={inputBaseClasses}
+                      value={office.province}
+                      onChange={(e) =>
+                        handleManualChange?.(
+                          "offices",
+                          offices.map((item, i) =>
+                            i === index ? { ...item, province: e.target.value } : item,
+                          ),
+                        )
+                      }
+                      placeholder="Provincia"
+                    />
+                    <input
+                      className={inputBaseClasses}
+                      value={office.city}
+                      onChange={(e) =>
+                        handleManualChange?.(
+                          "offices",
+                          offices.map((item, i) =>
+                            i === index ? { ...item, city: e.target.value } : item,
+                          ),
+                        )
+                      }
+                      placeholder="Ciudad"
+                    />
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                className="text-sm font-bold text-urbik-cyan"
+                onClick={() =>
+                  handleManualChange?.("offices", [
+                    ...offices,
+                    {
+                      name: "Sucursal",
+                      province: form.province || "",
+                      city: form.city || "",
+                      street: "",
+                      number: "",
+                      phone: "",
+                    },
+                  ])
+                }
+              >
+                + Agregar oficina
+              </button>
             </div>
           </div>
 
@@ -238,10 +427,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
                 Sitio Web
               </label>
               <div className="relative">
-                <Globe
-                  className="absolute left-6 top-5 text-urbik-black opacity-40"
-                  size={18}
-                />
+                <Globe className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
                 <input
                   name="website"
                   value={form.website || ""}
@@ -257,10 +443,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
                 Instagram
               </label>
               <div className="relative">
-                <Instagram
-                  className="absolute left-6 top-5 text-urbik-black opacity-40"
-                  size={18}
-                />
+                <Instagram className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
                 <input
                   name="instagram"
                   value={form.instagram || ""}
@@ -285,21 +468,11 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
         </form>
       </div>
 
-      <div className="w-full h-24"></div>
-
-      <div
-        className={
-          isPausing ? "opacity-50 pointer-events-none transition-opacity" : ""
-        }
-      >
-        <div
-          className={`transition-all duration-500 ${isPausing ? "opacity-50 pointer-events-none scale-[0.98]" : "opacity-100"}`}
-        >
-          <PauseAccountZone
-            isPaused={form.isActive === false}
-            onTogglePause={(newState) => handleTogglePause(newState)}
-          />
-        </div>
+      <div className={isPausing ? "opacity-50 pointer-events-none transition-opacity" : ""}>
+        <PauseAccountZone
+          isPaused={form.isActive === false}
+          onTogglePause={(newState) => handleTogglePause(newState)}
+        />
       </div>
 
       <DangerZone
