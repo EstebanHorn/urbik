@@ -1,11 +1,3 @@
-/*
-Este código define un componente de React llamado CustomDropdown, un selector desplegable personalizado
-y animado que permite al usuario elegir una opción de una lista mediante una interfaz moderna. Utiliza
-Framer Motion para gestionar las transiciones de apertura y cierre, Tailwind CSS para un diseño estilizado
-con soporte para múltiples variantes visuales, y hooks como useRef y useEffect para detectar clics fuera
-del componente y cerrarlo automáticamente, garantizando así una experiencia de usuario fluida y funcional.
-*/
-
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +13,7 @@ interface CustomDropdownProps {
   options: Option[];
   onChange: (value: string) => void;
   className?: string;
-  variant?: "white" | "white2";
+  variant?: "white" | "white2" | "map-layer";
 }
 
 export function CustomDropdown({
@@ -29,7 +21,7 @@ export function CustomDropdown({
   value,
   options,
   onChange,
-  className,
+  className = "", 
   variant = "white",
 }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,6 +48,8 @@ export function CustomDropdown({
     white: "bg-urbik-white1 text-urbik-black hover:bg-urbik-white",
     white2:
       "bg-urbik-white text-urbik-black/50 border border-black/50 hover:bg-urbik-dark/20",
+    "map-layer":
+      "bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm", 
   };
 
   return (
@@ -63,7 +57,7 @@ export function CustomDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`${variantStyles[variant]} h-10 cursor-pointer px-5 py-2 rounded-full font-extrabold tracking-wide transition flex items-center gap-2 min-w-[120px] justify-between`}
+        className={`${variantStyles[variant]} h-10 cursor-pointer px-5 py-2 rounded-full tracking-wide transition flex items-center gap-2 min-w-[120px] justify-between ${variant !== "map-layer" ? "font-extrabold" : ""}`}
       >
         <span className="text-md tracking-wider">
           {selectedOption ? selectedOption.label : label}
@@ -90,7 +84,9 @@ export function CustomDropdown({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-0 mt-3 w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-1001 overflow-hidden"
+            className={`absolute mt-3 w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-1001 overflow-hidden ${
+              variant === "map-layer" ? "right-0" : "left-0"
+            }`}
           >
             {options
               .filter((opt) => opt.value !== "")

@@ -23,13 +23,11 @@ export default function ProfileMediaUploader({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validación básica
     if (!file.type.startsWith("image/")) {
       alert("Por favor subí un archivo de imagen válido");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      // 5MB limit
       alert("La imagen es muy pesada (máx 5MB)");
       return;
     }
@@ -56,14 +54,12 @@ export default function ProfileMediaUploader({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || "Error al subir");
 
-      // Devolvemos la URL segura al padre
       onImageChange(data.secure_url);
     } catch (error) {
       console.error("Upload error:", error);
       alert("Hubo un error al subir la imagen.");
     } finally {
       setIsUploading(false);
-      // Limpiamos el input para permitir subir la misma imagen de nuevo si se borró
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -80,7 +76,6 @@ export default function ProfileMediaUploader({
     }
   };
 
-  // --- RENDERIZADO DEL LOGO (Circular / Cuadrado pequeño) ---
   if (variant === "logo") {
     return (
       <div
@@ -137,7 +132,6 @@ export default function ProfileMediaUploader({
     );
   }
 
-  // --- RENDERIZADO DEL BANNER (Rectangular grande) ---
   return (
     <div
       className={`

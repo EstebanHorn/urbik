@@ -13,7 +13,7 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import { updateServerPassword } from "../../../../features/profile/service/profileService";
 
 export async function PUT(req: NextRequest): Promise<Response> {
-  const session = await getServerSession(authOptions); // CORRECCIÓN: Quitamos 'as any'
+  const session = await getServerSession(authOptions); 
 
   if (!session) {
     return new Response(JSON.stringify({ error: "No autenticado" }), {
@@ -57,7 +57,6 @@ export async function PUT(req: NextRequest): Promise<Response> {
       },
     );
   } catch (err) {
-    // CORRECCIÓN: Quitamos ': any'
     const message = err instanceof Error ? err.message : "Error desconocido";
     console.error("Error cambiando password:", message);
     const status = message.includes("incorrecta") ? 401 : 500;

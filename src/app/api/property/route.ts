@@ -26,7 +26,6 @@ interface PropertyRequestBody {
   salePrice?: number | string;
   rentPrice?: number | string;
 
-  // Estos campos faltaban:
   saleCurrency?: Currency;
   rentCurrency?: Currency;
 

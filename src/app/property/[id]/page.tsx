@@ -31,7 +31,6 @@ import SmartZoneSingle from "../../../components/SmartZone/SmartView";
 import FavoriteButton from "@/components/FavoritesButton";
 import ImageGallery from "@/features/property/components/ImageGallery";
 
-// --- TIPOS ---
 
 interface PropertySummary {
   id: number;
@@ -45,7 +44,7 @@ interface PropertySummary {
   province: string | null;
   images: string[];
   favorites?: { userId: number }[];
-  isFavorite?: boolean; // Agregado para el map de otras propiedades
+  isFavorite?: boolean;
 }
 
 interface RealEstateProfile {
@@ -81,7 +80,6 @@ interface Property {
   isFavorite: boolean;
 }
 
-// Interfaz auxiliar para el tipado de datos crudos de la DB
 interface RawPropertyData {
   hasElectricity: boolean;
   hasGas: boolean;
@@ -94,7 +92,6 @@ interface RawPropertyData {
 
 export const dynamic = "force-dynamic";
 
-// --- CONFIGURACIÓN DE AMENITIES ---
 const AMENITIES_CONFIG = [
   { id: "hasElectricity", label: "Luz", icon: <Zap size={18} /> },
   { id: "hasGas", label: "Gas Natural", icon: <Flame size={18} /> },
@@ -106,8 +103,6 @@ const AMENITIES_CONFIG = [
   { id: "jardin", label: "Jardín", icon: <Trees size={18} /> },
   { id: "seguridad", label: "Seguridad", icon: <ShieldCheck size={18} /> },
 ];
-
-// --- HELPERS ---
 
 const getOperationLabel = (type: string) => {
   switch (type) {
@@ -231,7 +226,6 @@ async function getPropertyData(id: number, userId?: string) {
       hasWater: !!hasWater,
     };
 
-    // Reconstruimos el objeto con los tipos correctos para la interfaz Property
     const formattedProperty: Property = {
       id: propertyRaw.id,
       title: propertyRaw.title,
@@ -244,7 +238,7 @@ async function getPropertyData(id: number, userId?: string) {
       operationType: propertyRaw.operationType,
       salePrice: propertyRaw.salePrice,
       rentPrice: propertyRaw.rentPrice,
-      currency: (rest as Record<string, unknown>).currency as string | null, // Asumiendo que en DB puede venir string
+      currency: (rest as Record<string, unknown>).currency as string | null,
       area: propertyRaw.area,
       rooms: propertyRaw.rooms,
       bathrooms: propertyRaw.bathrooms,
@@ -263,7 +257,6 @@ async function getPropertyData(id: number, userId?: string) {
         ? {
             agencyName: propertyRaw.RealEstate.agencyName,
             phone: propertyRaw.RealEstate.phone,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             properties: propertyRaw.RealEstate.properties.map((p: any) => ({
               id: p.id,
               title: p.title,
@@ -350,7 +343,6 @@ export default async function PropertyPage({
 
   const { property, otherProperties } = data;
 
-  // CORRECCIÓN: Tipado de session user de forma segura
   const user = session?.user as { role?: string } | undefined;
   const isAdmin = user?.role === "ADMIN";
 
@@ -588,19 +580,17 @@ export default async function PropertyPage({
           </div>
         </div>
         <div className="mt-12 pt-12 border-t border-dashed border-urbik-g100 w-full">
-          {/* CORRECCIÓN: Pasar una copia del objeto property asegurando tipos correctos para SmartZoneSingle */}
           <SmartZoneSingle
             property={{
               ...property,
-              address: property.address || "", // Fallback para null
-              city: property.city || "", // Fallback para null
-              province: property.province || "", // Fallback para null
-              latitude: property.latitude || 0, // Fallback numérico para null
-              longitude: property.longitude || 0, // Fallback numérico para null
+              address: property.address || "", 
+              city: property.city || "",
+              province: property.province || "",
+              latitude: property.latitude || 0,
+              longitude: property.longitude || 0,
             }}
           />
         </div>
-        {/* --- OTRAS PROPIEDADES --- */}
         <div className="mt-24 pt-12 border-t border-urbik-g100">
           <h3 className="text-3xl font-display text-urbik-black tracking-tighter mb-8">
             <span className="font-medium">Más propiedades de </span>
@@ -611,7 +601,6 @@ export default async function PropertyPage({
 
           {otherProperties.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {/* CORRECCIÓN: Eliminado any en el map */}
               {otherProperties.map((other: PropertySummary) => (
                 <div
                   key={other.id}
@@ -624,7 +613,7 @@ export default async function PropertyPage({
                   <div className="absolute top-3 right-3 z-20">
                     <FavoriteButton
                       propertyId={other.id.toString()}
-                      initialIsFavorite={!!other.isFavorite} // Aseguramos booleano
+                      initialIsFavorite={!!other.isFavorite}
                       small
                     />
                   </div>

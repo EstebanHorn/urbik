@@ -3,12 +3,10 @@ import { createProperty, updateProperty } from "../service/dashboardService";
 import type { SelectedParcel } from "@/features/map/types/types";
 import type { Geometry } from "geojson";
 
-// Interfaz para mapear los datos que vienen del backend o edición
 export interface PropertyInitialData {
   id?: number | string;
   parcelCCA?: string;
   parcelPDA?: string;
-  // Corrección: Tipado compatible con Geometry o un objeto genérico flexible
   parcelGeom?: Geometry | Record<string, unknown>;
   latitude?: number;
   longitude?: number;
@@ -129,7 +127,6 @@ export function useCreateProperty(
       ? {
           CCA: initialData.parcelCCA ?? "S/D",
           PDA: initialData.parcelPDA ?? "S/D",
-          // Corrección: Cast seguro a Geometry para cumplir con SelectedParcel
           geometry: (initialData.parcelGeom as Geometry) ?? {},
           lat: initialData.latitude ?? 0,
           lon: initialData.longitude ?? 0,

@@ -178,7 +178,6 @@ export async function GET(request: Request) {
   }
 
   try {
-    // CORRECCIÓN: Tipado de Prisma para evitar 'any'
     const whereClause: Prisma.PropertyWhereInput = {
       status: { in: ["AVAILABLE", "ACTIVE"] },
       latitude: {

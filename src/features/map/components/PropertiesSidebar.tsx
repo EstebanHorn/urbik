@@ -28,7 +28,6 @@ interface ExtendedMapProperty extends MapProperty {
   type: string;
 }
 
-// Interfaz para la respuesta de la API de favoritos
 interface FavoriteProperty {
   id: number;
   [key: string]: unknown;
@@ -49,7 +48,6 @@ export function PropertiesSidebar({
           const res = await fetch("/api/properties/favorites");
           if (res.ok) {
             const data: FavoriteProperty[] = await res.json();
-            // Corrección: Tipado explícito para fav
             setFavoriteIds(data.map((fav) => fav.id));
           }
         } catch (error) {

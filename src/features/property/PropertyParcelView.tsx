@@ -4,8 +4,6 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { GeoJsonObject } from "geojson";
 
-// Definimos un tipo seguro que extiende GeoJsonObject para incluir 'id' opcional
-// y evitar el uso de 'any' al comparar IDs.
 type SafeGeoJSON = GeoJsonObject & { id?: string | number };
 
 interface PropertyData {
@@ -44,7 +42,6 @@ export default function PropertyParcelView({
       {allProperties.map(
         (prop) =>
           prop.parcelGeom &&
-          // Comparación segura sin castear a 'any'
           prop.id !== selectedGeom?.id && (
             <GeoJSON
               key={prop.id}

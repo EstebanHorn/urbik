@@ -97,7 +97,6 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   <AnimatePresence mode="popLayout">
-                    {/* CORRECCIÓN: Usamos el tipo PendingUser */}
                     {users.map((u) => (
                       <motion.tr
                         key={u.user_id}
