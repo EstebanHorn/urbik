@@ -51,7 +51,6 @@ const getCenterOfGeometry = (geometry: Geometry): [number, number] | null => {
       return null;
 
     const poly = geometry as Polygon | MultiPolygon;
-    // Normalizamos para obtener siempre una lista de coordenadas lineales del primer anillo
     const coords: Position[] =
       poly.type === "Polygon" ? poly.coordinates[0] : poly.coordinates[0][0];
 
@@ -59,7 +58,7 @@ const getCenterOfGeometry = (geometry: Geometry): [number, number] | null => {
     let lngSum = 0;
 
     coords.forEach((c) => {
-      lngSum += c[0]; // GeoJSON es [long, lat]
+      lngSum += c[0]; 
       latSum += c[1];
     });
 
@@ -98,10 +97,6 @@ export function DbParcelsLayer({ properties }: DbParcelsLayerProps) {
 
         if (!geometry) return null;
 
-        // Corrección: Usamos any explícitamente y desactivamos la regla porque getDynamicParcelStyle
-        // espera un objeto Property completo (DB) y aquí tenemos una versión optimizada (MapProperty)
-        // que es suficiente para el estilo pero no satisface la interfaz estricta.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const dynamicStyle = getDynamicParcelStyle(prop as any, colorMode);
 
         const displayPrice = getDisplayPrice(prop);

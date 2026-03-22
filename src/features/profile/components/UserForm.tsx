@@ -5,14 +5,13 @@ incluyendo además una sección de seguridad, un botón de guardado con estado d
 "zona de peligro" para acciones críticas como eliminar la cuenta.
 */
 import React from "react";
-import { Save, User, UserPlus, Phone } from "lucide-react"; // Eliminado ShieldCheck
+import { Save, User, UserPlus, Phone } from "lucide-react";
 import SecuritySection from "./ChangePassword";
 import DangerZone from "./DeleteAccount";
 import { UserFormFields } from "@/libs/types";
 
-// Definimos la interfaz de props
 interface UserFormProps {
-  form: Partial<UserFormFields>; // Partial porque al inicio puede estar vacío
+  form: Partial<UserFormFields>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent) => void;
   loading: boolean;

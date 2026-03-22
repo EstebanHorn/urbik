@@ -6,7 +6,6 @@ import { useSession } from "next-auth/react";
 import Versus from "../../components/SmartZone/SmartCompare";
 import FavoriteButton from "../../components/FavoritesButton";
 
-// Extendemos la interfaz para cumplir con lo que espera el componente Versus (SmartCompare)
 interface FavoriteProperty {
   id: number;
   title: string;
@@ -16,7 +15,6 @@ interface FavoriteProperty {
   currency?: string | null;
   images: string[];
   city: string;
-  // Propiedades requeridas por Versus
   area?: number;
   rooms?: number;
   bathrooms?: number;
@@ -26,7 +24,6 @@ interface FavoriteProperty {
   longitude?: number;
 }
 
-// Interfaz local para adaptar los datos al componente Versus si es necesario
 interface VersusProperty {
   id: number;
   title: string;
@@ -109,7 +106,6 @@ export default function GuardadosPage() {
     }
   };
 
-  // Función para adaptar las propiedades favoritas al formato que espera Versus
   const getSelectedPropertiesForVersus = (): VersusProperty[] => {
     return favorites
       .filter((p) => selectedIds.includes(p.id))

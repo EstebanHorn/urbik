@@ -14,7 +14,6 @@ import {
 } from "./create-modal/PropertyFormField";
 import SmartDescription from "../../../components/SmartZone/SmartDescription";
 
-// Interfaz local para satisfacer los requisitos estrictos de AmenitiesGrid
 interface UiAmenities {
   agua: boolean;
   luz: boolean;
@@ -38,19 +37,15 @@ export default function EditPropertyModal({
   onUpdated,
   property,
 }: EditPropertyModalProps) {
-  // Corrección 1: Usar 'unknown' como paso intermedio en lugar de 'any' para evitar el error de lint
   const { form, setForm, saving, message, handleUpdate } = useEditProperty(
     property as unknown as EditPropertyFormState & { id: number | string },
     onUpdated,
     onClose,
   );
 
-  // Castings seguros para cumplir con la interfaz que esperan los componentes hijos
   const safeForm = form as unknown as PropertyFormData;
 
-  // Wrapper para setForm que asegura compatibilidad de tipos
   const handleSetForm = (value: React.SetStateAction<PropertyFormData>) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setForm(value as any);
   };
 
@@ -69,7 +64,6 @@ export default function EditPropertyModal({
     (!!safeForm.areaM2 || !!safeForm.area) &&
     (safeForm.images?.length ?? 0) > 0;
 
-  // Preparar amenities para el Grid asegurando que tenga las propiedades requeridas
   const currentAmenities: UiAmenities = {
     agua: safeForm.amenities?.agua ?? false,
     luz: safeForm.amenities?.luz ?? false,
@@ -99,7 +93,6 @@ export default function EditPropertyModal({
           >
             <div className="shrink-0 py-5 px-10 flex items-center justify-between shadow-xl z-30">
               <div className="relative w-10 h-10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/Urbik_Logo_Mini.svg"
                   alt="Logo"
@@ -175,7 +168,6 @@ export default function EditPropertyModal({
                   <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-3">
                     Otras Características
                   </label>
-                  {/* Corrección 2: Uso de la variable con tipo explícito y cast en el onChange */}
                   <AmenitiesGrid
                     value={currentAmenities}
                     featureGroups={safeForm.featureGroups || {}}

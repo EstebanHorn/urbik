@@ -5,7 +5,6 @@ interface PropertyAmenities {
   [key: string]: boolean;
 }
 
-// Definición completa del estado del formulario para edición
 export interface EditPropertyFormState {
   title: string;
   description: string;
@@ -19,16 +18,14 @@ export interface EditPropertyFormState {
   rooms: string | number;
   bathrooms: string | number;
   amenities: PropertyAmenities;
-  // Campos geográficos adicionales pueden ser necesarios
   address?: string;
   street?: string;
   number?: string;
   city?: string;
   province?: string;
-  [key: string]: unknown; // Flexibilidad controlada para otros campos
+  [key: string]: unknown;
 }
 
-// Interfaz para el objeto que se envía a la API
 interface UpdatePropertyPayload {
   title: string;
   description: string;
@@ -65,7 +62,6 @@ interface UpdatePropertyPayload {
   isPriceHidden?: boolean;
   featureGroups?: Record<string, Record<string, boolean>>;
   extraData?: Record<string, unknown>;
-  // CORRECCIÓN: Index signature necesaria para ser compatible con PropertyPayload del servicio
   [key: string]: unknown;
 }
 

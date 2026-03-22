@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import LocationSelectors from "@/components/LocationSelectors";
 import { SearchSuggestion } from "@/features/search/hooks/useAutocompleteSuggestions";
+import { CustomDropdown } from "@/components/CustomDropdown"; 
 
 const ROTATING_PROVINCES = [
   "Buenos Aires",
@@ -100,8 +101,6 @@ export function SearchSection({
   suggestions,
   isLoading,
   onSelectSuggestion,
-  buttonData,
-  updatePill,
   onSearch,
 }: Props) {
   const [currentProvinceIndex, setCurrentProvinceIndex] = useState(0);
@@ -109,18 +108,18 @@ export function SearchSection({
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
 
   const propertyOptions = [
-    { id: "HOUSE", label: "CASA" },
-    { id: "APARTMENT", label: "DEPARTAMENTO" },
-    { id: "COMMERCIAL_PROPERTY", label: "LOCAL" },
-    { id: "PH", label: "PH" },
-    { id: "LAND", label: "TERRENO" },
-    { id: "FIELD", label: "CAMPO" },
-    { id: "BUSINESS_BACKGROUND", label: "FONDO COM." },
-    { id: "OFFICE", label: "OFICINA" },
-    { id: "GARAGE", label: "COCHERA" },
-    { id: "WAREHOUSE", label: "GALPÓN" },
-    { id: "DEVELOPMENT", label: "DESARROLLO" },
-    { id: "COUNTRY", label: "COUNTRY" },
+    { value: "HOUSE", label: "CASA" },
+    { value: "APARTMENT", label: "DEPARTAMENTO" },
+    { value: "COMMERCIAL_PROPERTY", label: "LOCAL" },
+    { value: "PH", label: "PH" },
+    { value: "LAND", label: "TERRENO" },
+    { value: "FIELD", label: "CAMPO" },
+    { value: "BUSINESS_BACKGROUND", label: "FONDO COM." },
+    { value: "OFFICE", label: "OFICINA" },
+    { value: "GARAGE", label: "COCHERA" },
+    { value: "WAREHOUSE", label: "GALPÓN" },
+    { value: "DEVELOPMENT", label: "DESARROLLO" },
+    { value: "COUNTRY", label: "COUNTRY" },
   ];
 
   const normalizedSuggestions = useMemo(
@@ -133,18 +132,6 @@ export function SearchSection({
   );
 
   const hasSuggestions = normalizedSuggestions.length > 0;
-
-  useEffect(() => {
-    const frameId = requestAnimationFrame(() => {
-      const initialButton = document.getElementById(
-        `btn-${propertyType}`,
-      ) as HTMLButtonElement | null;
-
-      if (initialButton) updatePill(initialButton);
-    });
-
-    return () => cancelAnimationFrame(frameId);
-  }, [propertyType, updatePill]);
 
   useEffect(() => {
     setIsHydrated(true);
@@ -307,13 +294,14 @@ export function SearchSection({
           Búsqueda detallada
         </div>
 
+<div className="w-full flex justify-between">
         <div className="relative flex bg-gray-100 rounded-full w-fit mb-6 overflow-hidden cursor-pointer p-1 border border-gray-200">
           <motion.div
-            className="absolute top-1 bottom-1 left-1 bg-urbik-black rounded-full shadow-sm"
+            className="absolute top-0 bottom-0 left-0 h-full bg-urbik-black rounded-full shadow-sm"
             initial={false}
             animate={{ x: operation === "SALE" ? "0%" : "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            style={{ width: "calc(50% - 4px)" }}
+            style={{ width: "calc(50%)" }}
           />
 
           <button
@@ -339,32 +327,18 @@ export function SearchSection({
           </button>
         </div>
 
-        <div className="relative flex bg-gray-100 rounded-full w-fit max-w-full flex-wrap mb-6 p-1 gap-1 border border-gray-200">
-          <motion.div
-            className="absolute top-1 bottom-1 bg-urbik-black rounded-full shadow-sm"
-            initial={false}
-            animate={{ width: buttonData.width, x: buttonData.x }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        <div className="mb-6 w-fit">
+          <CustomDropdown
+            label="Tipo de propiedad"
+            value={propertyType}
+            options={propertyOptions}
+            onChange={(val) => setPropertyType(val)}
+            variant="white"
+            className="w-full sm:w-auto"
           />
-
-          {propertyOptions.map((opt) => (
-            <button
-              key={opt.id}
-              id={`btn-${opt.id}`}
-              onClick={(e) => {
-                setPropertyType(opt.id);
-                updatePill(e.currentTarget);
-              }}
-              className={`relative z-10 px-4 py-2 font-bold text-xs transition-colors duration-200 whitespace-nowrap rounded-full ${
-                propertyType === opt.id
-                  ? "text-white"
-                  : "text-gray-500 hover:text-gray-900"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
         </div>
+        </div>
+        
 
         <div className="flex flex-col sm:flex-row gap-3 mb-8 w-full">
           <LocationSelectors

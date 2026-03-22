@@ -17,7 +17,6 @@ import LocationSelectors from "@/components/LocationSelectors";
 import SmartDescription from "@/components/SmartZone/SmartDescription";
 import { SelectedParcel } from "@/features/map/types/types";
 
-// Carga dinÃ¡mica del mapa
 const InteractiveMap = dynamic(
   () =>
     import("@/features/map/components/InteractiveMapClient").then(
@@ -38,13 +37,10 @@ const InteractiveMap = dynamic(
   },
 );
 
-// CORRECCIÃ“N: Definir PropertyInitialData localmente con parcelGeom compatible
-// Asumiremos una interfaz compatible basada en PropertyFormData para el modal.
 interface PropertyInitialData extends Partial<PropertyFormData> {
   id?: number | string;
   parcelCCA?: string;
   parcelPDA?: string;
-  // CorrecciÃ³n: Usar Record<string, unknown> o Geometry para compatibilidad
   parcelGeom?: Record<string, unknown>;
   latitude?: number;
   longitude?: number;
@@ -79,7 +75,6 @@ export default function CreatePropertyModal({
     handleSave,
     isEditing,
   } = useCreateProperty(
-    // CorrecciÃ³n: Cast seguro
     (initialData as PropertyInitialData) || null,
     onCreated,
     onClose,
@@ -102,7 +97,6 @@ export default function CreatePropertyModal({
   const canSelectParcel = isBuenosAires && hasCity;
 
   const handleInputChange = (name: string, value: string) => {
-    // CORRECCIÃ“N: Eliminado 'any'. TS infiere 'prev' correctamente desde el hook.
     setForm((prev) => ({ ...prev, [name]: value }));
     if (name === "city" || name === "province") {
       setCityCoords(null);
@@ -466,7 +460,6 @@ export default function CreatePropertyModal({
                         lat={selectedParcel?.lat ?? cityCoords?.lat ?? -34.9214}
                         lon={selectedParcel?.lon ?? cityCoords?.lon ?? -57.9545}
                         height="100%"
-                        // CORRECCIÃ“N: Se pasa selectedParcel directamente sin castear a Record<string, unknown>
                         selectedParcel={selectedParcel}
                       >
                         <ClickToCreateProperty

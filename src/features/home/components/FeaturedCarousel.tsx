@@ -15,8 +15,6 @@ import { FeaturedProperty } from "../service/propertyService";
 import FavoriteButton from "../../../components/FavoritesButton";
 import { Session } from "next-auth";
 
-// CORRECCIÓN 1: Eliminamos el [key: string]: any para evitar el error de lint.
-// Definimos explícitamente solo los campos que necesitamos sobreescribir o añadir.
 interface ExtendedFeaturedProperty extends Omit<
   FeaturedProperty,
   "salePrice" | "rentPrice" | "saleCurrency" | "rentCurrency"
@@ -32,14 +30,12 @@ interface Props {
   loading: boolean;
   currentIndex: number;
   session: Session | null;
-  // CORRECCIÓN 2: Tipado estricto del evento en lugar de 'any'
   onToggleFavorite?: (
     e: React.MouseEvent<HTMLButtonElement>,
     id: string,
   ) => Promise<void>;
 }
 
-// CORRECCIÓN 3: Usamos '_session' para indicar que no se usa y callar al linter
 export function FeaturedCarousel({
   properties,
   loading,
@@ -104,7 +100,6 @@ export function FeaturedCarousel({
       </div>
     );
 
-  // Casteamos a la interfaz extendida de forma segura
   const current = properties[
     currentIndex
   ] as unknown as ExtendedFeaturedProperty;
@@ -136,7 +131,7 @@ export function FeaturedCarousel({
                 <img
                   src={current.images[0]}
                   alt={current.title}
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
 

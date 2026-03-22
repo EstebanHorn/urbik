@@ -11,7 +11,6 @@ export const SearchBar: React.FC = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && suggestions.length > 0) {
       e.preventDefault();
-      // Corrección: Asegurar que el tipo coincida con el esperado por onSelectSuggestion
       onSelectSuggestion(suggestions[0]);
     }
   };

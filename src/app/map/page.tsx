@@ -481,106 +481,106 @@ export default function MapPage() {
 
   return (
     <div className="fixed top-16 left-0 right-0 bottom-0 z-0 flex flex-col bg-slate-100 overflow-hidden">
-      <div className="w-full bg-white border-b border-slate-200 z-40 px-6 py-3 shadow-sm flex flex-col gap-3">
-        <div className="flex flex-wrap gap-2 items-center justify-between">
-          <div className="flex flex-wrap gap-2 items-center">
-            <CustomDropdown
-              label="Operación"
-              variant="white2"
-              value={filters.operationType}
-              onChange={(val) => setFilters((f) => ({ ...f, operationType: val }))}
-              options={[
-                { label: "Operación", value: "" },
-                { label: "Venta", value: "SALE" },
-                { label: "Alquiler", value: "RENT" },
-                { label: "Temporal", value: "TEMP_RENT" },
-                { label: "Venta y Alquiler", value: "SALE_RENT" },
-              ]}
-            />
+      {/* HEADER DE FILTROS - Todo a la misma altura */}
+      <div className="w-full bg-white border-b border-slate-200 z-40 px-6 py-3 shadow-sm flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setShowFiltersMenu((prev) => !prev)}
+          className="h-10 px-4 rounded-full border border-black/50 text-[11px] font-bold bg-white inline-flex items-center gap-2 shrink-0"
+        >
+          <SlidersHorizontal size={14} />
+          Filtros
+        </button>
 
-            <CustomDropdown
-              label="Tipo"
-              variant="white2"
-              value={filters.propertyType}
-              onChange={(val) => setFilters((f) => ({ ...f, propertyType: val }))}
-              options={[
-                { label: "Tipo", value: "" },
-                { label: "Casa", value: "HOUSE" },
-                { label: "Departamento", value: "APARTMENT" },
-                { label: "Local", value: "COMMERCIAL_PROPERTY" },
-                { label: "PH", value: "PH" },
-                { label: "Terreno", value: "LAND" },
-                { label: "Campo", value: "FIELD" },
-                { label: "Fondo de comercio", value: "BUSINESS_BACKGROUND" },
-                { label: "Oficina", value: "OFFICE" },
-                { label: "Cochera", value: "GARAGE" },
-                { label: "Galpón", value: "WAREHOUSE" },
-                { label: "Desarrollo", value: "DEVELOPMENT" },
-                { label: "Country", value: "COUNTRY" },
-              ]}
-            />
-          </div>
+        <CustomDropdown
+          label="Operación"
+          variant="white2"
+          value={filters.operationType}
+          onChange={(val) => setFilters((f) => ({ ...f, operationType: val }))}
+          options={[
+            { label: "Operación", value: "" },
+            { label: "Venta", value: "SALE" },
+            { label: "Alquiler", value: "RENT" },
+            { label: "Temporal", value: "TEMP_RENT" },
+            { label: "Venta y Alquiler", value: "SALE_RENT" },
+          ]}
+        />
 
-          <div className="flex flex-wrap gap-2 items-center">
-            <button
-              type="button"
-              onClick={() => setShowFiltersMenu((prev) => !prev)}
-              className="h-10 px-4 rounded-full border border-black/50 text-[11px] font-bold bg-white inline-flex items-center gap-2"
-            >
-              <SlidersHorizontal size={14} />
-              Filtros
-            </button>
+        <CustomDropdown
+          label="Tipo"
+          variant="white2"
+          value={filters.propertyType}
+          onChange={(val) => setFilters((f) => ({ ...f, propertyType: val }))}
+          options={[
+            { label: "Tipo", value: "" },
+            { label: "Casa", value: "HOUSE" },
+            { label: "Departamento", value: "APARTMENT" },
+            { label: "Local", value: "COMMERCIAL_PROPERTY" },
+            { label: "PH", value: "PH" },
+            { label: "Terreno", value: "LAND" },
+            { label: "Campo", value: "FIELD" },
+            { label: "Fondo de comercio", value: "BUSINESS_BACKGROUND" },
+            { label: "Oficina", value: "OFFICE" },
+            { label: "Cochera", value: "GARAGE" },
+            { label: "Galpón", value: "WAREHOUSE" },
+            { label: "Desarrollo", value: "DEVELOPMENT" },
+            { label: "Country", value: "COUNTRY" },
+          ]}
+        />
 
-            <button
-              onClick={clearFilters}
-              className="h-10 px-4 text-md font-black cursor-pointer text-urbik-black/50 hover:text-urbik-rose transition-colors flex items-center gap-1 shrink-0"
-            >
-              <X size={20} /> Limpiar
-            </button>
-          </div>
+        <div className="w-full md:w-[360px] shrink-0">
+          <LocationSelectors
+            provinceValue={filters.province}
+            cityValue={filters.city}
+            onChange={(name, val) => {
+              if (name === "province") {
+                setFilters((prev) => ({ ...prev, province: val, city: "" }));
+              }
+              if (name === "city") {
+                setFilters((prev) => ({ ...prev, city: val }));
+              }
+            }}
+          />
         </div>
 
-        <div className="flex flex-wrap gap-2 items-center justify-end">
-          <div className="w-full md:w-[360px]">
-            <LocationSelectors
-              provinceValue={filters.province}
-              cityValue={filters.city}
-              onChange={(name, val) => {
-                if (name === "province") {
-                  setFilters((prev) => ({ ...prev, province: val, city: "" }));
-                }
-                if (name === "city") {
-                  setFilters((prev) => ({ ...prev, city: val }));
-                }
-              }}
-            />
-          </div>
-
-          <div className="relative w-full md:w-[260px]">
-            <input
-              type="text"
-              name="q"
-              value={filters.q}
-              onChange={handleInputChange}
-              placeholder="Zona, calle o barrio"
-              className="h-10 w-full rounded-full border border-black/50 px-4 text-xs font-semibold"
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={handleResolveLocation}
-            disabled={isSearchingLocation}
-            className="h-10 px-4 rounded-full border border-black/50 text-[11px] font-bold bg-white inline-flex items-center gap-2"
-          >
-            <Search size={14} />
-            {isSearchingLocation ? "Buscando..." : "Ir a ubicación"}
-          </button>
+        <div className="relative w-full md:w-[260px] shrink-0">
+          <input
+            type="text"
+            name="q"
+            value={filters.q}
+            onChange={handleInputChange}
+            placeholder="Zona, calle o barrio"
+            className="h-10 w-full rounded-full border border-black/50 px-4 text-xs font-semibold"
+          />
         </div>
+
+        <button
+          type="button"
+          onClick={handleResolveLocation}
+          disabled={isSearchingLocation}
+          className="h-10 px-4 rounded-full border border-urbik-emerald text-[11px] text-w font-bold bg-urbik-emerald inline-flex items-center gap-2 shrink-0"
+        >
+          <Search size={14} />
+          {isSearchingLocation ? "Buscando..." : "Ir a ubicación"}
+        </button>
+
+        <button
+          onClick={clearFilters}
+          className="ml-auto h-10 px-4 text-md font-black cursor-pointer text-urbik-black/50 hover:text-urbik-rose transition-colors flex items-center gap-1 shrink-0"
+        >
+          <X size={20} /> Limpiar
+        </button>
       </div>
 
-      {showFiltersMenu && (
-        <div className="w-full bg-white border-b border-slate-200 px-6 py-3 z-30">
+      {/* MENÚ DE FILTROS DESPLEGABLE CON ANIMACIÓN */}
+      <div
+        className={`w-full bg-white z-30 overflow-hidden transition-all duration-300 ease-in-out ${
+          showFiltersMenu
+            ? "max-h-[800px] border-b border-slate-200 opacity-100 py-3"
+            : "max-h-0 border-b-0 opacity-0 py-0"
+        }`}
+      >
+        <div className="px-6">
           <div className="flex flex-wrap items-center gap-2">
             <CustomDropdown
               label="Moneda"
@@ -712,7 +712,7 @@ export default function MapPage() {
             })}
           </div>
         </div>
-      )}
+      </div>
 
       <div className="flex flex-1 flex-row overflow-hidden relative">
         <aside
@@ -752,25 +752,20 @@ export default function MapPage() {
             height="100%"
           />
 
-          <div className="absolute top-5 right-5 z-[1001] bg-white rounded-2xl border border-slate-200 shadow-lg p-3 w-60">
-            <div className="text-[10px] font-black uppercase tracking-wider text-urbik-black/50 mb-2 flex items-center gap-2">
-              <Layers size={12} /> Capa del mapa
-            </div>
-            <select
-              value={baseLayer}
-              onChange={(e) => setBaseLayer(e.target.value as BaseLayerId)}
-              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold"
-            >
-              {layerOptions.map((layer) => (
-                <option key={layer.id} value={layer.id}>
-                  {layer.label}
-                </option>
-              ))}
-            </select>
+          <div className="absolute top-5 left-5 z-[1001]">
+             <CustomDropdown
+                label="Capa del Mapa"
+                variant="map-layer"
+                value={baseLayer}
+                onChange={(val) => setBaseLayer(val as BaseLayerId)}
+                options={layerOptions.map(layer => ({ label: layer.label, value: layer.id }))}
+             />
           </div>
 
           <div className="absolute bottom-10 right-10 z-9999 pointer-events-auto hidden md:block">
-            <ZoneAnalysis data={currentZone} />
+            {currentZone && currentZone.zoom >= 15 && (
+              <ZoneAnalysis data={currentZone} />
+            )}
           </div>
 
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden pointer-events-auto w-max">

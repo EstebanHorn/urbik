@@ -31,8 +31,8 @@ export default function LoginForm() {
     setEmail,
     password,
     setPassword,
-    rememberMe, // Consumir del hook
-    setRememberMe, // Consumir del hook
+    rememberMe, 
+    setRememberMe,
     handleLogin,
     handleGoogleSignIn,
     errorMessage,

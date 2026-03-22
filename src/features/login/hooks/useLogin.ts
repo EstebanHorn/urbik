@@ -14,12 +14,11 @@ import { authService } from "../service/authService";
 export const useLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false); // Nuevo estado
+  const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Cargar email recordado al montar el hook
   useEffect(() => {
     const savedEmail = localStorage.getItem("urbik_remember_email");
     if (savedEmail) {
@@ -38,7 +37,6 @@ export const useLogin = () => {
         const result = await authService.login(email, password);
 
         if (result.ok) {
-          // Lógica de persistencia
           if (rememberMe) {
             localStorage.setItem("urbik_remember_email", email);
           } else {
@@ -67,8 +65,8 @@ export const useLogin = () => {
     setEmail,
     password,
     setPassword,
-    rememberMe, // Exponer al componente
-    setRememberMe, // Exponer al componente
+    rememberMe,
+    setRememberMe,
     handleLogin,
     handleGoogleSignIn,
     errorMessage,

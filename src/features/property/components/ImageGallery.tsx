@@ -67,13 +67,11 @@ export default function ImageGallery({
   return (
     <>
       <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[400px] md:h-[600px] mb-12 rounded-2xl overflow-hidden">
-        {/* 1. IMAGEN PRINCIPAL (Grande - Izquierda) */}
         <div
           className="col-span-4 md:col-span-2 row-span-2 relative group overflow-hidden bg-gray-100 cursor-pointer"
           onClick={() => images[0] && openModal(0)}
         >
           {images[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={images[0]}
               alt={`Principal ${title}`}
@@ -87,13 +85,11 @@ export default function ImageGallery({
           )}
         </div>
 
-        {/* 2. SEGUNDA IMAGEN (Arriba Centro) */}
         <div
           className="hidden md:block col-span-1 row-span-1 relative overflow-hidden bg-gray-100 cursor-pointer group"
           onClick={() => images[1] && openModal(1)}
         >
           {images[1] ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={images[1]}
               className="w-full h-full object-cover group-hover:opacity-90 transition duration-300 group-hover:scale-105"
@@ -104,13 +100,11 @@ export default function ImageGallery({
           )}
         </div>
 
-        {/* 3. TERCERA IMAGEN (Arriba Derecha) */}
         <div
           className="hidden md:block col-span-1 row-span-1 relative overflow-hidden bg-gray-100 cursor-pointer group"
           onClick={() => images[2] && openModal(2)}
         >
           {images[2] ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={images[2]}
               className="w-full h-full object-cover group-hover:opacity-90 transition duration-300 group-hover:scale-105"

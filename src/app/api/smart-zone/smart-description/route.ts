@@ -56,7 +56,6 @@ export async function POST(req: Request) {
       "No se pudo generar el análisis.";
     return NextResponse.json({ text: responseText });
   } catch (_error) {
-    // CORRECCIÓN: _error para variable no usada y sin tipo any explícito
     return NextResponse.json(
       { error: "Error en el servidor" },
       { status: 500 },

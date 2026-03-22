@@ -33,7 +33,6 @@ export default function PropertyParcelWrapper({
       <MapComponent
         lat={lat}
         lon={lon}
-        // TypeScript ahora acepta selectedGeom porque es compatible con la firma del componente
         selectedGeom={
           selectedGeom as (GeoJsonObject & { id?: string | number }) | null
         }

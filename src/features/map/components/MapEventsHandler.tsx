@@ -1,13 +1,3 @@
-/*
-Este componente de React, denominado MapEventsHandler, actúa como un controlador de eventos
-para una instancia de React-Leaflet que monitorea y comunica los cambios en el estado geográfico
-del mapa. Al cargar el mapa o finalizar un movimiento (moveend), el código captura los nuevos
-límites (norte, sur, este y oeste) y las coordenadas del centro para enviarlos mediante callbacks;
-además, si el análisis de zona está habilitado, realiza una petición de geocodificación inversa a
-la API de Nominatim para transformar las coordenadas centrales en una dirección legible y un nombre
-de zona (barrio o ciudad), asegurando mediante un useRef que no se realicen actualizaciones de estado
-si el componente se ha desmontado.
-*/
 "use client";
 
 import { useMapEvents } from "react-leaflet";
@@ -20,6 +10,7 @@ export interface ZoneData {
   lng: number;
   address: string;
   zone: string;
+  zoom: number;
 }
 
 interface MapEventsHandlerProps {
@@ -42,8 +33,11 @@ export function MapEventsHandler({
   }, []);
 
   const fetchAddress = useCallback(
-    async (lat: number, lng: number) => {
-      if (!isZoneAnalysisEnabled || !isMountedRef.current) return;
+    async (lat: number, lng: number, zoom: number) => {
+      if (!isZoneAnalysisEnabled || !isMountedRef.current || zoom < 14) {
+        onCenterChange({ lat, lng, address: "", zone: "", zoom });
+        return;
+      }
 
       try {
         const response = await fetch(
@@ -65,6 +59,7 @@ export function MapEventsHandler({
             lng,
             address: `${street}${number}`,
             zone: neighborhood,
+            zoom, 
           });
         }
       } catch (error) {
@@ -79,7 +74,8 @@ export function MapEventsHandler({
       const m = e.target;
       const center = m.getCenter();
       const bounds = m.getBounds();
-      fetchAddress(center.lat, center.lng);
+      const zoom = m.getZoom();
+      fetchAddress(center.lat, center.lng, zoom);
       onBoundsChange({
         minLat: bounds.getSouth(),
         maxLat: bounds.getNorth(),
@@ -88,14 +84,14 @@ export function MapEventsHandler({
       });
     },
     moveend: () => {
-      // CORRECCIÓN: Casting seguro para acceder a propiedad interna _loaded
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (!map || !(map as any)._loaded) return;
 
       const center = map.getCenter();
       const bounds = map.getBounds();
+      const zoom = map.getZoom();
 
-      fetchAddress(center.lat, center.lng);
+      fetchAddress(center.lat, center.lng, zoom);
 
       onBoundsChange({
         minLat: bounds.getSouth(),

@@ -52,7 +52,6 @@ export default function SmartDescription({
     } else {
       setAnalysis(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [description, isActive]);
   const showLoadingState =
     loading || (isActive && (!description || description.length < 20));

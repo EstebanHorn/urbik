@@ -4,8 +4,7 @@ de los datos para usuarios, inmobiliarias, propiedades y los estados de los
 formularios, asegurando la integridad de los datos en toda la aplicación.
 */
 
-// --- TYPES DE UTILIDAD ---
-// FIX: Definimos un tipo para evitar el uso de 'any' en objetos JSON (GeoJSON)
+
 export type JsonValue =
   | string
   | number
@@ -14,7 +13,6 @@ export type JsonValue =
   | JsonValue[]
   | null;
 
-// --- ENUMS (Sincronizados con Prisma) ---
 export type Role = "USER" | "REALESTATE" | "ADMIN" | "AGENT";
 export type PropertyType =
   | "HOUSE"
@@ -42,13 +40,12 @@ export type PropertyStatus =
   | "PAUSED";
 export type Currency = "USD" | "ARS";
 
-// --- INTERFACES DE USUARIO ---
 
 export interface RealEstateFormFields {
   agencyName: string;
   address: string;
   street?: string;
-  phone: string; // Es obligatorio en Inmobiliarias
+  phone: string; 
   website: string;
   instagram: string;
   bio: string;
@@ -80,18 +77,15 @@ export interface RealEstateFormFields {
 export interface UserFormFields {
   firstName: string;
   lastName: string;
-  // FIX: Cambiado de 'string | undefined' a 'string'.
-  // En el estado del formulario, si no hay teléfono, usamos "" (string vacío).
+
   phone: string;
   isActive: boolean;
 }
 
-// Ahora la herencia es válida porque 'phone' es string en ambos padres
 export interface FormState extends UserFormFields, RealEstateFormFields {
   auth_provider: string;
 }
 
-// --- INTERFACES DE PROPIEDAD ---
 
 export interface Property {
   id: number;
@@ -102,23 +96,19 @@ export interface Property {
   province: string;
   country: string;
 
-  // Enums
   type: PropertyType;
   operationType: OperationType;
   status: PropertyStatus;
 
-  // Precios y Monedas
   salePrice?: number | null;
   saleCurrency?: Currency | null;
   rentPrice?: number | null;
   rentCurrency?: Currency | null;
 
-  // Detalles
   area?: number | null;
   rooms?: number | null;
   bathrooms?: number | null;
 
-  // Amenities (Booleanos)
   hasWater: boolean;
   hasElectricity: boolean;
   hasGas: boolean;
@@ -131,12 +121,10 @@ export interface Property {
   isPriceHidden?: boolean;
   featureGroups?: JsonValue | null;
 
-  // Geo / Parcelas
   latitude?: number | null;
   longitude?: number | null;
   parcelCCA?: string | null;
   parcelPDA?: string | null;
-  // FIX: Usamos JsonValue en lugar de any para satisfacer al linter
   parcelGeom?: JsonValue | null;
 
   images: string[];
@@ -145,8 +133,6 @@ export interface Property {
   createdAt: Date;
   updatedAt: Date;
 }
-
-// --- ESTADOS DE FORMULARIOS DE PROPIEDAD ---
 
 export interface PropertyFormDataType {
   title: string;
@@ -168,7 +154,6 @@ export interface PropertyFormDataType {
   rooms: number;
   bathrooms: number;
 
-  // Amenities
   hasWater: boolean;
   hasElectricity: boolean;
   hasGas: boolean;
@@ -209,7 +194,6 @@ export const initialPropertyFormState: PropertyFormDataType = {
   images: [],
 };
 
-// --- PROPS GENÉRICOS ---
 
 export interface FormProps<T> {
   form: T & { auth_provider?: string };

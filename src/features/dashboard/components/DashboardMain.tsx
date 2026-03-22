@@ -207,7 +207,6 @@ export default function DashboardMain({
       {editingProperty && (
         <EditPropertyModal
           open={true}
-          // CORRECCIÓN: Ajustamos el objeto para que coincida con lo que espera el Modal (undefined en lugar de null)
           property={{
             ...editingProperty,
             type: editingProperty.type || undefined,
@@ -216,7 +215,6 @@ export default function DashboardMain({
             featureGroups: editingProperty.featureGroups || undefined,
             youtubeUrl: editingProperty.youtubeUrl || undefined,
             tour360Url: editingProperty.tour360Url || undefined,
-            // Aseguramos compatibilidad de otros campos opcionales si es necesario
           }}
           onClose={() => setEditingProperty(null)}
           onUpdated={onRefresh}

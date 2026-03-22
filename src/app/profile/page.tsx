@@ -25,7 +25,6 @@ export default function Profile() {
   const {
     userRole,
     form,
-    // userProperties y refetchData eliminados para limpiar warnings
     loading,
     message,
     hasLoadedProfile,
@@ -108,7 +107,6 @@ export default function Profile() {
           <div className=" lg:col-span-12 gap-12 items-start">
             <div className="lg:col-span-8 lg:col-start-3">
               <RealEstateForm
-                // Usamos unknown como paso intermedio para compatibilidad de tipos segura
                 form={form as unknown as RealEstateFormData}
                 handleChange={handleChange}
                 handleManualChange={handleManualChange}

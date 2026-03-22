@@ -19,7 +19,6 @@ import AdminActions from "../../../features/administrate/components/AdminActions
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// Definimos un tipo parcial para la propiedad en este contexto
 interface PartialProperty {
   area?: number | null;
   rooms?: number | null;
@@ -135,7 +134,6 @@ export default async function RealEstatePage({
 
         <div className="grid grid-cols-1 gap-12">
           {realEstate.properties.map((property) => {
-            // Lógica para determinar el precio a mostrar
             const isSale =
               property.operationType === "SALE" ||
               property.operationType === "SALE_RENT";
@@ -143,7 +141,6 @@ export default async function RealEstatePage({
               property.operationType === "RENT" ||
               property.operationType === "SALE_RENT";
 
-            // Priorizamos venta si tiene ambos, o mostramos el que tenga
             const showPrice =
               isSale && property.salePrice
                 ? property.salePrice

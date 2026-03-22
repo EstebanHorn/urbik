@@ -30,7 +30,7 @@ export interface InteractiveMapProps {
   lat: number;
   lon: number;
   properties?: MapProperty[];
-  selectedParcel?: SelectedParcel | null; // Tipado específico
+  selectedParcel?: SelectedParcel | null; 
   onBoundsChange?: (bounds: MapBounds) => void;
   onCenterChange?: (data: ZoneData) => void;
   children?: React.ReactNode;
@@ -147,7 +147,6 @@ function MapUpdater({ center }: { center: [number, number] }) {
 
   useEffect(() => {
     if (!map || !center) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((map as any)._loaded) {
       map.flyTo(center, map.getZoom(), {
         animate: true,
