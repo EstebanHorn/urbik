@@ -171,7 +171,7 @@ export function useHomeSearch() {
       if (resolvedCity) params.set("city", resolvedCity);
     }
 
-    router.push(`/map?${params.toString()}`);
+    router.push(`/properties?${params.toString()}`);
   };
 
   const handleToggleFavorite = async (e: React.MouseEvent, id: string) => {
