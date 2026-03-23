@@ -59,25 +59,25 @@ export async function POST(req: Request) {
     const province = String(body.province || "").trim();
     const streetName = String(body.streetName || body.street || "").trim();
     const streetNumber = String(body.streetNumber || body.number || "").trim();
-    const address = String(body.address || `${streetName} ${streetNumber}`.trim() || "Sin direcciÛn");
+    const address = String(body.address || `${streetName} ${streetNumber}`.trim() || "Sin direcci√≥n");
 
     if (!title || !type || !city || !province || !streetName) {
       return NextResponse.json(
-        { error: "Faltan campos obligatorios de publicaciÛn" },
+        { error: "Faltan campos obligatorios de publicaci√≥n" },
         { status: 400 },
       );
     }
 
     if (!VALID_TYPES.has(type as PropertyType)) {
-      return NextResponse.json({ error: "Tipo de propiedad inv·lido" }, { status: 400 });
+      return NextResponse.json({ error: "Tipo de propiedad inv√°lido" }, { status: 400 });
     }
 
     if (!VALID_OPERATIONS.has(normalizedOperation as OperationType)) {
-      return NextResponse.json({ error: "OperaciÛn inv·lida" }, { status: 400 });
+      return NextResponse.json({ error: "Operaci√≥n inv√°lida" }, { status: 400 });
     }
 
     if (!VALID_STATUSES.has(normalizedStatus)) {
-      return NextResponse.json({ error: "Estado inv·lido" }, { status: 400 });
+      return NextResponse.json({ error: "Estado inv√°lido" }, { status: 400 });
     }
 
     const isPriceHidden = Boolean(body.isPriceHidden);
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
       }
       if (normalizedOperation === "SALE_RENT" && !hasSale && !hasRent) {
         return NextResponse.json(
-          { error: "Complet· al menos un precio o marc· Sin precio" },
+          { error: "Complet√° al menos un precio o marc√° Sin precio" },
           { status: 400 },
         );
       }

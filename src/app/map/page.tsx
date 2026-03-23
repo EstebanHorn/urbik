@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { PropertiesSidebar } from "@/features/map/components/PropertiesSidebar";
@@ -11,6 +12,14 @@ import { ZoneData } from "../../features/map/components/MapEventsHandler";
 import { CustomDropdown } from "../../components/CustomDropdown";
 import LocationSelectors from "@/components/LocationSelectors";
 import { mapBaseLayers, type BaseLayerId } from "@/features/map/config/baseLayers";
+import {
+  appendFiltersToApiQuery,
+  applyFiltersToParams,
+  areFiltersEqual,
+  DEFAULT_FILTERS,
+  parseFiltersFromQuery,
+  type FilterState,
+} from "@/features/search/utils/propertyFilters";
 import {
   Map as MapIcon,
   List,
@@ -46,33 +55,6 @@ const InteractiveMap = dynamic(
     ),
   },
 );
-
-type FilterState = {
-  operationType: string;
-  propertyType: string;
-  currency: string;
-  minPrice: string;
-  maxPrice: string;
-  bedrooms: string[];
-  bathrooms: string[];
-  minArea: string;
-  maxArea: string;
-  age: string;
-  city: string;
-  province: string;
-  q: string;
-  hasWater: boolean;
-  hasElectricity: boolean;
-  hasGas: boolean;
-  hasInternet: boolean;
-  hasParking: boolean;
-  hasPool: boolean;
-  hasBalcony: boolean;
-  hasGrill: boolean;
-  hasGarden: boolean;
-  hasLaundry: boolean;
-  hasAirConditioning: boolean;
-};
 
 interface RawProperty {
   salePrice?: number;
@@ -127,68 +109,6 @@ const AMENITIES_CONFIG: AmenityConfig[] = [
   { id: "hasAirConditioning", label: "Aire", icon: Wind },
 ];
 
-function parseFiltersFromQuery(params: URLSearchParams): FilterState {
-  return {
-    operationType: params.get("operationType") || "",
-    propertyType: params.get("propertyType") || "",
-    currency: params.get("currency") || "",
-    minPrice: params.get("minPrice") || "",
-    maxPrice: params.get("maxPrice") || "",
-    bedrooms: params.getAll("bedrooms").length
-      ? params.getAll("bedrooms")
-      : params.get("rooms")
-        ? [params.get("rooms") as string]
-        : [],
-    bathrooms: params.getAll("bathrooms"),
-    minArea: params.get("minArea") || "",
-    maxArea: params.get("maxArea") || "",
-    age: params.get("age") || "",
-    city: params.get("city") || "",
-    province: params.get("province") || "",
-    q: params.get("q") || "",
-    hasWater: params.get("hasWater") === "true",
-    hasElectricity: params.get("hasElectricity") === "true",
-    hasGas: params.get("hasGas") === "true",
-    hasInternet: params.get("hasInternet") === "true",
-    hasParking: params.get("hasParking") === "true",
-    hasPool: params.get("hasPool") === "true",
-    hasBalcony: params.get("hasBalcony") === "true",
-    hasGrill: params.get("hasGrill") === "true",
-    hasGarden: params.get("hasGarden") === "true",
-    hasLaundry: params.get("hasLaundry") === "true",
-    hasAirConditioning: params.get("hasAirConditioning") === "true",
-  };
-}
-
-function areFiltersEqual(a: FilterState, b: FilterState) {
-  return (
-    a.operationType === b.operationType &&
-    a.propertyType === b.propertyType &&
-    a.currency === b.currency &&
-    a.minPrice === b.minPrice &&
-    a.maxPrice === b.maxPrice &&
-    a.minArea === b.minArea &&
-    a.maxArea === b.maxArea &&
-    a.age === b.age &&
-    a.city === b.city &&
-    a.province === b.province &&
-    a.q === b.q &&
-    a.hasWater === b.hasWater &&
-    a.hasElectricity === b.hasElectricity &&
-    a.hasGas === b.hasGas &&
-    a.hasInternet === b.hasInternet &&
-    a.hasParking === b.hasParking &&
-    a.hasPool === b.hasPool &&
-    a.hasBalcony === b.hasBalcony &&
-    a.hasGrill === b.hasGrill &&
-    a.hasGarden === b.hasGarden &&
-    a.hasLaundry === b.hasLaundry &&
-    a.hasAirConditioning === b.hasAirConditioning &&
-    a.bedrooms.join("|") === b.bedrooms.join("|") &&
-    a.bathrooms.join("|") === b.bathrooms.join("|")
-  );
-}
-
 export default function MapPage() {
   const { propertiesLimit, baseLayer, setBaseLayer } = useMapSettings();
   const searchParams = useSearchParams();
@@ -227,49 +147,10 @@ export default function MapPage() {
 
   const syncFiltersToUrl = useCallback(
     (nextFilters: FilterState) => {
-      const params = new URLSearchParams(searchParams.toString());
-      const setOrDelete = (key: string, value: string) => {
-        if (value?.trim()) params.set(key, value.trim());
-        else params.delete(key);
-      };
-
-      setOrDelete("operationType", nextFilters.operationType);
-      setOrDelete("propertyType", nextFilters.propertyType);
-      setOrDelete("currency", nextFilters.currency);
-      setOrDelete("minPrice", nextFilters.minPrice);
-      setOrDelete("maxPrice", nextFilters.maxPrice);
-      setOrDelete("minArea", nextFilters.minArea);
-      setOrDelete("maxArea", nextFilters.maxArea);
-      setOrDelete("age", nextFilters.age);
-      setOrDelete("city", nextFilters.city);
-      setOrDelete("province", nextFilters.province);
-      setOrDelete("q", nextFilters.q);
-
-      params.delete("bedrooms");
-      params.delete("bathrooms");
-      nextFilters.bedrooms.forEach((value) => params.append("bedrooms", value));
-      nextFilters.bathrooms.forEach((value) => params.append("bathrooms", value));
-
-      const boolKeys: AmenityFlagKey[] = [
-        "hasWater",
-        "hasElectricity",
-        "hasGas",
-        "hasInternet",
-        "hasParking",
-        "hasPool",
-        "hasBalcony",
-        "hasGrill",
-        "hasGarden",
-        "hasLaundry",
-        "hasAirConditioning",
-      ];
-
-      boolKeys.forEach((key) => {
-        if (nextFilters[key]) params.set(key, "true");
-        else params.delete(key);
-      });
-
-      const nextQuery = params.toString();
+      const nextQuery = applyFiltersToParams(
+        new URLSearchParams(searchParams.toString()),
+        nextFilters,
+      ).toString();
       const currentQuery = searchParams.toString();
       if (nextQuery === currentQuery) return;
       router.replace(`${pathname}?${nextQuery}`, { scroll: false });
@@ -307,36 +188,7 @@ export default function MapPage() {
           minLon: bounds.minLon.toString(),
           maxLon: bounds.maxLon.toString(),
         });
-
-        if (currentFilters.operationType)
-          query.append("operationType", currentFilters.operationType);
-        if (currentFilters.propertyType)
-          query.append("propertyType", currentFilters.propertyType);
-        if (currentFilters.currency) query.append("currency", currentFilters.currency);
-        if (currentFilters.minPrice) query.append("minPrice", currentFilters.minPrice);
-        if (currentFilters.maxPrice) query.append("maxPrice", currentFilters.maxPrice);
-        if (currentFilters.minArea) query.append("minArea", currentFilters.minArea);
-        if (currentFilters.maxArea) query.append("maxArea", currentFilters.maxArea);
-        if (currentFilters.age) query.append("age", currentFilters.age);
-        if (currentFilters.city) query.append("city", currentFilters.city);
-        if (currentFilters.province) query.append("province", currentFilters.province);
-        if (currentFilters.q) query.append("q", currentFilters.q);
-
-        currentFilters.bedrooms.forEach((bedroom) => query.append("bedrooms", bedroom));
-        currentFilters.bathrooms.forEach((bathroom) => query.append("bathrooms", bathroom));
-
-        if (currentFilters.hasWater) query.append("hasWater", "true");
-        if (currentFilters.hasElectricity) query.append("hasElectricity", "true");
-        if (currentFilters.hasGas) query.append("hasGas", "true");
-        if (currentFilters.hasInternet) query.append("hasInternet", "true");
-        if (currentFilters.hasParking) query.append("hasParking", "true");
-        if (currentFilters.hasPool) query.append("hasPool", "true");
-        if (currentFilters.hasBalcony) query.append("hasBalcony", "true");
-        if (currentFilters.hasGrill) query.append("hasGrill", "true");
-        if (currentFilters.hasGarden) query.append("hasGarden", "true");
-        if (currentFilters.hasLaundry) query.append("hasLaundry", "true");
-        if (currentFilters.hasAirConditioning)
-          query.append("hasAirConditioning", "true");
+        appendFiltersToApiQuery(query, currentFilters);
 
         const res = await fetch(`/api/properties/in-bounds?${query}`, {
           signal: controller.signal,
@@ -446,32 +298,7 @@ export default function MapPage() {
   };
 
   const clearFilters = () => {
-    setFilters({
-      operationType: "",
-      propertyType: "",
-      currency: "",
-      minPrice: "",
-      maxPrice: "",
-      bedrooms: [],
-      bathrooms: [],
-      minArea: "",
-      maxArea: "",
-      age: "",
-      city: "",
-      province: "",
-      q: "",
-      hasWater: false,
-      hasElectricity: false,
-      hasGas: false,
-      hasInternet: false,
-      hasParking: false,
-      hasPool: false,
-      hasBalcony: false,
-      hasGrill: false,
-      hasGarden: false,
-      hasLaundry: false,
-      hasAirConditioning: false,
-    });
+    setFilters(DEFAULT_FILTERS);
   };
 
   const layerOptions = useMemo(
@@ -570,6 +397,13 @@ export default function MapPage() {
         >
           <X size={20} /> Limpiar
         </button>
+
+        <Link
+          href={`/properties?${searchParams.toString()}`}
+          className="h-10 px-4 rounded-full bg-urbik-black text-white text-[11px] font-bold inline-flex items-center"
+        >
+          Ver listado
+        </Link>
       </div>
 
       {/* MENÚ DE FILTROS DESPLEGABLE CON ANIMACIÓN */}

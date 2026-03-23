@@ -36,18 +36,24 @@ function Navbar() {
   }
 
   const getNavLinks = (role?: string) => {
+    const publicLinks = [
+      { label: "Búsqueda", href: "/map" },
+      { label: "Propiedades", href: "/properties" },
+    ];
+
     switch (role) {
       case "ADMIN":
-        return [{ label: "Administrar", href: "/administrate" }];
+        return [...publicLinks, { label: "Administrar", href: "/administrate" }];
       case "REALESTATE":
         return [
+          ...publicLinks,
           { label: "Mis Propiedades", href: "/dashboard" },
           { label: "Propiedades Guardadas", href: "/saved" },
         ];
       case "USER":
-        return [{ label: "Propiedades Guardadas", href: "/saved" }];
+        return [...publicLinks, { label: "Propiedades Guardadas", href: "/saved" }];
       default:
-        return [{ label: "Mis Propiedades", href: "/dashboard" }];
+        return publicLinks;
     }
   };
 
@@ -105,17 +111,25 @@ function Navbar() {
             </AnimatePresence>
 
             <div className="hidden md:flex items-center gap-8 text-sm font-bold tracking-wide">
-              {session && (
-                <Link
-                  href="/"
-                  className={`transition-colors duration-300 ${isHome ? "text-urbik-white" : "text-white/40 hover:text-urbik-white"}`}
-                >
-                  Inicio
-                </Link>
-              )}
+              <Link
+                href="/"
+                className={`transition-colors duration-300 ${isHome ? "text-urbik-white" : "text-white/40 hover:text-urbik-white"}`}
+              >
+                Inicio
+              </Link>
 
               {session &&
-                navLinks.map((link) => (
+                <Link
+                  href="/saved"
+                  className={`transition-colors duration-300 ${pathname === "/saved" ? "text-urbik-white" : "text-white/40 hover:text-urbik-white"}`}
+                >
+                  Guardadas
+                </Link>
+              }
+
+              {navLinks
+                .filter((link) => !(session && link.href === "/saved"))
+                .map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
