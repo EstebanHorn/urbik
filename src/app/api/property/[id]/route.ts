@@ -47,7 +47,7 @@ export async function PUT(
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
-    const updateData: Prisma.PropertyUpdateInput = {
+    const updateData = {
       title: body.title,
       description: body.description,
       type: body.type && VALID_TYPES.has(body.type as PropertyType) ? (body.type as PropertyType) : undefined,
@@ -139,7 +139,7 @@ export async function PUT(
 
     const updated = await prisma.property.update({
       where: { id },
-      data: updateData,
+      data: updateData as Prisma.PropertyUpdateInput,
     });
 
     return NextResponse.json(updated);
