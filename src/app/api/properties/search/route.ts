@@ -111,7 +111,7 @@ export async function GET(request: Request) {
 
   try {
     const whereClause: Prisma.PropertyWhereInput = {
-      status: { in: ["AVAILABLE", "ACTIVE"] },
+      status: "AVAILABLE",
     };
 
     if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
