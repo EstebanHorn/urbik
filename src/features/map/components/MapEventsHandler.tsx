@@ -44,6 +44,14 @@ export function MapEventsHandler({
           `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`,
           { headers: { "Accept-Language": "es" } },
         );
+
+        if (!response.ok) {
+          if (isMountedRef.current) {
+            onCenterChange({ lat, lng, address: "", zone: "", zoom });
+          }
+          return;
+        }
+
         const data = await response.json();
 
         if (data && data.address && isMountedRef.current) {
@@ -59,11 +67,13 @@ export function MapEventsHandler({
             lng,
             address: `${street}${number}`,
             zone: neighborhood,
-            zoom, 
+            zoom,
           });
         }
-      } catch (error) {
-        console.error("Error al obtener la dirección:", error);
+      } catch {
+        if (isMountedRef.current) {
+          onCenterChange({ lat, lng, address: "", zone: "", zoom });
+        }
       }
     },
     [onCenterChange, isZoneAnalysisEnabled],

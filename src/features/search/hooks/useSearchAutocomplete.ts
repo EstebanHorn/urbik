@@ -21,7 +21,10 @@ export function useSearchAutocomplete() {
       clearAutocomplete();
 
       if (suggestion.type === "ADDRESS" && suggestion.lat && suggestion.lon) {
-        router.push(`/map?lat=${suggestion.lat}&lon=${suggestion.lon}&zoom=16`);
+        const q = encodeURIComponent(suggestion.display_name || "");
+        router.push(
+          `/properties?lat=${suggestion.lat}&lon=${suggestion.lon}&zoom=16&q=${q}`,
+        );
         return;
       }
 
