@@ -179,7 +179,7 @@ export async function GET(request: Request) {
 
   try {
     const whereClause: Prisma.PropertyWhereInput = {
-      status: { in: ["AVAILABLE", "ACTIVE"] },
+      status: "AVAILABLE",
       latitude: {
         gte: minLat,
         lte: maxLat,

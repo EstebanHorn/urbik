@@ -21,7 +21,7 @@ export async function GET() {
     const properties = await prisma.property.findMany({
       take: 3,
       where: {
-        status: { in: ["AVAILABLE", "ACTIVE"] },
+        status: "AVAILABLE",
       },
       orderBy: {
         createdAt: "desc",
