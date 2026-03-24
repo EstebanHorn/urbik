@@ -65,7 +65,7 @@ const PROPERTY_SELECT = {
   hasLaundry: true,
   hasAirConditioning: true,
   createdAt: true,
-} satisfies Prisma.PropertySelect;
+} as Prisma.PropertySelect;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -209,17 +209,18 @@ export async function GET(request: Request) {
       ];
     }
 
-    if (hasWater) whereClause.hasWater = true;
-    if (hasElectricity) whereClause.hasElectricity = true;
-    if (hasGas) whereClause.hasGas = true;
-    if (hasInternet) whereClause.hasInternet = true;
-    if (hasParking) whereClause.hasParking = true;
-    if (hasPool) whereClause.hasPool = true;
-    if (hasBalcony) whereClause.hasBalcony = true;
-    if (hasGrill) whereClause.hasGrill = true;
-    if (hasGarden) whereClause.hasGarden = true;
-    if (hasLaundry) whereClause.hasLaundry = true;
-    if (hasAirConditioning) whereClause.hasAirConditioning = true;
+    const dynamicWhere = whereClause as Record<string, unknown>;
+    if (hasWater) dynamicWhere.hasWater = true;
+    if (hasElectricity) dynamicWhere.hasElectricity = true;
+    if (hasGas) dynamicWhere.hasGas = true;
+    if (hasInternet) dynamicWhere.hasInternet = true;
+    if (hasParking) dynamicWhere.hasParking = true;
+    if (hasPool) dynamicWhere.hasPool = true;
+    if (hasBalcony) dynamicWhere.hasBalcony = true;
+    if (hasGrill) dynamicWhere.hasGrill = true;
+    if (hasGarden) dynamicWhere.hasGarden = true;
+    if (hasLaundry) dynamicWhere.hasLaundry = true;
+    if (hasAirConditioning) dynamicWhere.hasAirConditioning = true;
 
     const [total, items] = await Promise.all([
       prisma.property.count({ where: whereClause }),
