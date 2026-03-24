@@ -71,7 +71,23 @@ type SearchProperty = {
   hasAirConditioning: boolean;
 };
 
-const AMENITIES_CONFIG: Array<{ id: AmenityFlagKey; label: string; icon: React.ElementType }> = [
+type ParsedSearchFilters = {
+  propertyType: string | null;
+  operationType: string | null;
+  minPrice: number | null;
+  maxPrice: number | null;
+  city: string | null;
+  province: string | null;
+  rooms: number | null;
+  bathrooms: number | null;
+  amenities: Partial<Record<AmenityFlagKey, boolean>>;
+};
+
+const AMENITIES_CONFIG: Array<{
+  id: AmenityFlagKey;
+  label: string;
+  icon: React.ElementType;
+}> = [
   { id: "hasElectricity", label: "Luz", icon: Zap },
   { id: "hasGas", label: "Gas", icon: Flame },
   { id: "hasInternet", label: "Internet", icon: Wifi },
@@ -141,10 +157,18 @@ export default function PropertiesPage() {
   const [showFiltersMenu, setShowFiltersMenu] = useState(false);
   const [isSearchingLocation, setIsSearchingLocation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hoveredPropertyId, setHoveredPropertyId] = useState<number | null>(
+    null,
+  );
   const [items, setItems] = useState<SearchProperty[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const skipUrlSync = useRef(true);
+  const parsedQueryRef = useRef("");
+  const [userCoords, setUserCoords] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
 
   const initialPage = Math.max(
     1,
@@ -154,7 +178,10 @@ export default function PropertiesPage() {
     50,
     Math.max(
       1,
-      Number.parseInt(searchParams.get("pageSize") || String(PAGE_SIZE_DEFAULT), 10) || PAGE_SIZE_DEFAULT,
+      Number.parseInt(
+        searchParams.get("pageSize") || String(PAGE_SIZE_DEFAULT),
+        10,
+      ) || PAGE_SIZE_DEFAULT,
     ),
   );
   const initialView = searchParams.get("view") === "grid" ? "grid" : "list";
@@ -181,12 +208,39 @@ export default function PropertiesPage() {
   }, [searchParams]);
 
   useEffect(() => {
+    if (lat !== undefined && lon !== undefined) return;
+    if (typeof window === "undefined" || !navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserCoords({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        });
+      },
+      () => {
+        setUserCoords(null);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 8000,
+        maximumAge: 120000,
+      },
+    );
+  }, [lat, lon]);
+
+  useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     const nextFilters = parseFiltersFromQuery(params);
-    const nextPage = Math.max(1, Number.parseInt(params.get("page") || "1", 10) || 1);
+    const nextPage = Math.max(
+      1,
+      Number.parseInt(params.get("page") || "1", 10) || 1,
+    );
     const nextView: ViewMode = params.get("view") === "grid" ? "grid" : "list";
 
-    setFilters((prev) => (areFiltersEqual(prev, nextFilters) ? prev : nextFilters));
+    setFilters((prev) =>
+      areFiltersEqual(prev, nextFilters) ? prev : nextFilters,
+    );
     setPage((prev) => (prev === nextPage ? prev : nextPage));
     setViewMode((prev) => (prev === nextView ? prev : nextView));
     skipUrlSync.current = true;
@@ -218,6 +272,65 @@ export default function PropertiesPage() {
     syncUrl(filters, page, viewMode);
   }, [filters, page, syncUrl, viewMode]);
 
+  useEffect(() => {
+    const query = filters.q.trim();
+    if (!query) {
+      parsedQueryRef.current = "";
+      return;
+    }
+    if (parsedQueryRef.current === query) return;
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `/api/search/parse?q=${encodeURIComponent(query)}`,
+          {
+            signal: controller.signal,
+          },
+        );
+        if (!response.ok) return;
+        const data = await response.json();
+        const parsed = data.parsed as ParsedSearchFilters;
+        parsedQueryRef.current = query;
+
+        setFilters((prev) => {
+          if (prev.q.trim() !== query) return prev;
+
+          const next: FilterState = { ...prev };
+          if (parsed.propertyType) next.propertyType = parsed.propertyType;
+          if (parsed.operationType) next.operationType = parsed.operationType;
+          if (parsed.minPrice) next.minPrice = String(parsed.minPrice);
+          if (parsed.maxPrice) next.maxPrice = String(parsed.maxPrice);
+          if (parsed.city) next.city = parsed.city;
+          if (parsed.province) next.province = parsed.province;
+          if (parsed.rooms) next.bedrooms = [String(parsed.rooms)];
+          if (parsed.bathrooms) next.bathrooms = [String(parsed.bathrooms)];
+
+          if (parsed.amenities) {
+            Object.entries(parsed.amenities).forEach(([key, value]) => {
+              if (value === true) {
+                (next as Record<string, unknown>)[key] = true;
+              }
+            });
+          }
+
+          if (areFiltersEqual(prev, next)) return prev;
+          setPage(1);
+          return next;
+        });
+      } catch (error) {
+        if ((error as Error).name === "AbortError") return;
+        console.error("Error parseando filtros de texto:", error);
+      }
+    }, 260);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timeoutId);
+    };
+  }, [filters.q]);
+
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -228,9 +341,12 @@ export default function PropertiesPage() {
 
       appendFiltersToApiQuery(query, filters);
 
+      // Solo aplicar filtro geográfico si viene explícito en URL.
+      // La ubicación del navegador se usa para centrar el mini mapa, no para recortar resultados.
       if (typeof lat === "number") query.set("lat", String(lat));
       if (typeof lon === "number") query.set("lon", String(lon));
-      if (searchParams.get("radius")) query.set("radius", searchParams.get("radius") as string);
+      if (searchParams.get("radius"))
+        query.set("radius", searchParams.get("radius") as string);
 
       const res = await fetch(`/api/properties/search?${query.toString()}`);
       if (!res.ok) {
@@ -264,7 +380,9 @@ export default function PropertiesPage() {
       const exists = prev[key].includes(value);
       return {
         ...prev,
-        [key]: exists ? prev[key].filter((item) => item !== value) : [...prev[key], value],
+        [key]: exists
+          ? prev[key].filter((item) => item !== value)
+          : [...prev[key], value],
       };
     });
   };
@@ -281,12 +399,16 @@ export default function PropertiesPage() {
   };
 
   const handleResolveLocation = async () => {
-    const locationQuery = [filters.city, filters.province].filter(Boolean).join(", ");
+    const locationQuery = [filters.city, filters.province]
+      .filter(Boolean)
+      .join(", ");
     if (!locationQuery.trim()) return;
 
     setIsSearchingLocation(true);
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(locationQuery)}`);
+      const response = await fetch(
+        `/api/search?q=${encodeURIComponent(locationQuery)}`,
+      );
       const data = await response.json();
       const firstAddress = (data.suggestions || []).find(
         (item: { type?: string; lat?: number; lon?: number }) =>
@@ -311,12 +433,21 @@ export default function PropertiesPage() {
   };
 
   const mapHref = useMemo(() => {
-    const params = applyFiltersToParams(new URLSearchParams(searchParams.toString()), filters);
+    const params = applyFiltersToParams(
+      new URLSearchParams(searchParams.toString()),
+      filters,
+    );
     params.set("page", String(page));
     params.set("pageSize", String(pageSize));
     params.set("view", viewMode);
+    const effectiveLat = typeof lat === "number" ? lat : userCoords?.lat;
+    const effectiveLon = typeof lon === "number" ? lon : userCoords?.lon;
+    if (typeof effectiveLat === "number")
+      params.set("lat", String(effectiveLat));
+    if (typeof effectiveLon === "number")
+      params.set("lon", String(effectiveLon));
     return `/map?${params.toString()}`;
-  }, [filters, page, pageSize, searchParams, viewMode]);
+  }, [filters, lat, lon, page, pageSize, searchParams, userCoords, viewMode]);
 
   return (
     <div className="min-h-screen bg-slate-50 pt-24 pb-12">
@@ -380,7 +511,11 @@ export default function PropertiesPage() {
                 onChange={(name, val) => {
                   setPage(1);
                   if (name === "province") {
-                    setFilters((prev) => ({ ...prev, province: val, city: "" }));
+                    setFilters((prev) => ({
+                      ...prev,
+                      province: val,
+                      city: "",
+                    }));
                   }
                   if (name === "city") {
                     setFilters((prev) => ({ ...prev, city: val }));
@@ -404,9 +539,10 @@ export default function PropertiesPage() {
               type="button"
               onClick={handleResolveLocation}
               disabled={isSearchingLocation}
-              className="h-10 px-4 rounded-full border border-urbik-emerald text-[11px] font-bold bg-urbik-emerald text-white inline-flex items-center gap-2"
+              className="h-10 px-4 rounded-full border border-urbik-emerald text-[11px] font-bold bg-urbik-emerald text-urbik-black inline-flex items-center gap-2"
             >
-              <Search size={14} /> {isSearchingLocation ? "Buscando..." : "Ir a ubicación"}
+              <Search size={14} />{" "}
+              {isSearchingLocation ? "Buscando..." : "Ir a ubicación"}
             </button>
 
             <button
@@ -461,7 +597,9 @@ export default function PropertiesPage() {
                 />
 
                 <div className="flex items-center gap-1 border border-black/50 rounded-full px-2 h-10 bg-white">
-                  <span className="text-[10px] font-bold text-urbik-black/70">Dorm</span>
+                  <span className="text-[10px] font-bold text-urbik-black/70">
+                    Dorm
+                  </span>
                   {["1", "2", "3", "4+"].map((value) => {
                     const isActive = filters.bedrooms.includes(value);
                     return (
@@ -482,7 +620,9 @@ export default function PropertiesPage() {
                 </div>
 
                 <div className="flex items-center gap-1 border border-black/50 rounded-full px-2 h-10 bg-white">
-                  <span className="text-[10px] font-bold text-urbik-black/70">Baños</span>
+                  <span className="text-[10px] font-bold text-urbik-black/70">
+                    Baños
+                  </span>
                   {["1", "2", "3", "4+"].map((value) => {
                     const isActive = filters.bathrooms.includes(value);
                     return (
@@ -548,7 +688,13 @@ export default function PropertiesPage() {
             <h2 className="mb-2 text-xs font-black uppercase tracking-wider text-slate-500">
               Vista previa de mapa
             </h2>
-            <PreviewMap properties={items} lat={lat} lon={lon} />
+            <PreviewMap
+              properties={items}
+              lat={typeof lat === "number" ? lat : userCoords?.lat}
+              lon={typeof lon === "number" ? lon : userCoords?.lon}
+              hoveredPropertyId={hoveredPropertyId}
+              onHoverProperty={setHoveredPropertyId}
+            />
             <Link
               href={mapHref}
               className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-urbik-black px-4 py-2 text-xs font-bold text-white"
@@ -559,14 +705,18 @@ export default function PropertiesPage() {
 
           <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="mb-4 flex flex-wrap items-center gap-2">
-              <h1 className="text-lg font-black text-slate-900">{total.toLocaleString("es-AR")} propiedades</h1>
+              <h1 className="text-lg font-black text-slate-900">
+                {total.toLocaleString("es-AR")} propiedades
+              </h1>
 
               <div className="ml-auto inline-flex rounded-full border border-slate-200 p-1">
                 <button
                   type="button"
                   onClick={() => setViewMode("list")}
                   className={`rounded-full px-3 py-1 text-xs font-bold inline-flex items-center gap-1 ${
-                    viewMode === "list" ? "bg-slate-900 text-white" : "text-slate-500"
+                    viewMode === "list"
+                      ? "bg-slate-900 text-white"
+                      : "text-slate-500"
                   }`}
                 >
                   <List size={14} /> Lista
@@ -575,7 +725,9 @@ export default function PropertiesPage() {
                   type="button"
                   onClick={() => setViewMode("grid")}
                   className={`rounded-full px-3 py-1 text-xs font-bold inline-flex items-center gap-1 ${
-                    viewMode === "grid" ? "bg-slate-900 text-white" : "text-slate-500"
+                    viewMode === "grid"
+                      ? "bg-slate-900 text-white"
+                      : "text-slate-500"
                   }`}
                 >
                   <Grid3X3 size={14} /> Cuadrícula
@@ -586,7 +738,10 @@ export default function PropertiesPage() {
             {isLoading ? (
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {Array.from({ length: 6 }).map((_, idx) => (
-                  <div key={idx} className="h-32 animate-pulse rounded-xl bg-slate-100" />
+                  <div
+                    key={idx}
+                    className="h-32 animate-pulse rounded-xl bg-slate-100"
+                  />
                 ))}
               </div>
             ) : items.length === 0 ? (
@@ -603,12 +758,23 @@ export default function PropertiesPage() {
               >
                 {items.map((property) => {
                   const price = property.salePrice ?? property.rentPrice ?? 0;
-                  const currency = property.saleCurrency ?? property.rentCurrency ?? "ARS";
+                  const currency =
+                    property.saleCurrency ?? property.rentCurrency ?? "ARS";
                   return (
                     <Link
                       key={property.id}
                       href={`/property/${property.id}`}
-                      className="group grid grid-cols-[120px_1fr] gap-3 rounded-xl border border-slate-200 p-2 transition hover:border-slate-300 hover:shadow-sm"
+                      onMouseEnter={() => setHoveredPropertyId(property.id)}
+                      onMouseLeave={() =>
+                        setHoveredPropertyId((current) =>
+                          current === property.id ? null : current,
+                        )
+                      }
+                      className={`group grid grid-cols-[120px_1fr] gap-3 rounded-xl border p-2 transition hover:shadow-sm ${
+                        hoveredPropertyId === property.id
+                          ? "border-emerald-500 ring-2 ring-emerald-200"
+                          : "border-slate-200 hover:border-slate-300"
+                      }`}
                     >
                       <div className="h-24 overflow-hidden rounded-lg bg-slate-100">
                         {property.images?.[0] ? (
@@ -635,14 +801,19 @@ export default function PropertiesPage() {
                           </span>
                         </div>
 
-                        <h3 className="truncate text-sm font-black text-slate-900">{property.title}</h3>
+                        <h3 className="truncate text-sm font-black text-slate-900">
+                          {property.title}
+                        </h3>
                         <p className="truncate text-xs font-semibold text-slate-500">
-                          {property.address}, {property.city}, {property.province}
+                          {property.address}, {property.city},{" "}
+                          {property.province}
                         </p>
 
                         <div className="mt-2 flex items-center justify-between">
                           <span className="text-xs font-bold text-slate-500">
-                            {property.rooms || 0} amb · {property.bathrooms || 0} baños · {property.area || 0} m²
+                            {property.rooms || 0} amb ·{" "}
+                            {property.bathrooms || 0} baños ·{" "}
+                            {property.area || 0} m²
                           </span>
                           <span className="text-sm font-black text-slate-900">
                             {currency} {Number(price).toLocaleString("es-AR")}
@@ -672,7 +843,9 @@ export default function PropertiesPage() {
               <button
                 type="button"
                 disabled={page >= totalPages}
-                onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                onClick={() =>
+                  setPage((prev) => Math.min(totalPages, prev + 1))
+                }
                 className="rounded-full border border-slate-300 px-4 py-2 text-xs font-bold disabled:opacity-30"
               >
                 Siguiente
