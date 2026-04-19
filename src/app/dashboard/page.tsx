@@ -60,7 +60,7 @@ type ProfileData = {
   name?: string;
   firstName?: string | null;
   lastName?: string | null;
-  agencyData?: { name?: string | null; properties?: PropertySummary[] | null };
+  agencyData?: { name?: string | null; slug?: string | null; properties?: PropertySummary[] | null };
   properties?: PropertySummary[] | null;
 };
 
@@ -141,7 +141,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white pt-20">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <DashboardHeader name={name} isAgency={isAgency} />
+        <DashboardHeader name={name} isAgency={isAgency} slug={profile?.agencyData?.slug ?? null} />
 
         <DashboardStats
           total={properties.length}

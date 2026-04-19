@@ -181,8 +181,8 @@ export default function CreatePropertyModal({
                   </h2>
                   <p className="text-xs font-bold text-urbik-black/40  tracking-widest">
                     {step === 1
-                      ? "Paso 1: InformaciÃ³n"
-                      : "Paso 2: UbicaciÃ³n Catastral"}
+                      ? "Paso 1: Información"
+                      : "Paso 2: Ubicación Catastral"}
                   </p>
                 </div>
               </div>
@@ -191,7 +191,7 @@ export default function CreatePropertyModal({
                 type="button"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all font-black text-sm"
               >
-                âœ•
+                x
               </button>
             </div>
 
@@ -208,7 +208,7 @@ export default function CreatePropertyModal({
                             1
                           </span>
                           <h3 className="text-sm font-bold text-urbik-black  tracking-widest">
-                            UbicaciÃ³n GeogrÃ¡fica
+                            Ubicacion geografica y parcelaria
                           </h3>
                         </div>
 
@@ -238,21 +238,16 @@ export default function CreatePropertyModal({
                               }
                               className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
                             />
-                            <input
-                              type="text"
-                              placeholder="Localidad"
-                              value={form.locality || ""}
-                              onChange={(e) =>
-                                handleInputChange("locality", e.target.value)
-                              }
-                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-                            />
+
                             <input
                               type="text"
                               placeholder="Barrio"
                               value={form.neighborhood || ""}
                               onChange={(e) =>
-                                handleInputChange("neighborhood", e.target.value)
+                                handleInputChange(
+                                  "neighborhood",
+                                  e.target.value,
+                                )
                               }
                               className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
                             />
@@ -341,27 +336,16 @@ export default function CreatePropertyModal({
 
                           <div className="space-y-2">
                             <label className="text-md font-bold text-urbik-black/50   ml-1">
-                              DescripciÃ³n
+                              Descripción
                             </label>
                             <textarea
                               rows={5}
-                              placeholder="DescribÃ­ los puntos fuertes de la propiedad..."
+                              placeholder="Describí los puntos fuertes de la propiedad..."
                               value={form.description || ""}
                               onChange={(e) =>
                                 handleInputChange("description", e.target.value)
                               }
                               className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm bg-gray-50 focus:bg-white resize-none"
-                            />
-
-                            <SmartDescription
-                              description={form.description || ""}
-                              context={{
-                                salePrice: form.salePrice,
-                                rentPrice: form.rentPrice,
-                                area: form.areaM2,
-                                type: form.operationType,
-                                city: form.city,
-                              }}
                             />
                           </div>
                         </div>
@@ -382,7 +366,9 @@ export default function CreatePropertyModal({
 
                         <div className="pl-9 space-y-8">
                           <AmenitiesGrid
-                            value={form.amenities as Record<string, boolean> || {}}
+                            value={
+                              (form.amenities as Record<string, boolean>) || {}
+                            }
                             propertyType={form.type}
                             onChange={(val) =>
                               setForm((prev) => ({
@@ -480,7 +466,7 @@ export default function CreatePropertyModal({
                         className="group flex items-center gap-2 text-[10px] font-black  tracking-widest text-gray-400 hover:text-urbik-black transition-colors"
                       >
                         <span className="text-lg group-hover:-translate-x-1 transition-transform">
-                          â†
+                          {"<"}
                         </span>{" "}
                         Volver
                       </button>
@@ -542,7 +528,7 @@ export default function CreatePropertyModal({
                       type="button"
                       className="w-full bg-urbik-black text-white py-4 rounded-xl font-black  text-xs tracking-widest hover:bg-emerald-600 transition-all shadow-lg disabled:opacity-30 disabled:transform-none transform active:scale-95"
                     >
-                      Confirmar SelecciÃ³n
+                      Confirmar Selección
                     </button>
                   </div>
                 </div>
@@ -554,5 +540,3 @@ export default function CreatePropertyModal({
     </AnimatePresence>
   );
 }
-
-

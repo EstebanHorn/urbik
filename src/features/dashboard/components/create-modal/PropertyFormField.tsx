@@ -139,7 +139,10 @@ const DYNAMIC_FIELDS_BY_TYPE: Record<string, DynamicField[]> = {
   ],
 };
 
-const SUBTYPE_BY_TYPE: Record<string, Array<{ value: string; label: string }>> = {
+const SUBTYPE_BY_TYPE: Record<
+  string,
+  Array<{ value: string; label: string }>
+> = {
   APARTMENT: [
     { value: "monoambiente", label: "Monoambiente" },
     { value: "semipiso", label: "Semipiso" },
@@ -167,7 +170,10 @@ const SUBTYPE_BY_TYPE: Record<string, Array<{ value: string; label: string }>> =
   ],
 };
 
-const UNIT_TYPE_BY_PROPERTY: Record<string, Array<{ value: string; label: string }>> = {
+const UNIT_TYPE_BY_PROPERTY: Record<
+  string,
+  Array<{ value: string; label: string }>
+> = {
   APARTMENT: SUBTYPE_BY_TYPE.APARTMENT,
   HOUSE: [
     { value: "casa", label: "Casa" },
@@ -182,7 +188,10 @@ const UNIT_TYPE_BY_PROPERTY: Record<string, Array<{ value: string; label: string
 };
 
 // Módulo A: Tipo de Unidad — solo para APARTMENT y PH
-const UNIT_TYPE_SELECTOR: Record<string, Array<{ value: string; label: string }>> = {
+const UNIT_TYPE_SELECTOR: Record<
+  string,
+  Array<{ value: string; label: string }>
+> = {
   APARTMENT: [
     { value: "departamento", label: "Departamento" },
     { value: "piso", label: "Piso" },
@@ -237,11 +246,18 @@ const BUILDING_CONDITION_OPTIONS = [
 ];
 
 const TYPES_WITH_CHARACTERISTICS = new Set([
-  "HOUSE", "APARTMENT", "PH", "COMMERCIAL_PROPERTY", "OFFICE",
+  "HOUSE",
+  "APARTMENT",
+  "PH",
+  "COMMERCIAL_PROPERTY",
+  "OFFICE",
 ]);
 
 const TYPES_WITH_DISPOSITION = new Set([
-  "APARTMENT", "PH", "COMMERCIAL_PROPERTY", "OFFICE",
+  "APARTMENT",
+  "PH",
+  "COMMERCIAL_PROPERTY",
+  "OFFICE",
 ]);
 
 const TYPES_WITH_BUILDING_INFO = new Set(["APARTMENT", "PH"]);
@@ -258,7 +274,12 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value, type } = e.target;
-    const val = type === "number" ? (value === "" ? undefined : parseFloat(value)) : value;
+    const val =
+      type === "number"
+        ? value === ""
+          ? undefined
+          : parseFloat(value)
+        : value;
 
     setForm((prev) => ({ ...prev, [name]: val }));
   };
@@ -323,10 +344,13 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
     form.operationType === "RENT" || form.operationType === "SALE";
 
   const dynamicFields =
-    DYNAMIC_FIELDS_BY_TYPE[form.type || "HOUSE"] || DYNAMIC_FIELDS_BY_TYPE.HOUSE;
+    DYNAMIC_FIELDS_BY_TYPE[form.type || "HOUSE"] ||
+    DYNAMIC_FIELDS_BY_TYPE.HOUSE;
 
   // Filter out 'expenses' from dynamic fields since we handle it separately (Módulo B)
-  const filteredDynamicFields = dynamicFields.filter((f) => f.key !== "expenses");
+  const filteredDynamicFields = dynamicFields.filter(
+    (f) => f.key !== "expenses",
+  );
 
   const subtypeOptions = useMemo(
     () => SUBTYPE_BY_TYPE[form.type || ""] || [],
@@ -344,7 +368,9 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
   );
   const showUnitTypeSelector = unitTypeSelectorOptions.length > 0;
 
-  const showCharacteristicsSection = TYPES_WITH_CHARACTERISTICS.has(form.type || "");
+  const showCharacteristicsSection = TYPES_WITH_CHARACTERISTICS.has(
+    form.type || "",
+  );
   const showDisposition = TYPES_WITH_DISPOSITION.has(form.type || "");
   const showBuildingInfo = TYPES_WITH_BUILDING_INFO.has(form.type || "");
 
@@ -406,7 +432,12 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             options={propertyTypes}
             value={form.type || ""}
             onChange={(val) =>
-              setForm((prev) => ({ ...prev, type: val, propertySubtype: "", unitType: "" }))
+              setForm((prev) => ({
+                ...prev,
+                type: val,
+                propertySubtype: "",
+                unitType: "",
+              }))
             }
             className="w-full"
             variant="white2"
@@ -473,7 +504,9 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
               label="Seleccionar unidad"
               options={unitTypeOptions}
               value={form.unitType || ""}
-              onChange={(val) => setForm((prev) => ({ ...prev, unitType: val }))}
+              onChange={(val) =>
+                setForm((prev) => ({ ...prev, unitType: val }))
+              }
               className="w-full"
               variant="white2"
             />
@@ -504,7 +537,9 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             label="Seleccionar subtipo"
             options={subtypeOptions}
             value={form.propertySubtype || ""}
-            onChange={(val) => setForm((prev) => ({ ...prev, propertySubtype: val }))}
+            onChange={(val) =>
+              setForm((prev) => ({ ...prev, propertySubtype: val }))
+            }
             className="w-full"
             variant="white2"
           />
@@ -524,7 +559,10 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             }))
           }
         />
-        <label htmlFor="sinPrecio" className="text-sm font-semibold text-urbik-black/70">
+        <label
+          htmlFor="sinPrecio"
+          className="text-sm font-semibold text-urbik-black/70"
+        >
           Publicar como "Sin precio"
         </label>
       </div>
@@ -618,7 +656,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
       {/* Módulo 6: Características básicas */}
       {showCharacteristicsSection && (
-        <div className="rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="rounded-2xl border border-gray-200 ">
           <button
             type="button"
             onClick={() => setShowCharacteristics((v) => !v)}
@@ -644,7 +682,9 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                     label="Seleccionar estado"
                     options={CONDITION_OPTIONS}
                     value={form.condition || ""}
-                    onChange={(val) => setForm((prev) => ({ ...prev, condition: val }))}
+                    onChange={(val) =>
+                      setForm((prev) => ({ ...prev, condition: val }))
+                    }
                     className="w-full"
                     variant="white2"
                   />
@@ -659,7 +699,9 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                     label="Seleccionar orientación"
                     options={ORIENTATION_OPTIONS}
                     value={form.orientation || ""}
-                    onChange={(val) => setForm((prev) => ({ ...prev, orientation: val }))}
+                    onChange={(val) =>
+                      setForm((prev) => ({ ...prev, orientation: val }))
+                    }
                     className="w-full"
                     variant="white2"
                   />
@@ -675,7 +717,9 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                       label="Seleccionar disposición"
                       options={DISPOSITION_OPTIONS}
                       value={form.disposition || ""}
-                      onChange={(val) => setForm((prev) => ({ ...prev, disposition: val }))}
+                      onChange={(val) =>
+                        setForm((prev) => ({ ...prev, disposition: val }))
+                      }
                       className="w-full"
                       variant="white2"
                     />
@@ -746,7 +790,9 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                 label="Seleccionar"
                 options={BUILDING_CONDITION_OPTIONS}
                 value={form.buildingCondition || ""}
-                onChange={(val) => setForm((prev) => ({ ...prev, buildingCondition: val }))}
+                onChange={(val) =>
+                  setForm((prev) => ({ ...prev, buildingCondition: val }))
+                }
                 className="w-full"
                 variant="white2"
               />

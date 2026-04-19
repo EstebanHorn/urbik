@@ -151,17 +151,6 @@ export default function EditPropertyModal({
                     }
                     className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-3 rounded-2xl focus:border-urbik-black outline-none transition-all"
                   />
-
-                  <SmartDescription
-                    description={safeForm.description || ""}
-                    context={{
-                      salePrice: safeForm.salePrice,
-                      rentPrice: safeForm.rentPrice,
-                      area: safeForm.areaM2 || safeForm.area,
-                      type: safeForm.operationType,
-                      city: safeForm.city,
-                    }}
-                  />
                 </div>
 
                 <div className="p-4">
