@@ -32,7 +32,6 @@ import FavoriteButton from "@/components/FavoritesButton";
 import ImageGallery from "@/features/property/components/ImageGallery";
 import InquiryForm from "@/features/property/components/InquiryForm";
 
-
 interface PropertySummary {
   id: number;
   title: string;
@@ -575,18 +574,7 @@ export default async function PropertyPage({
             <InquiryForm propertyId={property.id} />
           </div>
         </div>
-        <div className="mt-12 pt-12 border-t border-dashed border-urbik-g100 w-full">
-          <SmartZoneSingle
-            property={{
-              ...property,
-              address: property.address || "", 
-              city: property.city || "",
-              province: property.province || "",
-              latitude: property.latitude || 0,
-              longitude: property.longitude || 0,
-            }}
-          />
-        </div>
+
         <div className="mt-24 pt-12 border-t border-urbik-g100">
           <h3 className="text-3xl font-display text-urbik-black tracking-tighter mb-8">
             <span className="font-medium">Más propiedades de </span>

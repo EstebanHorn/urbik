@@ -15,13 +15,16 @@ escritorio.
 import React from "react";
 import Link from "next/link";
 import bgImage from "../../../assets/login_bg.png";
+import ShareButton from "../.././../components/ShareButton";
 
 export default function DashboardHeader({
   name,
   isAgency,
+  slug,
 }: {
   name: string;
   isAgency: boolean;
+  slug?: string | null;
 }) {
   const initials = (name ?? "Urbik")
     .split(" ")
@@ -70,6 +73,12 @@ export default function DashboardHeader({
                 Editar Perfil
               </button>
             </Link>
+            {isAgency && slug && (
+              <ShareButton
+                slug={slug}
+                className="flex items-center justify-center gap-2 rounded-full w-full px-5 py-2 text-md font-bold border border-urbik-cyan text-urbik-cyan hover:bg-urbik-cyan hover:text-urbik-black cursor-pointer transition-colors shadow-lg"
+              />
+            )}
           </div>
         </div>
       </div>

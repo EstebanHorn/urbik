@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs -I {} basename {})",
+      "mcp__claude_ai_Google_Drive__read_file_content",
+      "Bash(git *)",
+      "Bash(npx tsc *)",
+      "Skill(update-config)"
+    ]
+  }
+}

@@ -5,7 +5,7 @@ import { MapPin, Globe, Instagram, Building2 } from "lucide-react";
 import prisma from "@/libs/db";
 
 interface AgencyProfilePageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 const PROPERTY_LABELS: Record<string, string> = {
@@ -39,8 +39,9 @@ function formatPrice(price: number | null, currency: string | null): string {
 export default async function AgencyProfilePage({
   params,
 }: AgencyProfilePageProps) {
+  const { slug } = await params;
   const realEstate = await prisma.realEstate.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       properties: {
         where: { status: "AVAILABLE" },
@@ -99,8 +100,8 @@ export default async function AgencyProfilePage({
           </div>
 
           {/* Name + info */}
-          <div className="pt-20 md:pt-16 pb-6 flex-1 min-w-0">
-            <h1 className="text-3xl md:text-4xl font-black text-urbik-black tracking-tight leading-none mb-2">
+          <div className="pt-5 pb-6 flex-1 min-w-0">
+            <h1 className="text-3xl md:text-4xl font-black text-urbik-white tracking-tight leading-none mb-2">
               {realEstate.agencyName}
             </h1>
 
@@ -224,7 +225,10 @@ export default async function AgencyProfilePage({
 
                     {property.address && (
                       <p className="flex items-center gap-1 text-xs font-medium text-urbik-muted line-clamp-1 mb-3">
-                        <MapPin size={11} className="shrink-0 text-urbik-cyan" />
+                        <MapPin
+                          size={11}
+                          className="shrink-0 text-urbik-cyan"
+                        />
                         {property.address}
                         {property.city ? `, ${property.city}` : ""}
                       </p>

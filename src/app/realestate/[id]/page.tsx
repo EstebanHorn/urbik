@@ -16,6 +16,7 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 import bgImage from "../../../assets/login_bg.png";
 import AdminActions from "../../../features/administrate/components/AdminActions";
+import ShareButton from "../../../components/ShareButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -48,9 +49,10 @@ const getSpecsLabel = (p: PartialProperty) => {
 export default async function RealEstatePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const realEstateId = parseInt(params.id);
+  const { id } = await params;
+  const realEstateId = parseInt(id);
   const session = await getServerSession(authOptions);
   const user = session?.user as { role?: string } | undefined;
 
@@ -117,6 +119,12 @@ export default async function RealEstatePage({
               >
                 Contactar Agencia
               </a>
+              {realEstate.slug && (
+                <ShareButton
+                  slug={realEstate.slug}
+                  className="flex items-center justify-center gap-2 rounded-full w-full px-4 py-2 text-md font-bold border border-urbik-cyan text-urbik-cyan hover:bg-urbik-cyan hover:text-urbik-black cursor-pointer transition-colors"
+                />
+              )}
             </div>
           </div>
         </div>

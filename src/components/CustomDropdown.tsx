@@ -21,7 +21,7 @@ export function CustomDropdown({
   value,
   options,
   onChange,
-  className = "", 
+  className = "",
   variant = "white",
 }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +49,7 @@ export function CustomDropdown({
     white2:
       "bg-urbik-white text-urbik-black/50 border border-black/50 hover:bg-urbik-dark/20",
     "map-layer":
-      "bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm", 
+      "bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm",
   };
 
   return (
