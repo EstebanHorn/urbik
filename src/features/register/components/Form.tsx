@@ -105,180 +105,95 @@ export default function RegisterForm() {
         {isAgency && (
           <div className="space-y-6">
             <div>
-              <p className={cardTitle}>Datos de contacto</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className={labelStyles}>Teléfono</label>
-                  <div className="flex gap-2">
-                    <div className="w-12">
-                      <PhoneInput
-                        country={"ar"}
-                        value={dialCode}
-                        onChange={setDialCode}
-                        containerClass="!h-[46px]"
-                        inputClass="!hidden"
-                        buttonClass="!w-full !h-full !rounded-full !bg-gray-100 !border-none"
-                      />
-                    </div>
-                    <div className="relative flex-1">
-                      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-                        +{dialCode}
-                      </span>
-                      <input
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleNumericChange}
-                        className={`${inputStyles} pl-14`}
-                        placeholder="12345678"
-                        required
-                      />
-                    </div>
-                  </div>
+              <label className={labelStyles}>Teléfono</label>
+              <div className="flex gap-2">
+                <div className="w-12">
+                  <PhoneInput
+                    country={"ar"}
+                    value={dialCode}
+                    onChange={setDialCode}
+                    containerClass="!h-[46px]"
+                    inputClass="!hidden"
+                    buttonClass="!w-full !h-full !rounded-full !bg-gray-100 !border-none"
+                  />
+                </div>
+                <div className="relative flex-1">
+                  <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                    +{dialCode}
+                  </span>
+                  <input
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleNumericChange}
+                    className={`${inputStyles} pl-14`}
+                    placeholder="12345678"
+                    required
+                  />
                 </div>
               </div>
             </div>
 
-            <div>
-              <p className={cardTitle}>Matrículas</p>
-              <div className="space-y-4">
-                {form.licenses.map((license, index) => {
-                  const jurisdictions = getJurisdictionsByProvince(license.province);
-                  return (
-                    <div key={`license-${index}`} className="border border-gray-200 rounded-3xl p-4 space-y-3">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <input
-                          value={license.licenseNumber}
-                          onChange={(e) => updateLicense(index, "licenseNumber", e.target.value.replace(/\D/g, ""))}
-                          placeholder="Número de matrícula"
-                          className={inputStyles}
-                          required
-                        />
-                        <input
-                          value={license.responsibleName}
-                          onChange={(e) => updateLicense(index, "responsibleName", e.target.value)}
-                          placeholder="Responsable"
-                          className={inputStyles}
-                          required
-                        />
-                      </div>
-
-                      <LocationSelectors
-                        provinceValue={license.province}
-                        cityValue=""
-                        cityLabel="SIN CIUDAD"
-                        onChange={(name, val) => {
-                          if (name === "province") {
-                            updateLicense(index, "province", val);
-                            updateLicense(index, "jurisdiction", "");
-                          }
-                        }}
-                      />
-
-                      {jurisdictions.length > 0 && (
-                        <select
-                          value={license.jurisdiction}
-                          onChange={(e) => updateLicense(index, "jurisdiction", e.target.value)}
-                          className="w-full rounded-full px-5 py-3 text-sm outline-none bg-linear-to-r from-gray-100 via-gray-100 to-white focus:ring-2 focus:ring-black/20"
-                        >
-                          <option value="">Seleccionar jurisdicción</option>
-                          {jurisdictions.map((jurisdiction) => (
-                            <option key={jurisdiction} value={jurisdiction}>
-                              {jurisdiction}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-
-                      <div className="flex items-center justify-between">
-                        <label className="flex items-center gap-2 text-xs font-bold text-urbik-black/60">
-                          <input
-                            type="radio"
-                            checked={Boolean(license.isPrimary)}
-                            onChange={() => updateLicense(index, "isPrimary", true)}
-                          />
-                          Matrícula principal
-                        </label>
-                        {form.licenses.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeLicense(index)}
-                            className="text-xs font-bold text-red-500"
-                          >
-                            Quitar
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-                <button type="button" onClick={addLicense} className="text-sm font-bold text-urbik-cyan">
-                  + Agregar matrícula
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <p className={cardTitle}>Oficinas</p>
-              <div className="space-y-4">
-                {form.offices.map((office, index) => (
-                  <div key={`office-${index}`} className="border border-gray-200 rounded-3xl p-4 space-y-3">
-                    <input
-                      value={office.name}
-                      onChange={(e) => updateOffice(index, "name", e.target.value)}
-                      placeholder="Nombre de oficina"
-                      className={inputStyles}
-                      required
-                    />
-
-                    <LocationSelectors
-                      provinceValue={office.province}
-                      cityValue={office.city}
-                      onChange={(name, val) => {
-                        if (name === "province") updateOffice(index, "province", val);
-                        if (name === "city") updateOffice(index, "city", val);
-                      }}
-                    />
-
-                    <div className="grid grid-cols-3 gap-2">
+            {form.licenses.slice(0, 1).map((license, index) => {
+              const jurisdictions = getJurisdictionsByProvince(license.province);
+              return (
+                <div key={`license-${index}`} className="space-y-3">
+                  <p className={cardTitle}>Matrícula</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className={labelStyles}>Nombre del responsable</label>
                       <input
-                        value={office.street}
-                        onChange={(e) => updateOffice(index, "street", e.target.value)}
-                        placeholder="Calle"
-                        className={`${inputStyles} col-span-2`}
-                        required
-                      />
-                      <input
-                        value={office.number}
-                        onChange={(e) => updateOffice(index, "number", e.target.value)}
-                        placeholder="N°"
+                        value={license.responsibleName}
+                        onChange={(e) => updateLicense(index, "responsibleName", e.target.value)}
+                        placeholder="Juan Pérez"
                         className={inputStyles}
                         required
                       />
                     </div>
-
-                    <input
-                      value={office.phone}
-                      onChange={(e) => updateOffice(index, "phone", e.target.value.replace(/\D/g, ""))}
-                      placeholder="Teléfono oficina"
-                      className={inputStyles}
-                    />
-
-                    {form.offices.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeOffice(index)}
-                        className="text-xs font-bold text-red-500"
-                      >
-                        Quitar oficina
-                      </button>
-                    )}
+                    <div>
+                      <label className={labelStyles}>Número de matrícula</label>
+                      <input
+                        value={license.licenseNumber}
+                        onChange={(e) => updateLicense(index, "licenseNumber", e.target.value.replace(/\D/g, ""))}
+                        placeholder="Ej: 12345"
+                        className={inputStyles}
+                        required
+                      />
+                    </div>
                   </div>
-                ))}
-                <button type="button" onClick={addOffice} className="text-sm font-bold text-urbik-cyan">
-                  + Agregar oficina
-                </button>
-              </div>
-            </div>
+
+                  <LocationSelectors
+                    provinceValue={license.province}
+                    cityValue=""
+                    cityLabel="SIN CIUDAD"
+                    onChange={(name, val) => {
+                      if (name === "province") {
+                        updateLicense(index, "province", val);
+                        updateLicense(index, "jurisdiction", "");
+                      }
+                    }}
+                  />
+
+                  {jurisdictions.length > 0 && (
+                    <select
+                      value={license.jurisdiction}
+                      onChange={(e) => updateLicense(index, "jurisdiction", e.target.value)}
+                      className="w-full rounded-full px-5 py-3 text-sm outline-none bg-linear-to-r from-gray-100 via-gray-100 to-white focus:ring-2 focus:ring-black/20"
+                    >
+                      <option value="">Seleccionar jurisdicción</option>
+                      {jurisdictions.map((jurisdiction) => (
+                        <option key={jurisdiction} value={jurisdiction}>
+                          {jurisdiction}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              );
+            })}
+
+            <p className="text-xs text-urbik-muted ml-2">
+              Una vez registrada, podés agregar más matrículas y sucursales desde tu perfil.
+            </p>
           </div>
         )}
 
