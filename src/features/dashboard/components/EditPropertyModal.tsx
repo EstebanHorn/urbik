@@ -169,18 +169,13 @@ export default function EditPropertyModal({
                     Otras Características
                   </label>
                   <AmenitiesGrid
-                    value={currentAmenities}
-                    featureGroups={safeForm.featureGroups || {}}
-                    onFeatureGroupsChange={(groups) =>
-                      handleSetForm((prev: PropertyFormData) => ({
-                        ...prev,
-                        featureGroups: groups,
-                      }))
-                    }
+                    value={currentAmenities as Record<string, boolean>}
+                    propertyType={safeForm.type}
                     onChange={(val) =>
                       handleSetForm((prev: PropertyFormData) => ({
                         ...prev,
-                        amenities: val as unknown as Record<string, boolean>,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        amenities: val as any,
                       }))
                     }
                   />
