@@ -51,6 +51,7 @@ model User {
 model RealEstate {
   user_id    Int      @id
   agencyName String
+  slug       String?  @unique
   phone      String?
   license    String   @default("")
   province   String
