@@ -30,9 +30,10 @@ export interface InteractiveMapProps {
   lat: number;
   lon: number;
   properties?: MapProperty[];
-  selectedParcel?: SelectedParcel | null; 
+  selectedParcel?: SelectedParcel | null;
   onBoundsChange?: (bounds: MapBounds) => void;
   onCenterChange?: (data: ZoneData) => void;
+  onPropertySelect?: (prop: MapProperty) => void;
   children?: React.ReactNode;
   height?: string;
 }
@@ -165,6 +166,7 @@ export function InteractiveMapClient({
   selectedParcel = null,
   onBoundsChange,
   onCenterChange,
+  onPropertySelect,
   children,
   height = "100%",
 }: InteractiveMapProps) {
@@ -234,7 +236,7 @@ export function InteractiveMapClient({
           />
 
           <StaticParcelsLayer />
-          <DbParcelsLayer properties={properties} />
+          <DbParcelsLayer properties={properties} onPropertySelect={onPropertySelect} />
           <SelectedParcelLayer selectedParcel={selectedParcel} />
 
           {children}

@@ -70,9 +70,10 @@ const getCenterOfGeometry = (geometry: Geometry): [number, number] | null => {
 
 interface DbParcelsLayerProps {
   properties: MapProperty[];
+  onPropertySelect?: (prop: MapProperty) => void;
 }
 
-export function DbParcelsLayer({ properties }: DbParcelsLayerProps) {
+export function DbParcelsLayer({ properties, onPropertySelect }: DbParcelsLayerProps) {
   const router = useRouter();
   const { colorMode } = useMapSettings();
 
@@ -123,7 +124,7 @@ export function DbParcelsLayer({ properties }: DbParcelsLayerProps) {
               data={geometry as GeoJsonObject}
               style={dynamicStyle}
               eventHandlers={{
-                click: () => router.push(`/property/${prop.id}`),
+                click: () => onPropertySelect ? onPropertySelect(rawProp) : router.push(`/property/${prop.id}`),
                 mouseover: (e) => {
                   const layer = e.target;
                   layer.setStyle({
