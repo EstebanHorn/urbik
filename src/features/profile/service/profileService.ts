@@ -6,6 +6,7 @@ incluyendo matrices legales (matriculas) y oficinas.
 import { RealEstateFormFields, UserFormFields } from "../../../libs/types";
 import prisma from "@/libs/db";
 import bcrypt from "bcryptjs";
+import { generateUniqueSlug } from "@/libs/slugify";
 
 export async function fetchProfileData() {
   const res = await fetch("/api/user");
@@ -155,6 +156,17 @@ export async function updateServerProfile(
         throw new Error("El nombre de la inmobiliaria es requerido");
       }
 
+      // Check if slug needs to be generated (outside transaction to avoid deadlock)
+      const existingRealEstate = await prisma.realEstate.findUnique({
+        where: { user_id: authUser.user_id },
+        select: { slug: true },
+      });
+
+      const slugData: { slug?: string } = {};
+      if (!existingRealEstate?.slug) {
+        slugData.slug = await generateUniqueSlug(finalName, authUser.user_id);
+      }
+
       const updatedRealEstate = await tx.realEstate.update({
         where: { user_id: authUser.user_id },
         data: {
@@ -166,6 +178,7 @@ export async function updateServerProfile(
           bio,
           province,
           city,
+          ...slugData,
         },
       });
 

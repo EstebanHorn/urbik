@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import SecuritySection from "./ChangePassword";
 import DangerZone from "./DeleteAccount";
 import PauseAccountZone from "./PauseAccount";
@@ -8,10 +8,11 @@ import LocationSelectors from "../../../components/LocationSelectors";
 import ProfileMediaUploader from "./ProfileMediaUploader";
 import { toggleAccountPause } from "@/features/profile/service/profileService";
 import { getJurisdictionsByProvince } from "@/libs/jurisdictions";
-import { Globe, Instagram, MapPin, Save, Phone } from "lucide-react";
+import { Globe, Instagram, MapPin, Save, Phone, Copy, Check, Link2 } from "lucide-react";
 
 export interface RealEstateFormData {
   agencyName: string;
+  slug?: string | null;
   phone: string;
   address: string;
   license: string;
@@ -85,6 +86,33 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
   handleManualChange,
 }) => {
   const [isPausing, setIsPausing] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const baseUrl =
+    typeof window !== "undefined"
+      ? (process.env.NEXT_PUBLIC_BASE_URL ?? window.location.origin)
+      : process.env.NEXT_PUBLIC_BASE_URL ?? "https://urbik.com.ar";
+
+  const profileUrl = form.slug ? `${baseUrl}/${form.slug}` : null;
+
+  const handleCopy = useCallback(async () => {
+    if (!profileUrl) return;
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for browsers that block clipboard API
+      const el = document.createElement("input");
+      el.value = profileUrl;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }, [profileUrl]);
 
   const inputBaseClasses =
     "italic w-full px-6 py-4 rounded-full bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium text-urbik-black placeholder:text-gray-400";
@@ -121,6 +149,37 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
           onSubmit={handleSubmit}
           className="flex flex-col gap-6 text-urbik-black"
         >
+          {/* Profile URL */}
+          <div className="space-y-2">
+            <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide flex items-center gap-2">
+              <Link2 size={14} />
+              URL de tu perfil
+            </label>
+            {profileUrl ? (
+              <div className="flex items-center gap-2">
+                <div className="flex-1 flex items-center gap-3 px-6 py-4 rounded-full bg-urbik-g200 border border-gray-300">
+                  <Globe size={16} className="text-urbik-black opacity-40 shrink-0" />
+                  <span className="text-sm font-medium text-urbik-black truncate">
+                    {profileUrl}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  title="Copiar URL"
+                  className="flex items-center gap-2 px-5 py-4 rounded-full bg-urbik-black text-white text-sm font-bold hover:bg-urbik-emerald hover:text-urbik-black transition-colors shrink-0 active:scale-95"
+                >
+                  {copied ? <Check size={16} /> : <Copy size={16} />}
+                  {copied ? "Copiado" : "Copiar"}
+                </button>
+              </div>
+            ) : (
+              <p className="px-6 py-4 rounded-full bg-urbik-g200 border border-dashed border-gray-300 text-sm font-medium text-urbik-muted">
+                Tu perfil aún no tiene URL única. Guardá tu perfil para generarla.
+              </p>
+            )}
+          </div>
+
           <div className="bg-white rounded-[2rem] border border-urbik-g200 shadow-sm overflow-hidden relative mb-4">
             <div className="h-48 md:h-64 w-full bg-urbik-g50 relative">
               <ProfileMediaUploader
