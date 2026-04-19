@@ -30,6 +30,7 @@ import {
 import SmartZoneSingle from "../../../components/SmartZone/SmartView";
 import FavoriteButton from "@/components/FavoritesButton";
 import ImageGallery from "@/features/property/components/ImageGallery";
+import InquiryForm from "@/features/property/components/InquiryForm";
 
 
 interface PropertySummary {
@@ -561,13 +562,6 @@ export default async function PropertyPage({
                     </div>
                   </div>
 
-                  <button className="w-full bg-urbik-black hover:bg-urbik-dark2 text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group">
-                    <span>Contactar Ahora</span>
-                    <ChevronLeft
-                      size={16}
-                      className="rotate-180 group-hover:translate-x-1 transition-transform"
-                    />
-                  </button>
                   <Link
                     href={`/realestate/${property.realEstateId}`}
                     className="block mt-4 text-center text-xs font-bold text-urbik-muted hover:text-urbik-black underline decoration-dashed"
@@ -577,6 +571,8 @@ export default async function PropertyPage({
                 </div>
               </div>
             </div>
+
+            <InquiryForm propertyId={property.id} />
           </div>
         </div>
         <div className="mt-12 pt-12 border-t border-dashed border-urbik-g100 w-full">

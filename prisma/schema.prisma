@@ -217,13 +217,17 @@ model VerificationToken {
 }
 
 model Inquiry {
-  id         Int      @id @default(autoincrement())
-  message    String
-  userId     Int
-  propertyId Int
-  allUser    AllUsers @relation(fields: [userId], references: [user_id])
-  property   Property @relation(fields: [propertyId], references: [id])
-  createdAt  DateTime @default(now())
+  id            Int       @id @default(autoincrement())
+  message       String
+  senderName    String
+  senderEmail   String
+  senderPhone   String
+  userId        Int?
+  propertyId    Int
+  status        String    @default("UNREAD")
+  allUser       AllUsers? @relation(fields: [userId], references: [user_id])
+  property      Property  @relation(fields: [propertyId], references: [id])
+  createdAt     DateTime  @default(now())
 }
 
 model Favorite {
