@@ -325,11 +325,10 @@ export default function MapPage() {
           value={filters.operationType}
           onChange={(val) => setFilters((f) => ({ ...f, operationType: val }))}
           options={[
-            { label: "Operación", value: "" },
+            { label: "Cualquiera", value: "" },
             { label: "Venta", value: "SALE" },
             { label: "Alquiler", value: "RENT" },
             { label: "Temporal", value: "TEMP_RENT" },
-            { label: "Venta y Alquiler", value: "SALE_RENT" },
           ]}
         />
 
