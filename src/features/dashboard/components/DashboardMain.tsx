@@ -19,6 +19,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from "recharts";
 import CreatePropertyModal from "./CreatePropertyModal";
 import EditPropertyModal from "./EditPropertyModal";
 import PropertiesList from "./PropertiesList";
+import InquiriesPanel from "./InquiriesPanel";
 
 const mockViews = [
   { name: "Ene", views: 200 },
@@ -30,6 +31,8 @@ const mockViews = [
   { name: "Jul", views: 280 },
 ];
 
+type ActiveTab = "properties" | "inquiries";
+
 export default function DashboardMain({
   properties,
   onRefresh,
@@ -40,6 +43,7 @@ export default function DashboardMain({
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [editingProperty, setEditingProperty] =
     useState<PropertySummary | null>(null);
+  const [activeTab, setActiveTab] = useState<ActiveTab>("properties");
 
   const mostViewed = useMemo(() => properties[0] ?? null, [properties]);
 
@@ -50,30 +54,44 @@ export default function DashboardMain({
   return (
     <>
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6 mt-20">
-        <div className="w-2/3 flex justify-between items-end">
-          <div>
-            <h2 className="text-xl font-black text-urbik-black/60 ml-5">
-              Propiedades publicadas
-            </h2>
-            <p className="text-sm text-gray-500  ml-5">
-              Administrá, editá o pausá tus publicaciones
-            </p>
-          </div>
-          <div className=" px-4 py-2 text-sm font-bold text-gray-600">
-            {properties.length} propiedades en total
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 justify-end">
+        <div className="flex items-center gap-1 border border-gray-100 bg-gray-50 rounded-full p-1 w-fit">
           <button
-            onClick={() => setCreateOpen(true)}
-            className="bg-urbik-cyan  text-urbik-black/80 py-3 px-6 rounded-full border border-white font-black text-md hover:bg-urbik-white hover:border-urbik-cyan cursor-pointer hover:text-urbik-cyan transition-all shadow-cyan-500/20 transform active:scale-95"
+            onClick={() => setActiveTab("properties")}
+            className={`px-5 py-2 rounded-full text-sm font-black transition-all cursor-pointer ${
+              activeTab === "properties"
+                ? "bg-urbik-black text-white shadow-sm"
+                : "text-urbik-black/50 hover:text-urbik-black"
+            }`}
           >
-            Cargar propiedad
+            Propiedades
+          </button>
+          <button
+            onClick={() => setActiveTab("inquiries")}
+            className={`px-5 py-2 rounded-full text-sm font-black transition-all cursor-pointer ${
+              activeTab === "inquiries"
+                ? "bg-urbik-black text-white shadow-sm"
+                : "text-urbik-black/50 hover:text-urbik-black"
+            }`}
+          >
+            Consultas
           </button>
         </div>
+
+        {activeTab === "properties" && (
+          <div className="flex items-center gap-2 justify-end">
+            <button
+              onClick={() => setCreateOpen(true)}
+              className="bg-urbik-cyan text-urbik-black/80 py-3 px-6 rounded-full border border-white font-black text-md hover:bg-urbik-white hover:border-urbik-cyan cursor-pointer hover:text-urbik-cyan transition-all shadow-cyan-500/20 transform active:scale-95"
+            >
+              Cargar propiedad
+            </button>
+          </div>
+        )}
       </div>
 
+      {activeTab === "inquiries" ? (
+        <InquiriesPanel />
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 md border border-gray-100 bg-white shadow-sm overflow-hidden">
           <div className="p-2 sm:p-4">
@@ -197,6 +215,7 @@ export default function DashboardMain({
           </div>
         </div>
       </div>
+      )}
 
       <CreatePropertyModal
         open={isCreateOpen}
