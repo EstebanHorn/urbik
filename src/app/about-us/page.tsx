@@ -30,8 +30,8 @@ export default function AboutUs() {
     {
       icon: <Zap className="text-urbik-white" size={24} />,
       title: "Innovación",
-      desc: "Cambiamos la forma de buscar hogar mediante algoritmos inteligentes y mapas avanzados.",
-      longDesc: "Ademas de la búsqueda tradicional por filtros, utilizamos el modelo de recomendación Urbik Smart Zone® basado en comportamiento y geolocalización avanzada.",
+      desc: "Cambiamos la forma de buscar hogar mediante mapas avanzados y datos catastrales en tiempo real.",
+      longDesc: "Más allá de la búsqueda por filtros, integramos cartografía catastral, visualización de parcelas y herramientas pensadas para que cada inmobiliaria pueda publicar, gestionar y hacer crecer su cartera desde un solo lugar.",
     },
     {
       icon: <ShieldCheck className="text-urbik-white" size={24} />,
