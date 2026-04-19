@@ -14,7 +14,7 @@ import { useHomeSearch } from "@/features/home/hooks/useHomeSearch";
 import { SearchSection } from "@/features/home/components/SearchSection";
 import { FeaturedCarousel } from "@/features/home/components/FeaturedCarousel";
 import { PrecisionSection } from "@/features/home/components/PrecisionSection";
-import { SmartZoneSection } from "@/features/home/components/SmartZoneSection";
+import Link from "next/link";
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -36,7 +36,24 @@ export default function HomePage() {
 
       <PrecisionSection />
 
-      <SmartZoneSection />
+      <section className="bg-urbik-black text-white py-24 px-6">
+        <div className="max-w-3xl mx-auto text-center flex flex-col items-center gap-6">
+          <h2 className="text-4xl font-display font-bold tracking-tight">
+            Urbik, la plataforma de las inmobiliarias
+          </h2>
+          <p className="text-gray-300 text-lg font-medium max-w-2xl">
+            Si estás buscando dar el salto con tu inmobiliaria es necesario adaptarte a las nuevas
+            tecnologías. Registrate y obtené tu sitio para publicar propiedades en todo el país de
+            forma gratuita. Obtené tu verificación y empezá a recibir consultas y nuevas propiedades.
+          </p>
+          <Link
+            href="/register"
+            className="mt-2 inline-block bg-urbik-emerald text-white font-bold px-10 py-4 rounded-full hover:opacity-90 active:scale-95 transition-all"
+          >
+            Registrarse como inmobiliaria
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

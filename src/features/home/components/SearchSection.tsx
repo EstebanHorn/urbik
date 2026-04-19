@@ -160,7 +160,7 @@ export function SearchSection({
           <span>Encontrá tu lugar en </span>
 
           <div className="flex flex-wrap items-baseline gap-x-3">
-            <span className="font-black italic text-7xl text-urbik-black inline-flex min-w-[28ch] min-h-[1.1em]">
+            <span className="font-black italic text-7xl text-urbik-black inline-flex min-h-[1.1em]">
               {!isHydrated ? (
                 <span>{ROTATING_PROVINCES[0]}</span>
               ) : (

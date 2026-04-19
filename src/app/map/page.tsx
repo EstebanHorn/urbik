@@ -7,7 +7,6 @@ import React, { useState, useCallback, useEffect, useMemo, useRef } from "react"
 import { PropertiesSidebar } from "@/features/map/components/PropertiesSidebar";
 import type { MapBounds, MapProperty } from "@/features/map/types/types";
 import { useMapSettings } from "@/features/map/context/MapSettingsProvider";
-import { ZoneAnalysis } from "../../components/SmartZone/SmartArea";
 import { ZoneData } from "../../features/map/components/MapEventsHandler";
 import { CustomDropdown } from "../../components/CustomDropdown";
 import LocationSelectors from "@/components/LocationSelectors";
@@ -132,6 +131,7 @@ export default function MapPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showMobileList, setShowMobileList] = useState(false);
   const [currentZone, setCurrentZone] = useState<ZoneData | null>(null);
+  const [selectedProperty, setSelectedProperty] = useState<MapProperty | null>(null);
   const [showFiltersMenu, setShowFiltersMenu] = useState(false);
   const [isSearchingLocation, setIsSearchingLocation] = useState(false);
 
@@ -551,7 +551,7 @@ export default function MapPage() {
       <div className="flex flex-1 flex-row overflow-hidden relative">
         <aside
           className={`
-            absolute inset-0 z-30 bg-white md:static md:w-[400px] md:h-full border-r border-slate-200
+            absolute inset-0 z-30 bg-white md:static md:w-1/3 md:h-full border-r border-slate-200
             transition-transform duration-300 ease-in-out flex flex-col
             ${showMobileList ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
           `}
@@ -583,8 +583,71 @@ export default function MapPage() {
             properties={properties}
             onBoundsChange={handleBoundsChange}
             onCenterChange={setCurrentZone}
+            onPropertySelect={setSelectedProperty}
             height="100%"
           />
+
+          {selectedProperty && (
+            <div className="absolute top-0 right-0 h-full w-80 z-[1002] bg-white shadow-2xl flex flex-col overflow-hidden transition-transform duration-300">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
+                <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">Propiedad</span>
+                <button
+                  onClick={() => setSelectedProperty(null)}
+                  className="text-slate-500 hover:text-slate-800 cursor-pointer p-1 rounded-full hover:bg-slate-100 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto">
+                <div className="h-48 bg-slate-100 relative shrink-0">
+                  {selectedProperty.images?.[0] ? (
+                    <img
+                      src={selectedProperty.images[0]}
+                      alt={selectedProperty.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">Sin imagen</div>
+                  )}
+                  <span className={`absolute top-3 left-3 text-xs font-bold px-2 py-1 rounded-full ${selectedProperty.operationType === "SALE" ? "bg-urbik-cyan text-white" : "bg-urbik-emerald text-white"}`}>
+                    {selectedProperty.operationType === "SALE" ? "Venta" : selectedProperty.operationType === "RENT" ? "Alquiler" : "Alquiler temp."}
+                  </span>
+                </div>
+
+                <div className="p-4 flex flex-col gap-3">
+                  <h3 className="font-bold text-slate-800 text-sm leading-snug">{selectedProperty.title}</h3>
+
+                  {(selectedProperty.address || selectedProperty.city) && (
+                    <p className="text-xs text-slate-500 flex items-center gap-1">
+                      <span>📍</span>
+                      {[selectedProperty.address, selectedProperty.city].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+
+                  <p className="text-lg font-bold text-slate-900">
+                    {selectedProperty.currency === "USD" ? "U$D " : "$ "}
+                    {selectedProperty.price?.toLocaleString("es-AR")}
+                  </p>
+
+                  {(selectedProperty.rooms || selectedProperty.bathrooms || selectedProperty.area) && (
+                    <div className="flex gap-3 text-xs text-slate-600 font-medium">
+                      {selectedProperty.rooms && <span>{selectedProperty.rooms} amb.</span>}
+                      {selectedProperty.bathrooms && <span>{selectedProperty.bathrooms} baños</span>}
+                      {selectedProperty.area && <span>{selectedProperty.area} m²</span>}
+                    </div>
+                  )}
+
+                  <Link
+                    href={`/property/${selectedProperty.id}`}
+                    className="mt-2 block text-center bg-urbik-black text-white font-bold py-3 rounded-full text-sm hover:bg-urbik-emerald transition-colors"
+                  >
+                    Ver propiedad completa
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="absolute top-5 left-5 z-[1001]">
              <CustomDropdown
@@ -594,12 +657,6 @@ export default function MapPage() {
                 onChange={(val) => setBaseLayer(val as BaseLayerId)}
                 options={layerOptions.map(layer => ({ label: layer.label, value: layer.id }))}
              />
-          </div>
-
-          <div className="absolute bottom-10 right-10 z-9999 pointer-events-auto hidden md:block">
-            {currentZone && currentZone.zoom >= 15 && (
-              <ZoneAnalysis data={currentZone} />
-            )}
           </div>
 
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden pointer-events-auto w-max">

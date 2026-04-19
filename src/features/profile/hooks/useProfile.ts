@@ -154,7 +154,7 @@ export function useProfile(): UseProfileResult {
     } finally {
       setLoading(false);
     }
-  }, [session?.user, status]);
+  }, [status]);
 
   useEffect(() => {
     if (status === "authenticated") {
