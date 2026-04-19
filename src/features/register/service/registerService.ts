@@ -11,6 +11,7 @@ ningún cambio.
 import { hash } from "bcryptjs";
 import prisma from "@/libs/db";
 import { Role } from "@prisma/client";
+import { generateUniqueSlug } from "@/libs/slugify";
 
 export type RegisterInput = {
   email: string;
@@ -71,10 +72,14 @@ export async function registerUserAndAgency(input: RegisterInput) {
         },
       });
     } else if (role === "REALESTATE") {
+      const agencyName = input.agencyName || "Nueva Inmobiliaria";
+      const slug = await generateUniqueSlug(agencyName);
+
       const realEstate = await tx.realEstate.create({
         data: {
           user_id: mainUser.user_id,
-          agencyName: input.agencyName || "Nueva Inmobiliaria",
+          agencyName,
+          slug,
           license: input.license || `MAT-${mainUser.user_id}`,
           phone: input.phone,
           province: input.province || "",
