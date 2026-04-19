@@ -382,18 +382,13 @@ export default function CreatePropertyModal({
 
                         <div className="pl-9 space-y-8">
                           <AmenitiesGrid
-                            value={form.amenities || {}}
-                            featureGroups={form.featureGroups || {}}
-                            onFeatureGroupsChange={(groups) =>
-                              setForm((prev) => ({
-                                ...prev,
-                                featureGroups: groups,
-                              }))
-                            }
+                            value={form.amenities as Record<string, boolean> || {}}
+                            propertyType={form.type}
                             onChange={(val) =>
                               setForm((prev) => ({
                                 ...prev,
-                                amenities: val,
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                amenities: val as any,
                               }))
                             }
                           />
