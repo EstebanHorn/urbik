@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 
 const ARCGIS_BASE_URL = "http://mapasagencia.rionegro.gov.ar/server/rest/services/Hosted/PARCELARIO/FeatureServer/0/query";
 
+// Web Mercator to WGS84 conversion
+function webMercatorToWgs84(x: number, y: number): [number, number] {
+  const lon = (x / 20037508.34) * 180;
+  const latRad = Math.atan(Math.exp((y / 20037508.34) * Math.PI)) * 2 - Math.PI / 2;
+  const lat = (latRad * 180) / Math.PI;
+  return [lat, lon];
+}
+
 interface ArcGISFeature {
   geometry?: {
     x?: number;
@@ -59,14 +67,21 @@ export async function GET(request: Request) {
         let geometry: unknown;
 
         if (feat.geometry?.rings) {
+          const transformedRings = feat.geometry.rings.map((ring) =>
+            ring.map(([x, y]) => {
+              const [lat, lon] = webMercatorToWgs84(x, y);
+              return [lon, lat];
+            })
+          );
           geometry = {
             type: "Polygon",
-            coordinates: feat.geometry.rings,
+            coordinates: transformedRings,
           };
         } else if (feat.geometry?.x !== undefined && feat.geometry?.y !== undefined) {
+          const [lat, lon] = webMercatorToWgs84(feat.geometry.x, feat.geometry.y);
           geometry = {
             type: "Point",
-            coordinates: [feat.geometry.x, feat.geometry.y],
+            coordinates: [lon, lat],
           };
         }
 
