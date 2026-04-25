@@ -181,7 +181,7 @@ export function InteractiveMapClient({
   const initialZoom = useMemo(() => {
     const parsedZoom = searchZoom ? Number(searchZoom) : 15;
     if (Number.isNaN(parsedZoom)) return 15;
-    return Math.min(19, Math.max(4, parsedZoom));
+    return Math.min(19, Math.max(3, parsedZoom));
   }, [searchZoom]);
 
   const initialCenter = useMemo<[number, number]>(() => {
@@ -208,7 +208,7 @@ export function InteractiveMapClient({
       <MapContainer
         center={initialCenter}
         zoom={initialZoom}
-        minZoom={4}
+        minZoom={3}
         maxZoom={19}
         scrollWheelZoom={isScrollZoomEnabled}
         style={{ height: "100%", width: "100%" }}
@@ -227,7 +227,7 @@ export function InteractiveMapClient({
 
           <CustomZoomControls />
           <ScrollHandler enabled={isScrollZoomEnabled} />
-          <AutoSatelliteOnParcelZoom zoomThreshold={16} />
+          <AutoSatelliteOnParcelZoom zoomThreshold={15} />
           <MapUpdater center={initialCenter} />
 
           <MapEventsHandler

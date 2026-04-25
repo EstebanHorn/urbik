@@ -15,6 +15,7 @@ no autenticados.
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useSession, signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 import DashboardHeader from "../../features/dashboard/components/DashboardHeader";
 import DashboardStats from "../../features/dashboard/components/DashboardStats";
@@ -67,6 +68,8 @@ type ProfileData = {
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const searchParams = useSearchParams();
+  const autoOpenCreate = searchParams.get("nueva") === "1";
 
   const fetchProfile = useCallback(async () => {
     if (status !== "authenticated") return;
@@ -154,7 +157,11 @@ export default function DashboardPage() {
                 Tip: mantené tus propiedades “Disponibles” para mejorar
                 visibilidad.
               </div>
-        <DashboardMain properties={properties} onRefresh={fetchProfile} />
+        <DashboardMain
+          properties={properties}
+          onRefresh={fetchProfile}
+          autoOpenCreate={autoOpenCreate}
+        />
       </div>
     </div>
   );

@@ -84,9 +84,7 @@ export function CustomDropdown({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className={`absolute mt-3 w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-1001 overflow-hidden ${
-              variant === "map-layer" ? "right-0" : "left-0"
-            }`}
+            className={`absolute mt-3 w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden left-0`}
           >
             {options
               .filter((opt) => opt.value !== "")

@@ -12,7 +12,7 @@ inmobiliarios.
 
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import type { PropertySummary } from "../../../app/dashboard/page";
 
 import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from "recharts";
@@ -36,11 +36,19 @@ type ActiveTab = "properties" | "inquiries";
 export default function DashboardMain({
   properties,
   onRefresh,
+  autoOpenCreate = false,
 }: {
   properties: PropertySummary[];
   onRefresh: () => void;
+  autoOpenCreate?: boolean;
 }) {
   const [isCreateOpen, setCreateOpen] = useState(false);
+
+  useEffect(() => {
+    if (autoOpenCreate) {
+      setCreateOpen(true);
+    }
+  }, [autoOpenCreate]);
   const [editingProperty, setEditingProperty] =
     useState<PropertySummary | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>("properties");

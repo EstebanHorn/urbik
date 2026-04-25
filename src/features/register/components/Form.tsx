@@ -16,6 +16,9 @@ export default function RegisterForm() {
     handleSubmit,
     handleRoleSelection,
     isLoading,
+    emailError,
+    emailChecking,
+    checkEmailAvailability,
     updateLicense,
     addLicense,
     removeLicense,
@@ -199,15 +202,31 @@ export default function RegisterForm() {
 
         <div>
           <label className={labelStyles}>Correo electrónico</label>
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleInputChange}
-            placeholder="email@ejemplo.com"
-            className={inputStyles}
-            required
-          />
+          <div className="relative">
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleInputChange}
+              onBlur={(e) => checkEmailAvailability(e.target.value)}
+              placeholder="email@ejemplo.com"
+              className={`${inputStyles} ${emailError ? "ring-2 ring-red-400" : ""}`}
+              required
+            />
+            {emailChecking && (
+              <span className="absolute right-5 top-1/2 -translate-y-1/2 text-xs text-urbik-muted">
+                Verificando...
+              </span>
+            )}
+          </div>
+          {emailError && (
+            <p className="mt-2 ml-5 text-sm font-medium text-red-500">
+              {emailError}{" "}
+              <a href="/login" className="underline font-bold">
+                Iniciar sesión
+              </a>
+            </p>
+          )}
         </div>
 
         <div>
