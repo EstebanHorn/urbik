@@ -64,6 +64,9 @@ function Navbar() {
         ...(session.user?.role !== "ADMIN"
           ? [{ label: "Editar Perfil", value: "/profile" }]
           : []),
+        ...(session.user?.role === "REALESTATE"
+          ? [{ label: "Publicar Propiedad", value: "/dashboard?nueva=1" }]
+          : []),
         { label: "Configuración", value: "/settings" },
         { label: "Cerrar Sesión", value: "logout" },
       ]

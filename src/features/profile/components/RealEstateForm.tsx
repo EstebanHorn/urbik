@@ -284,7 +284,46 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
               {licenses.map((license, index) => {
                 const jurisdictions = getJurisdictionsByProvince(license.province);
                 return (
-                  <div key={`license-${index}`} className="rounded-3xl border border-gray-200 p-4 space-y-2">
+                  <div
+                    key={`license-${index}`}
+                    className={`rounded-3xl border p-4 space-y-2 ${license.isPrimary ? "border-urbik-cyan/40 bg-urbik-cyan/5" : "border-gray-200"}`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <button
+                        type="button"
+                        className={`text-xs font-bold px-3 py-1 rounded-full transition-colors ${
+                          license.isPrimary
+                            ? "bg-urbik-cyan text-white"
+                            : "bg-gray-100 text-urbik-muted hover:bg-urbik-cyan/10"
+                        }`}
+                        onClick={() =>
+                          handleManualChange?.(
+                            "licenses",
+                            licenses.map((item, i) => ({
+                              ...item,
+                              isPrimary: i === index,
+                            })),
+                          )
+                        }
+                      >
+                        {license.isPrimary ? "Principal" : "Marcar como principal"}
+                      </button>
+                      {licenses.length > 1 && (
+                        <button
+                          type="button"
+                          className="text-xs font-bold text-red-500 px-3 py-1 rounded-full border border-red-200 hover:bg-red-50 transition-colors"
+                          onClick={() => {
+                            const next = licenses.filter((_, i) => i !== index);
+                            if (!next.some((item) => item.isPrimary)) {
+                              next[0] = { ...next[0], isPrimary: true };
+                            }
+                            handleManualChange?.("licenses", next);
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                      )}
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <input
                         className={inputBaseClasses}
@@ -393,24 +432,40 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
 
           <div className="space-y-2">
             <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
-              Oficinas
+              Oficinas / Sucursales
             </label>
             <div className="space-y-3">
               {offices.map((office, index) => (
                 <div key={`office-${index}`} className="rounded-3xl border border-gray-200 p-4 space-y-2">
-                  <input
-                    className={inputBaseClasses}
-                    value={office.name}
-                    onChange={(e) =>
-                      handleManualChange?.(
-                        "offices",
-                        offices.map((item, i) =>
-                          i === index ? { ...item, name: e.target.value } : item,
-                        ),
-                      )
-                    }
-                    placeholder="Nombre oficina"
-                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      className={`${inputBaseClasses} flex-1`}
+                      value={office.name}
+                      onChange={(e) =>
+                        handleManualChange?.(
+                          "offices",
+                          offices.map((item, i) =>
+                            i === index ? { ...item, name: e.target.value } : item,
+                          ),
+                        )
+                      }
+                      placeholder="Nombre de la sucursal"
+                    />
+                    {offices.length > 1 && (
+                      <button
+                        type="button"
+                        className="shrink-0 px-4 py-3 rounded-full text-xs font-bold text-red-500 border border-red-200 hover:bg-red-50 transition-colors"
+                        onClick={() =>
+                          handleManualChange?.(
+                            "offices",
+                            offices.filter((_, i) => i !== index),
+                          )
+                        }
+                      >
+                        Eliminar
+                      </button>
+                    )}
+                  </div>
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       className={inputBaseClasses}
@@ -439,6 +494,48 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
                       placeholder="Ciudad"
                     />
                   </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      className={inputBaseClasses}
+                      value={office.street}
+                      onChange={(e) =>
+                        handleManualChange?.(
+                          "offices",
+                          offices.map((item, i) =>
+                            i === index ? { ...item, street: e.target.value } : item,
+                          ),
+                        )
+                      }
+                      placeholder="Calle"
+                    />
+                    <input
+                      className={inputBaseClasses}
+                      value={office.number}
+                      onChange={(e) =>
+                        handleManualChange?.(
+                          "offices",
+                          offices.map((item, i) =>
+                            i === index ? { ...item, number: e.target.value } : item,
+                          ),
+                        )
+                      }
+                      placeholder="Número"
+                    />
+                  </div>
+                  <input
+                    type="tel"
+                    className={inputBaseClasses}
+                    value={office.phone || ""}
+                    onChange={(e) =>
+                      handleManualChange?.(
+                        "offices",
+                        offices.map((item, i) =>
+                          i === index ? { ...item, phone: e.target.value } : item,
+                        ),
+                      )
+                    }
+                    placeholder="Teléfono de la sucursal (opcional)"
+                  />
                 </div>
               ))}
 
@@ -459,7 +556,7 @@ const RealEstateForm: React.FC<RealEstateFormProps> = ({
                   ])
                 }
               >
-                + Agregar oficina
+                + Agregar sucursal
               </button>
             </div>
           </div>

@@ -7,7 +7,8 @@ export interface SearchSuggestion {
   name?: string;
   lat?: number;
   lon?: number;
-  city?: string;
+  /** City of the address result (ADDRESS type) or agency headquarters (REALESTATE_USER type) */
+  city?: string | null;
   province?: string;
   fullLabel?: string;
 }

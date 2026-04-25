@@ -21,6 +21,7 @@ export const JURISDICTIONS_BY_PROVINCE: Record<string, string[]> = {
     "Zarate-Campana",
     "Avellaneda-Lanus",
   ],
+  "Capital Federal": ["CABA"],
   "Ciudad Autonoma de Buenos Aires": ["CABA"],
   "Ciudad Autónoma de Buenos Aires": ["CABA"],
 };

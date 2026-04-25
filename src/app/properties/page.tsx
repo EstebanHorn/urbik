@@ -4,6 +4,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useAutocompleteSuggestions, type SearchSuggestion } from "@/features/search/hooks/useAutocompleteSuggestions";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import LocationSelectors from "@/components/LocationSelectors";
 import {
@@ -192,6 +193,11 @@ export default function PropertiesPage() {
   const [filters, setFilters] = useState<FilterState>(() =>
     parseFiltersFromQuery(new URLSearchParams(searchParams.toString())),
   );
+
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const { suggestions: autoSuggestions, isLoading: autoLoading } =
+    useAutocompleteSuggestions(filters.q);
 
   const lat = useMemo(() => {
     const raw = searchParams.get("lat");
@@ -432,6 +438,29 @@ export default function PropertiesPage() {
     setFilters(DEFAULT_FILTERS);
   };
 
+  const handleSelectAutoSuggestion = useCallback(
+    (suggestion: SearchSuggestion) => {
+      setShowSuggestions(false);
+      setActiveSuggestionIndex(-1);
+
+      if (suggestion.type === "ADDRESS" && suggestion.lat && suggestion.lon) {
+        const label = suggestion.display_name ?? "";
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("lat", String(suggestion.lat));
+        params.set("lon", String(suggestion.lon));
+        params.set("zoom", "16");
+        params.set("q", label.split(",").slice(0, 3).join(",").trim());
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        return;
+      }
+
+      if (suggestion.type === "REALESTATE_USER" && suggestion.id) {
+        router.push(`/realestate/${suggestion.id}`);
+      }
+    },
+    [pathname, router, searchParams],
+  );
+
   const mapHref = useMemo(() => {
     const params = applyFiltersToParams(
       new URLSearchParams(searchParams.toString()),
@@ -529,10 +558,78 @@ export default function PropertiesPage() {
                 type="text"
                 name="q"
                 value={filters.q}
-                onChange={handleInputChange}
-                placeholder="Zona, calle o barrio"
+                onChange={(e) => {
+                  handleInputChange(e);
+                  setShowSuggestions(true);
+                  setActiveSuggestionIndex(-1);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                onKeyDown={(e) => {
+                  if (!showSuggestions || autoSuggestions.length === 0) return;
+                  if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    setActiveSuggestionIndex((prev) =>
+                      prev < autoSuggestions.length - 1 ? prev + 1 : 0,
+                    );
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setActiveSuggestionIndex((prev) =>
+                      prev > 0 ? prev - 1 : autoSuggestions.length - 1,
+                    );
+                  } else if (e.key === "Enter" && activeSuggestionIndex >= 0) {
+                    e.preventDefault();
+                    handleSelectAutoSuggestion(autoSuggestions[activeSuggestionIndex]);
+                  } else if (e.key === "Escape") {
+                    setShowSuggestions(false);
+                    setActiveSuggestionIndex(-1);
+                  }
+                }}
+                placeholder="Dirección, barrio o inmobiliaria"
                 className="h-10 w-full rounded-full border border-black/50 px-4 text-xs font-semibold"
+                aria-autocomplete="list"
+                aria-expanded={showSuggestions && autoSuggestions.length > 0}
               />
+
+              {showSuggestions && (autoLoading || autoSuggestions.length > 0) && (
+                <div className="absolute top-full left-0 right-0 z-30 mt-1 rounded-xl border border-gray-200 bg-white shadow-xl max-h-60 overflow-auto">
+                  {autoLoading ? (
+                    <div className="px-4 py-3 text-xs text-gray-400 font-semibold">
+                      Buscando...
+                    </div>
+                  ) : (
+                    <ul role="listbox">
+                      {autoSuggestions.map((s, index) => (
+                        <li
+                          key={`${s.type}-${s.id ?? index}`}
+                          role="option"
+                          aria-selected={index === activeSuggestionIndex}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => handleSelectAutoSuggestion(s)}
+                          onMouseEnter={() => setActiveSuggestionIndex(index)}
+                          className={`px-4 py-2.5 cursor-pointer border-b border-gray-100 last:border-b-0 ${
+                            index === activeSuggestionIndex
+                              ? "bg-gray-100"
+                              : "hover:bg-gray-50"
+                          }`}
+                        >
+                          <div className="text-xs font-semibold text-slate-900 truncate">
+                            {s.display_name?.split(",").slice(0, 3).join(",").trim() ?? s.display_name}
+                          </div>
+                          <div className="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5">
+                            <span>
+                              {s.type === "ADDRESS" ? "Dirección" : "Inmobiliaria"}
+                            </span>
+                            {s.type !== "ADDRESS" && s.city && (
+                              <span className="text-gray-300">· {s.city}</span>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
             </div>
 
             <button

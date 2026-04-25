@@ -78,23 +78,31 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q")?.trim();
+    const cityFilter = searchParams.get("city")?.trim();
 
     if (!query || query.length < 2) {
       return NextResponse.json({ suggestions: [] });
     }
 
+    const agencyWhereClause = {
+      role: "REALESTATE" as const,
+      OR: [
+        {
+          realEstate: {
+            agencyName: { contains: query, mode: "insensitive" as const },
+          },
+        },
+      ],
+      ...(cityFilter && {
+        realEstate: {
+          city: { contains: cityFilter, mode: "insensitive" as const },
+        },
+      }),
+    };
+
     const [dbResults, osmResponse] = await Promise.all([
       prisma.allUsers.findMany({
-        where: {
-          role: "REALESTATE",
-          OR: [
-            {
-              realEstate: {
-                agencyName: { contains: query, mode: "insensitive" },
-              },
-            },
-          ],
-        },
+        where: agencyWhereClause,
         include: { realEstate: true },
         take: 3,
       }),
@@ -111,6 +119,7 @@ export async function GET(request: NextRequest) {
         type: "REALESTATE_USER",
         id: user.user_id,
         display_name: user.realEstate?.agencyName || user.email,
+        city: user.realEstate?.city ?? null,
       })),
       ...osmResults.map((result) => ({
         type: "ADDRESS",

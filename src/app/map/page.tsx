@@ -7,7 +7,6 @@ import React, { useState, useCallback, useEffect, useMemo, useRef } from "react"
 import { PropertiesSidebar } from "@/features/map/components/PropertiesSidebar";
 import type { MapBounds, MapProperty } from "@/features/map/types/types";
 import { useMapSettings } from "@/features/map/context/MapSettingsProvider";
-import { ZoneData } from "../../features/map/components/MapEventsHandler";
 import { CustomDropdown } from "../../components/CustomDropdown";
 import LocationSelectors from "@/components/LocationSelectors";
 import { mapBaseLayers, type BaseLayerId } from "@/features/map/config/baseLayers";
@@ -130,7 +129,6 @@ export default function MapPage() {
   const [properties, setProperties] = useState<MapProperty[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showMobileList, setShowMobileList] = useState(false);
-  const [currentZone, setCurrentZone] = useState<ZoneData | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<MapProperty | null>(null);
   const [showFiltersMenu, setShowFiltersMenu] = useState(false);
   const [isSearchingLocation, setIsSearchingLocation] = useState(false);
@@ -581,7 +579,6 @@ export default function MapPage() {
             lon={lon}
             properties={properties}
             onBoundsChange={handleBoundsChange}
-            onCenterChange={setCurrentZone}
             onPropertySelect={setSelectedProperty}
             height="100%"
           />
