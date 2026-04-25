@@ -11,6 +11,7 @@ visual junto con iconos de la librería lucide-react.
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Instagram, Mail, Phone, MapPin } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
@@ -44,8 +45,8 @@ if (pathname === "/map") {
         <div>
           <h3 className="font-bold mb-4 uppercase text-sm tracking-widest text-gray-400">Cuenta</h3>
           <ul className="space-y-2">
-            <li><a href="/profile" className="hover:underline">Mi Perfil</a></li>
-            <li><a href="/settings" className="hover:underline">Configuración</a></li>
+            <li><Link href="/profile" className="hover:underline">Mi Perfil</Link></li>
+            <li><Link href="/settings" className="hover:underline">Configuración</Link></li>
           </ul>
         </div>
 
@@ -53,23 +54,23 @@ if (pathname === "/map") {
           <h3 className="font-bold mb-4 uppercase text-sm tracking-widest text-gray-400">Plataforma</h3>
           <ul className="space-y-2">
             {(userRole === "REALESTATE" || userRole === "ADMIN" || userRole === "AGENT") && (
-              <li><a href="/dashboard" className="hover:underline">Mis Propiedades</a></li>
+              <li><Link href="/dashboard" className="hover:underline">Mis Propiedades</Link></li>
             )}
 
             {userRole === "USER" && (
-              <li><a href="/saved" className="hover:underline">Guardados</a></li>
+              <li><Link href="/saved" className="hover:underline">Guardados</Link></li>
             )}
 
-            <li><a href="/map" className="hover:underline">Mapa</a></li>
+            <li><Link href="/map" className="hover:underline">Mapa</Link></li>
           </ul>
         </div>
 
         <div>
           <h3 className="font-bold mb-4 uppercase text-sm tracking-widest text-gray-400">Soporte</h3>
           <ul className="space-y-2">
-            <li><a href="/about-us" className="hover:underline">Sobre Nosotros</a></li>
-            <li><a href="/contact" className="hover:underline">Contacto</a></li>
-            <li><a href="/help" className="hover:underline">Ayuda</a></li>
+            <li><Link href="/about-us" className="hover:underline">Sobre Nosotros</Link></li>
+            <li><Link href="/contact" className="hover:underline">Contacto</Link></li>
+            <li><Link href="/help" className="hover:underline">Ayuda</Link></li>
           </ul>
         </div>
       </div>

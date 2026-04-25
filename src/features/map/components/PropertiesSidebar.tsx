@@ -13,7 +13,7 @@ integrado con navegación dinámica mediante Next.js.
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, Home, Droplet, Wind, Wifi, Car, Waves } from "lucide-react";
 import type { MapProperty } from "../types/types";
 import FavoriteButton from "../../../components/FavoritesButton";
 import { useSession } from "next-auth/react";
@@ -123,7 +123,7 @@ export function PropertiesSidebar({
     );
   }
 
-  const gridConfig = visualLimit > 4 ? "grid-cols-2" : "grid-cols-1";
+  const gridConfig = "grid-cols-1";
 
   return (
     <div className="h-full overflow-y-auto bg-white p-4 scrollbar-thin scrollbar-thumb-slate-200">
@@ -138,7 +138,7 @@ export function PropertiesSidebar({
 
           return (
             <div key={prop.id} className="relative group">
-              <div className="bg-urbik-white2 rounded-md border border-urbik-g100 overflow-hidden hover:scale-[1.02] hover:brightness-105 hover:shadow-lg transition-all h-full flex flex-col relative">
+              <div className="bg-urbik-white2 rounded-lg border border-urbik-g100 overflow-hidden hover:scale-[1.01] hover:brightness-105 hover:shadow-xl transition-all h-full flex flex-col relative">
                 <Link
                   href={`/property/${prop.id}`}
                   className="absolute inset-0 z-10"
@@ -152,12 +152,12 @@ export function PropertiesSidebar({
                   />
                 </div>
 
-                <div className="relative h-32 bg-urbik-g200 overflow-hidden">
+                <div className="relative h-48 bg-urbik-g200 overflow-hidden">
                   {prop.images && prop.images[0] ? (
                     <img
                       src={prop.images[0]}
                       alt={prop.title}
-                      className="w-full h-full object-cover transition-transform duration-500"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-urbik-muted text-[10px]">
@@ -166,31 +166,59 @@ export function PropertiesSidebar({
                   )}
                 </div>
 
-                <div className="p-3 flex flex-col grow">
-                  <div className="flex items-center justify-between mb-2 gap-1">
-                    <span className="bg-urbik-black text-white text-[9px] px-2 py-0.5 rounded-full font-bold tracking-tight whitespace-nowrap">
+                <div className="p-4 flex flex-col grow">
+                  <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+                    <span className="bg-urbik-black text-white text-[9px] px-2.5 py-1 rounded-full font-bold tracking-tight whitespace-nowrap">
                       {getPropertyLabel(prop.type)}
                     </span>
-                    <span className="bg-urbik-cyan text-urbik-muted text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-tight whitespace-nowrap">
+                    <span className="bg-urbik-cyan text-urbik-muted text-[8px] px-2.5 py-1 rounded-full font-black uppercase tracking-tight whitespace-nowrap">
                       {getOperationLabel(prop.operationType)}
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-black mb-1 line-clamp-1 text-urbik-dark uppercase">
+                  <h3 className="text-sm font-black mb-2 line-clamp-2 text-urbik-dark uppercase">
                     {prop.title}
                   </h3>
-                  <div className="w-full flex justify-end">
-                    <div className="flex items-center justify-start text-urbik-dark/60 mb-2">
-                      <MapPin size={10} strokeWidth={3} className="mr-1" />
-                      <p className="text-[10px] font-bold text-urbik-dark truncate">
-                        {prop.city || prop.address}
-                      </p>
-                    </div>
+
+                  <div className="flex items-center gap-2 text-urbik-dark/70 mb-3">
+                    <MapPin size={14} strokeWidth={2.5} className="flex-shrink-0" />
+                    <p className="text-xs font-bold line-clamp-1">
+                      {prop.city || prop.address}
+                    </p>
                   </div>
 
+                  {prop.area && (
+                    <p className="text-xs text-urbik-dark/60 mb-2">
+                      <span className="font-bold">{prop.area}</span> m²
+                    </p>
+                  )}
+
+                  <div className="flex gap-3 mb-3 text-urbik-dark/70 text-xs">
+                    {prop.rooms && (
+                      <div className="flex items-center gap-1">
+                        <Home size={12} strokeWidth={2.5} />
+                        <span className="font-semibold">{prop.rooms}</span>
+                      </div>
+                    )}
+                    {prop.bathrooms && (
+                      <div className="flex items-center gap-1">
+                        <Droplet size={12} strokeWidth={2.5} />
+                        <span className="font-semibold">{prop.bathrooms}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {(prop.hasParking || prop.hasPool || prop.hasGarden) && (
+                    <div className="flex gap-2 mb-3 text-urbik-dark/70">
+                      {prop.hasParking && <Car size={14} strokeWidth={2} className="flex-shrink-0" />}
+                      {prop.hasPool && <Waves size={14} strokeWidth={2} className="flex-shrink-0" />}
+                      {prop.hasGarden && <Wind size={14} strokeWidth={2} className="flex-shrink-0" />}
+                    </div>
+                  )}
+
                   <div className="mt-auto">
-                    <hr className="border-urbik-g100 mb-2" />
-                    <p className="text-base font-black text-urbik-dark tracking-tighter text-right">
+                    <hr className="border-urbik-g100 mb-3" />
+                    <p className="text-lg font-black text-urbik-dark tracking-tighter">
                       $ {prop.price?.toLocaleString("es-AR")}
                     </p>
                   </div>
