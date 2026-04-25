@@ -20,6 +20,7 @@ import "leaflet/dist/leaflet.css";
 
 import { StaticParcelsLayer } from "./StaticParcelsLayer";
 import { DbParcelsLayer } from "./DbParcelsLayer";
+import { RioNegroParcelLayer } from "./RioNegroParcelLayer";
 import { MapEventsHandler, ZoneData } from "./MapEventsHandler";
 import { SelectedParcelLayer } from "./SelectedParcelLayer";
 import { mapBaseLayers, type BaseLayerId } from "@/features/map/config/baseLayers";
@@ -236,6 +237,7 @@ export function InteractiveMapClient({
           />
 
           <StaticParcelsLayer />
+          <RioNegroParcelLayer />
           <DbParcelsLayer properties={properties} onPropertySelect={onPropertySelect} />
           <SelectedParcelLayer selectedParcel={selectedParcel} />
 
