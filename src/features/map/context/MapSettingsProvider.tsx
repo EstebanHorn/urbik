@@ -43,7 +43,7 @@ const MapSettingsContext = createContext<MapSettingsContextValue | null>(null);
 
 export function MapSettingsProvider({ children }: { children: ReactNode }) {
   const [baseLayer, setBaseLayerState] = useState<BaseLayerId>(defaultBaseLayerId);
-  const [propertiesLimit, setPropertiesLimitState] = useState<number>(4);
+  const [propertiesLimit, setPropertiesLimitState] = useState<number>(6);
   const [colorMode, setColorModeState] = useState<ColorMode>("uniform");
   const [isZoneAnalysisEnabled, setIsZoneAnalysisEnabledState] = useState<boolean>(true);
   const [isScrollZoomEnabled, setIsScrollZoomEnabledState] = useState<boolean>(true); 

@@ -27,7 +27,6 @@ import {
   Droplets,
   CheckCircle2,
 } from "lucide-react";
-import SmartZoneSingle from "../../../components/SmartZone/SmartView";
 import FavoriteButton from "@/components/FavoritesButton";
 import ImageGallery from "@/features/property/components/ImageGallery";
 import InquiryForm from "@/features/property/components/InquiryForm";

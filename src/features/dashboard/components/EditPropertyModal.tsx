@@ -12,7 +12,6 @@ import {
   PropertyFormFields,
   PropertyFormData,
 } from "./create-modal/PropertyFormField";
-import SmartDescription from "../../../components/SmartZone/SmartDescription";
 
 interface UiAmenities {
   agua: boolean;
