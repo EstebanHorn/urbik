@@ -7,17 +7,13 @@ import type { Layer } from "leaflet";
 import L from "leaflet";
 
 type RioNegroParcelProps = {
-  province?: string;
+  cca?: string;
+  fid?: number;
   [key: string]: unknown;
 };
 
-type RioNegroFeature = Feature<Geometry, RioNegroParcelProps>;
-
 export function RioNegroParcelLayer() {
-  const [data, setData] = useState<FeatureCollection<
-    Geometry,
-    RioNegroParcelProps
-  > | null>(null);
+  const [data, setData] = useState<FeatureCollection<Geometry, RioNegroParcelProps> | null>(null);
   const [loading, setLoading] = useState(true);
   const lastHighlighted = useRef<Layer | null>(null);
 
@@ -58,16 +54,29 @@ export function RioNegroParcelLayer() {
     if (path.setStyle) path.setStyle(style);
   };
 
-  const onEachFeature = (feature: RioNegroFeature, layer: Layer) => {
-    const attrs = feature.properties;
-    const attrsList = Object.entries(attrs)
-      .slice(0, 5)
-      .map(([key, val]) => `${key}: ${val}`)
-      .join("<br/>");
+  const onEachFeature = (feature: Feature<Geometry, RioNegroParcelProps>, layer: Layer) => {
+    const cca = feature.properties?.cca || `Parcel ${feature.properties?.fid || "unknown"}`;
+    const ara = feature.properties?.ara || "N/A";
+    const tpa = feature.properties?.tpa || "N/A";
 
     layer.bindPopup(`
-      <b>Parcela - Río Negro</b><br/>
-      ${attrsList}
+      <div style="padding: 10px; font-size: 12px; min-width: 200px;">
+        <strong style="color: #e74c3c;">PARCELA - RÍO NEGRO</strong><br/>
+        <hr style="margin: 6px 0; border: none; border-top: 1px solid #eee;"/>
+        <div style="margin: 6px 0;">
+          <strong>Código Catastral (CCA):</strong><br/>
+          <span style="color: #666;">${cca}</span>
+        </div>
+        <div style="margin: 6px 0;">
+          <strong>Área:</strong> ${ara} m²
+        </div>
+        <div style="margin: 6px 0;">
+          <strong>Tipo:</strong> ${tpa}
+        </div>
+        <div style="margin: 6px 0; font-size: 10px; color: #999;">
+          ID: ${feature.properties?.fid || "N/A"}
+        </div>
+      </div>
     `);
 
     layer.on("click", () => {

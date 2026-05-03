@@ -9,7 +9,18 @@
       "Bash(npm install *)",
       "Bash(npm run *)",
       "Bash(npx eslint *)",
-      "Bash(curl -s http://localhost:3000/settings)"
+      "Bash(curl -s http://localhost:3000/settings)",
+      "Bash(pkill -f \"npm run dev\")",
+      "Bash(curl -s \"http://mapasagencia.rionegro.gov.ar/server/rest/services/Hosted/PARCELARIO/FeatureServer/0/query?where=1=1&outFields=*&f=json&resultRecordCount=1\")",
+      "Bash(curl -s http://localhost:3000/api/parcels/rionegro)",
+      "Bash(curl -s \"http://localhost:3000/api/parcels/rionegro\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s \"http://localhost:3000/api/parcels/rionegro?q=test\")",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl -s \"http://localhost:3000/api/parcels/rionegro?province=\")",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(npx playwright *)",
+      "Bash(node *)"
     ]
   }
 }
