@@ -19,11 +19,10 @@
   /* Accent */
   --color-urbik-cyan: #00deff;
   --color-urbik-emerald: #00ff8e;
-    --color-urbik-rose: #ff0077;
-
+  --color-urbik-rose: #ff0077;
 
   /* Fonts (SOLO las del layout) */
---font-body: var(--font-inter);
+  --font-body: var(--font-inter);
   --font-display: var(--font-inter);
   --font-brand: var(--font-inter);
 }
@@ -36,7 +35,6 @@
   scroll-behavior: smooth;
 }
 
-
 html,
 body {
   margin: 0;
@@ -47,7 +45,12 @@ body {
 }
 
 /* Headings con Inter */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   font-weight: 800; /* Peso negrita para títulos */
   letter-spacing: -0.025em; /* Inter se ve mejor un poco más junta en títulos */
@@ -61,11 +64,8 @@ a {
    en distintas direcciones para simular un borde sólido
 */
 .parcel-layer-shadow img {
-  filter: 
-
-    drop-shadow(0.05px -0.05px 0px white)
+  filter: brightness(1) saturate(1) drop-shadow(0.05px -0.05px 0px white)
     drop-shadow(-0.05px 0.05px 0px white);
-
 }
 /* Contenedor del Marker de precio */
 .price-tag-container {
@@ -83,8 +83,8 @@ a {
   font-size: 10px;
   font-weight: 900;
   color: white;
-  border: 1px solid rgba(255,255,255,0.3);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
 }
 
@@ -94,7 +94,9 @@ a {
 }
 
 .price-tag-badge.is-rent {
-  background-color: var(--color-urbik-dark2); /* Azul o el color que prefieras para alquiler */
+  background-color: var(
+    --color-urbik-dark2
+  ); /* Azul o el color que prefieras para alquiler */
 }
 
 /* Hover Card Tooltip */
@@ -110,21 +112,19 @@ a {
 }
 
 .white-labels-custom {
-          /* Invertir colores (si el texto original es negro, pasa a blanco) */
-          filter: invert(0%) brightness(1)
-                  drop-shadow(1px 1px 0px white) 
-                  drop-shadow(-1px -1px 0px white);
-          /* Forzar un tamaño visual un poco mayor mediante escala */
-          transform-origin: center;
-        }
-        
-        /* Ajuste de escala para que se vean más grandes (opcional) */
-        .leaflet-tile-container img.white-labels-custom {
-          width: 258px !important; /* Un pequeño hack para que estire un poco el tile */
-          height: 258px !important;
-        }
+  /* Invertir colores (si el texto original es negro, pasa a blanco) */
+  filter: invert(0%) brightness(1) drop-shadow(1px 1px 0px white)
+    drop-shadow(-1px -1px 0px white);
+  /* Forzar un tamaño visual un poco mayor mediante escala */
+  transform-origin: center;
+}
 
-        
+/* Ajuste de escala para que se vean más grandes (opcional) */
+.leaflet-tile-container img.white-labels-custom {
+  width: 258px !important; /* Un pequeño hack para que estire un poco el tile */
+  height: 258px !important;
+}
+
 /* =========================
    UTILIDADES URBIK
    ========================= */
@@ -132,55 +132,51 @@ a {
   /* BG GRADIENT */
   .bg-urbik-gray1 {
     background-image: linear-gradient(
-      to right, 
-      var(--color-urbik-white) 0%, 
-      var(--color-urbik-g300) 25%, 
+      to right,
+      var(--color-urbik-white) 0%,
+      var(--color-urbik-g300) 25%,
       var(--color-urbik-white) 100%
     );
   }
-    .bg-urbik-black {
+  .bg-urbik-black {
     background-image: linear-gradient(
-      to right, 
-      var(--color-urbik-dark2) 0%, 
-      var(--color-urbik-black) 15%, 
+      to right,
+      var(--color-urbik-dark2) 0%,
+      var(--color-urbik-black) 15%,
       var(--color-urbik-dark) 100%
     );
   }
 
-      .bg-urbik-white1 {
+  .bg-urbik-white1 {
     background-image: linear-gradient(
-      to right, 
-      var(--color-urbik-white) 0%, 
-      var(--color-urbik-white) 15%, 
+      to right,
+      var(--color-urbik-white) 0%,
+      var(--color-urbik-white) 15%,
       var(--color-urbik-g400) 100%
     );
   }
-        .bg-urbik-white3 {
+  .bg-urbik-white3 {
     background-image: linear-gradient(
-      to right, 
-      var(--color-urbik-g300) 0%, 
-      var(--color-urbik-white) 15%, 
+      to right,
+      var(--color-urbik-g300) 0%,
+      var(--color-urbik-white) 15%,
       var(--color-urbik-g400) 100%
     );
-
-    
   }
 
-        .bg-urbik-white2 {
+  .bg-urbik-white2 {
     background-image: linear-gradient(
-      to right, 
-      var(--color-urbik-g100) 0%, 
-      var(--color-urbik-white) 50%, 
+      to right,
+      var(--color-urbik-g100) 0%,
+      var(--color-urbik-white) 50%,
       var(--color-urbik-g200) 100%
     );
-
-    
   }
 
   .bg-urbik-emerald {
     background-color: var(--color-urbik-emerald);
   }
-    .bg-urbik-cyan {
+  .bg-urbik-cyan {
     background-color: var(--color-urbik-cyan);
   }
   .bg-urbik-rose {
@@ -289,7 +285,11 @@ a {
   }
 
   @keyframes progress {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
   }
 }

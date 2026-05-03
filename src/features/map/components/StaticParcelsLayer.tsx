@@ -21,9 +21,9 @@ export function StaticParcelsLayer() {
       format="image/png"
       transparent={true}
       version="1.1.1"
-      className="parcel-layer-shadow brightness-200 saturate-200"
+      className="parcel-layer-shadow"
       tileSize={256}
-      maxZoom={20}
+      maxZoom={19}
       minZoom={15}
     />
   );

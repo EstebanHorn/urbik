@@ -22,7 +22,10 @@ import { StaticParcelsLayer } from "./StaticParcelsLayer";
 import { DbParcelsLayer } from "./DbParcelsLayer";
 import { MapEventsHandler, ZoneData } from "./MapEventsHandler";
 import { SelectedParcelLayer } from "./SelectedParcelLayer";
-import { mapBaseLayers, type BaseLayerId } from "@/features/map/config/baseLayers";
+import {
+  mapBaseLayers,
+  type BaseLayerId,
+} from "@/features/map/config/baseLayers";
 import { useMapSettings } from "@/features/map/context/MapSettingsProvider";
 import { MapProperty, MapBounds, SelectedParcel } from "../types/types";
 
@@ -227,7 +230,7 @@ export function InteractiveMapClient({
 
           <CustomZoomControls />
           <ScrollHandler enabled={isScrollZoomEnabled} />
-          <AutoSatelliteOnParcelZoom zoomThreshold={15} />
+          <AutoSatelliteOnParcelZoom zoomThreshold={16} />
           <MapUpdater center={initialCenter} />
 
           <MapEventsHandler
@@ -236,7 +239,10 @@ export function InteractiveMapClient({
           />
 
           <StaticParcelsLayer />
-          <DbParcelsLayer properties={properties} onPropertySelect={onPropertySelect} />
+          <DbParcelsLayer
+            properties={properties}
+            onPropertySelect={onPropertySelect}
+          />
           <SelectedParcelLayer selectedParcel={selectedParcel} />
 
           {children}
