@@ -16,7 +16,8 @@
       "WebSearch",
       "WebFetch(domain:mapasagencia.rionegro.gov.ar)",
       "WebFetch(domain:catastro.rionegro.gov.ar)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(npm *)"
     ]
   }
 }
