@@ -41,6 +41,7 @@ export default function LocationSelectors({
   const [provincias, setProvincias] = useState<GeorefItem[]>([]);
   const [ciudades, setCiudades] = useState<GeorefItem[]>([]);
   const [loadingCiudades, setLoadingCiudades] = useState(false);
+  const [hasCities, setHasCities] = useState(true);
   const [openDropdown, setOpenDropdown] = useState<"province" | "city" | null>(
     null,
   );
@@ -80,18 +81,29 @@ export default function LocationSelectors({
   }, []);
 
   useEffect(() => {
-    if (!provinceValue) return;
+    if (!provinceValue) {
+      setCiudades([]);
+      setHasCities(true);
+      return;
+    }
     setLoadingCiudades(true);
     fetch(
       `https://apis.datos.gob.ar/georef/api/municipios?provincia=${provinceValue}&max=1000&campos=id,nombre,centroide`,
     )
       .then((res) => res.json())
       .then((data) => {
+        const municipios = data.municipios || [];
         setCiudades(
-          data.municipios.sort((a: GeorefItem, b: GeorefItem) =>
+          municipios.sort((a: GeorefItem, b: GeorefItem) =>
             a.nombre.localeCompare(b.nombre),
           ),
         );
+        setHasCities(municipios.length > 0);
+        setLoadingCiudades(false);
+      })
+      .catch(() => {
+        setCiudades([]);
+        setHasCities(false);
         setLoadingCiudades(false);
       });
   }, [provinceValue]);
@@ -200,26 +212,28 @@ export default function LocationSelectors({
       <div className="relative flex-1" ref={cityRef}>
         <button
           type="button"
-          disabled={!provinceValue}
+          disabled={!provinceValue || !hasCities}
           onClick={() =>
             setOpenDropdown(openDropdown === "city" ? null : "city")
           }
           className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold disabled:opacity-30"
         >
-          {loadingCiudades ? "..." : cityValue || cityLabel}
+          {loadingCiudades ? "..." : !hasCities && provinceValue ? "SIN CIUDADES" : cityValue || cityLabel}
           <ChevronDown />
         </button>
 
-        <DropdownMenu
-          items={ciudades}
-          isOpen={openDropdown === "city"}
-          menuRef={cityMenuRef}
-          onSelect={(item) => {
-            onChange("city", item.nombre);
-            onCityCoordsChange?.(null);
-            setOpenDropdown(null);
-          }}
-        />
+        {hasCities && (
+          <DropdownMenu
+            items={ciudades}
+            isOpen={openDropdown === "city"}
+            menuRef={cityMenuRef}
+            onSelect={(item) => {
+              onChange("city", item.nombre);
+              onCityCoordsChange?.(item.centroide || null);
+              setOpenDropdown(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );

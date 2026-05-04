@@ -27,10 +27,10 @@ const ROTATING_PROVINCES = [
   "San Luis",
   "Santa Fe",
   "Santa Cruz",
-  "Santiago del Estero",
+  "Santiago",
   "Tierra del Fuego",
   "Tucumán",
-  "Ciudad Autónoma de Buenos Aires",
+  "Capital Federal",
 ];
 
 const SearchIcon = () => (
@@ -277,10 +277,18 @@ export function SearchSection({
                       <div className="font-medium text-urbik-black truncate">
                         {suggestion.listLabel}
                       </div>
-                      <div className="text-xs text-gray-500 mt-0.5">
-                        {suggestion.type === "ADDRESS"
-                          ? "Dirección"
-                          : "Inmobiliaria"}
+                      <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                        <span>
+                          {suggestion.type === "ADDRESS"
+                            ? "Dirección"
+                            : "Inmobiliaria"}
+                        </span>
+                        {suggestion.type !== "ADDRESS" &&
+                          suggestion.city && (
+                            <span className="text-gray-400">
+                              · {suggestion.city}
+                            </span>
+                          )}
                       </div>
                     </li>
                   ))}

@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useState, useCallback } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -59,6 +59,8 @@ const EMPTY_OFFICE: RegisterOfficeForm = {
 export function useRegisterForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailChecking, setEmailChecking] = useState(false);
   const [form, setForm] = useState<RegistrationForm>({
     name: "",
     lastName: "",
@@ -82,7 +84,36 @@ export function useRegisterForm() {
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "email") {
+      setEmailError(null);
+    }
   };
+
+  const checkEmailAvailability = useCallback(async (email: string) => {
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed || !trimmed.includes("@")) return;
+
+    setEmailChecking(true);
+    setEmailError(null);
+
+    try {
+      const res = await fetch("/api/register/check-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed }),
+      });
+
+      const data: { available?: boolean; error?: string } = await res.json();
+
+      if (!data.available) {
+        setEmailError("Este correo ya está registrado. ¿Querés iniciar sesión?");
+      }
+    } catch {
+      // Non-critical: server-side will still validate
+    } finally {
+      setEmailChecking(false);
+    }
+  }, []);
 
   const handleRoleSelection = (role: Role) => {
     setForm((prev) => ({ ...prev, role }));
@@ -156,6 +187,9 @@ export function useRegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLoading) return;
+
+    // Block submit if email is already taken
+    if (emailError) return;
 
     setIsLoading(true);
 
@@ -239,6 +273,9 @@ export function useRegisterForm() {
     handleRoleSelection,
     handleSubmit,
     isLoading,
+    emailError,
+    emailChecking,
+    checkEmailAvailability,
     updateLicense,
     addLicense,
     removeLicense,

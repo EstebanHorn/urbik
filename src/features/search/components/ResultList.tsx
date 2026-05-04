@@ -62,16 +62,26 @@ export const ResultList: React.FC<ResultListProps> = ({
         const isAddress = type === "ADDRESS";
         const badge = isAddress ? "Dirección" : "Inmobiliaria";
 
+        const agencyCity =
+          !isAddress && typeof suggestion.city === "string" && suggestion.city
+            ? suggestion.city
+            : null;
+
         return (
           <li
             key={`${type}-${index}`}
             className="p-3 cursor-pointer hover:bg-blue-50 transition-colors flex justify-between items-center text-sm border-b last:border-none border-gray-50"
             onClick={() => onSelect(suggestion)}
           >
-            <div className="flex items-center overflow-hidden mr-2">
+            <div className="flex flex-col overflow-hidden mr-2">
               <span className="truncate text-gray-800 font-medium">
                 {getLabel(suggestion)}
               </span>
+              {agencyCity && (
+                <span className="text-[11px] text-gray-400 truncate">
+                  {agencyCity}
+                </span>
+              )}
             </div>
 
             <span

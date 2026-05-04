@@ -19,10 +19,15 @@ import { useSearchParams } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 
 import { StaticParcelsLayer } from "./StaticParcelsLayer";
-import { DbParcelsLayer } from "./DbParcelsLayer";
+import { ParcelsLayerOptimized } from "./ParcelsLayerOptimized";
 import { MapEventsHandler, ZoneData } from "./MapEventsHandler";
 import { SelectedParcelLayer } from "./SelectedParcelLayer";
-import { mapBaseLayers, type BaseLayerId } from "@/features/map/config/baseLayers";
+import {
+  mapBaseLayers,
+  type BaseLayerId,
+} from "@/features/map/config/baseLayers";
+import { detectRegion, type Region } from "../utils/regionDetection";
+import { useMapEvents } from "react-leaflet";
 import { useMapSettings } from "@/features/map/context/MapSettingsProvider";
 import { MapProperty, MapBounds, SelectedParcel } from "../types/types";
 
@@ -143,6 +148,20 @@ function AutoSatelliteOnParcelZoom({
   return null;
 }
 
+function RegionTracker({
+  onChange,
+}: {
+  onChange: (region: Region) => void;
+}) {
+  useMapEvents({
+    moveend: (e) => {
+      const c = e.target.getCenter();
+      onChange(detectRegion(c.lat, c.lng));
+    },
+  });
+  return null;
+}
+
 function MapUpdater({ center }: { center: [number, number] }) {
   const map = useMap();
 
@@ -172,6 +191,7 @@ export function InteractiveMapClient({
 }: InteractiveMapProps) {
   const { baseLayer, isScrollZoomEnabled } = useMapSettings();
   const [mounted, setMounted] = useState(false);
+  const [region, setRegion] = useState<Region>("buenos-aires");
 
   const searchParams = useSearchParams();
   const searchLat = searchParams.get("lat");
@@ -181,7 +201,7 @@ export function InteractiveMapClient({
   const initialZoom = useMemo(() => {
     const parsedZoom = searchZoom ? Number(searchZoom) : 15;
     if (Number.isNaN(parsedZoom)) return 15;
-    return Math.min(19, Math.max(4, parsedZoom));
+    return Math.min(19, Math.max(3, parsedZoom));
   }, [searchZoom]);
 
   const initialCenter = useMemo<[number, number]>(() => {
@@ -208,7 +228,7 @@ export function InteractiveMapClient({
       <MapContainer
         center={initialCenter}
         zoom={initialZoom}
-        minZoom={4}
+        minZoom={3}
         maxZoom={19}
         scrollWheelZoom={isScrollZoomEnabled}
         style={{ height: "100%", width: "100%" }}
@@ -217,17 +237,28 @@ export function InteractiveMapClient({
       >
         <SafeMapChildren>
           <TileLayer
+            key={`tile-${currentBaseLayer.id}-${region}`}
             url={currentBaseLayer.url}
             attribution={currentBaseLayer.attribution}
-            maxNativeZoom={currentBaseLayer.id === "satellite" ? 19 : 20}
+            maxNativeZoom={
+              currentBaseLayer.id === "satellite"
+                ? region === "rio-negro"
+                  ? 17
+                  : 18
+                : 20
+            }
+            maxZoom={19}
             updateWhenIdle={true}
             updateWhenZooming={false}
             keepBuffer={4}
+            errorTileUrl="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
           />
+
+          <RegionTracker onChange={setRegion} />
 
           <CustomZoomControls />
           <ScrollHandler enabled={isScrollZoomEnabled} />
-          <AutoSatelliteOnParcelZoom zoomThreshold={16} />
+          <AutoSatelliteOnParcelZoom zoomThreshold={15} />
           <MapUpdater center={initialCenter} />
 
           <MapEventsHandler
@@ -236,7 +267,10 @@ export function InteractiveMapClient({
           />
 
           <StaticParcelsLayer />
-          <DbParcelsLayer properties={properties} onPropertySelect={onPropertySelect} />
+          <ParcelsLayerOptimized
+            properties={properties}
+            onPropertySelect={onPropertySelect}
+          />
           <SelectedParcelLayer selectedParcel={selectedParcel} />
 
           {children}

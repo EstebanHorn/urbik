@@ -1,21 +1,30 @@
-﻿"use client";
+"use client";
 
 import dynamic from "next/dynamic";
-import React, { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-/* eslint-disable @next/next/no-img-element */
-import ImageUpload from "@/components/ImageUpload";
 import { MapLayersProvider } from "@/features/map/components/MapLayersProvider";
 import { ClickToCreateProperty } from "@/features/map/components/ClickToCreateProperty";
-import { useCreateProperty } from "../hooks/useCreateProperty";
-import { AmenitiesGrid } from "./create-modal/AmenitiesGrid";
-import {
-  PropertyFormFields,
-  PropertyFormData,
-} from "./create-modal/PropertyFormField";
-import LocationSelectors from "@/components/LocationSelectors";
-import SmartDescription from "@/components/SmartZone/SmartDescription";
-import { SelectedParcel } from "@/features/map/types/types";
+import { usePropertyUploadForm } from "../hooks/usePropertyUploadForm";
+import { CompletionIndicator } from "./create-modal/CompletionIndicator";
+import { ModuleShell } from "./create-modal/ModuleShell";
+import { Module01PropertyData } from "./create-modal/Module01PropertyData";
+import { Module02Location } from "./create-modal/Module02Location";
+import { Module03Content } from "./create-modal/Module03Content";
+import { Module04Surfaces } from "./create-modal/Module04Surfaces";
+import { Module05Environments } from "./create-modal/Module05Environments";
+import { Module06BasicCharacteristics } from "./create-modal/Module06BasicCharacteristics";
+import { Module07Tags } from "./create-modal/Module07Tags";
+import { Module08BuildingInfo } from "./create-modal/Module08BuildingInfo";
+import { Module09CommercialInfo } from "./create-modal/Module09CommercialInfo";
+import { Module10FieldInfo } from "./create-modal/Module10FieldInfo";
+import { Module11LandInfo } from "./create-modal/Module11LandInfo";
+import { Module12Multimedia } from "./create-modal/Module12Multimedia";
+import { Module13ContactInfo } from "./create-modal/Module13ContactInfo";
+import { MODULE_DEFINITIONS, getVisibleModules } from "./create-modal/moduleDefinitions";
+import type { PropertyInitialData } from "../hooks/useCreateProperty";
+import type { SelectedParcel } from "@/features/map/types/types";
+import type { PropertyUploadFormData } from "./create-modal/types";
 
 const InteractiveMap = dynamic(
   () =>
@@ -27,8 +36,8 @@ const InteractiveMap = dynamic(
     loading: () => (
       <div className="h-full w-full bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3 animate-pulse">
-          <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-          <p className="text-xs font-bold text-urbik-black/40  tracking-widest">
+          <div className="w-10 h-10 bg-gray-200 rounded-full" />
+          <p className="text-xs font-bold text-urbik-black/40 tracking-widest">
             Cargando Mapa...
           </p>
         </div>
@@ -37,25 +46,18 @@ const InteractiveMap = dynamic(
   },
 );
 
-interface PropertyInitialData extends Partial<PropertyFormData> {
-  id?: number | string;
-  parcelCCA?: string;
-  parcelPDA?: string;
-  parcelGeom?: Record<string, unknown>;
-  latitude?: number;
-  longitude?: number;
+interface ExtendedSelectedParcel extends SelectedParcel {
+  nomenclatura?: string;
 }
 
 interface CreatePropertyModalProps {
   open: boolean;
   onClose: () => void;
   onCreated: () => void;
-  initialData?: PropertyInitialData;
+  initialData?: Partial<PropertyInitialData>;
 }
 
-interface ExtendedSelectedParcel extends SelectedParcel {
-  nomenclatura?: string;
-}
+const ALL_MODULE_IDS = MODULE_DEFINITIONS.map((m) => m.id);
 
 export default function CreatePropertyModal({
   open,
@@ -64,85 +66,73 @@ export default function CreatePropertyModal({
   initialData,
 }: CreatePropertyModalProps) {
   const {
-    step,
-    setStep,
-    selectedParcel,
-    setSelectedParcel,
-    form,
-    setForm,
+    rhf,
     saving,
     message,
+    selectedParcel,
+    setSelectedParcel,
     handleSave,
     isEditing,
-  } = useCreateProperty(
-    (initialData as PropertyInitialData) || null,
+    isFormComplete,
+  } = usePropertyUploadForm(
+    (initialData as PropertyInitialData) ?? null,
     onCreated,
     onClose,
   );
 
-  const safeForm = form as unknown as PropertyFormData;
-
-  const handleSetForm = setForm as React.Dispatch<
-    React.SetStateAction<PropertyFormData>
-  >;
-
-  const [cityCoords, setCityCoords] = useState<{
-    lat: number;
-    lon: number;
-  } | null>(null);
+  const [step, setStep] = useState<"form" | "map">("form");
+  const [cityCoords, setCityCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [isSearchingCity, setIsSearchingCity] = useState(false);
 
-  const isBuenosAires = form?.province?.toUpperCase().includes("BUENOS AIRES");
-  const hasCity = !!form?.city;
-  const canSelectParcel = isBuenosAires && hasCity;
+  const [openModules, setOpenModules] = useState<Set<number>>(new Set(ALL_MODULE_IDS));
+  const [activeModuleId, setActiveModuleId] = useState<number | null>(1);
 
-  const handleInputChange = (name: string, value: string) => {
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (name === "city" || name === "province") {
-      setCityCoords(null);
-    }
-  };
+  const formScrollRef = useRef<HTMLDivElement>(null);
 
-  const isFormComplete =
-    !!form.title?.trim() &&
-    !!form.type &&
-    !!form.operationType &&
-    !!form.status &&
-    !!form.country &&
-    !!form.street?.trim() &&
-    !!form.number?.toString().trim() &&
-    (Boolean(form.isPriceHidden) ||
-      (form.operationType === "SALE"
-        ? !!form.salePrice
-        : form.operationType === "RENT" || form.operationType === "TEMP_RENT"
-          ? !!form.rentPrice
-          : !!form.salePrice && !!form.rentPrice)) &&
-    !!form.province &&
-    !!form.city &&
-    (form.images?.length ?? 0) > 0;
+  const formValues = rhf.watch() as PropertyUploadFormData;
+  const visibleModules = getVisibleModules(formValues.type);
 
-  const handleGoToMap = async () => {
-    if (!form.city) return;
+  const toggleModule = useCallback((id: number) => {
+    setOpenModules((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    setActiveModuleId(id);
+  }, []);
 
+  const scrollToModule = useCallback((id: number) => {
+    setActiveModuleId(id);
+    setOpenModules((prev) => new Set(prev).add(id));
+    setTimeout(() => {
+      const el = document.getElementById(`module-${id}`);
+      if (el && formScrollRef.current) {
+        const top = el.offsetTop - formScrollRef.current.offsetTop - 16;
+        formScrollRef.current.scrollTo({ top, behavior: "smooth" });
+      }
+    }, 50);
+  }, []);
+
+  const handleOpenMap = async () => {
+    const city = rhf.getValues("city");
+    const province = rhf.getValues("province");
+    if (!city) return;
     setIsSearchingCity(true);
     try {
-      const query = `${form.city}, ${form.province}, Argentina`;
-      const response = await fetch(
+      const query = `${city}, ${province}, Argentina`;
+      const res = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
       );
-      const data = await response.json();
-
-      if (data && data.length > 0) {
-        setCityCoords({
-          lat: parseFloat(data[0].lat),
-          lon: parseFloat(data[0].lon),
-        });
+      const data = await res.json();
+      if (data?.length > 0) {
+        setCityCoords({ lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) });
       }
-    } catch (error) {
-      console.error("Error obteniendo coordenadas:", error);
+    } catch {
+      /* no-op */
     } finally {
       setIsSearchingCity(false);
-      setStep(2);
+      setStep("map");
     }
   };
 
@@ -160,29 +150,23 @@ export default function CreatePropertyModal({
           <div className="absolute inset-0" onClick={onClose} />
 
           <motion.div
-            className="relative w-[900px] h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            className="relative w-[1100px] max-w-[98vw] h-[92vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
             initial={{ y: 20, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 20, opacity: 0, scale: 0.95 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* HEADER */}
-            <div className="shrink-0 py-5 px-8 flex items-center justify-between border-b border-gray-100 bg-white z-20">
+            <div className="shrink-0 py-4 px-8 flex items-center justify-between border-b border-gray-100 bg-white z-20">
               <div className="flex items-center gap-4">
-                {}
-                <img
-                  src="/Urbik_Logo_Mini.svg"
-                  alt="Urbik"
-                  className="w-8 h-8 opacity-80"
-                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/Urbik_Logo_Mini.svg" alt="Urbik" className="w-8 h-8 opacity-80" />
                 <div>
                   <h2 className="text-xl font-black text-urbik-black tracking-tight">
                     {isEditing ? "Editar Propiedad" : "Nueva Propiedad"}
                   </h2>
-                  <p className="text-xs font-bold text-urbik-black/40  tracking-widest">
-                    {step === 1
-                      ? "Paso 1: Información"
-                      : "Paso 2: Ubicación Catastral"}
+                  <p className="text-xs font-bold text-urbik-black/40 tracking-widest">
+                    {step === "map" ? "Ubicacion Catastral" : "Modulos del aviso"}
                   </p>
                 </div>
               </div>
@@ -195,222 +179,62 @@ export default function CreatePropertyModal({
               </button>
             </div>
 
-            {/* CONTENT AREA */}
-            <div className="flex-1 overflow-hidden relative bg-white">
-              {step === 1 ? (
-                <div className="h-full overflow-y-auto custom-scrollbar">
-                  <div className="max-w-4xl mx-auto p-8 lg:p-12">
-                    <div className="flex flex-col gap-12">
-                      {/* SECCIÃ“N 1 */}
-                      <div className="space-y-6">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-xs font-black">
-                            1
-                          </span>
-                          <h3 className="text-sm font-bold text-urbik-black  tracking-widest">
-                            Ubicacion geografica y parcelaria
-                          </h3>
-                        </div>
+            {/* CONTENT */}
+            <div className="flex-1 overflow-hidden">
+              {step === "form" ? (
+                <div className="h-full grid grid-cols-1 lg:grid-cols-[1fr_240px]">
+                  {/* Form scroll area */}
+                  <div ref={formScrollRef} className="h-full overflow-y-auto custom-scrollbar">
+                    <div className="max-w-3xl mx-auto p-6 lg:p-10 flex flex-col gap-4">
 
-                        <div className="pl-9 space-y-4">
-                          <LocationSelectors
-                            provinceValue={form.province || ""}
-                            cityValue={form.city || ""}
-                            onChange={handleInputChange}
-                          />
+                      {visibleModules.map((mod) => {
+                        const isOpen = openModules.has(mod.id);
 
-                          <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-4">
-                            <input
-                              type="text"
-                              placeholder="País"
-                              value={form.country || "Argentina"}
-                              onChange={(e) =>
-                                handleInputChange("country", e.target.value)
-                              }
-                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Partido"
-                              value={form.city || ""}
-                              onChange={(e) =>
-                                handleInputChange("city", e.target.value)
-                              }
-                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-                            />
-
-                            <input
-                              type="text"
-                              placeholder="Barrio"
-                              value={form.neighborhood || ""}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  "neighborhood",
-                                  e.target.value,
-                                )
-                              }
-                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Calle / Dirección"
-                              value={form.street || ""}
-                              onChange={(e) =>
-                                handleInputChange("street", e.target.value)
-                              }
-                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Altura"
-                              value={form.number || ""}
-                              onChange={(e) =>
-                                handleInputChange("number", e.target.value)
-                              }
-                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Piso (Opcional)"
-                              value={form.floor || ""}
-                              onChange={(e) =>
-                                handleInputChange("floor", e.target.value)
-                              }
-                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Unidad (Opcional)"
-                              value={form.unitNumber || ""}
-                              onChange={(e) =>
-                                handleInputChange("unitNumber", e.target.value)
-                              }
-                              className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-                            />
-                          </div>
-
-                          <button
-                            type="button"
-                            disabled={!canSelectParcel || isSearchingCity}
-                            onClick={handleGoToMap}
-                            className={`w-full py-4 px-6 rounded-xl border-2 border-dashed transition-all flex items-center justify-center gap-3 font-bold  text-xs tracking-widest
-                                 ${
-                                   selectedParcel
-                                     ? "border-emerald-500 text-emerald-700 bg-emerald-50"
-                                     : "border-gray-300 text-gray-500 hover:border-urbik-black hover:text-urbik-black hover:bg-gray-50"
-                                 }
-                                 disabled:opacity-50 disabled:cursor-not-allowed`}
+                        return (
+                          <ModuleShell
+                            key={mod.id}
+                            id={mod.id}
+                            label={mod.label}
+                            status={mod.getStatus(formValues)}
+                            isOpen={isOpen}
+                            onToggle={() => toggleModule(mod.id)}
                           >
-                            {isSearchingCity ? (
-                              <>
-                                <span className="animate-spin"></span> Buscando
-                                zona...
-                              </>
-                            ) : selectedParcel ? (
-                              <>Parcela Vinculada (PDA: {selectedParcel.PDA})</>
-                            ) : (
-                              <>Seleccionar Parcela en el Mapa</>
+                            {mod.id === 1 && <Module01PropertyData rhf={rhf} />}
+                            {mod.id === 2 && (
+                              <Module02Location
+                                rhf={rhf}
+                                onOpenMap={handleOpenMap}
+                                selectedParcelPDA={selectedParcel?.PDA ?? null}
+                                isSearchingCity={isSearchingCity}
+                              />
                             )}
-                          </button>
-                        </div>
-                      </div>
+                            {mod.id === 3 && <Module03Content rhf={rhf} />}
+                            {mod.id === 4 && <Module04Surfaces rhf={rhf} />}
+                            {mod.id === 5 && <Module05Environments rhf={rhf} />}
+                            {mod.id === 6 && <Module06BasicCharacteristics rhf={rhf} />}
+                            {mod.id === 7 && <Module07Tags rhf={rhf} />}
+                            {mod.id === 8 && <Module08BuildingInfo rhf={rhf} />}
+                            {mod.id === 9 && <Module09CommercialInfo rhf={rhf} />}
+                            {mod.id === 10 && <Module10FieldInfo rhf={rhf} />}
+                            {mod.id === 11 && <Module11LandInfo rhf={rhf} />}
+                            {mod.id === 12 && <Module12Multimedia rhf={rhf} />}
+                            {mod.id === 13 && <Module13ContactInfo rhf={rhf} />}
+                          </ModuleShell>
+                        );
+                      })}
 
-                      <hr className="border-gray-100" />
-
-                      {/* SECCIÃ“N 2 */}
-                      <div className="space-y-6">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-xs font-black">
-                            2
-                          </span>
-                          <h3 className="text-sm font-bold text-urbik-black  tracking-widest">
-                            Detalles de la Propiedad
-                          </h3>
-                        </div>
-
-                        <div className="pl-9 space-y-8">
-                          <PropertyFormFields
-                            form={safeForm}
-                            setForm={handleSetForm}
-                          />
-
-                          <div className="space-y-2">
-                            <label className="text-md font-bold text-urbik-black/50   ml-1">
-                              Descripción
-                            </label>
-                            <textarea
-                              rows={5}
-                              placeholder="Describí los puntos fuertes de la propiedad..."
-                              value={form.description || ""}
-                              onChange={(e) =>
-                                handleInputChange("description", e.target.value)
-                              }
-                              className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm bg-gray-50 focus:bg-white resize-none"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <hr className="border-gray-100" />
-
-                      {/* SECCIÃ“N 3 */}
-                      <div className="space-y-6">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-xs font-black">
-                            3
-                          </span>
-                          <h3 className="text-sm font-bold text-urbik-black  tracking-widest">
-                            Multimedia y Extras
-                          </h3>
-                        </div>
-
-                        <div className="pl-9 space-y-8">
-                          <AmenitiesGrid
-                            value={
-                              (form.amenities as Record<string, boolean>) || {}
-                            }
-                            propertyType={form.type}
-                            onChange={(val) =>
-                              setForm((prev) => ({
-                                ...prev,
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                amenities: val as any,
-                              }))
-                            }
-                          />
-
-                          <ImageUpload
-                            value={form.images || []}
-                            onChange={(urls) =>
-                              setForm((prev) => ({
-                                ...prev,
-                                images: urls,
-                              }))
-                            }
-                            onRemove={(url) =>
-                              setForm((prev) => ({
-                                ...prev,
-                                images: (prev.images || []).filter(
-                                  (i: string) => i !== url,
-                                ),
-                              }))
-                            }
-                          />
-                        </div>
-                      </div>
-
-                      {/* FOOTER */}
-                      <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm py-6 border-t border-gray-100 flex justify-between items-center z-10">
+                      {/* Footer */}
+                      <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm py-5 border-t border-gray-100 flex justify-between items-center z-10 -mx-6 lg:-mx-10 px-6 lg:px-10 mt-2">
                         <span className="text-xs font-bold text-gray-400">
-                          {isFormComplete
+                          {isFormComplete()
                             ? "Todo listo para publicar"
-                            : "* CompletÃ¡ los campos obligatorios"}
+                            : "* Completa los campos obligatorios"}
                         </span>
                         <button
-                          onClick={handleSave}
                           type="button"
-                          disabled={saving || !isFormComplete}
-                          className="px-10 py-4 rounded-full bg-urbik-black text-white text-xs font-black  tracking-widest shadow-xl hover:bg-gray-800 hover:shadow-2xl transition-all disabled:opacity-30 disabled:shadow-none transform active:scale-95"
+                          onClick={handleSave}
+                          disabled={saving || !isFormComplete()}
+                          className="px-10 py-4 rounded-full bg-urbik-black text-white text-xs font-black tracking-widest shadow-xl hover:bg-gray-800 hover:shadow-2xl transition-all disabled:opacity-30 disabled:shadow-none transform active:scale-95"
                         >
                           {saving
                             ? "Publicando..."
@@ -427,32 +251,37 @@ export default function CreatePropertyModal({
                       )}
                     </div>
                   </div>
+
+                  {/* Completion indicator sidebar */}
+                  <div className="hidden lg:flex flex-col border-l border-gray-100 bg-gray-50/80 p-4 overflow-hidden">
+                    <CompletionIndicator
+                      modules={visibleModules}
+                      form={formValues}
+                      activeModuleId={activeModuleId}
+                      onModuleClick={scrollToModule}
+                    />
+                  </div>
                 </div>
               ) : (
-                /* PASO 2: MAPA */
-                <div
-                  key="step-map"
-                  className="h-full grid grid-cols-1 lg:grid-cols-[1fr_350px]"
-                >
+                /* MAP STEP */
+                <div className="h-full grid grid-cols-1 lg:grid-cols-[1fr_350px]">
                   <div className="relative bg-slate-100 overflow-hidden">
                     <MapLayersProvider>
                       <InteractiveMap
-                        key={`map-${form.city}-${cityCoords?.lat || "default"}`}
+                        key={`map-${rhf.getValues("city")}-${cityCoords?.lat ?? "default"}`}
                         lat={selectedParcel?.lat ?? cityCoords?.lat ?? -34.9214}
                         lon={selectedParcel?.lon ?? cityCoords?.lon ?? -57.9545}
                         height="100%"
                         selectedParcel={selectedParcel}
                       >
-                        <ClickToCreateProperty
-                          onParcelPicked={setSelectedParcel}
-                        />
+                        <ClickToCreateProperty onParcelPicked={setSelectedParcel} />
                       </InteractiveMap>
                     </MapLayersProvider>
 
                     {!selectedParcel && (
                       <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-urbik-black/10 z-10 pointer-events-none">
                         <p className="text-xs font-bold text-urbik-black animate-pulse">
-                          ðŸ‘‡ HacÃ© clic sobre una parcela para seleccionarla
+                          Hace clic sobre una parcela para seleccionarla
                         </p>
                       </div>
                     )}
@@ -461,34 +290,33 @@ export default function CreatePropertyModal({
                   <div className="p-8 flex flex-col justify-between border-l border-gray-100 bg-white shadow-xl z-20">
                     <div className="space-y-8">
                       <button
-                        onClick={() => setStep(1)}
+                        onClick={() => setStep("form")}
                         type="button"
-                        className="group flex items-center gap-2 text-[10px] font-black  tracking-widest text-gray-400 hover:text-urbik-black transition-colors"
+                        className="group flex items-center gap-2 text-[10px] font-black tracking-widest text-gray-400 hover:text-urbik-black transition-colors"
                       >
                         <span className="text-lg group-hover:-translate-x-1 transition-transform">
                           {"<"}
-                        </span>{" "}
-                        Volver
+                        </span>
+                        Volver al formulario
                       </button>
 
                       {!selectedParcel ? (
                         <div className="mt-10 text-center opacity-50">
-                          {}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src="/Urbik_Logo_Smart_Zone.svg"
-                            alt="Select"
+                            alt="Seleccionar parcela"
                             width={80}
                             height={80}
                             className="mx-auto mb-4 grayscale"
                           />
-                          <p className="text-sm font-bold text-gray-900"></p>
                         </div>
                       ) : (
                         <div className="animate-in slide-in-from-right-4 duration-500">
                           <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 mb-6">
                             <div className="flex items-center gap-2 mb-2">
-                              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                              <p className="text-[10px] font-black text-emerald-700  tracking-widest">
+                              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                              <p className="text-[10px] font-black text-emerald-700 tracking-widest">
                                 Parcela Detectada
                               </p>
                             </div>
@@ -502,17 +330,13 @@ export default function CreatePropertyModal({
 
                           <div className="space-y-4">
                             <div className="flex justify-between text-xs border-b border-gray-100 pb-2">
-                              <span className="text-gray-400 font-medium">
-                                Ciudad
-                              </span>
+                              <span className="text-gray-400 font-medium">Ciudad</span>
                               <span className="font-bold text-gray-800">
-                                {form.city}
+                                {rhf.getValues("city")}
                               </span>
                             </div>
                             <div className="flex justify-between text-xs border-b border-gray-100 pb-2">
-                              <span className="text-gray-400 font-medium">
-                                Nomenclatura
-                              </span>
+                              <span className="text-gray-400 font-medium">Nomenclatura</span>
                               <span className="font-bold text-gray-800 truncate max-w-[150px]">
                                 {parcelDisplay?.nomenclatura || "-"}
                               </span>
@@ -524,11 +348,11 @@ export default function CreatePropertyModal({
 
                     <button
                       disabled={!selectedParcel}
-                      onClick={() => setStep(1)}
+                      onClick={() => setStep("form")}
                       type="button"
-                      className="w-full bg-urbik-black text-white py-4 rounded-xl font-black  text-xs tracking-widest hover:bg-emerald-600 transition-all shadow-lg disabled:opacity-30 disabled:transform-none transform active:scale-95"
+                      className="w-full bg-urbik-black text-white py-4 rounded-xl font-black text-xs tracking-widest hover:bg-emerald-600 transition-all shadow-lg disabled:opacity-30 transform active:scale-95"
                     >
-                      Confirmar Selección
+                      Confirmar Seleccion
                     </button>
                   </div>
                 </div>

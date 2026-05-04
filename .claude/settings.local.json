@@ -5,7 +5,19 @@
       "mcp__claude_ai_Google_Drive__read_file_content",
       "Bash(git *)",
       "Bash(npx tsc *)",
-      "Skill(update-config)"
+      "Skill(update-config)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npx eslint *)",
+      "Bash(curl -s http://localhost:3000/settings)",
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3000/api/parcels)",
+      "WebSearch",
+      "WebFetch(domain:mapasagencia.rionegro.gov.ar)",
+      "WebFetch(domain:catastro.rionegro.gov.ar)",
+      "Bash(curl *)",
+      "Bash(npm *)"
     ]
   }
 }
