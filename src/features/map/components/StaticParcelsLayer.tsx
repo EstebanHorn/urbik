@@ -3,6 +3,7 @@
 import { WMSTileLayer, useMapEvents } from "react-leaflet";
 import { useState } from "react";
 import { detectRegion, type Region } from "../utils/regionDetection";
+import { RioNegroGeoJsonLayer } from "./RioNegroGeoJsonLayer";
 
 export function StaticParcelsLayer() {
   const [region, setRegion] = useState<Region>("buenos-aires");
@@ -15,20 +16,7 @@ export function StaticParcelsLayer() {
   });
 
   if (region === "rio-negro") {
-    return (
-      <WMSTileLayer
-        key="rio-negro"
-        url="https://mapasagencia.rionegro.gov.ar/server/services/Municipios/GC_201904_WMS_V7/MapServer/WMSServer?"
-        layers="GIS_PARCELAS"
-        format="image/png"
-        transparent={true}
-        version="1.3.0"
-        className="parcel-layer-shadow brightness-200 saturate-200"
-        tileSize={256}
-        maxZoom={20}
-        minZoom={14}
-      />
-    );
+    return <RioNegroGeoJsonLayer key="rio-negro-geojson" />;
   }
 
   return (
