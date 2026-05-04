@@ -25,9 +25,9 @@ export function StaticParcelsLayer() {
 
       if (region === "rio-negro") {
         newConfig = {
-          url: "https://servicios.ign.gob.ar/geoserver/ows?",
-          layers: "caratula_1500k",
-          minZoom: 12,
+          url: "https://mapasagencia.rionegro.gov.ar/server/services/Municipios/GC_201904_WMS_V7/MapServer/WMSServer?",
+          layers: "GIS_PARCELAS",
+          minZoom: 14,
         };
       }
 
