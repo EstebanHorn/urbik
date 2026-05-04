@@ -1,43 +1,8 @@
 "use client";
 
-import { WMSTileLayer, useMap, useMapEvents } from "react-leaflet";
-import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
-// @ts-expect-error - esri-leaflet has no types installed
-import * as esri from "esri-leaflet";
+import { WMSTileLayer, useMapEvents } from "react-leaflet";
+import { useState } from "react";
 import { detectRegion, type Region } from "../utils/regionDetection";
-
-function RioNegroParcelsLayer() {
-  const map = useMap();
-  const layerRef = useRef<L.Layer | null>(null);
-
-  useEffect(() => {
-    if (!map) return;
-
-    const layer = esri.dynamicMapLayer({
-      url: "https://mapasagencia.rionegro.gov.ar/server/rest/services/Hosted/PARCELARIO/MapServer",
-      opacity: 1,
-      format: "png32",
-      transparent: true,
-      f: "image",
-      minZoom: 14,
-      maxZoom: 20,
-      className: "parcel-layer-shadow brightness-200 saturate-200",
-    });
-
-    layer.addTo(map);
-    layerRef.current = layer as unknown as L.Layer;
-
-    return () => {
-      if (layerRef.current) {
-        map.removeLayer(layerRef.current);
-        layerRef.current = null;
-      }
-    };
-  }, [map]);
-
-  return null;
-}
 
 export function StaticParcelsLayer() {
   const [region, setRegion] = useState<Region>("buenos-aires");
@@ -50,7 +15,20 @@ export function StaticParcelsLayer() {
   });
 
   if (region === "rio-negro") {
-    return <RioNegroParcelsLayer key="rio-negro" />;
+    return (
+      <WMSTileLayer
+        key="rio-negro"
+        url="https://mapasagencia.rionegro.gov.ar/server/services/Municipios/GC_201904_WMS_V7/MapServer/WMSServer?"
+        layers="GIS_PARCELAS"
+        format="image/png"
+        transparent={true}
+        version="1.3.0"
+        className="parcel-layer-shadow brightness-200 saturate-200"
+        tileSize={256}
+        maxZoom={20}
+        minZoom={14}
+      />
+    );
   }
 
   return (
