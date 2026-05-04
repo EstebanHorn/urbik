@@ -14,7 +14,9 @@
       "Read(//tmp/**)",
       "Bash(curl -s http://localhost:3000/api/parcels)",
       "WebSearch",
-      "WebFetch(domain:mapasagencia.rionegro.gov.ar)"
+      "WebFetch(domain:mapasagencia.rionegro.gov.ar)",
+      "WebFetch(domain:catastro.rionegro.gov.ar)",
+      "Bash(curl *)"
     ]
   }
 }
