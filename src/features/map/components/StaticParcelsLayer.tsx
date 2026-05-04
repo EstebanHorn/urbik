@@ -29,7 +29,7 @@ export function StaticParcelsLayer() {
       version="1.1.1"
       className="parcel-layer-shadow brightness-200 saturate-200"
       tileSize={256}
-      maxZoom={20}
+      maxZoom={19}
       minZoom={15}
     />
   );
