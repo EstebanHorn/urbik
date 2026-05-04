@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapContainer, Marker, TileLayer, Tooltip, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  TileLayer,
+  Tooltip,
+  useMap,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -64,7 +70,10 @@ function FitToProperties({ properties, lat, lon }: Props) {
   const lastSignature = useRef("");
 
   useEffect(() => {
-    const mapRef = map as unknown as { _loaded?: boolean; _container?: HTMLElement };
+    const mapRef = map as unknown as {
+      _loaded?: boolean;
+      _container?: HTMLElement;
+    };
     if (!mapRef?._loaded || !mapRef?._container) return;
 
     const signature = JSON.stringify({
@@ -77,7 +86,10 @@ function FitToProperties({ properties, lat, lon }: Props) {
 
     const points = properties
       .filter((p) => p.latitude !== null && p.longitude !== null)
-      .map((p) => [p.latitude as number, p.longitude as number] as [number, number]);
+      .map(
+        (p) =>
+          [p.latitude as number, p.longitude as number] as [number, number],
+      );
 
     const rafId = window.requestAnimationFrame(() => {
       if (!mapRef?._loaded || !mapRef?._container) return;
@@ -126,7 +138,9 @@ export default function PropertiesPreviewMap({
   );
 
   if (!mounted) {
-    return <div className="h-[260px] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 animate-pulse" />;
+    return (
+      <div className="h-[260px] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 animate-pulse" />
+    );
   }
 
   return (
@@ -144,7 +158,7 @@ export default function PropertiesPreviewMap({
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+          attribution="&copy; OpenStreetMap contributors &copy; CARTO"
         />
 
         <FitToProperties properties={properties} lat={lat} lon={lon} />
@@ -152,7 +166,10 @@ export default function PropertiesPreviewMap({
         {withCoords.map((property) => (
           <Marker
             key={property.id}
-            position={[property.latitude as number, property.longitude as number]}
+            position={[
+              property.latitude as number,
+              property.longitude as number,
+            ]}
             icon={createPinIcon(property.id === hoveredPropertyId)}
             zIndexOffset={property.id === hoveredPropertyId ? 1000 : 0}
             eventHandlers={{
