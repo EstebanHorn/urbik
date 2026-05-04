@@ -219,10 +219,12 @@ export function InteractiveMapClient({
           <TileLayer
             url={currentBaseLayer.url}
             attribution={currentBaseLayer.attribution}
-            maxNativeZoom={currentBaseLayer.id === "satellite" ? 19 : 20}
+            maxNativeZoom={currentBaseLayer.id === "satellite" ? 18 : 20}
+            maxZoom={20}
             updateWhenIdle={true}
             updateWhenZooming={false}
             keepBuffer={4}
+            errorTileUrl="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
           />
 
           <CustomZoomControls />
