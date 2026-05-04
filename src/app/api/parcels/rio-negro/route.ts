@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import Flatbush from "flatbush";
 
 interface RawFeature {
   type: "Feature";
@@ -11,71 +12,73 @@ interface RawFeature {
   };
 }
 
-interface IndexedFeature {
-  feature: RawFeature;
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
+type LonLatGeometry = {
+  type: "Polygon" | "MultiPolygon";
+  coordinates: number[][][] | number[][][][];
+};
+
+type CompactFeature = {
+  fid: number;
+  cca: string;
+  geometry: LonLatGeometry;
+};
+
+interface CachedIndex {
+  features: CompactFeature[];
+  spatial: Flatbush;
 }
 
-let INDEX: IndexedFeature[] | null = null;
-let LOADING: Promise<IndexedFeature[]> | null = null;
+let CACHE: CachedIndex | null = null;
+let LOADING: Promise<CachedIndex> | null = null;
 
 const ORIGIN = 20037508.342789244;
-
-function lonLatToMercator(lon: number, lat: number): [number, number] {
-  const x = (lon * ORIGIN) / 180;
-  const y =
-    (Math.log(Math.tan(((90 + lat) * Math.PI) / 360)) * ORIGIN) / Math.PI;
-  return [x, y];
-}
 
 function mercatorToLonLat(x: number, y: number): [number, number] {
   const lon = (x / ORIGIN) * 180;
   const lat =
     (180 / Math.PI) *
     (2 * Math.atan(Math.exp((y / ORIGIN) * Math.PI)) - Math.PI / 2);
-  return [lon, lat];
+  return [
+    Math.round(lon * 1e6) / 1e6,
+    Math.round(lat * 1e6) / 1e6,
+  ];
 }
 
-function computeFeatureBBox(geom: RawFeature["geometry"]): [number, number, number, number] {
+function reprojectAndBBox(geom: RawFeature["geometry"]): {
+  geometry: LonLatGeometry;
+  bbox: [number, number, number, number];
+} {
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  const visit = (coord: number[]) => {
-    if (coord[0] < minX) minX = coord[0];
-    if (coord[0] > maxX) maxX = coord[0];
-    if (coord[1] < minY) minY = coord[1];
-    if (coord[1] > maxY) maxY = coord[1];
-  };
-  if (geom.type === "Polygon") {
-    (geom.coordinates as number[][][]).forEach((ring) => ring.forEach(visit));
-  } else {
-    (geom.coordinates as number[][][][]).forEach((poly) =>
-      poly.forEach((ring) => ring.forEach(visit)),
-    );
-  }
-  return [minX, minY, maxX, maxY];
-}
-
-function reprojectGeometry(geom: RawFeature["geometry"]): RawFeature["geometry"] {
   const reprojectRing = (ring: number[][]): number[][] =>
-    ring.map((c) => mercatorToLonLat(c[0], c[1]));
+    ring.map((c) => {
+      const [lon, lat] = mercatorToLonLat(c[0], c[1]);
+      if (lon < minX) minX = lon;
+      if (lon > maxX) maxX = lon;
+      if (lat < minY) minY = lat;
+      if (lat > maxY) maxY = lat;
+      return [lon, lat];
+    });
+
+  let geometry: LonLatGeometry;
   if (geom.type === "Polygon") {
-    return {
+    geometry = {
       type: "Polygon",
       coordinates: (geom.coordinates as number[][][]).map(reprojectRing),
     };
+  } else {
+    geometry = {
+      type: "MultiPolygon",
+      coordinates: (geom.coordinates as number[][][][]).map((poly) =>
+        poly.map(reprojectRing),
+      ),
+    };
   }
-  return {
-    type: "MultiPolygon",
-    coordinates: (geom.coordinates as number[][][][]).map((poly) =>
-      poly.map(reprojectRing),
-    ),
-  };
+
+  return { geometry, bbox: [minX, minY, maxX, maxY] };
 }
 
-async function loadIndex(): Promise<IndexedFeature[]> {
-  if (INDEX) return INDEX;
+async function loadIndex(): Promise<CachedIndex> {
+  if (CACHE) return CACHE;
   if (LOADING) return LOADING;
 
   LOADING = (async () => {
@@ -83,14 +86,25 @@ async function loadIndex(): Promise<IndexedFeature[]> {
     const raw = await fs.readFile(filePath, "utf-8");
     const data = JSON.parse(raw) as { features: RawFeature[] };
 
-    const indexed: IndexedFeature[] = data.features.map((feature) => {
-      const [minX, minY, maxX, maxY] = computeFeatureBBox(feature.geometry);
-      return { feature, minX, minY, maxX, maxY };
-    });
+    const total = data.features.length;
+    const compact: CompactFeature[] = new Array(total);
+    const spatial = new Flatbush(total);
 
-    INDEX = indexed;
+    for (let i = 0; i < total; i++) {
+      const f = data.features[i];
+      const { geometry, bbox } = reprojectAndBBox(f.geometry);
+      compact[i] = {
+        fid: f.properties.fid,
+        cca: f.properties.cca,
+        geometry,
+      };
+      spatial.add(bbox[0], bbox[1], bbox[2], bbox[3]);
+    }
+    spatial.finish();
+
+    CACHE = { features: compact, spatial };
     LOADING = null;
-    return indexed;
+    return CACHE;
   })();
 
   return LOADING;
@@ -102,35 +116,32 @@ export async function GET(request: Request) {
   const maxLat = parseFloat(searchParams.get("maxLat") ?? "");
   const minLon = parseFloat(searchParams.get("minLon") ?? "");
   const maxLon = parseFloat(searchParams.get("maxLon") ?? "");
+  const limit = Math.min(
+    parseInt(searchParams.get("limit") ?? "8000", 10) || 8000,
+    20000,
+  );
 
   if ([minLat, maxLat, minLon, maxLon].some(Number.isNaN)) {
     return NextResponse.json({ error: "bbox inválido" }, { status: 400 });
   }
 
   try {
-    const index = await loadIndex();
-    const [bMinX, bMinY] = lonLatToMercator(minLon, minLat);
-    const [bMaxX, bMaxY] = lonLatToMercator(maxLon, maxLat);
-
-    const matches: RawFeature[] = [];
-    const limit = 5000;
-    for (const item of index) {
-      if (
-        item.maxX < bMinX ||
-        item.minX > bMaxX ||
-        item.maxY < bMinY ||
-        item.minY > bMaxY
-      ) continue;
-      matches.push({
-        ...item.feature,
-        geometry: reprojectGeometry(item.feature.geometry),
-      });
-      if (matches.length >= limit) break;
-    }
+    const { features, spatial } = await loadIndex();
+    const ids = spatial.search(minLon, minLat, maxLon, maxLat);
+    const slice = ids.length > limit ? ids.slice(0, limit) : ids;
+    const matches = slice.map((i) => ({
+      type: "Feature",
+      properties: { fid: features[i].fid, cca: features[i].cca },
+      geometry: features[i].geometry,
+    }));
 
     return NextResponse.json(
-      { type: "FeatureCollection", features: matches },
-      { headers: { "Cache-Control": "public, max-age=300" } },
+      { type: "FeatureCollection", features: matches, total: ids.length },
+      {
+        headers: {
+          "Cache-Control": "public, max-age=600, s-maxage=3600",
+        },
+      },
     );
   } catch (error) {
     console.error("Error loading rio-negro parcels:", error);
