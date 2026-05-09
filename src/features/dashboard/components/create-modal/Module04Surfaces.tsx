@@ -23,14 +23,9 @@ const ALL_SURFACE_TYPES = [
 const SURFACE_FIELDS: SurfaceField[] = [
   {
     key: "areaM2",
-    label: "Superficie total (m²) *",
+    label: "M2 cubiertos (m²) *",
     required: true,
     visibleFor: ALL_SURFACE_TYPES,
-  },
-  {
-    key: "coveredArea",
-    label: "Sup. cubierta (m²)",
-    visibleFor: ["HOUSE", "APARTMENT", "PH", "COUNTRY", "COMMERCIAL_PROPERTY", "OFFICE", "WAREHOUSE"],
   },
   {
     key: "semiCoveredArea",

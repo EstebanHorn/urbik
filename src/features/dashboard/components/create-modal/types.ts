@@ -44,10 +44,12 @@ export interface PropertyUploadFormData {
 
   // --- Module 5: Environments ---
   rooms?: number | string;
+  bedrooms?: number | string;
   bathrooms?: number | string;
   toilets?: number | string;
   garages?: number | string;
   plants?: number | string;
+  laundryType?: string;
 
   // --- Module 6: Basic Characteristics ---
   condition?: string;

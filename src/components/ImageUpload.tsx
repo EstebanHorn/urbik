@@ -17,6 +17,8 @@ export default function ImageUpload({
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragActive, setIsDragActive] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const remaining = maxFiles - value.length;
@@ -25,7 +27,6 @@ export default function ImageUpload({
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-    // 1. Validación de variables de entorno
     if (!cloudName || !uploadPreset) {
       console.error("🚨 FALTAN VARIABLES DE ENTORNO: Chequeá .env.local");
       return null;
@@ -46,7 +47,6 @@ export default function ImageUpload({
 
       const data = await response.json();
 
-      // 2. Manejo de error detallado
       if (!response.ok) {
         console.error("🚨 Error de Cloudinary:", data);
         alert(`Error al subir: ${data.error?.message || "Revisá la consola"}`);
@@ -66,7 +66,6 @@ export default function ImageUpload({
     const newUrls: string[] = [];
 
     Array.from(files).forEach((file) => {
-      // Validar tipo y que no sea gigante (>10MB)
       if (file.type.startsWith("image/") && validFiles.length < remaining) {
         validFiles.push(file);
       }
@@ -93,9 +92,13 @@ export default function ImageUpload({
     }
   };
 
+  // Drop zone handlers (for uploading new files from OS)
   const onDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragActive(true);
+    // Only activate drop zone if dragging from OS (has files)
+    if (e.dataTransfer.types.includes("Files")) {
+      setIsDragActive(true);
+    }
   }, []);
 
   const onDragLeave = useCallback((e: React.DragEvent) => {
@@ -122,6 +125,39 @@ export default function ImageUpload({
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  // Drag-and-drop reordering handlers
+  const handleImageDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(index));
+  };
+
+  const handleImageDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedIndex !== null && draggedIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleImageDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const reordered = [...value];
+    const [moved] = reordered.splice(draggedIndex, 1);
+    reordered.splice(index, 0, moved);
+    onChange(reordered);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleImageDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-end px-1">
@@ -133,37 +169,65 @@ export default function ImageUpload({
         </span>
       </div>
 
-      {/* GRILLA */}
       {value.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-          {value.map((url, index) => (
-            <div
-              key={`${url}-${index}`}
-              className="relative aspect-square rounded-xl overflow-hidden border border-urbik-black/10 group bg-gray-50 shadow-sm animate-in fade-in zoom-in duration-300"
-            >
-              <img
-                src={url}
-                alt={`Imagen ${index + 1}`}
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-              <button
-                type="button"
-                onClick={() => onRemove(url)}
-                className="absolute top-2 right-2 bg-white/90 text-red-500 hover:text-red-600 rounded-full p-1.5 shadow-sm opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 z-10 cursor-pointer"
+        <>
+          <p className="text-[10px] text-gray-400 font-medium px-1">
+            Arrastrá las fotos para reordenarlas. La posición 1 será la foto de portada.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            {value.map((url, index) => (
+              <div
+                key={`${url}-${index}`}
+                draggable
+                onDragStart={(e) => handleImageDragStart(e, index)}
+                onDragOver={(e) => handleImageDragOver(e, index)}
+                onDrop={(e) => handleImageDrop(e, index)}
+                onDragEnd={handleImageDragEnd}
+                className={`relative aspect-square rounded-xl overflow-hidden border group bg-gray-50 shadow-sm animate-in fade-in zoom-in duration-300 cursor-grab active:cursor-grabbing transition-all
+                  ${dragOverIndex === index && draggedIndex !== index
+                    ? "border-emerald-400 scale-105 shadow-md"
+                    : draggedIndex === index
+                    ? "border-urbik-black/30 opacity-50"
+                    : "border-urbik-black/10"
+                  }`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="w-4 h-4"
+                {index === 0 && (
+                  <span className="absolute top-2 left-2 z-10 bg-urbik-black text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">
+                    Portada
+                  </span>
+                )}
+                <img
+                  src={url}
+                  alt={`Imagen ${index + 1}`}
+                  className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  draggable={false}
+                />
+                <button
+                  type="button"
+                  onClick={() => onRemove(url)}
+                  className="absolute top-2 right-2 bg-white/90 text-red-500 hover:text-red-600 rounded-full p-1.5 shadow-sm opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 z-10 cursor-pointer"
                 >
-                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                </svg>
-              </button>
-            </div>
-          ))}
-        </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                  </svg>
+                </button>
+                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="bg-black/50 rounded-full p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white" className="w-3 h-3">
+                      <path d="M10 3a1 1 0 100 2 1 1 0 000-2zM10 9a1 1 0 100 2 1 1 0 000-2zM10 15a1 1 0 100 2 1 1 0 000-2z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* DROP ZONE */}
@@ -174,7 +238,7 @@ export default function ImageUpload({
           onDrop={onDrop}
           onClick={() => !isUploading && fileInputRef.current?.click()}
           className={`
-            group relative flex flex-col items-center justify-center w-full h-32 
+            group relative flex flex-col items-center justify-center w-full h-32
             rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer overflow-hidden
             ${
               isDragActive
@@ -218,7 +282,7 @@ export default function ImageUpload({
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.75 0 11-.75 0 .375.375 0 01.75 0z"
                     />
                   </svg>
                 </div>

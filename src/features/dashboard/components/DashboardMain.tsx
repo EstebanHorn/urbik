@@ -43,12 +43,25 @@ export default function DashboardMain({
   autoOpenCreate?: boolean;
 }) {
   const [isCreateOpen, setCreateOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (autoOpenCreate) {
       setCreateOpen(true);
     }
   }, [autoOpenCreate]);
+
+  useEffect(() => {
+    fetch("/api/inquiries")
+      .then((r) => r.json())
+      .then((data: { status: string }[]) => {
+        if (Array.isArray(data)) {
+          setUnreadCount(data.filter((i) => i.status === "UNREAD").length);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const [editingProperty, setEditingProperty] =
     useState<PropertySummary | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>("properties");
@@ -75,13 +88,16 @@ export default function DashboardMain({
           </button>
           <button
             onClick={() => setActiveTab("inquiries")}
-            className={`px-5 py-2 rounded-full text-sm font-black transition-all cursor-pointer ${
+            className={`relative px-5 py-2 rounded-full text-sm font-black transition-all cursor-pointer ${
               activeTab === "inquiries"
                 ? "bg-urbik-black text-white shadow-sm"
                 : "text-urbik-black/50 hover:text-urbik-black"
             }`}
           >
             Consultas
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+            )}
           </button>
         </div>
 
@@ -98,7 +114,7 @@ export default function DashboardMain({
       </div>
 
       {activeTab === "inquiries" ? (
-        <InquiriesPanel />
+        <InquiriesPanel onRead={() => setUnreadCount((n) => Math.max(0, n - 1))} />
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 md border border-gray-100 bg-white shadow-sm overflow-hidden">

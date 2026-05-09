@@ -103,6 +103,7 @@ model Property {
   expenses        Float?
 
   rooms           Int?
+  bedrooms        Int?
   bathrooms       Int?
   toilets         Int?
   garages         Int?

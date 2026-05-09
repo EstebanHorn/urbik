@@ -3,7 +3,7 @@ Este componente de React es un selector de ubicación dependiente que utiliza la
 Georef Argentina para permitir al usuario elegir una provincia y, posteriormente, una
 ciudad basada en esa elección. El código gestiona de forma asíncrona la carga de datos,
 el filtrado de municipios por provincia y el estado de los menús desplegables personalizados,
-incluyendo funcionalidades avanzadas como el cierre al hacer clic fuera del elemento y una 
+incluyendo funcionalidades avanzadas como el cierre al hacer clic fuera del elemento y una
 navegación mediante teclado que permite desplazarse rápidamente por las listas al presionar
 la letra inicial de cada localidad.
 */
@@ -24,33 +24,44 @@ interface GeorefItem {
 interface LocationSelectorsProps {
   provinceValue: string;
   cityValue: string;
+  localityValue?: string;
   onChange: (name: string, value: string) => void;
   onCityCoordsChange?: (coords: { lat: number; lon: number } | null) => void;
   provinceLabel?: string;
   cityLabel?: string;
+  localityLabel?: string;
+  cityApiEndpoint?: "municipios" | "departamentos";
+  showLocality?: boolean;
 }
 
 export default function LocationSelectors({
   provinceValue,
   cityValue,
+  localityValue,
   onChange,
   onCityCoordsChange,
   provinceLabel = "PROVINCIA",
   cityLabel = "CIUDAD",
+  localityLabel = "LOCALIDAD",
+  cityApiEndpoint = "municipios",
+  showLocality = false,
 }: LocationSelectorsProps) {
   const [provincias, setProvincias] = useState<GeorefItem[]>([]);
   const [ciudades, setCiudades] = useState<GeorefItem[]>([]);
+  const [localidades, setLocalidades] = useState<GeorefItem[]>([]);
   const [loadingCiudades, setLoadingCiudades] = useState(false);
+  const [loadingLocalidades, setLoadingLocalidades] = useState(false);
   const [hasCities, setHasCities] = useState(true);
-  const [openDropdown, setOpenDropdown] = useState<"province" | "city" | null>(
-    null,
-  );
+  const [hasLocalidades, setHasLocalidades] = useState(true);
+  const [openDropdown, setOpenDropdown] = useState<"province" | "city" | "locality" | null>(null);
 
   const provRef = useRef<HTMLDivElement>(null);
   const cityRef = useRef<HTMLDivElement>(null);
+  const localityRef = useRef<HTMLDivElement>(null);
 
   const provMenuRef = useRef<HTMLDivElement>(null);
   const cityMenuRef = useRef<HTMLDivElement>(null);
+  const localityMenuRef = useRef<HTMLDivElement>(null);
 
   const scrollRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
@@ -70,7 +81,8 @@ export default function LocationSelectors({
         provRef.current &&
         !provRef.current.contains(e.target as Node) &&
         cityRef.current &&
-        !cityRef.current.contains(e.target as Node)
+        !cityRef.current.contains(e.target as Node) &&
+        (!localityRef.current || !localityRef.current.contains(e.target as Node))
       ) {
         setOpenDropdown(null);
       }
@@ -87,18 +99,19 @@ export default function LocationSelectors({
       return;
     }
     setLoadingCiudades(true);
-    fetch(
-      `https://apis.datos.gob.ar/georef/api/municipios?provincia=${provinceValue}&max=1000&campos=id,nombre,centroide`,
-    )
+    const endpoint = cityApiEndpoint === "departamentos"
+      ? `https://apis.datos.gob.ar/georef/api/departamentos?provincia=${encodeURIComponent(provinceValue)}&max=200&campos=id,nombre`
+      : `https://apis.datos.gob.ar/georef/api/municipios?provincia=${encodeURIComponent(provinceValue)}&max=1000&campos=id,nombre,centroide`;
+    fetch(endpoint)
       .then((res) => res.json())
       .then((data) => {
-        const municipios = data.municipios || [];
+        const items = data.departamentos || data.municipios || [];
         setCiudades(
-          municipios.sort((a: GeorefItem, b: GeorefItem) =>
+          items.sort((a: GeorefItem, b: GeorefItem) =>
             a.nombre.localeCompare(b.nombre),
           ),
         );
-        setHasCities(municipios.length > 0);
+        setHasCities(items.length > 0);
         setLoadingCiudades(false);
       })
       .catch(() => {
@@ -106,13 +119,43 @@ export default function LocationSelectors({
         setHasCities(false);
         setLoadingCiudades(false);
       });
-  }, [provinceValue]);
+  }, [provinceValue, cityApiEndpoint]);
+
+  useEffect(() => {
+    if (!showLocality || !cityValue) {
+      setLocalidades([]);
+      setHasLocalidades(true);
+      return;
+    }
+    setLoadingLocalidades(true);
+    fetch(
+      `https://apis.datos.gob.ar/georef/api/localidades?departamento=${encodeURIComponent(cityValue)}&max=1000&campos=id,nombre`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const items = data.localidades || [];
+        setLocalidades(
+          items.sort((a: GeorefItem, b: GeorefItem) =>
+            a.nombre.localeCompare(b.nombre),
+          ),
+        );
+        setHasLocalidades(items.length > 0);
+        setLoadingLocalidades(false);
+      })
+      .catch(() => {
+        setLocalidades([]);
+        setHasLocalidades(false);
+        setLoadingLocalidades(false);
+      });
+  }, [cityValue, showLocality]);
 
   useEffect(() => {
     if (openDropdown === "province" && provMenuRef.current) {
       provMenuRef.current.focus();
     } else if (openDropdown === "city" && cityMenuRef.current) {
       cityMenuRef.current.focus();
+    } else if (openDropdown === "locality" && localityMenuRef.current) {
+      localityMenuRef.current.focus();
     }
   }, [openDropdown]);
 
@@ -127,7 +170,7 @@ export default function LocationSelectors({
         item.nombre
           .toLowerCase()
           .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[̀-ͯ]/g, "")
           .startsWith(char),
       );
 
@@ -183,7 +226,7 @@ export default function LocationSelectors({
   );
 
   return (
-    <div className="flex flex-col sm:flex-row gap-2 w-full">
+    <div className={`flex flex-col sm:flex-row gap-2 w-full ${showLocality ? "flex-wrap" : ""}`}>
       <div className="relative flex-1" ref={provRef}>
         <button
           type="button"
@@ -203,6 +246,7 @@ export default function LocationSelectors({
           onSelect={(item) => {
             onChange("province", item.nombre);
             onChange("city", "");
+            if (showLocality) onChange("locality", "");
             onCityCoordsChange?.(null);
             setOpenDropdown(null);
           }}
@@ -218,7 +262,7 @@ export default function LocationSelectors({
           }
           className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold disabled:opacity-30"
         >
-          {loadingCiudades ? "..." : !hasCities && provinceValue ? "SIN CIUDADES" : cityValue || cityLabel}
+          {loadingCiudades ? "..." : !hasCities && provinceValue ? "SIN DATOS" : cityValue || cityLabel}
           <ChevronDown />
         </button>
 
@@ -229,12 +273,41 @@ export default function LocationSelectors({
             menuRef={cityMenuRef}
             onSelect={(item) => {
               onChange("city", item.nombre);
+              if (showLocality) onChange("locality", "");
               onCityCoordsChange?.(item.centroide || null);
               setOpenDropdown(null);
             }}
           />
         )}
       </div>
+
+      {showLocality && (
+        <div className="relative flex-1 min-w-[200px]" ref={localityRef}>
+          <button
+            type="button"
+            disabled={!cityValue || !hasLocalidades}
+            onClick={() =>
+              setOpenDropdown(openDropdown === "locality" ? null : "locality")
+            }
+            className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold disabled:opacity-30"
+          >
+            {loadingLocalidades ? "..." : !hasLocalidades && cityValue ? "SIN DATOS" : localityValue || localityLabel}
+            <ChevronDown />
+          </button>
+
+          {hasLocalidades && (
+            <DropdownMenu
+              items={localidades}
+              isOpen={openDropdown === "locality"}
+              menuRef={localityMenuRef}
+              onSelect={(item) => {
+                onChange("locality", item.nombre);
+                setOpenDropdown(null);
+              }}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -33,24 +33,15 @@ export function Module02Location({
       <LocationSelectors
         provinceValue={watch("province") ?? ""}
         cityValue={watch("city") ?? ""}
+        localityValue={watch("locality") ?? ""}
         onChange={handleLocationChange}
+        cityLabel="DEPARTAMENTO / PARTIDO"
+        localityLabel="LOCALIDAD"
+        cityApiEndpoint="departamentos"
+        showLocality={true}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input
-          type="text"
-          placeholder="País"
-          value={watch("country") ?? "Argentina"}
-          onChange={(e) => setValue("country", e.target.value)}
-          className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-        />
-        <input
-          type="text"
-          placeholder="Partido"
-          value={watch("district") ?? ""}
-          onChange={(e) => setValue("district", e.target.value)}
-          className="input-urbik w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-urbik-black outline-none transition-all text-sm font-medium"
-        />
         <input
           type="text"
           placeholder="Barrio"

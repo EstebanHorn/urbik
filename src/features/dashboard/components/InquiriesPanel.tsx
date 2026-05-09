@@ -29,7 +29,11 @@ function formatDate(iso: string): string {
   }).format(new Date(iso));
 }
 
-export default function InquiriesPanel() {
+interface InquiriesPanelProps {
+  onRead?: () => void;
+}
+
+export default function InquiriesPanel({ onRead }: InquiriesPanelProps = {}) {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -63,6 +67,7 @@ export default function InquiriesPanel() {
           inq.id === id ? { ...inq, status: "READ" } : inq,
         ),
       );
+      onRead?.();
     } catch (err) {
       console.error(err);
     } finally {

@@ -73,6 +73,7 @@ export async function PUT(
       address: body.address ?? undefined,
       area: toNumberOrUndefined(body.area ?? body.areaM2),
       rooms: toNumberOrUndefined(body.rooms),
+      bedrooms: toNumberOrUndefined(body.bedrooms),
       bathrooms: toNumberOrUndefined(body.bathrooms),
       toilets: toNumberOrUndefined(body.toilets),
       garages: toNumberOrUndefined(body.garages),
@@ -89,7 +90,10 @@ export async function PUT(
       tour360Url: body.tour360Url || undefined,
       isPriceHidden: body.isPriceHidden !== undefined ? Boolean(body.isPriceHidden) : undefined,
       featureGroups: body.featureGroups || undefined,
-      extraData: body.extraData || undefined,
+      extraData: body.laundryType !== undefined
+        ? { ...(body.extraData || {}), laundryType: body.laundryType || null }
+        : body.extraData || undefined,
+      hasLaundry: body.laundryType !== undefined ? (body.laundryType ? true : false) : undefined,
       hasWater:
         typeof body.amenities?.agua === "boolean"
           ? body.amenities.agua
