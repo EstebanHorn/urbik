@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/libs/db";
+import { createClient } from "@/lib/supabase/server";
 
 interface OsmAddress {
   house_number?: string;
@@ -45,7 +45,9 @@ function buildAddressLabel(result: OsmResult) {
   );
 
   const houseNumber = address?.house_number?.trim();
-  const street = [streetName, houseNumber].filter(Boolean).join(" ") || "Direccion";
+
+  const street =
+    [streetName, houseNumber].filter(Boolean).join(" ") || "Direccion";
 
   const city =
     pickFirst(
@@ -76,6 +78,8 @@ function buildAddressLabel(result: OsmResult) {
 
 export async function GET(request: NextRequest) {
   try {
+    const supabase = await createClient();
+
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q")?.trim();
     const cityFilter = searchParams.get("city")?.trim();
@@ -84,28 +88,27 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ suggestions: [] });
     }
 
-    const agencyWhereClause = {
-      role: "REALESTATE" as const,
-      OR: [
-        {
-          realEstate: {
-            agencyName: { contains: query, mode: "insensitive" as const },
-          },
-        },
-      ],
-      ...(cityFilter && {
-        realEstate: {
-          city: { contains: cityFilter, mode: "insensitive" as const },
-        },
-      }),
-    };
+    let dbQuery = supabase
+      .from("profiles")
+      .select(`
+        user_id,
+        email,
+        role,
+        real_estates (
+          agency_name,
+          city
+        )
+      `)
+      .eq("role", "REALESTATE")
+      .ilike("real_estates.agency_name", `%${query}%`)
+      .limit(3);
 
-    const [dbResults, osmResponse] = await Promise.all([
-      prisma.allUsers.findMany({
-        where: agencyWhereClause,
-        include: { realEstate: true },
-        take: 3,
-      }),
+    if (cityFilter) {
+      dbQuery = dbQuery.ilike("real_estates.city", `%${cityFilter}%`);
+    }
+
+    const [{ data: dbResults }, osmResponse] = await Promise.all([
+      dbQuery,
       fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ar&addressdetails=1&limit=6`,
         { headers: { "User-Agent": "Urbik-App-v2" } },
@@ -115,12 +118,19 @@ export async function GET(request: NextRequest) {
     const osmResults = (await osmResponse.json()) as OsmResult[];
 
     const suggestions = [
-      ...dbResults.map((user) => ({
-        type: "REALESTATE_USER",
-        id: user.user_id,
-        display_name: user.realEstate?.agencyName || user.email,
-        city: user.realEstate?.city ?? null,
-      })),
+      ...(dbResults ?? []).map((user) => {
+  const realEstate = Array.isArray(user.real_estates)
+    ? user.real_estates[0]
+    : user.real_estates;
+
+  return {
+    type: "REALESTATE_USER",
+    id: user.user_id,
+    display_name:
+      realEstate?.agency_name || user.email,
+    city: realEstate?.city ?? null,
+  };
+}),
       ...osmResults.map((result) => ({
         type: "ADDRESS",
         id: result.place_id,

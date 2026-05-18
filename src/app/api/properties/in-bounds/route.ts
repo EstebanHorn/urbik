@@ -1,176 +1,164 @@
-/*
-ARCHIVO: src/app/api/properties/in-bounds/route.ts
-CORRECCIÓN: Eliminada la selección de 'price' que no existe en la BD y uso de Prisma.PropertyWhereInput.
-*/
-
 import { NextResponse } from "next/server";
-import prisma from "@/libs/db";
-import { Currency, OperationType, PropertyType, Prisma } from "@prisma/client";
+import { createClient } from "@/lib/supabase/server";
 
-
-const buildNumericSelectionFilter = (values: string[]): Prisma.IntNullableFilter | undefined => {
-  if (values.length === 0) return undefined;
+const buildNumericSelectionFilter = (values: string[]) => {
+  if (values.length === 0) return null;
 
   const exactValues = values
     .filter((value) => !value.endsWith("+"))
     .map((value) => parseInt(value, 10))
-    .filter((value) => !isNaN(value));
+    .filter((value) => !Number.isNaN(value));
 
   const plusValues = values
     .filter((value) => value.endsWith("+"))
     .map((value) => parseInt(value.replace("+", ""), 10))
-    .filter((value) => !isNaN(value));
+    .filter((value) => !Number.isNaN(value));
 
-  if (exactValues.length === 0 && plusValues.length === 0) return undefined;
-
-  const minPlusValue = plusValues.length > 0 ? Math.min(...plusValues) : undefined;
-
-  if (exactValues.length > 0 && minPlusValue !== undefined) {
-    return {
-      in: [...new Set(exactValues)],
-      gte: minPlusValue,
-    };
+  if (exactValues.length === 0 && plusValues.length === 0) {
+    return null;
   }
 
-  if (minPlusValue !== undefined) {
-    return { gte: minPlusValue };
-  }
-
-  return { in: [...new Set(exactValues)] };
+  return {
+    exactValues,
+    minPlusValue:
+      plusValues.length > 0 ? Math.min(...plusValues) : null,
+  };
 };
 
-const LEGACY_MISSING_AMENITIES = [
-  "hasBalcony",
-  "hasGrill",
-  "hasGarden",
-  "hasLaundry",
-  "hasAirConditioning",
-] as const;
+const PROPERTY_SELECT = `
+  id,
+  title,
+  sale_price,
+  sale_currency,
+  rent_price,
+  rent_currency,
+  latitude,
+  longitude,
+  city,
+  province,
+  operation_type,
+  type,
+  parcel_cca,
+  parcel_geom,
+  images,
+  address,
+  rooms,
+  bathrooms,
+  area,
+  has_water,
+  has_electricity,
+  has_gas,
+  has_internet,
+  has_parking,
+  has_pool,
+  has_balcony,
+  has_grill,
+  has_garden,
+  has_laundry,
+  has_air_conditioning
+`;
 
-const PROPERTY_SELECT_FULL = {
-  id: true,
-  title: true,
-  salePrice: true,
-  saleCurrency: true,
-  rentPrice: true,
-  rentCurrency: true,
-  latitude: true,
-  longitude: true,
-  city: true,
-  province: true,
-  operationType: true,
-  type: true,
-  parcelCCA: true,
-  parcelGeom: true,
-  images: true,
-  address: true,
-  rooms: true,
-  area: true,
-  hasWater: true,
-  hasElectricity: true,
-  hasGas: true,
-  hasInternet: true,
-  hasParking: true,
-  hasPool: true,
-  hasBalcony: true,
-  hasGrill: true,
-  hasGarden: true,
-  hasLaundry: true,
-  hasAirConditioning: true,
-} as Prisma.PropertySelect;
-
-const PROPERTY_SELECT_LEGACY = {
-  id: true,
-  title: true,
-  salePrice: true,
-  saleCurrency: true,
-  rentPrice: true,
-  rentCurrency: true,
-  latitude: true,
-  longitude: true,
-  city: true,
-  province: true,
-  operationType: true,
-  type: true,
-  parcelCCA: true,
-  parcelGeom: true,
-  images: true,
-  address: true,
-  rooms: true,
-  area: true,
-  hasWater: true,
-  hasElectricity: true,
-  hasGas: true,
-  hasInternet: true,
-  hasParking: true,
-  hasPool: true,
-} as Prisma.PropertySelect;
-
-function stripLegacyMissingAmenityFilters(
-  whereClause: Prisma.PropertyWhereInput,
-): Prisma.PropertyWhereInput {
-  const withoutLegacyFields = {
-    ...whereClause,
-  } as Prisma.PropertyWhereInput & Record<string, unknown>;
-
-  for (const field of LEGACY_MISSING_AMENITIES) {
-    delete withoutLegacyFields[field];
-  }
-
-  return withoutLegacyFields;
+interface MapPropertyRow {
+  id: string | number;
+  title: string;
+  sale_price?: number | null;
+  sale_currency?: string | null;
+  rent_price?: number | null;
+  rent_currency?: string | null;
+  latitude: number;
+  longitude: number;
+  city: string;
+  province: string;
+  operation_type: string;
+  type: string;
+  parcel_cca?: string | null;
+  parcel_geom?: unknown;
+  images: string[];
+  address: string;
+  rooms: number;
+  bathrooms: number;
+  area: number;
+  has_water: boolean;
+  has_electricity: boolean;
+  has_gas: boolean;
+  has_internet: boolean;
+  has_parking: boolean;
+  has_pool: boolean;
+  has_balcony: boolean;
+  has_grill: boolean;
+  has_garden: boolean;
+  has_laundry: boolean;
+  has_air_conditioning: boolean;
 }
 
-function isMissingColumnError(error: unknown): error is Prisma.PrismaClientKnownRequestError {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2022"
-  );
-}
-
-function isPrismaServiceUnavailableError(
-  error: unknown,
-): error is Prisma.PrismaClientKnownRequestError {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    (error.code === "P5010" || error.code === "P1001" || error.code === "P1002")
-  );
-}
+const mapProperty = (property: MapPropertyRow) => ({
+  id: property.id,
+  title: property.title,
+  salePrice: property.sale_price,
+  saleCurrency: property.sale_currency,
+  rentPrice: property.rent_price,
+  rentCurrency: property.rent_currency,
+  latitude: property.latitude,
+  longitude: property.longitude,
+  city: property.city,
+  province: property.province,
+  operationType: property.operation_type,
+  type: property.type,
+  parcelCCA: property.parcel_cca,
+  parcelGeom: property.parcel_geom,
+  images: property.images,
+  address: property.address,
+  rooms: property.rooms,
+  bathrooms: property.bathrooms,
+  area: property.area,
+  hasWater: property.has_water,
+  hasElectricity: property.has_electricity,
+  hasGas: property.has_gas,
+  hasInternet: property.has_internet,
+  hasParking: property.has_parking,
+  hasPool: property.has_pool,
+  hasBalcony: property.has_balcony,
+  hasGrill: property.has_grill,
+  hasGarden: property.has_garden,
+  hasLaundry: property.has_laundry,
+  hasAirConditioning: property.has_air_conditioning,
+});
 
 export async function GET(request: Request) {
+  const supabase = await createClient();
+
   const { searchParams } = new URL(request.url);
 
   const minLat = parseFloat(searchParams.get("minLat") ?? "");
   const maxLat = parseFloat(searchParams.get("maxLat") ?? "");
   const minLon = parseFloat(searchParams.get("minLon") ?? "");
   const maxLon = parseFloat(searchParams.get("maxLon") ?? "");
+
   const operationType = searchParams.get("operationType");
   const propertyType = searchParams.get("propertyType");
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const currency = searchParams.get("currency");
+
   const bedrooms = searchParams.getAll("bedrooms");
   const bathrooms = searchParams.getAll("bathrooms");
+
   const minArea = searchParams.get("minArea");
   const maxArea = searchParams.get("maxArea");
+
   const age = searchParams.get("age");
+
   const city = searchParams.get("city");
   const province = searchParams.get("province");
+
   const text = searchParams.get("q");
 
-  const hasWater = searchParams.get("hasWater") === "true";
-  const hasElectricity = searchParams.get("hasElectricity") === "true";
-  const hasGas = searchParams.get("hasGas") === "true";
-  const hasInternet = searchParams.get("hasInternet") === "true";
-  const hasParking = searchParams.get("hasParking") === "true";
-  const hasPool = searchParams.get("hasPool") === "true";
-  const hasBalcony = searchParams.get("hasBalcony") === "true";
-  const hasGrill = searchParams.get("hasGrill") === "true";
-  const hasGarden = searchParams.get("hasGarden") === "true";
-  const hasLaundry = searchParams.get("hasLaundry") === "true";
-  const hasAirConditioning =
-    searchParams.get("hasAirConditioning") === "true";
-
-  if (isNaN(minLat) || isNaN(maxLat) || isNaN(minLon) || isNaN(maxLon)) {
+  if (
+    Number.isNaN(minLat) ||
+    Number.isNaN(maxLat) ||
+    Number.isNaN(minLon) ||
+    Number.isNaN(maxLon)
+  ) {
     return NextResponse.json(
       { error: "Coordenadas inválidas" },
       { status: 400 },
@@ -178,170 +166,164 @@ export async function GET(request: Request) {
   }
 
   try {
-    const whereClause: Prisma.PropertyWhereInput = {
-      status: "AVAILABLE",
-      latitude: {
-        gte: minLat,
-        lte: maxLat,
-      },
-      longitude: {
-        gte: minLon,
-        lte: maxLon,
-      },
-    };
+    let query = supabase
+      .from("properties")
+      .select(PROPERTY_SELECT)
+      .eq("status", "AVAILABLE")
+      .gte("latitude", minLat)
+      .lte("latitude", maxLat)
+      .gte("longitude", minLon)
+      .lte("longitude", maxLon);
 
     if (operationType) {
-      whereClause.operationType = operationType as OperationType;
+      query = query.eq("operation_type", operationType);
     }
 
     if (propertyType) {
-      whereClause.type = propertyType as PropertyType;
+      query = query.eq("type", propertyType);
     }
 
     if (city) {
-      whereClause.city = { contains: city, mode: "insensitive" };
+      query = query.ilike("city", `%${city}%`);
     }
 
     if (province) {
-      whereClause.province = { contains: province, mode: "insensitive" };
+      query = query.ilike("province", `%${province}%`);
     }
 
     if (text) {
-      const currentAnd = whereClause.AND
-        ? Array.isArray(whereClause.AND)
-          ? whereClause.AND
-          : [whereClause.AND]
-        : [];
-      whereClause.AND = [
-        ...currentAnd,
-        {
-          OR: [
-            { title: { contains: text, mode: "insensitive" } },
-            { address: { contains: text, mode: "insensitive" } },
-            { city: { contains: text, mode: "insensitive" } },
-            { province: { contains: text, mode: "insensitive" } },
-          ],
-        },
-      ];
+      query = query.or(
+        `title.ilike.%${text}%,address.ilike.%${text}%,city.ilike.%${text}%,province.ilike.%${text}%`,
+      );
     }
 
     const roomsFilter = buildNumericSelectionFilter(bedrooms);
+
     if (roomsFilter) {
-      whereClause.rooms = roomsFilter;
+      const conditions: string[] = [];
+
+      if (roomsFilter.exactValues.length > 0) {
+        conditions.push(
+          `rooms.in.(${roomsFilter.exactValues.join(",")})`,
+        );
+      }
+
+      if (roomsFilter.minPlusValue !== null) {
+        conditions.push(`rooms.gte.${roomsFilter.minPlusValue}`);
+      }
+
+      query = query.or(conditions.join(","));
     }
 
-    const bathroomsFilter = buildNumericSelectionFilter(bathrooms);
+    const bathroomsFilter =
+      buildNumericSelectionFilter(bathrooms);
+
     if (bathroomsFilter) {
-      whereClause.bathrooms = bathroomsFilter;
+      const conditions: string[] = [];
+
+      if (bathroomsFilter.exactValues.length > 0) {
+        conditions.push(
+          `bathrooms.in.(${bathroomsFilter.exactValues.join(",")})`,
+        );
+      }
+
+      if (bathroomsFilter.minPlusValue !== null) {
+        conditions.push(
+          `bathrooms.gte.${bathroomsFilter.minPlusValue}`,
+        );
+      }
+
+      query = query.or(conditions.join(","));
     }
 
-    if (minArea || maxArea) {
-      whereClause.area = {
-        ...(minArea && { gte: parseFloat(minArea) }),
-        ...(maxArea && { lte: parseFloat(maxArea) }),
-      };
+    if (minArea) {
+      query = query.gte("area", parseFloat(minArea));
+    }
+
+    if (maxArea) {
+      query = query.lte("area", parseFloat(maxArea));
     }
 
     if (age) {
       const ageInYears = parseInt(age, 10);
-      if (!isNaN(ageInYears)) {
+
+      if (!Number.isNaN(ageInYears)) {
         const minDate = new Date();
-        minDate.setFullYear(minDate.getFullYear() - ageInYears);
-        whereClause.createdAt = {
-          gte: minDate,
-        };
+
+        minDate.setFullYear(
+          minDate.getFullYear() - ageInYears,
+        );
+
+        query = query.gte(
+          "created_at",
+          minDate.toISOString(),
+        );
       }
     }
 
     if (minPrice || maxPrice) {
-      whereClause.OR = [
-        {
-          salePrice: {
-            ...(minPrice && { gte: parseFloat(minPrice) }),
-            ...(maxPrice && { lte: parseFloat(maxPrice) }),
-          },
-        },
-        {
-          rentPrice: {
-            ...(minPrice && { gte: parseFloat(minPrice) }),
-            ...(maxPrice && { lte: parseFloat(maxPrice) }),
-          },
-        },
-      ];
+      const saleConditions: string[] = [];
+      const rentConditions: string[] = [];
+
+      if (minPrice) {
+        saleConditions.push(`sale_price.gte.${minPrice}`);
+        rentConditions.push(`rent_price.gte.${minPrice}`);
+      }
+
+      if (maxPrice) {
+        saleConditions.push(`sale_price.lte.${maxPrice}`);
+        rentConditions.push(`rent_price.lte.${maxPrice}`);
+      }
 
       if (currency) {
-        whereClause.OR = [
-          {
-            salePrice: {
-              ...(minPrice && { gte: parseFloat(minPrice) }),
-              ...(maxPrice && { lte: parseFloat(maxPrice) }),
-            },
-            saleCurrency: currency as Currency,
-          },
-          {
-            rentPrice: {
-              ...(minPrice && { gte: parseFloat(minPrice) }),
-              ...(maxPrice && { lte: parseFloat(maxPrice) }),
-            },
-            rentCurrency: currency as Currency,
-          },
-        ];
+        saleConditions.push(`sale_currency.eq.${currency}`);
+        rentConditions.push(`rent_currency.eq.${currency}`);
       }
+
+      query = query.or(
+        `and(${saleConditions.join(",")}),and(${rentConditions.join(",")})`,
+      );
     } else if (currency) {
-      whereClause.OR = [
-        { saleCurrency: currency as Currency },
-        { rentCurrency: currency as Currency },
-      ];
+      query = query.or(
+        `sale_currency.eq.${currency},rent_currency.eq.${currency}`,
+      );
     }
 
-    const dynamicWhere = whereClause as Record<string, unknown>;
-    if (hasWater) dynamicWhere.hasWater = true;
-    if (hasElectricity) dynamicWhere.hasElectricity = true;
-    if (hasGas) dynamicWhere.hasGas = true;
-    if (hasInternet) dynamicWhere.hasInternet = true;
-    if (hasParking) dynamicWhere.hasParking = true;
-    if (hasPool) dynamicWhere.hasPool = true;
-    if (hasBalcony) dynamicWhere.hasBalcony = true;
-    if (hasGrill) dynamicWhere.hasGrill = true;
-    if (hasGarden) dynamicWhere.hasGarden = true;
-    if (hasLaundry) dynamicWhere.hasLaundry = true;
-    if (hasAirConditioning) dynamicWhere.hasAirConditioning = true;
+    const amenities = [
+      ["hasWater", "has_water"],
+      ["hasElectricity", "has_electricity"],
+      ["hasGas", "has_gas"],
+      ["hasInternet", "has_internet"],
+      ["hasParking", "has_parking"],
+      ["hasPool", "has_pool"],
+      ["hasBalcony", "has_balcony"],
+      ["hasGrill", "has_grill"],
+      ["hasGarden", "has_garden"],
+      ["hasLaundry", "has_laundry"],
+      ["hasAirConditioning", "has_air_conditioning"],
+    ];
 
-    let properties;
-    try {
-      properties = await prisma.property.findMany({
-        where: whereClause,
-        select: PROPERTY_SELECT_FULL,
-      });
-    } catch (queryError) {
-      if (!isMissingColumnError(queryError)) {
-        throw queryError;
+    for (const [param, column] of amenities) {
+      if (searchParams.get(param) === "true") {
+        query = query.eq(column, true);
       }
-
-      const fallbackWhere = stripLegacyMissingAmenityFilters(whereClause);
-      const legacyProperties = await prisma.property.findMany({
-        where: fallbackWhere,
-        select: PROPERTY_SELECT_LEGACY,
-      });
-
-      properties = legacyProperties.map((property) => ({
-        ...property,
-        hasBalcony: false,
-        hasGrill: false,
-        hasGarden: false,
-        hasLaundry: false,
-        hasAirConditioning: false,
-      }));
     }
 
-    return NextResponse.json({ properties });
+    const { data, error } = await query;
+
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json({
+      properties: (data || []).map((prop) => mapProperty(prop as unknown as MapPropertyRow)),
+    });
   } catch (error) {
-    if (isPrismaServiceUnavailableError(error)) {
-      console.warn("Prisma service unavailable in in-bounds route:", error.code);
-      return NextResponse.json({ properties: [] });
-    }
+    console.error(
+      "Error fetching properties in bounds:",
+      error,
+    );
 
-    console.error("Error fetching properties in bounds:", error);
     return NextResponse.json(
       { error: "Error interno del servidor" },
       { status: 500 },

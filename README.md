@@ -49,13 +49,13 @@ Plataforma web para buscar y publicar propiedades con autenticacion, perfiles de
 
 ## Rutas de aplicacion
 - `/` landing con banner animado y categorias de propiedades.
-- `/login` formulario de credenciales + acceso con Google.
-- `/register` registro de usuario o inmobiliaria.
+- `/auth/login` formulario de credenciales + acceso con Google.
+- `/auth/register` registro de usuario o inmobiliaria.
 - `/profile` panel segun rol para editar datos y (si es inmobiliaria) gestionar publicaciones.
 - `/map?lat={lat}&lon={lon}&q={query}` vista de mapa Leaflet para la direccion seleccionada.
 
 ## API principal
-- `POST /api/register` registra usuario o inmobiliaria.
+- `POST /api/auth/register` registra usuario o inmobiliaria.
 - `POST /api/property` crea una propiedad (requiere sesion de rol REALESTATE).
 - `GET /api/search?q=` devuelve sugerencias de usuarios REALESTATE para el buscador.
 - `GET /api/user` obtiene perfil de la sesion actual.

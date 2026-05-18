@@ -1,20 +1,10 @@
-/*
-Este código define una página de configuración para una aplicación de mapas (probablemente inmobiliaria)
-que permite a los usuarios personalizar su experiencia visual e interactiva mediante el uso de un contexto
-global (MapSettingsProvider). A través de una interfaz moderna construida con React, Framer Motion y Lucide
-React, el componente gestiona estados y preferencias como el estilo de las capas de datos, el mapa base, el
-zoom del ratón, el análisis de zonas inteligentes y el tamaño de los elementos en la barra lateral,
-ofreciendo además una vista previa en tiempo real mediante un mapa interactivo cargado de forma dinámica
-para optimizar el rendimiento.
-*/
-
 "use client";
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { useMapSettings, ColorMode } from "@/features/map/context/MapSettingsProvider";
-import { mapBaseLayers, type BaseLayerId } from "@/features/map/config/baseLayers";
+import { useMapSettings, type ColorMode } from "@/components/map/MapSettingsProvider";
+import { mapBaseLayers, type BaseLayerId } from "@/components/map/types";
 import { 
   MousePointer2, 
   BrainCircuit, 
@@ -24,10 +14,12 @@ import {
 } from 'lucide-react';
 
 const InteractiveMap = dynamic(
-  () => import("@/features/map/components/InteractiveMap").then((m) => m.InteractiveMap),
+  () => import("@/components/map/InteractiveMapClient").then(
+      (m) => m.InteractiveMapClient,
+    ),
   { 
     ssr: false,
-    loading: () => <div className="h-[60vh] w-full bg-urbik-g200 animate-pulse rounded-[2rem]" /> 
+    loading: () => <div className="h-[60vh] w-full bg-urbik-g200 animate-pulse rounded-4xl" /> 
   }
 );
 
@@ -97,7 +89,7 @@ export default function SettingsPage() {
               <h2 className="text-2xl font-display font-bold text-urbik-muted tracking-tight">Interacción</h2>
             </div>
             
-            <div className="flex items-center justify-between px-8 py-6 bg-urbik-white border border-gray-200 rounded-[2rem]">
+            <div className="flex items-center justify-between px-8 py-6 bg-urbik-white border border-gray-200 rounded-4xl">
               <div>
                 <h3 className="font-bold text-urbik-black text-lg">Zoom con mouse</h3>
                 <p className="text-sm text-gray-500 italic">Navegación fluida con la rueda del ratón.</p>
@@ -119,7 +111,7 @@ export default function SettingsPage() {
               <h2 className="text-2xl font-display font-bold text-urbik-muted tracking-tight">Urbik Smart Zone®</h2>
             </div>
 
-            <div className="flex items-center justify-between px-8 py-6 bg-urbik-white border border-gray-200 rounded-[2rem]">
+            <div className="flex items-center justify-between px-8 py-6 bg-urbik-white border border-gray-200 rounded-4xl">
               <div>
                 <h3 className="font-bold text-urbik-black text-lg">Análisis de zona</h3>
                 <p className="text-sm text-gray-500 italic">Evaluación automática de entorno y servicios.</p>
@@ -140,7 +132,7 @@ export default function SettingsPage() {
                 <button
                   key={opt.id}
                   onClick={() => setColorMode(opt.id as ColorMode)}
-                  className={`cursor-pointer flex flex-col p-6 rounded-[2rem] border transition-all text-left ${
+                  className={`cursor-pointer flex flex-col p-6 rounded-4xl border transition-all text-left ${
                     colorMode === opt.id 
                     ? "border-urbik-black bg-urbik-black text-white shadow-lg scale-[1.02]" 
                     : "border-gray-200 bg-white hover:border-urbik-black/40 text-urbik-black"

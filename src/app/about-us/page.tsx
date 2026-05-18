@@ -1,24 +1,9 @@
-/*
-Este código define un componente para la sección Quiénes Somos (AboutUs), utilizando Next.js
-con la directiva "use client" para permitir interactividad y animaciones. El componente emplea
-Tailwind CSS para el diseño visual, Framer Motion para añadir efectos de entrada y transiciones
-suaves en los elementos, y la librería Lucide-react para mostrar íconos representativos de los
-valores de la empresa. Su estructura organiza dinámicamente información sobre transparencia,
-innovación y seguridad, presentando una narrativa visual que combina una sección de introducción
-con imágenes, tarjetas de pilares fundamentales y descripciones detalladas de los procesos de
-la marca.
-*/
-
 "use client";
 import { motion } from "framer-motion";
-import { Users, Eye, Target, Zap, ShieldCheck, Globe, ChevronRight } from "lucide-react";
+import { Eye, Zap, ShieldCheck } from "lucide-react";
+import Image from "next/image";
 
 export default function AboutUs() {
-  const stats = [
-    { label: "Propiedades", value: "+15k" },
-    { label: "Inmobiliarias", value: "200+" },
-    { label: "Localidades", value: "45" },
-  ];
 
   const values = [
     {
@@ -69,12 +54,13 @@ export default function AboutUs() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="rounded-md overflow-hidden aspect-[1/1] relative z-10"
+            className="rounded-md overflow-hidden aspect-square relative z-10"
           >
-            <img 
+            <Image
               src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80" 
               alt="Oficina Urbik" 
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+              fill
+              className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
             />
           </motion.div>
         </div>
@@ -87,7 +73,7 @@ export default function AboutUs() {
               <h2 className="text-2xl font-display font-bold text-urbik-muted ml-2">Nuestros Pilares</h2>
               <p className="text-urbik-black opacity-50 text-md font-medium mt-2">Lo que nos hace diferentes al resto.</p>
             </div>
-            <div className="hidden md:block h-[1px] bg-urbik-g300 flex-1 mx-10 mb-4" />
+            <div className="hidden md:block h-px bg-urbik-g300 flex-1 mx-10 mb-4" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

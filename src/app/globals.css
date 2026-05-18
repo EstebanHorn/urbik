@@ -1,11 +1,7 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-/* =========================
-   THEME TOKENS (Tailwind v4)
-   ========================= */
 @theme {
-  /* Paleta del boceto */
   --color-urbik-black: #000000;
   --color-urbik-dark: #2e2e2e;
   --color-urbik-dark2: #3e3e3e;
@@ -16,23 +12,22 @@
   --color-urbik-g300: #e6e6e6;
   --color-urbik-g400: #c5c5c5;
 
-  /* Accent */
   --color-urbik-cyan: #00deff;
   --color-urbik-emerald: #00ff8e;
     --color-urbik-rose: #ff0077;
 
 
-  /* Fonts (SOLO las del layout) */
 --font-body: var(--font-inter);
   --font-display: var(--font-inter);
   --font-brand: var(--font-inter);
 }
-/* =========================
-   BASE GLOBAL
-   ========================= */
+
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html {
   scroll-behavior: smooth;
 }
 
@@ -42,24 +37,20 @@ body {
   margin: 0;
   padding: 0;
   background: var(--color-urbik-white);
-  font-family: var(--font-body); /* Ahora es Inter */
+  font-family: var(--font-body); 
   color: var(--color-urbik-black);
 }
 
-/* Headings con Inter */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  font-weight: 800; /* Peso negrita para títulos */
-  letter-spacing: -0.025em; /* Inter se ve mejor un poco más junta en títulos */
+  font-weight: 800; 
+  letter-spacing: -0.025em;
 }
 
 a {
   text-decoration: none;
 }
 
-/* Aplicamos múltiples drop-shadows sin blur (0px) 
-   en distintas direcciones para simular un borde sólido
-*/
 .parcel-layer-shadow img {
   filter: 
 
@@ -67,13 +58,11 @@ a {
     drop-shadow(-0.05px 0.05px 0px white);
 
 }
-/* Contenedor del Marker de precio */
 .price-tag-container {
   background: transparent !important;
   border: none !important;
 }
 
-/* El badge de precio propiamente dicho */
 .price-tag-badge {
   display: flex;
   align-items: center;
@@ -88,16 +77,14 @@ a {
   white-space: nowrap;
 }
 
-/* Colores según operación (Venta = Rojo/Rosa, Alquiler = Azul/Blanco) */
 .price-tag-badge.is-sale {
   background-color: var(--color-urbik-dark2);
 }
 
 .price-tag-badge.is-rent {
-  background-color: var(--color-urbik-dark2); /* Azul o el color que prefieras para alquiler */
+  background-color: var(--color-urbik-dark2);
 }
 
-/* Hover Card Tooltip */
 .leaflet-tooltip.custom-property-tooltip {
   background: transparent !important;
   border: none !important;
@@ -110,26 +97,19 @@ a {
 }
 
 .white-labels-custom {
-          /* Invertir colores (si el texto original es negro, pasa a blanco) */
           filter: invert(0%) brightness(1)
                   drop-shadow(1px 1px 0px white) 
                   drop-shadow(-1px -1px 0px white);
-          /* Forzar un tamaño visual un poco mayor mediante escala */
           transform-origin: center;
         }
         
-        /* Ajuste de escala para que se vean más grandes (opcional) */
         .leaflet-tile-container img.white-labels-custom {
-          width: 258px !important; /* Un pequeño hack para que estire un poco el tile */
+          width: 258px !important;
           height: 258px !important;
         }
 
-        
-/* =========================
-   UTILIDADES URBIK
-   ========================= */
+
 @layer utilities {
-  /* BG GRADIENT */
   .bg-urbik-gray1 {
     background-image: linear-gradient(
       to right, 
@@ -211,7 +191,6 @@ a {
     background-color: var(--color-urbik-cyan);
   }
 
-  /* TEXT */
   .text-urbik-black {
     color: var(--color-urbik-black);
   }
@@ -225,12 +204,10 @@ a {
     color: var(--color-urbik-cyan);
   }
 
-  /* BORDER */
   .border-urbik {
     border-color: var(--color-urbik-g400);
   }
 
-  /* Fonts explícitas */
   .font-body {
     font-family: var(--font-body);
   }
@@ -241,7 +218,6 @@ a {
     font-family: var(--font-brand);
   }
 
-  /* Components */
   .pill {
     @apply rounded-full px-6 py-3 text-xs font-medium uppercase tracking-wide;
   }
@@ -259,16 +235,11 @@ a {
   }
 }
 
-/* =========================
-   MAP
-   ========================= */
+
 .map-container {
   height: 90vh;
 }
 
-/* =========================
-   SCROLLBAR
-   ========================= */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -292,4 +263,18 @@ a {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
   }
+}
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
 }

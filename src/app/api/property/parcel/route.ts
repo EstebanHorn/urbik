@@ -1,16 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/libs/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import {
-  OperationType,
-  PropertyStatus,
-  PropertyType,
-} from "@prisma/client";
-
-const VALID_TYPES = new Set(Object.values(PropertyType));
-const VALID_OPERATIONS = new Set(Object.values(OperationType));
-const VALID_STATUSES = new Set(Object.values(PropertyStatus));
+import { createClient } from "@/lib/supabase/server";
 
 const toNumberOrNull = (value: unknown) => {
   if (value === null || value === undefined || value === "") return null;
@@ -18,22 +7,40 @@ const toNumberOrNull = (value: unknown) => {
   return Number.isNaN(parsed) ? null : parsed;
 };
 
-export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
+type RealEstateData = { user_id: string } | { user_id: string }[] | null | undefined;
 
-  if (!session || !session.user?.email) {
+export async function POST(req: Request) {
+  const supabase = await createClient();
+
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  if (!authUser) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
   try {
     const body = await req.json();
 
-    const user = await prisma.allUsers.findUnique({
-      where: { email: session.user.email },
-      include: { realEstate: true },
-    });
+    const { data: user, error: userError } = await supabase
+      .from("profiles")
+      .select(`
+        user_id,
+        real_estates (
+          user_id
+        )
+      `)
+      .eq("id", authUser.id)
+      .single();
 
-    if (!user || !user.realEstate) {
+    const realEstatesData = user?.real_estates as unknown as RealEstateData;
+    
+    const realEstateId = Array.isArray(realEstatesData) 
+      ? realEstatesData[0]?.user_id 
+      : realEstatesData?.user_id;
+
+    if (userError || !user || !realEstateId) {
       return NextResponse.json(
         { error: "Solo las inmobiliarias pueden crear propiedades" },
         { status: 403 },
@@ -43,23 +50,35 @@ export async function POST(req: Request) {
     const normalizedOperation =
       body.operationType === "rent" || body.operationType === "RENT"
         ? "RENT"
-        : body.operationType === "temp_rent" || body.operationType === "TEMP_RENT"
+        : body.operationType === "temp_rent" ||
+            body.operationType === "TEMP_RENT"
           ? "TEMP_RENT"
-          : body.operationType === "sale" || body.operationType === "SALE"
+          : body.operationType === "sale" ||
+              body.operationType === "SALE"
             ? "SALE"
-            : body.operationType === "both" || body.operationType === "SALE_RENT"
+            : body.operationType === "both" ||
+                body.operationType === "SALE_RENT"
               ? "SALE_RENT"
               : "RENT";
 
-    const normalizedStatus = (body.status || "AVAILABLE") as PropertyStatus;
+    const normalizedStatus = body.status || "AVAILABLE";
 
     const title = String(body.title || "").trim();
     const type = String(body.type || "").trim();
     const city = String(body.city || "").trim();
     const province = String(body.province || "").trim();
-    const streetName = String(body.streetName || body.street || "").trim();
-    const streetNumber = String(body.streetNumber || body.number || "").trim();
-    const address = String(body.address || `${streetName} ${streetNumber}`.trim() || "Sin dirección");
+    const streetName = String(
+      body.streetName || body.street || "",
+    ).trim();
+    const streetNumber = String(
+      body.streetNumber || body.number || "",
+    ).trim();
+
+    const address = String(
+      body.address ||
+        `${streetName} ${streetNumber}`.trim() ||
+        "Sin dirección",
+    );
 
     if (!title || !type || !city || !province || !streetName) {
       return NextResponse.json(
@@ -68,40 +87,56 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!VALID_TYPES.has(type as PropertyType)) {
-      return NextResponse.json({ error: "Tipo de propiedad inválido" }, { status: 400 });
-    }
-
-    if (!VALID_OPERATIONS.has(normalizedOperation as OperationType)) {
-      return NextResponse.json({ error: "Operación inválida" }, { status: 400 });
-    }
-
-    if (!VALID_STATUSES.has(normalizedStatus)) {
-      return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
-    }
-
     const isPriceHidden = Boolean(body.isPriceHidden);
-    const hasSale = body.salePrice !== null && body.salePrice !== undefined && body.salePrice !== "";
-    const hasRent = body.rentPrice !== null && body.rentPrice !== undefined && body.rentPrice !== "";
+
+    const hasSale =
+      body.salePrice !== null &&
+      body.salePrice !== undefined &&
+      body.salePrice !== "";
+
+    const hasRent =
+      body.rentPrice !== null &&
+      body.rentPrice !== undefined &&
+      body.rentPrice !== "";
 
     if (!isPriceHidden) {
       if (normalizedOperation === "SALE" && !hasSale) {
-        return NextResponse.json({ error: "Falta precio de venta" }, { status: 400 });
-      }
-      if ((normalizedOperation === "RENT" || normalizedOperation === "TEMP_RENT") && !hasRent) {
-        return NextResponse.json({ error: "Falta precio de alquiler" }, { status: 400 });
-      }
-      if (normalizedOperation === "SALE_RENT" && !hasSale && !hasRent) {
         return NextResponse.json(
-          { error: "Completá al menos un precio o marcá Sin precio" },
+          { error: "Falta precio de venta" },
+          { status: 400 },
+        );
+      }
+
+      if (
+        (normalizedOperation === "RENT" ||
+          normalizedOperation === "TEMP_RENT") &&
+        !hasRent
+      ) {
+        return NextResponse.json(
+          { error: "Falta precio de alquiler" },
+          { status: 400 },
+        );
+      }
+
+      if (
+        normalizedOperation === "SALE_RENT" &&
+        !hasSale &&
+        !hasRent
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Completá al menos un precio o marcá Sin precio",
+          },
           { status: 400 },
         );
       }
     }
 
-    const newProperty = await prisma.property.create({
-      data: {
-        realEstateId: user.realEstate.user_id,
+    const { data: newProperty, error } = await supabase
+      .from("properties")
+      .insert({
+        real_estate_id: realEstateId, 
         title,
         description: body.description || "",
         address,
@@ -111,20 +146,20 @@ export async function POST(req: Request) {
         district: body.district || null,
         locality: body.locality || null,
         neighborhood: body.neighborhood || null,
-        streetName,
-        streetNumber: streetNumber || null,
+        street_name: streetName,
+        street_number: streetNumber || null,
         floor: body.floor || null,
-        unitNumber: body.unitNumber || null,
-        type: type as PropertyType,
-        unitType: body.unitType || null,
-        propertySubtype: body.propertySubtype || null,
+        unit_number: body.unitNumber || null,
+        type,
+        unit_type: body.unitType || null,
+        property_subtype: body.propertySubtype || null,
         status: normalizedStatus,
-        operationType: normalizedOperation as OperationType,
-        isPriceHidden,
-        salePrice: toNumberOrNull(body.salePrice),
-        rentPrice: toNumberOrNull(body.rentPrice),
-        saleCurrency: body.saleCurrency || "USD",
-        rentCurrency: body.rentCurrency || "ARS",
+        operation_type: normalizedOperation,
+        is_price_hidden: isPriceHidden,
+        sale_price: toNumberOrNull(body.salePrice),
+        rent_price: toNumberOrNull(body.rentPrice),
+        sale_currency: body.saleCurrency || "USD",
+        rent_currency: body.rentCurrency || "ARS",
         area: toNumberOrNull(body.areaM2 ?? body.area),
         rooms: toNumberOrNull(body.rooms),
         bedrooms: toNumberOrNull(body.bedrooms),
@@ -132,35 +167,47 @@ export async function POST(req: Request) {
         toilets: toNumberOrNull(body.toilets),
         garages: toNumberOrNull(body.garages),
         plants: toNumberOrNull(body.plants),
-        coveredArea: toNumberOrNull(body.coveredArea),
-        semiCoveredArea: toNumberOrNull(body.semiCoveredArea),
-        uncoveredArea: toNumberOrNull(body.uncoveredArea),
-        frontLength: toNumberOrNull(body.frontLength),
-        backLength: toNumberOrNull(body.backLength),
+        covered_area: toNumberOrNull(body.coveredArea),
+        semi_covered_area: toNumberOrNull(body.semiCoveredArea),
+        uncovered_area: toNumberOrNull(body.uncoveredArea),
+        front_length: toNumberOrNull(body.frontLength),
+        back_length: toNumberOrNull(body.backLength),
         expenses: toNumberOrNull(body.expenses),
-        hasLaundry: body.laundryType ? true : false,
-        hasWater: !!body.hasWater,
-        hasElectricity: !!body.hasElectricity,
-        hasGas: !!body.hasGas,
-        hasInternet: !!body.hasInternet,
-        hasParking: !!body.hasParking,
-        hasPool: !!body.hasPool,
-        featureGroups: body.featureGroups || {},
-        extraData: { ...(body.extraData || {}), laundryType: body.laundryType || null },
-        youtubeUrl: body.youtubeUrl || null,
-        tour360Url: body.tour360Url || null,
+        has_laundry: body.laundryType ? true : false,
+        has_water: !!body.hasWater,
+        has_electricity: !!body.hasElectricity,
+        has_gas: !!body.hasGas,
+        has_internet: !!body.hasInternet,
+        has_parking: !!body.hasParking,
+        has_pool: !!body.hasPool,
+        feature_groups: body.featureGroups || {},
+        extra_data: {
+          ...(body.extraData || {}),
+          laundryType: body.laundryType || null,
+        },
+        youtube_url: body.youtubeUrl || null,
+        tour360_url: body.tour360Url || null,
         images: body.images ?? [],
         latitude: toNumberOrNull(body.latitude),
         longitude: toNumberOrNull(body.longitude),
-        parcelCCA: body.parcelCCA,
-        parcelPDA: body.parcelPDA,
-        parcelGeom: body.parcelGeom,
-      },
-    });
+        parcel_cca: body.parcelCCA,
+        parcel_pda: body.parcelPDA,
+        parcel_geom: body.parcelGeom,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
 
     return NextResponse.json(newProperty);
   } catch (error) {
     console.error("ERROR_CREATING_PROPERTY:", error);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 },
+    );
   }
 }

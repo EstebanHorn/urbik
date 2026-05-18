@@ -1,19 +1,5 @@
-/*
-Este código implementa un endpoint de API en Next.js (utilizando App Router) para la creación de
-propiedades inmobiliarias, gestionando de forma integral la autenticación y el control de acceso
-mediante NextAuth y Prisma. El flujo comienza verificando la sesión del usuario y validando que
-este posea el rol de "REALESTATE"; posteriormente, extrae la información del cuerpo de la solicitud
-(POST), realiza una limpieza y conversión de tipos de datos (como el parseo de números y manejo de
-valores nulos), y finalmente persiste la nueva propiedad en la base de datos vinculándola al usuario
-autenticado, devolviendo la propiedad creada con un estado 201 o gestionando posibles errores de
-validación y servidor.
-*/
-
-import prisma from "@/libs/db";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
-import { PropertyType, OperationType, Currency } from "@prisma/client";
 
 interface PropertyRequestBody {
   title: string;
@@ -22,17 +8,15 @@ interface PropertyRequestBody {
   city: string;
   province?: string;
   country?: string;
-  type: PropertyType;
+  type: string;
   salePrice?: number | string;
   rentPrice?: number | string;
-
-  saleCurrency?: Currency;
-  rentCurrency?: Currency;
-
+  saleCurrency?: string;
+  rentCurrency?: string;
   areaM2?: number | string;
   rooms?: number | string;
   bathrooms?: number | string;
-  operationType: OperationType;
+  operationType: string;
   images?: string[];
   propertySubtype?: string;
   youtubeUrl?: string;
@@ -42,27 +26,35 @@ interface PropertyRequestBody {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const supabase = await createClient();
 
-  const email = session.user?.email;
-  if (!email) {
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  if (!authUser) {
     return NextResponse.json(
-      { error: "Email de sesión no encontrado" },
+      { error: "No autenticado" },
       { status: 401 },
     );
   }
 
   try {
-    const user = await prisma.allUsers.findUnique({
-      where: { email },
-      include: { realEstate: true },
-    });
+    const { data: user } = await supabase
+      .from("profiles")
+      .select(`
+        user_id,
+        role,
+        real_estates (*)
+      `)
+      .eq("id", authUser.id)
+      .single();
 
     if (!user || user.role !== "REALESTATE") {
-      return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Acceso denegado." },
+        { status: 403 },
+      );
     }
 
     const body: PropertyRequestBody = await req.json();
@@ -98,8 +90,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const newProperty = await prisma.property.create({
-      data: {
+    const { data: newProperty, error } = await supabase
+      .from("properties")
+      .insert({
         title,
         description: description || "",
         address,
@@ -107,31 +100,51 @@ export async function POST(req: NextRequest) {
         province: province ?? "",
         country: country ?? "Argentina",
         type,
-        propertySubtype: propertySubtype || null,
-        operationType,
+        property_subtype: propertySubtype || null,
+        operation_type: operationType,
         status: "AVAILABLE",
-        isPriceHidden: Boolean(isPriceHidden),
-        salePrice: salePrice ? parseFloat(salePrice.toString()) : null,
-        saleCurrency: saleCurrency || "USD",
-        rentPrice: rentPrice ? parseFloat(rentPrice.toString()) : null,
-        rentCurrency: rentCurrency || "ARS",
-        area: areaM2 ? parseFloat(areaM2.toString()) : null,
-        rooms: rooms ? parseInt(rooms.toString()) : null,
-        bathrooms: bathrooms ? parseInt(bathrooms.toString()) : null,
+        is_price_hidden: Boolean(isPriceHidden),
+        sale_price: salePrice
+          ? parseFloat(salePrice.toString())
+          : null,
+        sale_currency: saleCurrency || "USD",
+        rent_price: rentPrice
+          ? parseFloat(rentPrice.toString())
+          : null,
+        rent_currency: rentCurrency || "ARS",
+        area: areaM2
+          ? parseFloat(areaM2.toString())
+          : null,
+        rooms: rooms
+          ? parseInt(rooms.toString())
+          : null,
+        bathrooms: bathrooms
+          ? parseInt(bathrooms.toString())
+          : null,
         images: images || [],
-        youtubeUrl: youtubeUrl || null,
-        tour360Url: tour360Url || null,
-        featureGroups: featureGroups || {},
-        realEstateId: user.user_id,
-      },
-    });
+        youtube_url: youtubeUrl || null,
+        tour360_url: tour360Url || null,
+        feature_groups: featureGroups || {},
+        real_estate_id: user.user_id,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
 
     return NextResponse.json(newProperty, { status: 201 });
   } catch (err) {
     const error = err as Error;
+
     console.error("Error al crear propiedad:", error);
+
     return NextResponse.json(
-      { error: "Error al crear la propiedad", detail: error.message },
+      {
+        error: "Error al crear la propiedad",
+        detail: error.message,
+      },
       { status: 500 },
     );
   }

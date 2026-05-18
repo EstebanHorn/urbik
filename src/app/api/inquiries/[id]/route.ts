@@ -1,6 +1,4 @@
-import prisma from "@/libs/db";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function PATCH(
@@ -8,34 +6,56 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const supabase = await createClient();
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "No autenticado." }, { status: 401 });
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+
+    if (!authUser) {
+      return NextResponse.json(
+        { error: "No autenticado." },
+        { status: 401 },
+      );
     }
 
-    const user = await prisma.allUsers.findUnique({
-      where: { email: session.user.email },
-      select: { user_id: true, role: true },
-    });
+    const { data: user } = await supabase
+      .from("profiles")
+      .select("user_id, role")
+      .eq("id", authUser.id)
+      .single();
 
-    if (!user || (user.role !== "REALESTATE" && user.role !== "ADMIN")) {
-      return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
+    if (
+      !user ||
+      (user.role !== "REALESTATE" &&
+        user.role !== "ADMIN")
+    ) {
+      return NextResponse.json(
+        { error: "Acceso denegado." },
+        { status: 403 },
+      );
     }
 
     const { id: rawId } = await params;
     const inquiryId = parseInt(rawId);
 
     if (isNaN(inquiryId)) {
-      return NextResponse.json({ error: "ID inválido." }, { status: 400 });
+      return NextResponse.json(
+        { error: "ID inválido." },
+        { status: 400 },
+      );
     }
 
-    const inquiry = await prisma.inquiry.findUnique({
-      where: { id: inquiryId },
-      include: {
-        property: { select: { realEstateId: true } },
-      },
-    });
+    const { data: inquiry } = await supabase
+      .from("inquiries")
+      .select(`
+        id,
+        properties (
+          real_estate_id
+        )
+      `)
+      .eq("id", inquiryId)
+      .single();
 
     if (!inquiry) {
       return NextResponse.json(
@@ -44,24 +64,45 @@ export async function PATCH(
       );
     }
 
+    const propertyData = Array.isArray(inquiry.properties)
+      ? inquiry.properties[0]
+      : inquiry.properties;
+
     if (
       user.role !== "ADMIN" &&
-      inquiry.property.realEstateId !== user.user_id
+      propertyData?.real_estate_id !== user.user_id
     ) {
-      return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Acceso denegado." },
+        { status: 403 },
+      );
     }
 
-    const updated = await prisma.inquiry.update({
-      where: { id: inquiryId },
-      data: { status: "READ" },
-    });
+    const { data: updated, error } = await supabase
+      .from("inquiries")
+      .update({ status: "READ" })
+      .eq("id", inquiryId)
+      .select("id")
+      .single();
 
-    return NextResponse.json({ success: true, id: updated.id });
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json({
+      success: true,
+      id: updated.id,
+    });
   } catch (err) {
     const error = err as Error;
+
     console.error("Error al actualizar consulta:", error);
+
     return NextResponse.json(
-      { error: "Error interno del servidor.", detail: error.message },
+      {
+        error: "Error interno del servidor.",
+        detail: error.message,
+      },
       { status: 500 },
     );
   }

@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
-import prisma from "@/libs/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { OperationType, Prisma, PropertyStatus, PropertyType } from "@prisma/client";
+import { createClient } from "@/lib/supabase/server";
 
-const VALID_TYPES = new Set(Object.values(PropertyType));
-const VALID_OPERATIONS = new Set(Object.values(OperationType));
-const VALID_STATUSES = new Set(Object.values(PropertyStatus));
-
-const toNumberOrUndefined = (value: unknown): number | undefined => {
+const toNumberOrUndefined = (
+  value: unknown,
+): number | undefined => {
   if (value === undefined) return undefined;
   if (value === null || value === "") return undefined;
+
   const parsed = Number(value);
+
   return Number.isNaN(parsed) ? undefined : parsed;
 };
 
@@ -19,9 +16,13 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getServerSession(authOptions);
+  const supabase = await createClient();
 
-  if (!session || !session.user?.email) {
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  if (!authUser) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
@@ -30,46 +31,56 @@ export async function PUT(
     const id = Number(resolvedParams.id);
     const body = await req.json();
 
-    const userAccount = await prisma.allUsers.findUnique({
-      where: { email: session.user.email },
-    });
+    const { data: userAccount } = await supabase
+      .from("profiles")
+      .select("user_id, role")
+      .eq("id", authUser.id)
+      .single();
 
-    const property = await prisma.property.findUnique({ where: { id } });
+    const { data: property } = await supabase
+      .from("properties")
+      .select("id, real_estate_id")
+      .eq("id", id)
+      .single();
 
     if (!property || !userAccount) {
-      return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No encontrado" },
+        { status: 404 },
+      );
     }
 
-    const isOwner = property.realEstateId === userAccount.user_id;
+    const isOwner =
+      property.real_estate_id === userAccount.user_id;
+
     const isAdmin = userAccount.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 403 },
+      );
     }
 
-    const updateData = {
+    const updateData: Record<string, unknown> = {
       title: body.title,
       description: body.description,
-      type: body.type && VALID_TYPES.has(body.type as PropertyType) ? (body.type as PropertyType) : undefined,
-      unitType: body.unitType ?? undefined,
-      status:
-        body.status && VALID_STATUSES.has(body.status as PropertyStatus)
-          ? (body.status as PropertyStatus)
-          : undefined,
-      operationType:
-        body.operationType && VALID_OPERATIONS.has(body.operationType as OperationType)
-          ? (body.operationType as OperationType)
-          : undefined,
+      type: body.type,
+      unit_type: body.unitType ?? undefined,
+      status: body.status ?? undefined,
+      operation_type: body.operationType ?? undefined,
       country: body.country ?? undefined,
       province: body.province ?? undefined,
       city: body.city ?? undefined,
       district: body.district ?? undefined,
       locality: body.locality ?? undefined,
       neighborhood: body.neighborhood ?? undefined,
-      streetName: body.streetName ?? body.street ?? undefined,
-      streetNumber: body.streetNumber ?? body.number ?? undefined,
+      street_name:
+        body.streetName ?? body.street ?? undefined,
+      street_number:
+        body.streetNumber ?? body.number ?? undefined,
       floor: body.floor ?? undefined,
-      unitNumber: body.unitNumber ?? undefined,
+      unit_number: body.unitNumber ?? undefined,
       address: body.address ?? undefined,
       area: toNumberOrUndefined(body.area ?? body.areaM2),
       rooms: toNumberOrUndefined(body.rooms),
@@ -78,79 +89,104 @@ export async function PUT(
       toilets: toNumberOrUndefined(body.toilets),
       garages: toNumberOrUndefined(body.garages),
       plants: toNumberOrUndefined(body.plants),
-      coveredArea: toNumberOrUndefined(body.coveredArea),
-      semiCoveredArea: toNumberOrUndefined(body.semiCoveredArea),
-      uncoveredArea: toNumberOrUndefined(body.uncoveredArea),
-      frontLength: toNumberOrUndefined(body.frontLength),
-      backLength: toNumberOrUndefined(body.backLength),
+      covered_area: toNumberOrUndefined(body.coveredArea),
+      semi_covered_area: toNumberOrUndefined(
+        body.semiCoveredArea,
+      ),
+      uncovered_area: toNumberOrUndefined(
+        body.uncoveredArea,
+      ),
+      front_length: toNumberOrUndefined(body.frontLength),
+      back_length: toNumberOrUndefined(body.backLength),
       expenses: toNumberOrUndefined(body.expenses),
       images: body.images,
-      propertySubtype: body.propertySubtype || undefined,
-      youtubeUrl: body.youtubeUrl || undefined,
-      tour360Url: body.tour360Url || undefined,
-      isPriceHidden: body.isPriceHidden !== undefined ? Boolean(body.isPriceHidden) : undefined,
-      featureGroups: body.featureGroups || undefined,
-      extraData: body.laundryType !== undefined
-        ? { ...(body.extraData || {}), laundryType: body.laundryType || null }
-        : body.extraData || undefined,
-      hasLaundry: body.laundryType !== undefined ? (body.laundryType ? true : false) : undefined,
-      hasWater:
+      property_subtype:
+        body.propertySubtype || undefined,
+      youtube_url: body.youtubeUrl || undefined,
+      tour360_url: body.tour360Url || undefined,
+      is_price_hidden:
+        body.isPriceHidden !== undefined
+          ? Boolean(body.isPriceHidden)
+          : undefined,
+      feature_groups:
+        body.featureGroups || undefined,
+      extra_data:
+        body.laundryType !== undefined
+          ? {
+              ...(body.extraData || {}),
+              laundryType: body.laundryType || null,
+            }
+          : body.extraData || undefined,
+      has_laundry:
+        body.laundryType !== undefined
+          ? !!body.laundryType
+          : undefined,
+      has_water:
         typeof body.amenities?.agua === "boolean"
           ? body.amenities.agua
           : undefined,
-      hasElectricity:
+      has_electricity:
         typeof body.amenities?.luz === "boolean"
           ? body.amenities.luz
           : undefined,
-      hasGas:
+      has_gas:
         typeof body.amenities?.gas === "boolean"
           ? body.amenities.gas
           : undefined,
-      hasInternet:
+      has_internet:
         typeof body.amenities?.internet === "boolean"
           ? body.amenities.internet
           : undefined,
-      hasParking:
+      has_parking:
         typeof body.amenities?.cochera === "boolean"
           ? body.amenities.cochera
           : undefined,
-      hasPool:
+      has_pool:
         typeof body.amenities?.pileta === "boolean"
           ? body.amenities.pileta
           : undefined,
-      salePrice:
+      sale_price:
         body.salePrice !== undefined
           ? body.salePrice === "" || body.salePrice === null
             ? null
             : Number(body.salePrice)
           : undefined,
-      rentPrice:
+      rent_price:
         body.rentPrice !== undefined
           ? body.rentPrice === "" || body.rentPrice === null
             ? null
             : Number(body.rentPrice)
           : undefined,
-      saleCurrency: body.saleCurrency ?? undefined,
-      rentCurrency: body.rentCurrency ?? undefined,
+      sale_currency: body.saleCurrency ?? undefined,
+      rent_currency: body.rentCurrency ?? undefined,
     };
 
-    const safeUpdateData = updateData as Record<string, unknown>;
-    Object.keys(safeUpdateData).forEach((key) => {
-      if (safeUpdateData[key] === undefined) {
-        delete safeUpdateData[key];
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
       }
     });
 
-    const updated = await prisma.property.update({
-      where: { id },
-      data: updateData as Prisma.PropertyUpdateInput,
-    });
+    const { data: updated, error } = await supabase
+      .from("properties")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
 
     return NextResponse.json(updated);
   } catch (error) {
     console.error("ERROR EN PUT PROPERTY:", error);
+
     const message =
-      error instanceof Error ? error.message : "Error desconocido";
+      error instanceof Error
+        ? error.message
+        : "Error desconocido";
+
     return NextResponse.json(
       { error: "Error interno", message },
       { status: 500 },
@@ -159,12 +195,16 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getServerSession(authOptions);
+  const supabase = await createClient();
 
-  if (!session || !session.user?.email) {
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  if (!authUser) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
@@ -172,28 +212,55 @@ export async function DELETE(
     const resolvedParams = await params;
     const id = Number(resolvedParams.id);
 
-    const userAccount = await prisma.allUsers.findUnique({
-      where: { email: session.user.email },
-    });
+    const { data: userAccount } = await supabase
+      .from("profiles")
+      .select("user_id, role")
+      .eq("id", authUser.id)
+      .single();
 
-    const property = await prisma.property.findUnique({ where: { id } });
+    const { data: property } = await supabase
+      .from("properties")
+      .select("id, real_estate_id")
+      .eq("id", id)
+      .single();
 
     if (!property || !userAccount) {
-      return NextResponse.json({ error: "No encontrada" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No encontrada" },
+        { status: 404 },
+      );
     }
 
-    const isOwner = property.realEstateId === userAccount.user_id;
+    const isOwner =
+      property.real_estate_id === userAccount.user_id;
+
     const isAdmin = userAccount.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {
-      return NextResponse.json({ error: "Prohibido" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Prohibido" },
+        { status: 403 },
+      );
     }
 
-    await prisma.property.delete({ where: { id } });
+    const { error } = await supabase
+      .from("properties")
+      .delete()
+      .eq("id", id);
 
-    return NextResponse.json({ message: "Propiedad eliminada correctamente" });
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json({
+      message: "Propiedad eliminada correctamente",
+    });
   } catch (error) {
     console.error("Error en DELETE property:", error);
-    return NextResponse.json({ error: "Error al eliminar" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Error al eliminar" },
+      { status: 500 },
+    );
   }
 }

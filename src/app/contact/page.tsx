@@ -1,19 +1,7 @@
-/*
-Este código implementa un componente para una página de contacto moderna y
-animada, que utiliza Next.js (indicado por "use client"), Framer Motion para transiciones
-fluidas y Lucide React para la iconografía. Su funcionalidad principal consiste en un
-formulario interactivo que permite a los usuarios enviar mensajes, incluyendo la validación
-de campos, un menú desplegable personalizado para seleccionar el asunto y un manejo de
-estado que simula el envío del mensaje para mostrar una pantalla de confirmación tras el
-éxito de la operación. Además, el diseño es responsivo y presenta información de contacto
-estática (email, teléfono y oficina) con un estilo visual coherente basado en clases de
-Tailwind CSS.
-*/
-
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
-import { Send, MapPin, Phone, Mail, CheckCircle2, ChevronDown } from "lucide-react";
+import { MapPin, Phone, Mail, CheckCircle2, ChevronDown } from "lucide-react";
 
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,7 +54,7 @@ export default function Contact() {
           </p>
 
           <div className="space-y-4">
-            <div className="flex items-center w-sm bg-urbik-white2 w-fit px-3 py-1 rounded-full">
+            <div className="flex items-center bg-urbik-white2 w-fit px-3 py-1 rounded-full">
               <div className="bg-urbik-black p-2 rounded-full text-white"><Mail size={18} /></div>
               <div className="ml-5">
                 <p className="text-xmd font-medium text-urbik-dark opacity-40 tracking-wide italic">Email</p>
@@ -74,7 +62,7 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="flex items-center w-sm bg-urbik-white2 w-fit px-3 py-1 rounded-full">
+            <div className="flex items-center bg-urbik-white2 w-fit px-3 py-1 rounded-full">
               <div className="bg-urbik-black p-2 rounded-full text-white">
                 <Phone size={18} />
               </div>
@@ -84,7 +72,7 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="flex items-center w-sm bg-urbik-white2 w-fit px-3 py-1 rounded-full">
+            <div className="flex items-center bg-urbik-white2 w-fit px-3 py-1 rounded-full">
               <div className="bg-urbik-black p-2 rounded-full text-white">
                 <MapPin size={18} />
               </div>
@@ -161,7 +149,7 @@ export default function Contact() {
 
               <div className="space-y-2">
                 <label className="ml-10 text-xmd font-medium text-urbik-black opacity-40">Mensaje</label>
-                <textarea required rows={9} className="w-full px-6 py-5 rounded-[2rem] bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
+                <textarea required rows={9} className="w-full px-6 py-5 rounded-4xl bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
               </div>
 
               <div className="flex justify-end pt-4">

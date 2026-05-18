@@ -1,79 +1,106 @@
-/*
-Este código implementa un endpoint de API en Next.js que recupera las tres propiedades
-disponibles más recientes de una base de datos mediante Prisma, integrando además una
-verificación de estado de "favoritos" personalizada según la sesión del usuario. La
-función obtiene los datos básicos de las propiedades y, si existe un usuario autenticado
-a través de NextAuth, cruza esa información con la tabla de favoritos para marcar cada
-propiedad con un booleano isFavorite antes de retornar la respuesta en formato JSON; en 
-caso de que no haya una sesión activa, devuelve la lista de propiedades con dicho marcador
-siempre en falso.
-*/
-
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; 
-import prisma from "@/libs/db";
+import { createClient } from "@/lib/supabase/server";
+
+interface FeaturedProperty {
+  id: string | number;
+  title: string;
+  sale_price?: number | null;
+  rent_price?: number | null;
+  operation_type: string;
+  address: string;
+  city: string;
+  images: string[];
+  rooms: number;
+  bathrooms: number;
+  area: number;
+  type: string;
+}
+
+const mapProperty = (
+  property: FeaturedProperty,
+  isFavorite = false,
+) => ({
+  id: property.id,
+  title: property.title,
+  salePrice: property.sale_price,
+  rentPrice: property.rent_price,
+  operationType: property.operation_type,
+  address: property.address,
+  city: property.city,
+  images: property.images,
+  rooms: property.rooms,
+  bathrooms: property.bathrooms,
+  area: property.area,
+  type: property.type,
+  isFavorite,
+});
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const supabase = await createClient();
 
-    const properties = await prisma.property.findMany({
-      take: 3,
-      where: {
-        status: "AVAILABLE",
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      select: {
-        id: true,
-        title: true,
-        salePrice: true, 
-        rentPrice: true,
-        operationType: true,
-        address: true,
-        city: true,
-        images: true,
-        rooms: true,
-        bathrooms: true,
-        area: true,
-        type: true,
-      },
-    });
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session || !session.user) {
+    const { data: properties, error } = await supabase
+      .from("properties")
+      .select(`
+        id,
+        title,
+        sale_price,
+        rent_price,
+        operation_type,
+        address,
+        city,
+        images,
+        rooms,
+        bathrooms,
+        area,
+        type
+      `)
+      .eq("status", "AVAILABLE")
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    if (error) {
+      throw error;
+    }
+
+    if (!user) {
       return NextResponse.json(
-        properties.map((prop) => ({ ...prop, isFavorite: false }))
+        (properties || []).map((prop) =>
+          mapProperty(prop as unknown as FeaturedProperty, false),
+        ),
       );
     }
 
-    const userId = Number(session.user.id);
-    const propertyIds = properties.map((p) => p.id);
+    const propertyIds = (properties || []).map((p) => p.id);
 
-    const userFavorites = await prisma.favorite.findMany({
-      where: {
-        userId: userId,
-        propertyId: { in: propertyIds },
-      },
-      select: {
-        propertyId: true,
-      },
-    });
+    const { data: favorites } = await supabase
+      .from("favorites")
+      .select("property_id")
+      .eq("user_id", user.id)
+      .in("property_id", propertyIds);
 
-    const favoriteIds = new Set(userFavorites.map((fav) => fav.propertyId));
+    const favoriteIds = new Set(
+      (favorites || []).map((fav) => fav.property_id),
+    );
 
-    const propertiesWithFavorites = properties.map((prop) => ({
-      ...prop,
-      isFavorite: favoriteIds.has(prop.id),
-    }));
-
-    return NextResponse.json(propertiesWithFavorites);
+    return NextResponse.json(
+      (properties || []).map((prop) =>
+        mapProperty(prop as unknown as FeaturedProperty, favoriteIds.has(prop.id)),
+      ),
+    );
   } catch (error) {
-    console.error("Error fetching featured properties:", error);
+    console.error(
+      "Error fetching featured properties:",
+      error,
+    );
+
     return NextResponse.json(
       { error: "Error al obtener propiedades destacadas" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
