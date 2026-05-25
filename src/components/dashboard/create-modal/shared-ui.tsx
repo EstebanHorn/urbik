@@ -85,12 +85,12 @@ export function ModuleShell({
   return (
     <div
       id={`module-${id}`}
-      className={`rounded-2xl border border-gray-200 border-l-4 overflow-hidden transition-all ${STATUS_ACCENT[status]}`}
+      className={`rounded-2xl border border-gray-200 border-l-4 transition-all ${STATUS_ACCENT[status]}`}
     >
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50 transition-colors text-left"
+        className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50 transition-colors text-left rounded-t-2xl"
       >
         <div className="flex items-center gap-3">
           <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-[10px] font-black shrink-0">

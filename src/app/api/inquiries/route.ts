@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse, NextRequest } from "next/server";
 
 interface InquiryRequestBody {
@@ -73,13 +74,7 @@ export async function POST(req: NextRequest) {
     let userId: number | null = null;
 
     if (authUser) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("user_id")
-        .eq("id", authUser.id)
-        .single();
-
-      userId = profile?.user_id ?? null;
+      userId = authUser.id as unknown as number;
     }
 
     const insertData: Record<string, unknown> = {
@@ -139,16 +134,17 @@ export async function GET() {
       );
     }
 
-    const { data: user } = await supabase
+    const admin = createAdminClient();
+    const { data: profile } = await admin
       .from("profiles")
-      .select("user_id, role")
+      .select("role")
       .eq("id", authUser.id)
       .single();
 
     if (
-      !user ||
-      (user.role !== "REALESTATE" &&
-        user.role !== "ADMIN")
+      !profile ||
+      (profile.role !== "REALESTATE" &&
+        profile.role !== "ADMIN")
     ) {
       return NextResponse.json(
         { error: "Acceso denegado." },
@@ -156,7 +152,7 @@ export async function GET() {
       );
     }
 
-    const { data: inquiries, error } = await supabase
+    const { data: inquiries, error } = await admin
       .from("inquiries")
       .select(`
         id,
@@ -172,7 +168,7 @@ export async function GET() {
           real_estate_id
         )
       `)
-      .eq("properties.real_estate_id", user.user_id)
+      .eq("properties.real_estate_id", authUser.id)
       .order("created_at", { ascending: false });
 
     if (error) {

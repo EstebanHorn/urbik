@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse, NextRequest } from "next/server";
 
 interface PropertyRequestBody {
@@ -40,17 +41,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { data: user } = await supabase
+    const admin = createAdminClient();
+    const { data: profile } = await admin
       .from("profiles")
-      .select(`
-        user_id,
-        role,
-        real_estates (*)
-      `)
+      .select("role")
       .eq("id", authUser.id)
       .single();
 
-    if (!user || user.role !== "REALESTATE") {
+    if (!profile || profile.role !== "REALESTATE") {
       return NextResponse.json(
         { error: "Acceso denegado." },
         { status: 403 },
@@ -90,7 +88,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data: newProperty, error } = await supabase
+    const { data: newProperty, error } = await admin
       .from("properties")
       .insert({
         title,
@@ -125,7 +123,7 @@ export async function POST(req: NextRequest) {
         youtube_url: youtubeUrl || null,
         tour360_url: tour360Url || null,
         feature_groups: featureGroups || {},
-        real_estate_id: user.user_id,
+        real_estate_id: authUser.id,
       })
       .select()
       .single();

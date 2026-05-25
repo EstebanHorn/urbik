@@ -2,7 +2,6 @@
 
 import React, { useState, useRef } from "react";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
 
 interface ImageUploadProps {
   value: string[];
@@ -22,29 +21,20 @@ export default function ImageUpload({
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const supabase = createClient();
 
   const remaining = maxFiles - value.length;
 
-  const uploadToSupabase = async (file: File): Promise<string | null> => {
+  const uploadFile = async (file: File): Promise<string | null> => {
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-      const filePath = `images/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('properties')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage
-        .from('properties')
-        .getPublicUrl(filePath);
-
-      return data.publicUrl;
+      const body = new FormData();
+      body.append("file", file);
+      body.append("folder", "properties");
+      const res = await fetch("/api/upload", { method: "POST", body });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? `Error ${res.status}`);
+      return json.url as string;
     } catch (error) {
-      console.error("Error subiendo imagen a Supabase:", error);
+      console.error("Error subiendo imagen:", error);
       return null;
     }
   };
@@ -66,7 +56,7 @@ export default function ImageUpload({
     }
 
     try {
-      const uploadPromises = validFiles.map((file) => uploadToSupabase(file));
+      const uploadPromises = validFiles.map((file) => uploadFile(file));
       const results = await Promise.all(uploadPromises);
 
       results.forEach((url) => {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const toNumberOrNull = (value: unknown) => {
   if (value === null || value === undefined || value === "") return null;
@@ -23,29 +24,21 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { data: user, error: userError } = await supabase
+    const admin = createAdminClient();
+    const { data: profile } = await admin
       .from("profiles")
-      .select(`
-        user_id,
-        real_estates (
-          user_id
-        )
-      `)
+      .select("role")
       .eq("id", authUser.id)
       .single();
 
-    const realEstatesData = user?.real_estates as unknown as RealEstateData;
-    
-    const realEstateId = Array.isArray(realEstatesData) 
-      ? realEstatesData[0]?.user_id 
-      : realEstatesData?.user_id;
-
-    if (userError || !user || !realEstateId) {
+    if (!profile || (profile.role !== "REALESTATE" && profile.role !== "ADMIN")) {
       return NextResponse.json(
         { error: "Solo las inmobiliarias pueden crear propiedades" },
         { status: 403 },
       );
     }
+
+    const realEstateId = authUser.id;
 
     const normalizedOperation =
       body.operationType === "rent" || body.operationType === "RENT"

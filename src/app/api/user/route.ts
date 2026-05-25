@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapProperty(p: any) {
@@ -43,9 +44,10 @@ export async function GET() {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
+  const admin = createAdminClient();
+  const { data: profile } = await admin
     .from("profiles")
-    .select("user_id, role, email")
+    .select("role, email")
     .eq("id", authUser.id)
     .single();
 
@@ -54,16 +56,16 @@ export async function GET() {
   }
 
   if (profile.role === "REALESTATE" || profile.role === "ADMIN") {
-    const { data: realEstate } = await supabase
+    const { data: realEstate } = await admin
       .from("real_estates")
       .select("agency_name, slug, phone")
       .eq("profile_id", authUser.id)
       .single();
 
-    const { data: properties } = await supabase
+    const { data: properties } = await admin
       .from("properties")
       .select("*")
-      .eq("real_estate_id", profile.user_id)
+      .eq("real_estate_id", authUser.id)
       .order("id", { ascending: false });
 
     return NextResponse.json({
@@ -78,7 +80,7 @@ export async function GET() {
   }
 
   // USER / AGENT
-  const { data: userProfile } = await supabase
+  const { data: userProfile } = await admin
     .from("user_profiles")
     .select("first_name, last_name")
     .eq("profile_id", authUser.id)
