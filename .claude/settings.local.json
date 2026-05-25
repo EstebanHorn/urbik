@@ -18,7 +18,11 @@
       "WebFetch(domain:catastro.rionegro.gov.ar)",
       "Bash(curl *)",
       "Bash(npm *)",
-      "Bash(npx *)"
+      "Bash(npx *)",
+      "Bash(Get-ChildItem -Path src -Directory -Force)",
+      "PowerShell($url = \"http://localhost:3000/dashboard\"; try { $r = Invoke-WebRequest -Uri $url -TimeoutSec 5 -ErrorAction Stop; \"Status: $\\($r.StatusCode\\)\" } catch { \"Error: $_\" })",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\app\\\\api\\\\user\")",
+      "Bash(Out-Null)"
     ]
   }
 }

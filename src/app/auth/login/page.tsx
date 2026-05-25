@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import loginBg from "@/assets/login_bg.png";
 
@@ -18,6 +18,7 @@ const GoogleIcon = () => (
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
@@ -25,6 +26,9 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const isPending = searchParams.get("pending") === "1";
+  const isRegistered = searchParams.get("registered") === "1";
 
   useEffect(() => {
     const savedEmail = localStorage.getItem("urbik_remember_email");
@@ -135,6 +139,22 @@ export default function LoginPage() {
               Ingresá tus credenciales para continuar
             </p>
           </div>
+
+          {isPending && (
+            <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-100 text-center">
+              <p className="text-sm text-amber-700 font-medium">
+                Tu cuenta está pendiente de aprobación. Te avisaremos por email cuando esté habilitada.
+              </p>
+            </div>
+          )}
+
+          {isRegistered && (
+            <div className="mb-6 p-4 rounded-2xl bg-green-50 border border-green-100 text-center">
+              <p className="text-sm text-green-700 font-medium">
+                ¡Cuenta creada con éxito! Ya podés iniciar sesión.
+              </p>
+            </div>
+          )}
 
           {errorMessage && (
             <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 text-center">

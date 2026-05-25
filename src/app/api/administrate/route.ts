@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 interface ProfileWithRealEstate {
   id: string;
@@ -43,16 +44,16 @@ export async function GET() {
 }
 
 export async function PATCH(req: Request) {
-  const supabase = await createClient();
+  const admin = createAdminClient();
   const { userId, action } = await req.json();
 
   if (action === "APPROVE") {
-    await supabase
+    await admin
       .from("profiles")
-      .update({ status: "APPROVED" })
+      .update({ status: "APPROVED", role: "REALESTATE" })
       .eq("id", userId);
   } else if (action === "DELETE") {
-    await supabase
+    await admin
       .from("profiles")
       .delete()
       .eq("id", userId);
