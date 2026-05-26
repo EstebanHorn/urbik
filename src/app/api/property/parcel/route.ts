@@ -126,7 +126,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const { data: newProperty, error } = await supabase
+    const { data: newProperty, error } = await admin
       .from("properties")
       .insert({
         real_estate_id: realEstateId, 
@@ -181,11 +181,11 @@ export async function POST(req: Request) {
         youtube_url: body.youtubeUrl || null,
         tour360_url: body.tour360Url || null,
         images: body.images ?? [],
-        latitude: toNumberOrNull(body.latitude),
-        longitude: toNumberOrNull(body.longitude),
-        parcel_cca: body.parcelCCA,
-        parcel_pda: body.parcelPDA,
-        parcel_geom: body.parcelGeom,
+        ...(body.latitude != null && { latitude: toNumberOrNull(body.latitude) }),
+        ...(body.longitude != null && { longitude: toNumberOrNull(body.longitude) }),
+        ...(body.parcelCCA && { parcel_cca: body.parcelCCA }),
+        ...(body.parcelPDA && { parcel_pda: body.parcelPDA }),
+        ...(body.parcelGeom && { parcel_geom: body.parcelGeom }),
       })
       .select()
       .single();

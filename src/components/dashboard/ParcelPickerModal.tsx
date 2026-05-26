@@ -42,12 +42,14 @@ export default function ParcelPickerModal({
   const [selected, setSelected] = useState<SelectedParcel | null>(null);
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
 
   if (!open) return null;
 
   const handleParcelClick = async (lat: number, lng: number) => {
     setLoading(true);
     setNotFound(false);
+    setFetchError(false);
     try {
       const res = await fetch(
         `/api/parcels/point?lat=${lat}&lng=${lng}&province=${encodeURIComponent(province)}`,
@@ -56,14 +58,17 @@ export default function ParcelPickerModal({
         setNotFound(true);
         return;
       }
-      if (!res.ok) return;
+      if (!res.ok) {
+        setFetchError(true);
+        return;
+      }
       const data = await res.json();
       if (data.cca || data.geometry) {
         setSelected({ cca: data.cca, pda: data.pda, geometry: data.geometry, lat, lon: lng });
         setNotFound(false);
       }
     } catch {
-      /* ignore */
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -118,6 +123,16 @@ export default function ParcelPickerModal({
               <div className="bg-white/90 rounded-xl px-4 py-2.5 shadow-lg border border-red-100">
                 <p className="text-xs font-bold text-red-500">
                   No se encontró parcela en ese punto
+                </p>
+              </div>
+            </div>
+          )}
+
+          {fetchError && !loading && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none">
+              <div className="bg-white/90 rounded-xl px-4 py-2.5 shadow-lg border border-orange-100">
+                <p className="text-xs font-bold text-orange-500">
+                  Error al consultar parcelas. Intentá de nuevo.
                 </p>
               </div>
             </div>

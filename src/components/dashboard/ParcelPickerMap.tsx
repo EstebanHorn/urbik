@@ -170,6 +170,43 @@ function SelectedParcelLayer({ geometry }: { geometry: Geometry | null }) {
   );
 }
 
+function MapAutoCenter({ city, province }: { city?: string; province: string }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const q = [city, province, "Argentina"].filter(Boolean).join(", ");
+    if (!q.trim()) return;
+
+    fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&countrycodes=ar&limit=1`,
+    )
+      .then((r) => r.json())
+      .then((data: Array<{ lat: string; lon: string }>) => {
+        if (data[0]) {
+          map.setView([parseFloat(data[0].lat), parseFloat(data[0].lon)], 16);
+        }
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return null;
+}
+
+function ZoomHint() {
+  const map = useMap();
+  const [zoom, setZoom] = useState(map.getZoom());
+  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+
+  if (zoom >= 15) return null;
+
+  return (
+    <div className="absolute top-4 right-4 z-[1000] bg-white/90 rounded-xl px-4 py-2.5 shadow border border-gray-100 pointer-events-none">
+      <p className="text-xs font-bold text-gray-600">Acercate para ver las parcelas</p>
+    </div>
+  );
+}
+
 interface ParcelPickerMapProps {
   province: string;
   city?: string;
@@ -179,7 +216,7 @@ interface ParcelPickerMapProps {
 
 export default function ParcelPickerMap({
   province,
-  city: _city,
+  city,
   onParcelClick,
   selectedGeometry,
 }: ParcelPickerMapProps) {
@@ -189,25 +226,24 @@ export default function ParcelPickerMap({
   return (
     <MapContainer
       center={center}
-      zoom={13}
+      zoom={rioNegro ? 13 : 16}
       style={{ height: "100%", width: "100%" }}
       zoomControl={false}
       attributionControl={false}
     >
-      {/* Zoom controls */}
       <ZoomControls />
-
-      {/* Base tile */}
       <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+      <MapAutoCenter city={city} province={province} />
 
-      {/* Parcel layer + click */}
       {rioNegro ? (
         <RioNegroClickLayer onParcelClick={onParcelClick} />
       ) : (
-        <BuenosAiresClickLayer onParcelClick={onParcelClick} />
+        <>
+          <BuenosAiresClickLayer onParcelClick={onParcelClick} />
+          <ZoomHint />
+        </>
       )}
 
-      {/* Selected parcel highlight */}
       <SelectedParcelLayer geometry={selectedGeometry} />
     </MapContainer>
   );

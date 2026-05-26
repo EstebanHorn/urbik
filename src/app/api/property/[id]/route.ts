@@ -35,7 +35,7 @@ export async function PUT(
     const admin = createAdminClient();
     const { data: profile } = await admin
       .from("profiles")
-      .select("role")
+      .select("role, user_id")
       .eq("id", authUser.id)
       .single();
 
@@ -52,7 +52,10 @@ export async function PUT(
       );
     }
 
-    const isOwner = property.real_estate_id === authUser.id;
+    // real_estate_id can be either authUser.id (new route) or profiles.user_id (old route)
+    const isOwner =
+      property.real_estate_id === authUser.id ||
+      (profile.user_id != null && property.real_estate_id === profile.user_id);
     const isAdmin = profile.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {
@@ -159,6 +162,11 @@ export async function PUT(
           : undefined,
       sale_currency: body.saleCurrency ?? undefined,
       rent_currency: body.rentCurrency ?? undefined,
+      latitude: body.latitude != null ? Number(body.latitude) : undefined,
+      longitude: body.longitude != null ? Number(body.longitude) : undefined,
+      parcel_cca: body.parcelCCA || undefined,
+      parcel_pda: body.parcelPDA || undefined,
+      parcel_geom: body.parcelGeom || undefined,
     };
 
     Object.keys(updateData).forEach((key) => {
@@ -215,7 +223,7 @@ export async function DELETE(
     const admin2 = createAdminClient();
     const { data: profile2 } = await admin2
       .from("profiles")
-      .select("role")
+      .select("role, user_id")
       .eq("id", authUser.id)
       .single();
 
@@ -232,7 +240,9 @@ export async function DELETE(
       );
     }
 
-    const isOwner = property.real_estate_id === authUser.id;
+    const isOwner =
+      property.real_estate_id === authUser.id ||
+      (profile2.user_id != null && property.real_estate_id === profile2.user_id);
     const isAdmin = profile2.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {

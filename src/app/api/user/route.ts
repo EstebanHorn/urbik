@@ -33,6 +33,9 @@ function mapProperty(p: any) {
     featureGroups: p.feature_groups,
     latitude: p.latitude,
     longitude: p.longitude,
+    parcelCCA: p.parcel_cca,
+    parcelPDA: p.parcel_pda,
+    parcelGeom: p.parcel_geom,
   };
 }
 

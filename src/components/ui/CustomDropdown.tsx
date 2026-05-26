@@ -100,6 +100,7 @@ export function CustomDropdown({
               .map((opt) => (
                 <button
                   key={opt.value}
+                  type="button"
                   onClick={() => {
                     onChange(opt.value);
                     setIsOpen(false);
