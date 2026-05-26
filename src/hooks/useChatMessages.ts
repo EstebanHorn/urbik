@@ -14,8 +14,8 @@ export type ChatMessage = {
 export function useChatMessages(threadId: string | null) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const supabaseRef = useRef(createClient());
+  const channelRef = useRef<ReturnType<typeof supabaseRef.current.channel> | null>(null);
 
   useEffect(() => {
     if (!threadId) { setMessages([]); return; }
@@ -27,9 +27,14 @@ export function useChatMessages(threadId: string | null) {
   }, [threadId]);
 
   useEffect(() => {
-    if (!threadId) return;
+    const supabase = supabaseRef.current;
 
-    if (channelRef.current) supabase.removeChannel(channelRef.current);
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
+    if (!threadId) return;
 
     const channel = supabase
       .channel(`chat:thread:${threadId}`)
@@ -52,8 +57,11 @@ export function useChatMessages(threadId: string | null) {
       .subscribe();
 
     channelRef.current = channel;
-    return () => { supabase.removeChannel(channel); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return () => {
+      supabase.removeChannel(channel);
+      channelRef.current = null;
+    };
   }, [threadId]);
 
   const addOptimistic = (msg: ChatMessage) => {

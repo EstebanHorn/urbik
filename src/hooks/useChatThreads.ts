@@ -14,8 +14,8 @@ export type ChatThread = {
 export function useChatThreads() {
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const supabaseRef = useRef(createClient());
+  const channelRef = useRef<ReturnType<typeof supabaseRef.current.channel> | null>(null);
 
   const fetchThreads = useCallback(async () => {
     const res = await fetch("/api/chat/threads");
@@ -31,10 +31,15 @@ export function useChatThreads() {
   }, [fetchThreads]);
 
   useEffect(() => {
-    if (channelRef.current) supabase.removeChannel(channelRef.current);
+    const supabase = supabaseRef.current;
+
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
 
     const channel = supabase
-      .channel("chat:threads:mine")
+      .channel(`chat:threads:mine:${Date.now()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "chat_threads" }, () => {
         fetchThreads();
       })
@@ -44,8 +49,11 @@ export function useChatThreads() {
       .subscribe();
 
     channelRef.current = channel;
-    return () => { supabase.removeChannel(channel); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return () => {
+      supabase.removeChannel(channel);
+      channelRef.current = null;
+    };
   }, [fetchThreads]);
 
   const totalUnread = threads.reduce((sum, t) => sum + (t.unreadCount ?? 0), 0);
