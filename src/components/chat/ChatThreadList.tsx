@@ -67,9 +67,9 @@ export default function ChatThreadList({ threads, loading, activeThreadId, onSel
                   <span className="font-black text-sm text-urbik-black truncate">{t.otherParty}</span>
                   <span className="text-[10px] text-gray-400 shrink-0">{timeAgo(t.lastMessageAt)}</span>
                 </div>
-                {t.property && (
-                  <p className="text-xs text-gray-500 truncate mt-0.5">{t.property.title}</p>
-                )}
+                <p className="text-xs text-gray-500 truncate mt-0.5">
+                  {t.property ? t.property.title : "Consulta general"}
+                </p>
                 {hasUnread && (
                   <span className="inline-flex items-center mt-1 bg-urbik-cyan text-urbik-black text-[10px] font-black px-2 py-0.5 rounded-full">
                     {t.unreadCount} nuevo{t.unreadCount > 1 ? "s" : ""}

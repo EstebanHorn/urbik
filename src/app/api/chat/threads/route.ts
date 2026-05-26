@@ -9,37 +9,68 @@ export async function POST(req: Request) {
 
   const body = await req.json();
   const { propertyId, realEstateId, firstMessage } = body as {
-    propertyId: number;
+    propertyId?: number | null;
     realEstateId: string;
     firstMessage?: string;
   };
 
-  if (!propertyId || !realEstateId) {
-    return NextResponse.json({ error: "propertyId y realEstateId son requeridos" }, { status: 400 });
+  if (!realEstateId) {
+    return NextResponse.json({ error: "realEstateId es requerido" }, { status: 400 });
   }
 
   const admin = createAdminClient();
 
-  // Verify property belongs to realEstateId
-  const { data: prop } = await admin
-    .from("properties")
-    .select("real_estate_id")
-    .eq("id", propertyId)
-    .single();
+  // If propertyId provided, verify it belongs to realEstateId
+  if (propertyId) {
+    const { data: prop } = await admin
+      .from("properties")
+      .select("real_estate_id")
+      .eq("id", propertyId)
+      .single();
 
-  if (!prop || prop.real_estate_id !== realEstateId) {
-    return NextResponse.json({ error: "Propiedad no encontrada o inmobiliaria incorrecta" }, { status: 404 });
+    if (!prop || prop.real_estate_id !== realEstateId) {
+      return NextResponse.json({ error: "Propiedad no encontrada o inmobiliaria incorrecta" }, { status: 404 });
+    }
   }
 
-  // Upsert thread (idempotent via UNIQUE constraint)
-  const { data: thread, error: threadError } = await admin
-    .from("chat_threads")
-    .upsert(
-      { user_id: user.id, real_estate_id: realEstateId, property_id: propertyId },
-      { onConflict: "user_id,real_estate_id,property_id", ignoreDuplicates: false }
-    )
-    .select("id")
-    .single();
+  // For threads with a property: upsert via UNIQUE index
+  // For general threads (no property): look up or create
+  let thread: { id: string } | null = null;
+  let threadError = null;
+
+  if (propertyId) {
+    const res = await admin
+      .from("chat_threads")
+      .upsert(
+        { user_id: user.id, real_estate_id: realEstateId, property_id: propertyId },
+        { onConflict: "user_id,real_estate_id,property_id", ignoreDuplicates: false }
+      )
+      .select("id")
+      .single();
+    thread = res.data;
+    threadError = res.error;
+  } else {
+    // Find existing general thread or create one
+    const { data: existing } = await admin
+      .from("chat_threads")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("real_estate_id", realEstateId)
+      .is("property_id", null)
+      .single();
+
+    if (existing) {
+      thread = existing;
+    } else {
+      const res = await admin
+        .from("chat_threads")
+        .insert({ user_id: user.id, real_estate_id: realEstateId, property_id: null })
+        .select("id")
+        .single();
+      thread = res.data;
+      threadError = res.error;
+    }
+  }
 
   if (threadError || !thread) {
     console.error("Error creating thread:", threadError);
