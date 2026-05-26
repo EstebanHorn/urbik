@@ -12,6 +12,7 @@ import {
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import ImageGallery from "@/components/property/ImageGallery";
 import InquiryForm from "@/components/property/InquiryForm";
+import StartChatButton from "@/components/chat/StartChatButton";
 
 export const dynamic = "force-dynamic";
 
@@ -212,9 +213,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   let isAdmin = false;
+  let userRole: string | null = null;
   if (user) {
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
     isAdmin = profile?.role === 'ADMIN';
+    userRole = profile?.role ?? null;
   }
 
   const { property, otherProperties } = data;
@@ -327,7 +330,14 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                   <Link href={`/realestate/${property.realEstateId}`} className="block mt-4 text-center text-xs font-bold text-urbik-muted hover:text-urbik-black underline decoration-dashed">Ver todas las propiedades</Link>
                 </div>
               </div>
-              <InquiryForm propertyId={property.id} />
+              {user && userRole === 'USER' ? (
+                <StartChatButton
+                  propertyId={property.id}
+                  realEstateId={property.realEstateId as string}
+                />
+              ) : (
+                <InquiryForm propertyId={property.id} />
+              )}
             </div>
           </div>
         </div>

@@ -1,0 +1,68 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+export type ChatMessage = {
+  id: string;
+  thread_id: string;
+  sender_id: string;
+  body: string;
+  created_at: string;
+  read_at: string | null;
+};
+
+export function useChatMessages(threadId: string | null) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const supabase = createClient();
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  useEffect(() => {
+    if (!threadId) { setMessages([]); return; }
+    setLoading(true);
+    fetch(`/api/chat/threads/${threadId}/messages`)
+      .then((r) => r.json())
+      .then((data) => setMessages(Array.isArray(data) ? data : []))
+      .finally(() => setLoading(false));
+  }, [threadId]);
+
+  useEffect(() => {
+    if (!threadId) return;
+
+    if (channelRef.current) supabase.removeChannel(channelRef.current);
+
+    const channel = supabase
+      .channel(`chat:thread:${threadId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "chat_messages",
+          filter: `thread_id=eq.${threadId}`,
+        },
+        (payload) => {
+          const msg = payload.new as ChatMessage;
+          setMessages((prev) => {
+            if (prev.find((m) => m.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
+        }
+      )
+      .subscribe();
+
+    channelRef.current = channel;
+    return () => { supabase.removeChannel(channel); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threadId]);
+
+  const addOptimistic = (msg: ChatMessage) => {
+    setMessages((prev) => [...prev, msg]);
+  };
+
+  const replaceOptimistic = (tempId: string, real: ChatMessage) => {
+    setMessages((prev) => prev.map((m) => (m.id === tempId ? real : m)));
+  };
+
+  return { messages, loading, addOptimistic, replaceOptimistic };
+}

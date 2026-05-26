@@ -110,7 +110,7 @@ export default function Navbar() {
       case "REALESTATE":
         return [...publicLinks, { label: "Mis Propiedades", value: "/dashboard" }, { label: "Propiedades Guardadas", value: "/saved" }];
       case "USER":
-        return [...publicLinks, { label: "Propiedades Guardadas", value: "/saved" }];
+        return [...publicLinks, { label: "Mis Mensajes", value: "/messages" }, { label: "Propiedades Guardadas", value: "/saved" }];
       default:
         return publicLinks;
     }
