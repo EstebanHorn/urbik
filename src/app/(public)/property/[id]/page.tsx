@@ -213,11 +213,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   let isAdmin = false;
-  let userRole: string | null = null;
   if (user) {
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
     isAdmin = profile?.role === 'ADMIN';
-    userRole = profile?.role ?? null;
   }
 
   const { property, otherProperties } = data;
@@ -330,7 +328,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                   <Link href={`/realestate/${property.realEstateId}`} className="block mt-4 text-center text-xs font-bold text-urbik-muted hover:text-urbik-black underline decoration-dashed">Ver todas las propiedades</Link>
                 </div>
               </div>
-              {user && userRole === 'USER' ? (
+              {user && property.realEstateId !== user.id ? (
                 <StartChatButton
                   propertyId={property.id}
                   realEstateId={property.realEstateId as string}

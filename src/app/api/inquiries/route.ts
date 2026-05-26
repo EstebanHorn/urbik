@@ -86,9 +86,7 @@ export async function POST(req: NextRequest) {
       status: "UNREAD",
     };
 
-    if (userId) {
-      insertData.user_id = userId;
-    }
+    void userId;
 
     const { data: inquiry, error } = await supabase
       .from("inquiries")

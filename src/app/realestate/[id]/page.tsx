@@ -83,7 +83,6 @@ export default async function RealEstatePage({
   } = await supabase.auth.getUser();
 
   let isAdmin = false;
-  let userRole: string | null = null;
 
   if (user) {
     const { data: currentUserProfile } = await supabase
@@ -93,7 +92,6 @@ export default async function RealEstatePage({
       .single();
 
     isAdmin = currentUserProfile?.role === "ADMIN";
-    userRole = currentUserProfile?.role ?? null;
   }
 
   const activeProperties: Property[] =
@@ -168,7 +166,7 @@ export default async function RealEstatePage({
               >
                 Contactar Agencia
               </a>
-              {user && userRole === "USER" && (
+              {user && id !== user.id && (
                 <StartChatButton
                   realEstateId={id}
                   label="Consultar por chat"
