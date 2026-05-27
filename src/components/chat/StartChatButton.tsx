@@ -22,11 +22,6 @@ export default function StartChatButton({ propertyId, realEstateId, label }: Pro
   }, []);
 
   const handleClick = async () => {
-    if (!isAuth) {
-      const redirect = propertyId ? `/property/${propertyId}` : window.location.pathname;
-      router.push(`/auth/login?redirect=${encodeURIComponent(redirect)}`);
-      return;
-    }
     setLoading(true);
     try {
       const res = await fetch("/api/chat/threads", {
@@ -43,9 +38,9 @@ export default function StartChatButton({ propertyId, realEstateId, label }: Pro
     }
   };
 
-  if (isAuth === null) return null;
+  if (isAuth === null || !isAuth) return null;
 
-  const defaultLabel = isAuth ? (label ?? "Consultar por chat") : "Iniciar sesión para consultar";
+  const defaultLabel = label ?? "Consultar por chat";
 
   return (
     <button
