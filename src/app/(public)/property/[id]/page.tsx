@@ -498,9 +498,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
     property.coveredArea || property.semiCoveredArea || property.uncoveredArea;
 
   return (
-    <main className="min-h-screen bg-white pb-20">
+    <main className="min-h-screen bg-white pb-32 lg:pb-20">
       {/* Back link */}
-      <div className="max-w-7xl mx-auto px-6 pt-28 mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-28 mb-6 sm:mb-8">
         <Link
           href="/dashboard"
           className="group text-urbik-black/50 inline-flex items-center gap-2 text-sm font-bold hover:text-urbik-black transition-colors"
@@ -513,9 +513,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
         {isAdmin && <AdminActions id={property.id} currentStatus={property.status} type="property" />}
       </div>
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-8">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="space-y-4 w-full lg:w-auto">
             <div className="flex flex-wrap items-center gap-3">
               <FavoriteButton propertyId={property.id.toString()} initialIsFavorite={property.isFavorite} />
@@ -530,8 +530,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
               {property.title}
             </h1>
             <div className="flex items-center gap-2 text-urbik-muted font-medium italic">
-              <MapPin size={20} className="text-urbik-emerald" />
-              <span className="text-lg">
+              <MapPin size={16} className="text-urbik-emerald shrink-0 sm:w-5 sm:h-5" />
+              <span className="text-base sm:text-lg">
                 {property.address}{property.neighborhood ? `, ${property.neighborhood}` : ""}, {property.city}
                 {property.locality && property.locality !== property.city ? ` (${property.locality})` : ""}
               </span>
@@ -545,7 +545,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 {(property.operationType === "SALE" || isBoth) && property.salePrice && (
                   <div className="flex flex-col lg:items-end">
                     {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1">Venta</span>}
-                    <div className={`${isBoth ? "text-3xl" : "text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
+                    <div className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
                       <span className="text-urbik-emerald mr-2 font-black text-0.5em">{property.saleCurrency}</span>
                       <span className="text-urbik-black">{formatter.format(property.salePrice)}</span>
                     </div>
@@ -559,7 +559,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 {(property.operationType === "RENT" || property.operationType === "TEMP_RENT" || isBoth) && property.rentPrice && (
                   <div className="flex flex-col lg:items-end">
                     {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1 mt-2">Alquiler</span>}
-                    <div className={`${isBoth ? "text-3xl" : "text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
+                    <div className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
                       <span className="text-urbik-emerald mr-2 font-black text-0.5em">{property.rentCurrency}</span>
                       <span className="text-urbik-black">{formatter.format(property.rentPrice)}</span>
                     </div>
@@ -593,7 +593,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
         />
 
         {/* Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 mt-8 sm:mt-12">
           <div className="lg:col-span-8 space-y-10">
 
             {/* Quick stats strip */}
@@ -661,7 +661,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-4 relative">
+          <div className="lg:col-span-4 relative" id="contacto">
             <div className="sticky top-28 space-y-6">
               {/* Agency card */}
               <div className="bg-urbik-white2 rounded-2xl p-8 text-urbik-dark shadow-xl border border-urbik-g100 overflow-hidden relative">
@@ -712,8 +712,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
         </div>
 
         {/* More from this agency */}
-        <div className="mt-24 pt-12 border-t border-urbik-g100">
-          <h3 className="text-3xl font-display text-urbik-black tracking-tighter mb-8">
+        <div className="mt-12 sm:mt-24 pt-8 sm:pt-12 border-t border-urbik-g100">
+          <h3 className="text-2xl sm:text-3xl font-display text-urbik-black tracking-tighter mb-6 sm:mb-8">
             <span className="font-medium">Más propiedades de </span>
             <span className="font-black italic uppercase text-urbik-emerald">
               {property.RealEstate?.agencyName || "la inmobiliaria"}
@@ -769,6 +769,32 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             </div>
           )}
         </div>
+      </div>
+
+      {/* Mobile sticky contact bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-sm border-t border-urbik-g100 shadow-2xl px-4 py-3 flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          {!property.isPriceHidden ? (
+            <>
+              <p className="text-[10px] font-bold text-urbik-muted uppercase tracking-widest leading-none mb-0.5">
+                {(property.operationType === "RENT" || property.operationType === "TEMP_RENT") ? "Alquiler" : "Venta"}
+              </p>
+              <p className="text-lg font-black text-urbik-black truncate">
+                {(property.operationType === "RENT" || property.operationType === "TEMP_RENT")
+                  ? `${property.rentCurrency} ${formatter.format(property.rentPrice ?? 0)}`
+                  : `${property.saleCurrency} ${formatter.format(property.salePrice ?? 0)}`}
+              </p>
+            </>
+          ) : (
+            <p className="text-lg font-black text-urbik-muted italic">Consultar precio</p>
+          )}
+        </div>
+        <a
+          href="#contacto"
+          className="shrink-0 bg-urbik-black text-white font-black py-3 px-6 rounded-xl text-sm"
+        >
+          Consultar
+        </a>
       </div>
     </main>
   );

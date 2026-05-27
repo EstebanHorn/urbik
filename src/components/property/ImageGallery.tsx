@@ -45,6 +45,11 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
           ) : (
             <div className="flex items-center justify-center h-full text-urbik-g300 flex-col gap-2"><Building2 size={64} /><span className="text-sm font-bold">Sin imágenes</span></div>
           )}
+          {images.length > 1 && (
+            <div className="absolute bottom-3 right-3 md:hidden bg-black/65 text-white text-xs font-bold px-3 py-2 rounded-lg backdrop-blur-sm flex items-center gap-1.5 pointer-events-none z-10">
+              <span>+{images.length - 1} fotos</span>
+            </div>
+          )}
         </div>
 
         <div className="hidden md:block col-span-1 row-span-1 relative overflow-hidden bg-gray-100 cursor-pointer group" onClick={() => images[1] && openModal(1)}>
@@ -80,7 +85,7 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
         {isOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-9999 flex items-center justify-center bg-black/95 backdrop-blur-sm" onClick={closeModal}>
             <button onClick={closeModal} className="absolute top-6 right-6 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"><X size={32} /></button>
-            <button onClick={prevImage} className="absolute left-4 md:left-8 z-50 p-3 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all hover:scale-110 active:scale-95 hidden md:block"><ChevronLeft size={40} /></button>
+            <button onClick={prevImage} className="absolute left-2 md:left-8 z-50 p-2 md:p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all hover:scale-110 active:scale-95"><ChevronLeft className="w-5 h-5 md:w-10 md:h-10" /></button>
             
             <div className="relative w-full h-full max-w-7xl max-h-[85vh] p-4 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
               <AnimatePresence mode="wait">
@@ -101,7 +106,7 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 font-medium bg-black/50 px-4 py-1 rounded-full backdrop-blur-md text-sm z-50">{currentIndex + 1} / {images.length}</div>
             </div>
             
-            <button onClick={nextImage} className="absolute right-4 md:right-8 z-50 p-3 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all hover:scale-110 active:scale-95 hidden md:block"><ChevronRight size={40} /></button>
+            <button onClick={nextImage} className="absolute right-2 md:right-8 z-50 p-2 md:p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all hover:scale-110 active:scale-95"><ChevronRight className="w-5 h-5 md:w-10 md:h-10" /></button>
             
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex gap-2 max-w-[80vw] overflow-x-auto pb-2 scrollbar-hide z-50" onClick={(e) => e.stopPropagation()}>
               {images.map((img, idx) => (

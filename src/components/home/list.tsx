@@ -57,8 +57,8 @@ function PropertyFeatures({ property }: { property: SearchProperty }) {
     case "LOCAL":
     case "OFICINA":
       dynamicFeature1 = (
-        <div className="flex items-center gap-3 px-2 py-1 text-[10px] sm:text-xl font-bold">
-          <BathIcon className="w-3 h-3 md:w-7 md:h-7" />
+        <div className="flex items-center gap-1.5 sm:gap-3 px-2 py-1 text-[10px] sm:text-sm md:text-xl font-bold">
+          <BathIcon className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
           <span>{property.bathrooms || 0} ba</span>
         </div>
       );
@@ -66,14 +66,14 @@ function PropertyFeatures({ property }: { property: SearchProperty }) {
 
     default:
       dynamicFeature1 = (
-        <div className="flex items-center gap-3 px-2 py-1 text-[10px] sm:text-xl font-bold">
-          <RoomIcon className="w-3 h-3 md:w-7 md:h-7" />
+        <div className="flex items-center gap-1.5 sm:gap-3 px-2 py-1 text-[10px] sm:text-sm md:text-xl font-bold">
+          <RoomIcon className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
           <span>{property.rooms || 0} amb</span>
         </div>
       );
       dynamicFeature2 = (
-        <div className="flex items-center gap-3 px-2 py-1 text-[10px] sm:text-xl font-bold">
-          <BathIcon className="w-3 h-3 md:w-7 md:h-7" />
+        <div className="flex items-center gap-1.5 sm:gap-3 px-2 py-1 text-[10px] sm:text-sm md:text-xl font-bold">
+          <BathIcon className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
           <span>{property.bathrooms || 0} ba</span>
         </div>
       );
@@ -85,8 +85,8 @@ function PropertyFeatures({ property }: { property: SearchProperty }) {
       {dynamicFeature1}
       {dynamicFeature2}
       
-      <div className="flex items-center gap-3 px-2 py-1 text-[10px] sm:text-xl font-bold">
-        <AreaIcon className="w-3 h-3 md:w-7 md:h-7" />
+      <div className="flex items-center gap-1.5 sm:gap-3 px-2 py-1 text-[10px] sm:text-sm md:text-xl font-bold">
+        <AreaIcon className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
         <span>{property.area || 0} m²</span>
       </div>
     </div>

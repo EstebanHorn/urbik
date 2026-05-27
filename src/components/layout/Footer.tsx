@@ -26,7 +26,7 @@ export default function Footer() {
   if (pathname === "/map") return null;
 
   return (
-    <footer className="w-full bg-urbik-black text-white py-12 px-8">
+    <footer className="w-full bg-urbik-black text-white py-10 sm:py-12 px-4 sm:px-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="flex flex-col gap-4">
           <div className="relative h-12 w-32"><Image src="/Urbik_Logo_Mini.svg" alt="Urbik Logo" fill className="object-contain object-left" priority /></div>
