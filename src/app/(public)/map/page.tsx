@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 import React, {
   useState,
   useCallback,
@@ -34,7 +34,7 @@ import {
 
 import { Map as MapIcon, List, X } from "lucide-react";
 
-const PropertiesSidebar = dynamic(
+const PropertiesSidebar = dynamicImport(
   () =>
     import("@/components/map/PropertiesSidebar").then(
       (mod) => mod.PropertiesSidebar,
@@ -49,7 +49,7 @@ const PropertiesSidebar = dynamic(
   }
 );
 
-const InteractiveMap = dynamic(
+const InteractiveMap = dynamicImport(
   () =>
     import("@/components/map/InteractiveMapClient").then(
       (mod) => mod.InteractiveMapClient,
