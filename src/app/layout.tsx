@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import { Providers } from "./providers";
@@ -26,7 +27,9 @@ export default function RootLayout({
       <body className="overflow-x-hidden">
         <Providers>
           <Navbar />
-          <SidebarFilters />
+          <Suspense fallback={null}>
+            <SidebarFilters />
+          </Suspense>
           {children}
           <Footer/>
         </Providers>
