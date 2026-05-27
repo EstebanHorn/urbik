@@ -9,7 +9,6 @@ import {
   useMap,
 } from "react-leaflet";
 import L from "leaflet";
-// @ts-expect-error - TypeScript.
 import "leaflet/dist/leaflet.css";
 
 type PreviewProperty = {

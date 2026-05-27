@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import React from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
-// @ts-expect-error: TypeScript no encuentra los tipos del CSS, pero Next.js lo resuelve en el build sin problemas
 import "leaflet/dist/leaflet.css";
 import type { GeoJsonObject } from "geojson";
 
