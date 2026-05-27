@@ -256,7 +256,7 @@ export default function Navbar() {
             options={profileOptions} 
             onChange={handleProfileClick} 
             className="shrink-0"
-            variant={isLightMode ? "white3" : "black"} 
+            variant={isLightMode ? "white2" : "black"}
           />
         </div>
 
