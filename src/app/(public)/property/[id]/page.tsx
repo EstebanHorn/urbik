@@ -703,10 +703,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
-              {user && property.realEstateId !== user.id ? (
+              <InquiryForm propertyId={property.id} />
+              {property.realEstateId && property.realEstateId !== user?.id && (
                 <StartChatButton propertyId={property.id} realEstateId={property.realEstateId as string} />
-              ) : (
-                <InquiryForm propertyId={property.id} />
               )}
             </div>
           </div>
