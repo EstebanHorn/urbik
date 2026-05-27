@@ -98,7 +98,7 @@ function PromotedPropertyCard({
   setHoveredPropertyId,
 }: {
   property: SearchProperty;
-  setHoveredPropertyId: (id: number | null) => void;
+  setHoveredPropertyId: React.Dispatch<React.SetStateAction<number | null>>;
 }) {
   const price = property.salePrice ?? property.rentPrice ?? 0;
   const currency = property.saleCurrency ?? property.rentCurrency ?? "ARS";
