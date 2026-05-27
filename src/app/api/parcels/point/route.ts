@@ -54,25 +54,40 @@ export async function GET(request: Request) {
     }
   }
 
-  // Buenos Aires / other provinces: proxy ARBA WFS
+  // Buenos Aires / other provinces: proxy ARBA WMS GetFeatureInfo
+  // (WFS returns XML regardless of OUTPUTFORMAT; WMS GetFeatureInfo works with JSON)
   try {
-    const wfsUrl =
-      `https://geo.arba.gov.ar/geoserver/idera/ows` +
-      `?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature` +
-      `&TYPENAMES=idera:Parcela&OUTPUTFORMAT=application/json` +
-      `&CQL_FILTER=INTERSECTS(the_geom,POINT(${lng}%20${lat}))` +
-      `&MAXFEATURES=1`;
+    const DELTA = 0.001;
+    const west = lng - DELTA;
+    const east = lng + DELTA;
+    const south = lat - DELTA;
+    const north = lat + DELTA;
 
-    const response = await fetch(wfsUrl, {
+    // Virtual 256x256 tile centered on the click point; pixel (128,128) = the click
+    const featureInfoUrl =
+      `https://geo.arba.gov.ar/geoserver/idera/ows` +
+      `?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo` +
+      `&LAYERS=idera:Parcela&QUERY_LAYERS=idera:Parcela` +
+      `&INFO_FORMAT=application%2Fjson` +
+      `&FEATURE_COUNT=1` +
+      `&X=128&Y=128&WIDTH=256&HEIGHT=256` +
+      `&BBOX=${west},${south},${east},${north}` +
+      `&SRS=EPSG:4326`;
+
+    const response = await fetch(featureInfoUrl, {
       signal: AbortSignal.timeout(8000),
-      headers: { Accept: "application/json" },
     });
 
     if (!response.ok) {
       return NextResponse.json({ error: "ARBA no disponible" }, { status: 502 });
     }
 
-    const data = await response.json();
+    const text = await response.text();
+    if (text.trimStart().startsWith("<")) {
+      return NextResponse.json({ error: "ARBA no disponible" }, { status: 502 });
+    }
+
+    const data = JSON.parse(text);
     const feature = data.features?.[0];
 
     if (!feature) {
@@ -82,7 +97,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       cca: feature.properties?.cca ?? feature.properties?.CCA ?? "",
       pda: feature.properties?.pda ?? feature.properties?.PDA ?? "",
-      geometry: feature.geometry,
+      geometry: feature.geometry ?? null,
     });
   } catch (err) {
     console.error("Error querying ARBA:", err);

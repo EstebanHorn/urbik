@@ -50,7 +50,7 @@ export async function GET() {
   const admin = createAdminClient();
   const { data: profile } = await admin
     .from("profiles")
-    .select("role, email")
+    .select("role, email, phone, is_active")
     .eq("id", authUser.id)
     .single();
 
@@ -61,7 +61,7 @@ export async function GET() {
   if (profile.role === "REALESTATE" || profile.role === "ADMIN") {
     const { data: realEstate } = await admin
       .from("real_estates")
-      .select("agency_name, slug, phone")
+      .select("agency_name, slug, phone, address, street, website, instagram, bio, province, city, logo_url, banner_url")
       .eq("profile_id", authUser.id)
       .single();
 
@@ -73,10 +73,20 @@ export async function GET() {
 
     return NextResponse.json({
       role: profile.role,
+      isActive: Boolean(profile.is_active),
       agencyData: {
         name: realEstate?.agency_name ?? null,
         slug: realEstate?.slug ?? null,
         phone: realEstate?.phone ?? null,
+        address: realEstate?.address ?? null,
+        street: realEstate?.street ?? null,
+        website: realEstate?.website ?? null,
+        instagram: realEstate?.instagram ?? null,
+        bio: realEstate?.bio ?? null,
+        province: realEstate?.province ?? null,
+        city: realEstate?.city ?? null,
+        logoUrl: realEstate?.logo_url ?? null,
+        bannerUrl: realEstate?.banner_url ?? null,
         properties: (properties ?? []).map(mapProperty),
       },
     });
@@ -91,6 +101,8 @@ export async function GET() {
 
   return NextResponse.json({
     role: profile.role,
+    phone: profile.phone ?? null,
+    isActive: Boolean(profile.is_active),
     firstName: userProfile?.first_name ?? null,
     lastName: userProfile?.last_name ?? null,
     properties: [],

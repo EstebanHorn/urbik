@@ -3,7 +3,10 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
-import { getVisibleModules, type PropertyUploadFormData } from "./create-modal/schema";
+import {
+  getVisibleModules,
+  type PropertyUploadFormData,
+} from "./create-modal/schema";
 import { CompletionIndicator, ModuleShell } from "./create-modal/shared-ui";
 import {
   Module01PropertyData,
@@ -39,8 +42,14 @@ const DEFAULT_VALUES: PropertyUploadFormData = {
   featureGroups: {},
 };
 
-export default function CreatePropertyModal({ open, onClose, onCreated }: CreatePropertyModalProps) {
-  const rhf = useForm<PropertyUploadFormData>({ defaultValues: DEFAULT_VALUES });
+export default function CreatePropertyModal({
+  open,
+  onClose,
+  onCreated,
+}: CreatePropertyModalProps) {
+  const rhf = useForm<PropertyUploadFormData>({
+    defaultValues: DEFAULT_VALUES,
+  });
   const [activeModuleId, setActiveModuleId] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,13 +62,18 @@ export default function CreatePropertyModal({ open, onClose, onCreated }: Create
 
   const handleModuleClick = (id: number) => {
     setActiveModuleId(id);
-    document.getElementById(`module-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document
+      .getElementById(`module-${id}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const handleParcelConfirm = (parcel: SelectedParcel) => {
     rhf.setValue("parcelCCA", parcel.cca);
     rhf.setValue("parcelPDA", parcel.pda ?? "");
-    rhf.setValue("parcelGeom", parcel.geometry as unknown as Record<string, unknown>);
+    rhf.setValue(
+      "parcelGeom",
+      parcel.geometry as unknown as Record<string, unknown>,
+    );
     rhf.setValue("latitude", parcel.lat);
     rhf.setValue("longitude", parcel.lon);
     setParcelPickerOpen(false);
@@ -67,8 +81,14 @@ export default function CreatePropertyModal({ open, onClose, onCreated }: Create
 
   const handleSubmit = rhf.handleSubmit(async (data) => {
     setError(null);
-    if (!data.title) { setError("El título es obligatorio."); return; }
-    if (!data.city) { setError("La ciudad es obligatoria."); return; }
+    if (!data.title) {
+      setError("El título es obligatorio.");
+      return;
+    }
+    if (!data.city) {
+      setError("La ciudad es obligatoria.");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -127,7 +147,8 @@ export default function CreatePropertyModal({ open, onClose, onCreated }: Create
       });
 
       const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Error al crear la propiedad");
+      if (!res.ok)
+        throw new Error(result.error || "Error al crear la propiedad");
 
       rhf.reset(DEFAULT_VALUES);
       setActiveModuleId(1);
@@ -164,13 +185,18 @@ export default function CreatePropertyModal({ open, onClose, onCreated }: Create
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex">
-        <div className="flex-1 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center pt-20 px-6 pb-6">
+        <div
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          onClick={onClose}
+        />
 
-        <div className="w-full max-w-4xl bg-white flex flex-col shadow-2xl">
+        <div className="relative w-full max-w-4xl h-[90vh] bg-white rounded-3xl flex flex-col shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
-            <h2 className="text-lg font-black text-urbik-black">Cargar propiedad</h2>
+          <div className="flex items-center justify-between px-8 py-5 border-b border-gray-100 shrink-0">
+            <h2 className="text-lg font-black text-urbik-black">
+              Cargar propiedad
+            </h2>
             <button
               type="button"
               onClick={onClose}
@@ -183,7 +209,7 @@ export default function CreatePropertyModal({ open, onClose, onCreated }: Create
           {/* Body */}
           <div className="flex flex-1 overflow-hidden">
             {/* Sidebar */}
-            <div className="w-56 shrink-0 border-r border-gray-100 p-4 overflow-y-auto hidden md:flex flex-col">
+            <div className="w-60 shrink-0 border-r border-gray-100 py-6 px-5 overflow-y-auto hidden md:flex flex-col">
               <CompletionIndicator
                 modules={visibleModules}
                 form={formData}
@@ -196,7 +222,7 @@ export default function CreatePropertyModal({ open, onClose, onCreated }: Create
             <form
               id="create-property-form"
               onSubmit={handleSubmit}
-              className="flex-1 overflow-y-auto p-5 space-y-3"
+              className="flex-1 overflow-y-auto px-8 py-6 space-y-4"
             >
               {visibleModules.map((mod) => (
                 <ModuleShell
@@ -222,7 +248,7 @@ export default function CreatePropertyModal({ open, onClose, onCreated }: Create
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-gray-100 shrink-0">
+          <div className="px-8 py-5 border-t border-gray-100 shrink-0">
             <button
               type="submit"
               form="create-property-form"
