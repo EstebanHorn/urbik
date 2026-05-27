@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { generateUniqueSlug } from "@/lib/utils";
 
 const ALLOWED_DOMAINS = [
@@ -17,6 +18,7 @@ interface LicensePayload {
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
+    const admin = createAdminClient();
     const data = await req.json();
     const email = data.email?.toLowerCase();
 
@@ -42,10 +44,13 @@ export async function POST(req: NextRequest) {
     const role = data.role as "USER" | "REALESTATE";
     const status = role === "REALESTATE" ? "PENDING" : "APPROVED";
 
-    await supabase.from("profiles").update({ role, status }).eq("id", userId);
+    const { error: profileError } = await admin
+      .from("profiles")
+      .upsert({ id: userId, email: data.email, role, status });
+    if (profileError) console.error("Profile upsert error:", profileError);
 
     if (role === "USER") {
-      await supabase.from("user_profiles").insert({
+      await admin.from("user_profiles").insert({
         profile_id: userId,
         first_name: data.name || email.split("@")[0],
         last_name: data.lastName || "",
@@ -54,7 +59,7 @@ export async function POST(req: NextRequest) {
       const agencyName = data.name || "Nueva Inmobiliaria";
       const slug = await generateUniqueSlug(agencyName);
 
-      await supabase.from("real_estates").insert({
+      await admin.from("real_estates").insert({
         profile_id: userId,
         agency_name: agencyName,
         slug: slug,
@@ -75,10 +80,10 @@ export async function POST(req: NextRequest) {
           responsible_name: lic.responsibleName,
           is_primary: idx === 0,
         }));
-        await supabase.from("real_estate_licenses").insert(licensesToInsert);
+        await admin.from("real_estate_licenses").insert(licensesToInsert);
       }
 
-      await supabase.from("real_estate_offices").insert({
+      await admin.from("real_estate_offices").insert({
         real_estate_id: userId,
         name: "Casa central",
         province: data.licenses?.[0]?.province || "",

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const toNumberOrUndefined = (
   value: unknown,
@@ -31,29 +32,31 @@ export async function PUT(
     const id = Number(resolvedParams.id);
     const body = await req.json();
 
-    const { data: userAccount } = await supabase
+    const admin = createAdminClient();
+    const { data: profile } = await admin
       .from("profiles")
-      .select("user_id, role")
+      .select("role, user_id")
       .eq("id", authUser.id)
       .single();
 
-    const { data: property } = await supabase
+    const { data: property } = await admin
       .from("properties")
       .select("id, real_estate_id")
       .eq("id", id)
       .single();
 
-    if (!property || !userAccount) {
+    if (!property || !profile) {
       return NextResponse.json(
         { error: "No encontrado" },
         { status: 404 },
       );
     }
 
+    // real_estate_id can be either authUser.id (new route) or profiles.user_id (old route)
     const isOwner =
-      property.real_estate_id === userAccount.user_id;
-
-    const isAdmin = userAccount.role === "ADMIN";
+      property.real_estate_id === authUser.id ||
+      (profile.user_id != null && property.real_estate_id === profile.user_id);
+    const isAdmin = profile.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {
       return NextResponse.json(
@@ -159,6 +162,11 @@ export async function PUT(
           : undefined,
       sale_currency: body.saleCurrency ?? undefined,
       rent_currency: body.rentCurrency ?? undefined,
+      latitude: body.latitude != null ? Number(body.latitude) : undefined,
+      longitude: body.longitude != null ? Number(body.longitude) : undefined,
+      parcel_cca: body.parcelCCA || undefined,
+      parcel_pda: body.parcelPDA || undefined,
+      parcel_geom: body.parcelGeom || undefined,
     };
 
     Object.keys(updateData).forEach((key) => {
@@ -167,7 +175,7 @@ export async function PUT(
       }
     });
 
-    const { data: updated, error } = await supabase
+    const { data: updated, error } = await admin
       .from("properties")
       .update(updateData)
       .eq("id", id)
@@ -212,19 +220,20 @@ export async function DELETE(
     const resolvedParams = await params;
     const id = Number(resolvedParams.id);
 
-    const { data: userAccount } = await supabase
+    const admin2 = createAdminClient();
+    const { data: profile2 } = await admin2
       .from("profiles")
-      .select("user_id, role")
+      .select("role, user_id")
       .eq("id", authUser.id)
       .single();
 
-    const { data: property } = await supabase
+    const { data: property } = await admin2
       .from("properties")
       .select("id, real_estate_id")
       .eq("id", id)
       .single();
 
-    if (!property || !userAccount) {
+    if (!property || !profile2) {
       return NextResponse.json(
         { error: "No encontrada" },
         { status: 404 },
@@ -232,9 +241,9 @@ export async function DELETE(
     }
 
     const isOwner =
-      property.real_estate_id === userAccount.user_id;
-
-    const isAdmin = userAccount.role === "ADMIN";
+      property.real_estate_id === authUser.id ||
+      (profile2.user_id != null && property.real_estate_id === profile2.user_id);
+    const isAdmin = profile2.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {
       return NextResponse.json(
@@ -243,7 +252,7 @@ export async function DELETE(
       );
     }
 
-    const { error } = await supabase
+    const { error } = await admin2
       .from("properties")
       .delete()
       .eq("id", id);

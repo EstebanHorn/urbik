@@ -13,10 +13,7 @@ interface CurrencySelectorProps {
   onChange: (val: "USD" | "ARS") => void;
 }
 
-export function CurrencySelector({
-  value,
-  onChange,
-}: CurrencySelectorProps) {
+export function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
   return (
     <div className="relative flex bg-urbik-white rounded-full w-fit overflow-hidden border border-black/50 focus:border-urbik-black outline-none transition-all">
       <motion.div
@@ -85,12 +82,12 @@ export function ModuleShell({
   return (
     <div
       id={`module-${id}`}
-      className={`rounded-2xl border border-gray-200 border-l-4 overflow-hidden transition-all ${STATUS_ACCENT[status]}`}
+      className={`rounded-2xl border border-gray-200 border-l-4 transition-all ${STATUS_ACCENT[status]}`}
     >
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50 transition-colors text-left"
+        className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50 transition-colors text-left rounded-t-2xl"
       >
         <div className="flex items-center gap-3">
           <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-[10px] font-black shrink-0">
@@ -101,9 +98,7 @@ export function ModuleShell({
             {label}
           </span>
 
-          <div
-            className={`w-2 h-2 rounded-full ${STATUS_DOT[status]}`}
-          />
+          <div className={`w-2 h-2 rounded-full ${STATUS_DOT[status]}`} />
         </div>
 
         <span className="text-gray-400 font-bold text-sm select-none">
@@ -162,21 +157,13 @@ export function CompletionIndicator({
 }: CompletionIndicatorProps) {
   const statuses = modules.map((m) => m.getStatus(form));
 
-  const completeCount = statuses.filter(
-    (s) => s === "complete",
-  ).length;
+  const completeCount = statuses.filter((s) => s === "complete").length;
 
   const percentage =
-    modules.length > 0
-      ? Math.round((completeCount / modules.length) * 100)
-      : 0;
+    modules.length > 0 ? Math.round((completeCount / modules.length) * 100) : 0;
 
   const overallStatus: ModuleStatus =
-    percentage === 100
-      ? "complete"
-      : percentage > 0
-        ? "partial"
-        : "empty";
+    percentage === 100 ? "complete" : percentage > 0 ? "partial" : "empty";
 
   const progressColor =
     percentage === 100
@@ -186,7 +173,7 @@ export function CompletionIndicator({
         : "bg-red-400";
 
   return (
-    <div className="flex flex-col gap-2 h-full">
+    <div className="flex flex-col gap-2 h-[90vh]">
       <div className="mb-1">
         <div className="flex items-center justify-between mb-1.5">
           <span className="text-[10px] font-black uppercase tracking-widest text-urbik-black/50">
@@ -239,9 +226,7 @@ export function CompletionIndicator({
                 >
                   <span
                     className={`mr-1 ${
-                      isActive
-                        ? "text-white/60"
-                        : "text-urbik-black/30"
+                      isActive ? "text-white/60" : "text-urbik-black/30"
                     }`}
                   >
                     {String(mod.id).padStart(2, "0")}.

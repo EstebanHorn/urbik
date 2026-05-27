@@ -7,6 +7,7 @@ import { MapPin, Building2 } from "lucide-react";
 import bgImage from "@/assets/login_bg.png";
 import AdminActions from "@/components/administrate/AdminActions";
 import { createClient } from "@/lib/supabase/server";
+import StartChatButton from "@/components/chat/StartChatButton";
 
 const PROPERTY_LABELS: Record<string, string> = {
   HOUSE: "Casa",
@@ -165,6 +166,12 @@ export default async function RealEstatePage({
               >
                 Contactar Agencia
               </a>
+              {user && id !== user.id && (
+                <StartChatButton
+                  realEstateId={id}
+                  label="Consultar por chat"
+                />
+              )}
             </div>
           </div>
         </div>

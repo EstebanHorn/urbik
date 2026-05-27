@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
@@ -30,138 +30,89 @@ const inputBaseClasses =
 const textareaClasses =
   "w-full px-6 py-4 rounded-3xl bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium resize-none text-urbik-black";
 
-type UserProfileData = {
-  first_name: string | null;
-  last_name: string | null;
-};
-
-type RealEstateData = {
-  agency_name: string | null;
-  slug: string | null;
-  phone: string | null;
-  address: string | null;
-  website: string | null;
-  instagram: string | null;
-  bio: string | null;
-  province: string | null;
-  city: string | null;
-  street: string | null;
-  logo_url: string | null;
-  banner_url: string | null;
-};
-
-type ProfileData = {
-  id: string;
-  role: "USER" | "REALESTATE";
-  phone: string | null;
-  is_active: boolean;
-  user_profiles?: UserProfileData[];
-  real_estates?: RealEstateData[];
-};
-
 type FormState = {
   firstName: string;
   lastName: string;
+  phone: string;
   agencyName: string;
   slug: string;
-  phone: string;
   address: string;
+  street: string;
   website: string;
   instagram: string;
   bio: string;
   province: string;
   city: string;
-  street: string;
   logoUrl: string;
   bannerUrl: string;
 };
 
+type ProfileInfo = {
+  id: string;
+  role: "USER" | "REALESTATE" | "ADMIN" | "AGENT";
+  isActive: boolean;
+};
+
 export default function ProfilePage() {
-  const supabase = createClient();
   const router = useRouter();
+  const supabaseRef = useRef(createClient());
 
-  const [status, setStatus] = useState<
-    "loading" | "authenticated" | "unauthenticated"
-  >("loading");
-
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-
+  const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
+  const [profileInfo, setProfileInfo] = useState<ProfileInfo | null>(null);
   const [form, setForm] = useState<FormState>({
-    firstName: "",
-    lastName: "",
-    agencyName: "",
-    slug: "",
-    phone: "",
-    address: "",
-    website: "",
-    instagram: "",
-    bio: "",
-    province: "",
-    city: "",
-    street: "",
-    logoUrl: "",
-    bannerUrl: "",
+    firstName: "", lastName: "", phone: "",
+    agencyName: "", slug: "", address: "", street: "",
+    website: "", instagram: "", bio: "",
+    province: "", city: "", logoUrl: "", bannerUrl: "",
   });
 
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const fetchProfile = useCallback(
-    async (userId: string) => {
-      const { data: userProfile } = await supabase
-        .from("profiles")
-        .select(`
-          *,
-          user_profiles (*),
-          real_estates (*),
-          real_estate_licenses (*),
-          real_estate_offices (*)
-        `)
-        .eq("id", userId)
-        .single();
+  const fetchProfile = useCallback(async (userId: string) => {
+    try {
+      const res = await fetch("/api/user");
+      if (!res.ok) throw new Error("Error cargando perfil");
+      const data = await res.json();
 
-      if (userProfile) {
-        const typedProfile = userProfile as ProfileData;
+      setProfileInfo({ id: userId, role: data.role, isActive: data.isActive ?? true });
 
-        setProfile(typedProfile);
-
-        if (typedProfile.role === "USER") {
-          setForm((prev) => ({
-            ...prev,
-            firstName:
-              typedProfile.user_profiles?.[0]?.first_name || "",
-            lastName:
-              typedProfile.user_profiles?.[0]?.last_name || "",
-            phone: typedProfile.phone || "",
-          }));
-        } else {
-          const agency = typedProfile.real_estates?.[0];
-
-          setForm((prev) => ({
-            ...prev,
-            agencyName: agency?.agency_name || "",
-            slug: agency?.slug || "",
-            phone: agency?.phone || "",
-            address: agency?.address || "",
-            website: agency?.website || "",
-            instagram: agency?.instagram || "",
-            bio: agency?.bio || "",
-            province: agency?.province || "",
-            city: agency?.city || "",
-            street: agency?.street || "",
-            logoUrl: agency?.logo_url || "",
-            bannerUrl: agency?.banner_url || "",
-          }));
-        }
+      if (data.role === "USER" || data.role === "AGENT") {
+        setForm((prev) => ({
+          ...prev,
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          phone: data.phone || "",
+        }));
+      } else {
+        const a = data.agencyData ?? {};
+        setForm((prev) => ({
+          ...prev,
+          agencyName: a.name || "",
+          slug: a.slug || "",
+          phone: a.phone || "",
+          address: a.address || "",
+          street: a.street || "",
+          website: a.website || "",
+          instagram: a.instagram || "",
+          bio: a.bio || "",
+          province: a.province || "",
+          city: a.city || "",
+          logoUrl: a.logoUrl || "",
+          bannerUrl: a.bannerUrl || "",
+        }));
       }
 
       setStatus("authenticated");
-    },
-    [supabase]
-  );
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setStatus("authenticated"); // show form even on error
+    }
+  }, []);
 
   useEffect(() => {
+    const supabase = supabaseRef.current;
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         fetchProfile(session.user.id);
@@ -169,35 +120,30 @@ export default function ProfilePage() {
         setStatus("unauthenticated");
       }
     });
-  }, [fetchProfile, supabase]);
+  }, [fetchProfile]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!profile) return;
-
+    if (!profileInfo) return;
     setSaving(true);
     setMessage("");
 
     try {
-      if (profile.role === "USER") {
+      const supabase = supabaseRef.current;
+      if (profileInfo.role === "USER" || profileInfo.role === "AGENT") {
         await supabase.from("user_profiles").upsert({
-          profile_id: profile.id,
+          profile_id: profileInfo.id,
           first_name: form.firstName,
           last_name: form.lastName,
         });
+        await supabase.from("profiles").update({ phone: form.phone }).eq("id", profileInfo.id);
       } else {
         await supabase.from("real_estates").upsert({
-          profile_id: profile.id,
+          profile_id: profileInfo.id,
           agency_name: form.agencyName,
           phone: form.phone,
           address: form.address,
@@ -221,17 +167,10 @@ export default function ProfilePage() {
   };
 
   const handleCopy = () => {
-    if (!profile) return;
-
-    const url = `${window.location.origin}/realestate/${profile.id}`;
-
-    navigator.clipboard.writeText(url);
-
+    if (!profileInfo) return;
+    navigator.clipboard.writeText(`${window.location.origin}/realestate/${profileInfo.id}`);
     setCopied(true);
-
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (status === "loading") {
@@ -246,15 +185,8 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-urbik-white px-6">
         <div className="bg-urbik-g300 p-8 rounded-[3rem] text-center max-w-md">
-          <Lock
-            className="mx-auto mb-4 text-urbik-muted"
-            size={48}
-          />
-
-          <h1 className="text-3xl font-display font-bold mb-4">
-            Acceso Restringido
-          </h1>
-
+          <Lock className="mx-auto mb-4 text-urbik-muted" size={48} />
+          <h1 className="text-3xl font-display font-bold mb-4">Acceso Restringido</h1>
           <button
             onClick={() => router.push("/auth/login")}
             className="w-full py-4 bg-urbik-black text-white rounded-full font-bold"
@@ -266,22 +198,14 @@ export default function ProfilePage() {
     );
   }
 
-  if (!profile) return null;
-
-  const isRealEstate = profile.role === "REALESTATE";
+  const isRealEstate = profileInfo?.role === "REALESTATE" || profileInfo?.role === "ADMIN";
 
   return (
     <div className="bg-urbik-white min-h-screen pt-32 pb-20 font-sans">
       <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-right text-5xl font-display font-bold text-urbik-black tracking-tighter">
-            Mi{" "}
-            <span className="italic font-black text-6xl">
-              Perfil.
-            </span>
+            Mi <span className="italic font-black text-6xl">Perfil.</span>
           </h1>
 
           {message && (
@@ -293,83 +217,63 @@ export default function ProfilePage() {
         </motion.div>
 
         <div className="w-full max-w-5xl mx-auto space-y-10 mt-10">
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-6 text-urbik-black p-8 md:p-12"
-          >
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6 text-urbik-black p-8 md:p-12">
+
             {isRealEstate && (
               <>
+                {/* Profile URL */}
                 <div className="space-y-2">
                   <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide flex items-center gap-2">
                     <Link2 size={14} />
                     URL de tu perfil
                   </label>
-
                   <div className="flex items-center gap-2">
                     <div className="flex-1 flex items-center gap-3 px-6 py-4 rounded-full bg-urbik-g200 border border-gray-300">
-                      <Globe
-                        size={16}
-                        className="text-urbik-black opacity-40 shrink-0"
-                      />
-
-                      <span className="text-sm font-medium text-urbik-black truncate">
-                        {`${window.location.origin}/realestate/${profile.id}`}
-                      </span>
+                      <Globe size={16} className="text-urbik-black opacity-40 shrink-0" />
+                      {profileInfo && (
+                        <span className="text-sm font-medium text-urbik-black truncate">
+                          {`${typeof window !== "undefined" ? window.location.origin : ""}/realestate/${profileInfo.id}`}
+                        </span>
+                      )}
                     </div>
-
                     <button
                       type="button"
                       onClick={handleCopy}
                       className="flex items-center gap-2 px-5 py-4 rounded-full bg-urbik-black text-white text-sm font-bold hover:bg-urbik-emerald transition-colors shrink-0"
                     >
-                      {copied ? (
-                        <Check size={16} />
-                      ) : (
-                        <Copy size={16} />
-                      )}
-
+                      {copied ? <Check size={16} /> : <Copy size={16} />}
                       {copied ? "Copiado" : "Copiar"}
                     </button>
                   </div>
                 </div>
 
+                {/* Banner + Logo uploader */}
                 <div className="bg-white rounded-4xl border border-urbik-g200 shadow-sm overflow-hidden relative mb-4">
                   <div className="h-48 md:h-64 w-full bg-urbik-g50 relative">
                     <MediaUploader
                       variant="banner"
                       currentUrl={form.bannerUrl}
-                      onImageChange={(url: string) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          bannerUrl: url,
-                        }))
-                      }
+                      onImageChange={(url: string) => setForm((prev) => ({ ...prev, bannerUrl: url }))}
                       disabled={saving}
                     />
                   </div>
-
                   <div className="px-8 pb-6 relative">
                     <div className="relative -mt-16 mb-4 w-32 h-32 md:w-40 md:h-40 z-10">
                       <MediaUploader
                         variant="logo"
                         currentUrl={form.logoUrl}
-                        onImageChange={(url: string) =>
-                          setForm((prev) => ({
-                            ...prev,
-                            logoUrl: url,
-                          }))
-                        }
+                        onImageChange={(url: string) => setForm((prev) => ({ ...prev, logoUrl: url }))}
                         disabled={saving}
                       />
                     </div>
                   </div>
                 </div>
 
+                {/* Agency name */}
                 <div className="space-y-2">
                   <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                     Nombre Comercial
                   </label>
-
                   <input
                     name="agencyName"
                     value={form.agencyName}
@@ -379,82 +283,65 @@ export default function ProfilePage() {
                   />
                 </div>
 
+                {/* Location */}
                 <div className="space-y-2">
                   <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                     Ubicación
                   </label>
-
                   <LocationSelectors
                     provinceValue={form.province}
                     cityValue={form.city}
-                    onChange={(name, value) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        [name]: value,
-                      }))
-                    }
+                    onChange={(name, value) => setForm((prev) => ({ ...prev, [name]: value }))}
+                  />
+                </div>
+
+                {/* Street */}
+                <div className="space-y-2">
+                  <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
+                    Dirección
+                  </label>
+                  <input
+                    name="street"
+                    value={form.street}
+                    onChange={handleChange}
+                    placeholder="Av. Ejemplo 1234"
+                    className={inputBaseClasses}
                   />
                 </div>
               </>
             )}
 
+            {/* Name fields for USER */}
             {!isRealEstate && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                     Nombre
                   </label>
-
                   <div className="relative">
-                    <UserPlus
-                      className="absolute left-6 top-5 text-urbik-black opacity-40"
-                      size={18}
-                    />
-
-                    <input
-                      name="firstName"
-                      value={form.firstName}
-                      onChange={handleChange}
-                      className={`${inputBaseClasses} pl-14`}
-                      required
-                    />
+                    <UserPlus className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
+                    <input name="firstName" value={form.firstName} onChange={handleChange} className={`${inputBaseClasses} pl-14`} required />
                   </div>
                 </div>
-
                 <div className="space-y-2">
                   <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                     Apellido
                   </label>
-
                   <div className="relative">
-                    <UserPlus
-                      className="absolute left-6 top-5 text-urbik-black opacity-40"
-                      size={18}
-                    />
-
-                    <input
-                      name="lastName"
-                      value={form.lastName}
-                      onChange={handleChange}
-                      className={`${inputBaseClasses} pl-14`}
-                      required
-                    />
+                    <UserPlus className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
+                    <input name="lastName" value={form.lastName} onChange={handleChange} className={`${inputBaseClasses} pl-14`} required />
                   </div>
                 </div>
               </div>
             )}
 
+            {/* Phone */}
             <div className="space-y-2">
               <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                 Teléfono de Contacto
               </label>
-
               <div className="relative">
-                <Phone
-                  className="absolute left-6 top-5 text-urbik-black opacity-40"
-                  size={18}
-                />
-
+                <Phone className="absolute left-6 top-5 text-urbik-black opacity-40" size={18} />
                 <input
                   type="tel"
                   name="phone"
@@ -466,12 +353,12 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* Bio for REALESTATE */}
             {isRealEstate && (
               <div className="space-y-2">
                 <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                   Sobre nosotros
                 </label>
-
                 <textarea
                   name="bio"
                   value={form.bio}
@@ -494,32 +381,29 @@ export default function ProfilePage() {
                 className="px-10 py-5 bg-urbik-black text-white font-bold rounded-full flex items-center gap-3 shadow-xl hover:bg-urbik-emerald disabled:opacity-50"
               >
                 {saving ? "GUARDANDO..." : "GUARDAR CAMBIOS"}
-
                 {!saving && <Save size={20} />}
               </button>
             </div>
           </form>
 
-          {isRealEstate && (
-            <div className={!profile.is_active ? "opacity-50" : ""}>
+          {isRealEstate && profileInfo && (
+            <div className={!(profileInfo.isActive) ? "opacity-50" : ""}>
               <PauseAccountZone
-                isPaused={!profile.is_active}
-                userId={profile.id}
-                onToggleSuccess={() => fetchProfile(profile.id)}
+                isPaused={!profileInfo.isActive}
+                userId={profileInfo.id}
+                onToggleSuccess={() => fetchProfile(profileInfo.id)}
               />
             </div>
           )}
 
-          <div className="pt-10">
-            <DangerZone
-              itemName={
-                isRealEstate
-                  ? form.agencyName
-                  : form.firstName
-              }
-              userId={profile.id}
-            />
-          </div>
+          {profileInfo && (
+            <div className="pt-10">
+              <DangerZone
+                itemName={isRealEstate ? form.agencyName : form.firstName}
+                userId={profileInfo.id}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

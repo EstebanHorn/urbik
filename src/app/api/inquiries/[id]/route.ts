@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function PATCH(
@@ -19,16 +20,17 @@ export async function PATCH(
       );
     }
 
-    const { data: user } = await supabase
+    const admin = createAdminClient();
+    const { data: profile } = await admin
       .from("profiles")
-      .select("user_id, role")
+      .select("role")
       .eq("id", authUser.id)
       .single();
 
     if (
-      !user ||
-      (user.role !== "REALESTATE" &&
-        user.role !== "ADMIN")
+      !profile ||
+      (profile.role !== "REALESTATE" &&
+        profile.role !== "ADMIN")
     ) {
       return NextResponse.json(
         { error: "Acceso denegado." },
@@ -69,8 +71,8 @@ export async function PATCH(
       : inquiry.properties;
 
     if (
-      user.role !== "ADMIN" &&
-      propertyData?.real_estate_id !== user.user_id
+      profile.role !== "ADMIN" &&
+      propertyData?.real_estate_id !== authUser.id
     ) {
       return NextResponse.json(
         { error: "Acceso denegado." },

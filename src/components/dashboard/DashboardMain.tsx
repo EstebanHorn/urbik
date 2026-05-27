@@ -8,6 +8,8 @@ import { Mail, Phone, Building2, Clock, CheckCheck, Inbox } from "lucide-react";
 import type { PropertySummary } from "@/app/(dashboard)/dashboard/page";
 import CreatePropertyModal from "./CreatePropertyModal";
 import EditPropertyModal from "./EditPropertyModal";
+import ChatPanel from "@/components/chat/ChatPanel";
+import { useChatThreads } from "@/hooks/useChatThreads";
 
 const deleteProperty = async (id: string | number) => {
   const res = await fetch(`/api/property/${id}`, { method: "DELETE" });
@@ -24,7 +26,7 @@ const mockViews = [
   { name: "Jul", views: 280 },
 ];
 
-type ActiveTab = "properties" | "inquiries";
+type ActiveTab = "properties" | "inquiries" | "chat";
 
 function ConfirmationModal({ isOpen, onClose, onConfirm, title, message, isLoading }: any) {
   if (!isOpen) return null;
@@ -153,6 +155,7 @@ export default function DashboardMain({ properties, onRefresh, autoOpenCreate = 
   useEffect(() => { if (autoOpenCreate) setCreateOpen(true); }, [autoOpenCreate]);
   useEffect(() => { fetch("/api/inquiries").then((r) => r.json()).then((data) => { if (Array.isArray(data)) setUnreadCount(data.filter((i) => i.status === "UNREAD").length); }).catch(() => {}); }, []);
 
+  const { totalUnread: unreadChatCount } = useChatThreads();
   const mostViewed = useMemo(() => properties[0] ?? null, [properties]);
   const lastMonthViews = useMemo(() => mockViews.reduce((acc, x) => acc + x.views, 0), []);
 
@@ -171,6 +174,7 @@ export default function DashboardMain({ properties, onRefresh, autoOpenCreate = 
         <div className="flex items-center gap-1 border border-gray-100 bg-gray-50 rounded-full p-1 w-fit">
           <button onClick={() => setActiveTab("properties")} className={`px-5 py-2 rounded-full text-sm font-black transition-all cursor-pointer ${activeTab === "properties" ? "bg-urbik-black text-white shadow-sm" : "text-urbik-black/50 hover:text-urbik-black"}`}>Propiedades</button>
           <button onClick={() => setActiveTab("inquiries")} className={`relative px-5 py-2 rounded-full text-sm font-black transition-all cursor-pointer ${activeTab === "inquiries" ? "bg-urbik-black text-white shadow-sm" : "text-urbik-black/50 hover:text-urbik-black"}`}>Consultas {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />}</button>
+          <button onClick={() => setActiveTab("chat")} className={`relative px-5 py-2 rounded-full text-sm font-black transition-all cursor-pointer ${activeTab === "chat" ? "bg-urbik-black text-white shadow-sm" : "text-urbik-black/50 hover:text-urbik-black"}`}>Mensajes {unreadChatCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-urbik-cyan rounded-full border-2 border-white" />}</button>
         </div>
         {activeTab === "properties" && (
           <div className="flex items-center gap-2 justify-end">
@@ -179,7 +183,11 @@ export default function DashboardMain({ properties, onRefresh, autoOpenCreate = 
         )}
       </div>
 
-      {activeTab === "inquiries" ? <InquiriesPanel onRead={() => setUnreadCount((n) => Math.max(0, n - 1))} /> : (
+      {activeTab === "chat" ? (
+        <div className="h-[70vh]">
+          <ChatPanel />
+        </div>
+      ) : activeTab === "inquiries" ? <InquiriesPanel onRead={() => setUnreadCount((n) => Math.max(0, n - 1))} /> : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <div className="lg:col-span-2 border border-gray-100 bg-white shadow-sm overflow-hidden">
             <div className="p-2 sm:p-4">

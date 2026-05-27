@@ -6,31 +6,22 @@ import { createClient } from "@/lib/supabase/server";
 import AdminActions from "@/components/administrate/AdminActions";
 import {
   MapPin, Maximize2, BedDouble, Bath, Hash, ChevronLeft, Building2,
-  Phone, Mail, Flame, Waves, Wifi, Car, Snowflake, Trees, ShieldCheck,
-  Zap, Droplets, CheckCircle2,
+  Phone, Mail, Car, CheckCircle2, XCircle, Layers, Flame,
+  Waves, Wifi, Zap, Droplets, ShieldCheck, Trees, Snowflake,
+  CalendarDays, Star, FlipVertical, Home,
 } from "lucide-react";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import ImageGallery from "@/components/property/ImageGallery";
 import InquiryForm from "@/components/property/InquiryForm";
+import StartChatButton from "@/components/chat/StartChatButton";
 
 export const dynamic = "force-dynamic";
-
-const AMENITIES_CONFIG = [
-  { id: "hasElectricity", label: "Luz", icon: <Zap size={18} /> },
-  { id: "hasGas", label: "Gas Natural", icon: <Flame size={18} /> },
-  { id: "hasInternet", label: "Internet", icon: <Wifi size={18} /> },
-  { id: "hasParking", label: "Cochera", icon: <Car size={18} /> },
-  { id: "hasPool", label: "Pileta", icon: <Waves size={18} /> },
-  { id: "hasWater", label: "Agua Corriente", icon: <Droplets size={18} /> },
-  { id: "aire", label: "Aire Acondicionado", icon: <Snowflake size={18} /> },
-  { id: "jardin", label: "Jardín", icon: <Trees size={18} /> },
-  { id: "seguridad", label: "Seguridad", icon: <ShieldCheck size={18} /> },
-];
 
 const getOperationLabel = (type: string) => {
   switch (type) {
     case "SALE": return "Venta";
     case "RENT": return "Alquiler";
+    case "TEMP_RENT": return "Temporal";
     case "SALE_RENT": return "Venta y Alquiler";
     default: return type;
   }
@@ -40,42 +31,127 @@ const getPropertyLabel = (type: string) => {
   switch (type) {
     case "HOUSE": return "Casa";
     case "APARTMENT": return "Departamento";
+    case "PH": return "PH";
+    case "COUNTRY": return "Country";
     case "LAND": return "Terreno";
-    case "COMMERCIAL_PROPERTY": return "Local";
+    case "FIELD": return "Campo";
+    case "COMMERCIAL_PROPERTY": return "Local Comercial";
     case "OFFICE": return "Oficina";
+    case "WAREHOUSE": return "Depósito";
     default: return type;
   }
 };
 
-function AmenitiesList({ data }: { data: Record<string, boolean> }) {
-  if (!data || typeof data !== "object") return null;
-  const activeAmenities = AMENITIES_CONFIG.filter((config) => data[config.id] === true);
-  const extraKeys = Object.entries(data)
-    .filter(([key, value]) => value === true && !AMENITIES_CONFIG.some((c) => c.id === key))
-    .map(([key]) => ({
-      id: key,
-      label: key.charAt(0).toUpperCase() + key.slice(1),
-      icon: <CheckCircle2 size={18} />,
-    }));
+// ── Amenity categories (mirrors AmenitiesGrid in the form) ──────────────────
+const AMENITY_CATEGORIES = [
+  {
+    key: "ambientes",
+    label: "Ambientes / Espacios",
+    visibleFor: ["HOUSE", "APARTMENT", "PH", "OFFICE"],
+    tags: [
+      { key: "hasLiving", label: "Living" },
+      { key: "hasLivingDining", label: "Living-comedor" },
+      { key: "hasDining", label: "Comedor" },
+      { key: "hasKitchen", label: "Cocina" },
+      { key: "hasKitchenDining", label: "Cocina-comedor" },
+      { key: "hasIntegratedKitchen", label: "Cocina integrada" },
+      { key: "hasPantry", label: "Despensa" },
+      { key: "hasSuite", label: "Suite" },
+      { key: "hasWalkInCloset", label: "Vestidor" },
+      { key: "hasStudy", label: "Escritorio" },
+      { key: "hasPlayroom", label: "Playroom" },
+      { key: "hasServiceRoom", label: "Cuarto de servicio" },
+      { key: "hasStorage", label: "Depósito" },
+      { key: "hasAttic", label: "Altillo" },
+      { key: "hasBasement", label: "Subsuelo" },
+    ],
+  },
+  {
+    key: "exterior",
+    label: "Exterior",
+    visibleFor: ["HOUSE", "APARTMENT", "PH"],
+    tags: [
+      { key: "hasPatio", label: "Patio" },
+      { key: "hasTerrace", label: "Terraza" },
+      { key: "hasBalcony", label: "Balcón" },
+      { key: "hasGarden", label: "Jardín" },
+      { key: "hasGallery", label: "Galería" },
+      { key: "hasGrill", label: "Parrilla" },
+      { key: "hasSolarium", label: "Solárium" },
+    ],
+  },
+  {
+    key: "servicios",
+    label: "Servicios",
+    visibleFor: [],
+    tags: [
+      { key: "hasWater", label: "Agua corriente" },
+      { key: "hasGas", label: "Gas natural" },
+      { key: "hasGasBottle", label: "Gas en garrafa" },
+      { key: "hasElectricity", label: "Luz eléctrica" },
+      { key: "hasSewage", label: "Cloacas" },
+      { key: "hasInternet", label: "Internet" },
+      { key: "hasCable", label: "TV por cable" },
+      { key: "hasPhone", label: "Teléfono" },
+    ],
+  },
+];
 
-  const allAmenities = [...activeAmenities, ...extraKeys];
-  if (allAmenities.length === 0) return null;
+const LEGACY_ICON: Record<string, React.ReactNode> = {
+  hasElectricity: <Zap size={14} />,
+  hasGas: <Flame size={14} />,
+  hasInternet: <Wifi size={14} />,
+  hasParking: <Car size={14} />,
+  hasPool: <Waves size={14} />,
+  hasWater: <Droplets size={14} />,
+  aire: <Snowflake size={14} />,
+  jardin: <Trees size={14} />,
+  seguridad: <ShieldCheck size={14} />,
+};
 
-  return (
-    <div className="mt-10">
-      <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight ml-2 mb-4">
-        Servicios y Comodidades
-      </h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {allAmenities.map((item) => (
-          <div key={item.id} className="flex items-center gap-3 p-4 bg-urbik-white rounded-xl border border-urbik-g100 text-urbik-black hover:border-urbik-emerald/50 transition-colors">
-            <span className="text-urbik-emerald bg-urbik-emerald/10 p-2 rounded-full">{item.icon}</span>
-            <span className="font-bold text-sm">{item.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+interface Property {
+  id: number;
+  title: string;
+  description: string | null;
+  address: string;
+  city: string;
+  province: string;
+  neighborhood: string | null;
+  locality: string | null;
+  status: string;
+  type: string;
+  operationType: string;
+  salePrice: number | null;
+  rentPrice: number | null;
+  saleCurrency: string;
+  rentCurrency: string;
+  expenses: number | null;
+  isPriceHidden: boolean;
+  area: number | null;
+  coveredArea: number | null;
+  semiCoveredArea: number | null;
+  uncoveredArea: number | null;
+  frontLength: number | null;
+  backLength: number | null;
+  rooms: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  toilets: number | null;
+  garages: number | null;
+  plants: number | null;
+  floor: string | null;
+  unitNumber: string | null;
+  condition: string | null;
+  constructionYear: number | null;
+  latitude: number | null;
+  longitude: number | null;
+  parcelGeom: Record<string, unknown> | null;
+  realEstateId: string | null;
+  images: string[];
+  isFavorite: boolean;
+  legacyAmenities: Record<string, boolean>;
+  featureGroups: Record<string, Record<string, boolean>>;
+  RealEstate: { agencyName: string; phone: string } | null;
 }
 
 interface FormattedOtherProperty {
@@ -99,100 +175,267 @@ async function getPropertyData(id: number) {
 
   try {
     const { data: propRaw, error } = await supabase
-      .from('properties')
-      .select(`
-        *,
-        real_estates (agency_name, phone)
-      `)
-      .eq('id', id)
+      .from("properties")
+      .select(`*, real_estates (agency_name, phone)`)
+      .eq("id", id)
       .single();
 
     if (error || !propRaw) return null;
 
     let isFavorite = false;
     if (userId) {
-      const { count } = await supabase.from('favorites').select('*', { count: 'exact', head: true })
-        .eq('property_id', id).eq('profile_id', userId);
+      const { count } = await supabase.from("favorites").select("*", { count: "exact", head: true })
+        .eq("property_id", id).eq("profile_id", userId);
       isFavorite = (count || 0) > 0;
     }
 
     let otherProperties: Array<{
-      id: number;
-      title: string;
-      type: string;
-      operation_type: string;
-      sale_price: number | null;
-      rent_price: number | null;
-      sale_currency: string | null;
-      rent_currency: string | null;
-      city: string;
-      province: string;
-      images: string[] | null;
-      isFavorite?: boolean;
+      id: number; title: string; type: string; operation_type: string;
+      sale_price: number | null; rent_price: number | null;
+      sale_currency: string | null; rent_currency: string | null;
+      city: string; province: string; images: string[] | null; isFavorite?: boolean;
     }> = [];
 
     if (propRaw.real_estate_id) {
       const { data: othersRaw } = await supabase
-        .from('properties')
-        .select('id, title, type, operation_type, sale_price, rent_price, sale_currency, rent_currency, city, province, images')
-        .eq('real_estate_id', propRaw.real_estate_id)
-        .eq('status', 'AVAILABLE')
-        .neq('id', id)
+        .from("properties")
+        .select("id, title, type, operation_type, sale_price, rent_price, sale_currency, rent_currency, city, province, images")
+        .eq("real_estate_id", propRaw.real_estate_id)
+        .eq("status", "AVAILABLE")
+        .neq("id", id)
         .limit(4);
 
       if (othersRaw) {
         if (userId) {
-          const otherIds = othersRaw.map(p => p.id);
-          const { data: favs } = await supabase.from('favorites').select('property_id').eq('profile_id', userId).in('property_id', otherIds);
-          const favSet = new Set(favs?.map(f => f.property_id));
-          otherProperties = othersRaw.map(p => ({ ...p, isFavorite: favSet.has(p.id) }));
+          const otherIds = othersRaw.map((p) => p.id);
+          const { data: favs } = await supabase.from("favorites").select("property_id").eq("profile_id", userId).in("property_id", otherIds);
+          const favSet = new Set(favs?.map((f) => f.property_id));
+          otherProperties = othersRaw.map((p) => ({ ...p, isFavorite: favSet.has(p.id) }));
         } else {
-          otherProperties = othersRaw.map(p => ({ ...p, isFavorite: false }));
+          otherProperties = othersRaw.map((p) => ({ ...p, isFavorite: false }));
         }
       }
     }
 
-    const formattedProperty = {
-      id: propRaw.id, title: propRaw.title, description: propRaw.description, address: propRaw.address,
-      city: propRaw.city, province: propRaw.province, status: propRaw.status, type: propRaw.type,
-      operationType: propRaw.operation_type, salePrice: propRaw.sale_price, rentPrice: propRaw.rent_price,
-      currency: propRaw.sale_currency || propRaw.rent_currency || 'USD', area: propRaw.area,
-      rooms: propRaw.rooms, bathrooms: propRaw.bathrooms, latitude: propRaw.latitude, longitude: propRaw.longitude,
-      parcelGeom: propRaw.parcel_geom, realEstateId: propRaw.real_estate_id, images: propRaw.images || [],
+    const featureGroups: Record<string, Record<string, boolean>> =
+      (propRaw.feature_groups && typeof propRaw.feature_groups === "object")
+        ? (propRaw.feature_groups as Record<string, Record<string, boolean>>)
+        : {};
+
+    const property: Property = {
+      id: propRaw.id,
+      title: propRaw.title,
+      description: propRaw.description,
+      address: propRaw.address,
+      city: propRaw.city,
+      province: propRaw.province,
+      neighborhood: propRaw.neighborhood || null,
+      locality: propRaw.locality || null,
+      status: propRaw.status,
+      type: propRaw.type,
+      operationType: propRaw.operation_type,
+      salePrice: propRaw.sale_price,
+      rentPrice: propRaw.rent_price,
+      saleCurrency: propRaw.sale_currency || "USD",
+      rentCurrency: propRaw.rent_currency || "ARS",
+      expenses: propRaw.expenses,
+      isPriceHidden: Boolean(propRaw.is_price_hidden),
+      area: propRaw.area,
+      coveredArea: propRaw.covered_area,
+      semiCoveredArea: propRaw.semi_covered_area,
+      uncoveredArea: propRaw.uncovered_area,
+      frontLength: propRaw.front_length,
+      backLength: propRaw.back_length,
+      rooms: propRaw.rooms,
+      bedrooms: propRaw.bedrooms,
+      bathrooms: propRaw.bathrooms,
+      toilets: propRaw.toilets,
+      garages: propRaw.garages,
+      plants: propRaw.plants,
+      floor: propRaw.floor,
+      unitNumber: propRaw.unit_number,
+      condition: propRaw.condition,
+      constructionYear: propRaw.construction_year,
+      latitude: propRaw.latitude,
+      longitude: propRaw.longitude,
+      parcelGeom: propRaw.parcel_geom,
+      realEstateId: propRaw.real_estate_id,
+      images: propRaw.images || [],
       isFavorite,
-      amenities: {
-        hasElectricity: propRaw.has_electricity, hasGas: propRaw.has_gas, hasInternet: propRaw.has_internet,
-        hasParking: propRaw.has_parking, hasPool: propRaw.has_pool, hasWater: propRaw.has_water,
+      legacyAmenities: {
+        hasElectricity: Boolean(propRaw.has_electricity),
+        hasGas: Boolean(propRaw.has_gas),
+        hasInternet: Boolean(propRaw.has_internet),
+        hasParking: Boolean(propRaw.has_parking),
+        hasPool: Boolean(propRaw.has_pool),
+        hasWater: Boolean(propRaw.has_water),
       },
-      RealEstate: propRaw.real_estates ? {
-        agencyName: propRaw.real_estates.agency_name,
-        phone: propRaw.real_estates.phone,
-      } : null,
+      featureGroups,
+      RealEstate: propRaw.real_estates
+        ? { agencyName: propRaw.real_estates.agency_name, phone: propRaw.real_estates.phone }
+        : null,
     };
 
-    const formattedOtherProps: FormattedOtherProperty[] = otherProperties.map(p => ({
+    const formattedOtherProps: FormattedOtherProperty[] = otherProperties.map((p) => ({
       id: p.id, title: p.title, type: p.type, operationType: p.operation_type,
-      salePrice: p.sale_price, rentPrice: p.rent_price, currency: p.sale_currency || p.rent_currency || 'USD',
-      city: p.city, province: p.province, images: p.images || [], isFavorite: p.isFavorite || false
+      salePrice: p.sale_price, rentPrice: p.rent_price,
+      currency: p.sale_currency || p.rent_currency || "USD",
+      city: p.city, province: p.province, images: p.images || [], isFavorite: p.isFavorite || false,
     }));
 
-    return { property: formattedProperty, otherProperties: formattedOtherProps };
-  } catch (error) {
-    console.error("Error fetching property:", error);
+    return { property, otherProperties: formattedOtherProps };
+  } catch (err) {
+    console.error("Error fetching property:", err);
     return null;
   }
 }
 
-function StatBox({ label, value, icon }: { label: string; value: string | number; icon: React.ReactNode; }) {
+// ── Stat chip ────────────────────────────────────────────────────────────────
+function StatChip({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
   return (
-    <div className="p-6 flex flex-col items-center justify-center text-center transition-all hover:shadow-md border border-urbik-g100 rounded-xl bg-white">
-      <div className="text-urbik-white mb-3 p-3 bg-urbik-dark2 rounded-full shadow-sm">{icon}</div>
-      <div className="text-md text-urbik-muted font-bold mb-1">{label}</div>
-      <div className="text-xl font-black text-urbik-black tracking-tight">{value}</div>
+    <div className="flex items-center gap-3 bg-white border border-urbik-g100 rounded-2xl px-4 py-3 shadow-sm">
+      <span className="text-urbik-black bg-urbik-g100 p-2 rounded-full shrink-0">{icon}</span>
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-widest text-urbik-muted leading-none mb-0.5">{label}</p>
+        <p className="text-base font-black text-urbik-black leading-tight">{value}</p>
+      </div>
     </div>
   );
 }
 
+// ── Surface row ──────────────────────────────────────────────────────────────
+function SurfaceRow({ label, value }: { label: string; value: number | null }) {
+  if (!value) return null;
+  return (
+    <div className="flex items-center justify-between py-2.5 border-b border-urbik-g100 last:border-0">
+      <span className="text-sm font-semibold text-urbik-muted">{label}</span>
+      <span className="text-sm font-black text-urbik-black">{value} m²</span>
+    </div>
+  );
+}
+
+// ── Detail row ───────────────────────────────────────────────────────────────
+function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
+  return (
+    <div className="flex items-center gap-3 py-3 border-b border-urbik-g100 last:border-0">
+      <span className="text-urbik-muted shrink-0">{icon}</span>
+      <span className="text-sm font-semibold text-urbik-muted flex-1">{label}</span>
+      <span className="text-sm font-black text-urbik-black">{value}</span>
+    </div>
+  );
+}
+
+// ── Features display ─────────────────────────────────────────────────────────
+function FeaturesSection({
+  propertyType,
+  legacyAmenities,
+  featureGroups,
+}: {
+  propertyType: string;
+  legacyAmenities: Record<string, boolean>;
+  featureGroups: Record<string, Record<string, boolean>>;
+}) {
+  // Merge feature groups + legacy amenities into a single flat map
+  const flat: Record<string, boolean> = { ...legacyAmenities };
+  for (const group of Object.values(featureGroups)) {
+    if (group && typeof group === "object") {
+      Object.assign(flat, group);
+    }
+  }
+
+  // Also unwrap if featureGroups is itself flat (some older saves)
+  for (const [k, v] of Object.entries(featureGroups)) {
+    if (typeof v === "boolean") flat[k] = v;
+  }
+
+  const visibleCats = AMENITY_CATEGORIES.filter(
+    (cat) => cat.visibleFor.length === 0 || cat.visibleFor.includes(propertyType),
+  );
+
+  // Build per-category active/inactive counts to skip empty categories
+  const catsWithData = visibleCats.filter((cat) =>
+    cat.tags.some((t) => flat[t.key] === true || flat[t.key] === false),
+  );
+
+  // For servicios always show (even if all false – it's structural info)
+  const catsToShow = visibleCats.length > 0
+    ? visibleCats.filter(
+        (cat) => cat.key === "servicios" || cat.tags.some((t) => flat[t.key] === true),
+      )
+    : [];
+
+  if (catsToShow.length === 0 && catsWithData.length === 0) {
+    // Fallback: show only legacy amenities
+    const legacyActive = Object.entries(legacyAmenities).filter(([, v]) => v);
+    if (legacyActive.length === 0) return null;
+    return (
+      <div className="mt-10">
+        <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight ml-2 mb-4">
+          Servicios y Comodidades
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {legacyActive.map(([key]) => (
+            <span key={key} className="inline-flex items-center gap-2 px-3 py-2 bg-urbik-black text-white text-xs font-bold rounded-full">
+              {LEGACY_ICON[key] ?? <CheckCircle2 size={14} />}
+              {key.replace("has", "").replace(/([A-Z])/g, " $1").trim()}
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const showCats = catsToShow.length > 0 ? catsToShow : visibleCats.slice(0, 1);
+
+  return (
+    <div className="mt-10">
+      <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight ml-2 mb-6">
+        Características y Servicios
+      </h3>
+      <div className="space-y-5">
+        {showCats.map((cat) => {
+          const hasSomething = cat.tags.some((t) => flat[t.key] !== undefined);
+          if (!hasSomething && cat.key !== "servicios") return null;
+          return (
+            <div key={cat.key}>
+              <p className="text-[11px] font-black uppercase tracking-widest text-urbik-muted mb-2 ml-1">
+                {cat.label}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {cat.tags.map((tag) => {
+                  const isTrue = flat[tag.key] === true;
+                  const isDefined = flat[tag.key] !== undefined;
+                  if (!isTrue && !isDefined) {
+                    // Show as inactive pill if category is servicios (always show all)
+                    if (cat.key !== "servicios") return null;
+                  }
+                  return (
+                    <span
+                      key={tag.key}
+                      className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-full border transition-colors ${
+                        isTrue
+                          ? "bg-urbik-black text-white border-urbik-black"
+                          : "bg-white text-urbik-muted border-urbik-g200"
+                      }`}
+                    >
+                      {isTrue
+                        ? <CheckCircle2 size={13} className="shrink-0" />
+                        : <XCircle size={13} className="shrink-0 opacity-40" />
+                      }
+                      {tag.label}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Status badge ─────────────────────────────────────────────────────────────
 const getStatusBadge = (property: { status?: string; operationType: string }) => {
   const s = property.status || "AVAILABLE";
   if (s === "SOLD") return { label: "VENDIDA", color: "bg-urbik-rose text-white" };
@@ -201,106 +444,233 @@ const getStatusBadge = (property: { status?: string; operationType: string }) =>
   return { label: getOperationLabel(property.operationType), color: "bg-urbik-cyan text-urbik-dark" };
 };
 
+// ── Page ─────────────────────────────────────────────────────────────────────
 export default async function PropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: rawId } = await params;
   const id = Number(rawId);
   if (isNaN(id)) return notFound();
 
-  const data = await getPropertyData(id);
-  if (!data) return notFound();
+  const result = await getPropertyData(id);
+  if (!result) return notFound();
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   let isAdmin = false;
   if (user) {
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-    isAdmin = profile?.role === 'ADMIN';
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    isAdmin = profile?.role === "ADMIN";
   }
 
-  const { property, otherProperties } = data;
+  const { property, otherProperties } = result;
   const formatter = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 });
-  const currencySymbol = property.currency || "USD";
   const statusBadge = getStatusBadge(property);
   const isBoth = property.operationType === "SALE_RENT";
 
+  // Build stat chips – only those with values
+  const statChips = [
+    property.rooms && { icon: <Home size={16} />, label: "Ambientes", value: property.rooms },
+    property.bedrooms && { icon: <BedDouble size={16} />, label: "Dormitorios", value: property.bedrooms },
+    property.bathrooms && { icon: <Bath size={16} />, label: "Baños", value: property.bathrooms },
+    property.toilets && { icon: <Bath size={16} />, label: "Toilettes", value: property.toilets },
+    property.garages && { icon: <Car size={16} />, label: "Cocheras", value: property.garages },
+    property.plants && { icon: <Layers size={16} />, label: "Plantas", value: property.plants },
+    property.area && { icon: <Maximize2 size={16} />, label: "Sup. cubierta", value: `${property.area} m²` },
+  ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string | number }[];
+
+  // Build property detail rows
+  const detailRows = [
+    property.type && { icon: <Building2 size={16} />, label: "Tipo", value: getPropertyLabel(property.type) },
+    property.floor && { icon: <Layers size={16} />, label: "Piso", value: property.floor },
+    property.unitNumber && { icon: <Hash size={16} />, label: "Unidad", value: property.unitNumber },
+    property.condition && {
+      icon: <Star size={16} />,
+      label: "Estado del inmueble",
+      value: property.condition.charAt(0).toUpperCase() + property.condition.slice(1),
+    },
+    property.constructionYear && { icon: <CalendarDays size={16} />, label: "Año de construcción", value: property.constructionYear },
+    property.frontLength && { icon: <FlipVertical size={16} />, label: "Frente", value: `${property.frontLength} m` },
+    property.backLength && { icon: <FlipVertical size={16} />, label: "Fondo", value: `${property.backLength} m` },
+    { icon: <Hash size={16} />, label: "Referencia", value: `#${property.id}` },
+  ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string | number }[];
+
+  // Surface breakdown
+  const hasSurfaceBreakdown =
+    property.coveredArea || property.semiCoveredArea || property.uncoveredArea;
+
   return (
     <main className="min-h-screen bg-white pb-20">
+      {/* Back link */}
       <div className="max-w-7xl mx-auto px-6 pt-28 mb-8">
-        <Link href="/dashboard" className="group text-urbik-black/50 inline-flex items-center gap-2 text-sm font-bold hover:text-urbik-black transition-colors">
-          <div className="p-2 bg-urbik-g100 rounded-full group-hover:bg-urbik-g200 transition-colors"><ChevronLeft size={18} /></div>
+        <Link
+          href="/dashboard"
+          className="group text-urbik-black/50 inline-flex items-center gap-2 text-sm font-bold hover:text-urbik-black transition-colors"
+        >
+          <div className="p-2 bg-urbik-g100 rounded-full group-hover:bg-urbik-g200 transition-colors">
+            <ChevronLeft size={18} />
+          </div>
           Volver al listado
         </Link>
         {isAdmin && <AdminActions id={property.id} currentStatus={property.status} type="property" />}
       </div>
 
       <div className="max-w-7xl mx-auto px-6">
+        {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-8">
           <div className="space-y-4 w-full lg:w-auto">
             <div className="flex flex-wrap items-center gap-3">
               <FavoriteButton propertyId={property.id.toString()} initialIsFavorite={property.isFavorite} />
-              <span className="bg-urbik-black text-urbik-white text-xs font-black uppercase tracking-wider border border-urbik-g100 px-4 py-2 rounded-full">{getPropertyLabel(property.type)}</span>
-              <span className={`text-xs font-black uppercase px-4 py-2 rounded-full tracking-wider shadow-sm ${statusBadge.color}`}>{statusBadge.label}</span>
+              <span className="bg-urbik-black text-urbik-white text-xs font-black uppercase tracking-wider border border-urbik-g100 px-4 py-2 rounded-full">
+                {getPropertyLabel(property.type)}
+              </span>
+              <span className={`text-xs font-black uppercase px-4 py-2 rounded-full tracking-wider shadow-sm ${statusBadge.color}`}>
+                {statusBadge.label}
+              </span>
             </div>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-black text-urbik-black italic tracking-tighter leading-tight">{property.title}</h1>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-black text-urbik-black italic tracking-tighter leading-tight">
+              {property.title}
+            </h1>
             <div className="flex items-center gap-2 text-urbik-muted font-medium italic">
               <MapPin size={20} className="text-urbik-emerald" />
-              <span className="text-lg">{property.address}, {property.city}</span>
+              <span className="text-lg">
+                {property.address}{property.neighborhood ? `, ${property.neighborhood}` : ""}, {property.city}
+                {property.locality && property.locality !== property.city ? ` (${property.locality})` : ""}
+              </span>
             </div>
           </div>
 
-          <div className="lg:text-right w-full lg:w-auto p-4 rounded-2xl lg:bg-transparent lg:p-0">
-            <div className={`flex flex-col ${isBoth ? "gap-2" : ""}`}>
-              {(property.operationType === "SALE" || isBoth) && property.salePrice && (
-                <div className="flex flex-col lg:items-end">
-                  {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1">Valor Venta</span>}
-                  <div className={`${isBoth ? "text-3xl" : "text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
-                    <span className="text-urbik-emerald mr-2 font-black text-0.5em">{currencySymbol}</span>
-                    <span className="text-urbik-black">{formatter.format(property.salePrice)}</span>
+          {/* Price block */}
+          {!property.isPriceHidden && (
+            <div className="lg:text-right w-full lg:w-auto">
+              <div className={`flex flex-col ${isBoth ? "gap-2" : ""}`}>
+                {(property.operationType === "SALE" || isBoth) && property.salePrice && (
+                  <div className="flex flex-col lg:items-end">
+                    {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1">Venta</span>}
+                    <div className={`${isBoth ? "text-3xl" : "text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
+                      <span className="text-urbik-emerald mr-2 font-black text-0.5em">{property.saleCurrency}</span>
+                      <span className="text-urbik-black">{formatter.format(property.salePrice)}</span>
+                    </div>
+                    {property.expenses && (
+                      <p className="text-sm font-bold text-urbik-muted lg:text-right mt-1">
+                        + Expensas: {property.saleCurrency} {formatter.format(property.expenses)}
+                      </p>
+                    )}
                   </div>
-                </div>
-              )}
-              {(property.operationType === "RENT" || isBoth) && property.rentPrice && (
-                <div className="flex flex-col lg:items-end">
-                  {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1 mt-2">Valor Alquiler</span>}
-                  <div className={`${isBoth ? "text-3xl" : "text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
-                    <span className="text-urbik-emerald mr-2 font-black text-0.5em">{currencySymbol}</span>
-                    <span className="text-urbik-black">{formatter.format(property.rentPrice)}</span>
+                )}
+                {(property.operationType === "RENT" || property.operationType === "TEMP_RENT" || isBoth) && property.rentPrice && (
+                  <div className="flex flex-col lg:items-end">
+                    {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1 mt-2">Alquiler</span>}
+                    <div className={`${isBoth ? "text-3xl" : "text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
+                      <span className="text-urbik-emerald mr-2 font-black text-0.5em">{property.rentCurrency}</span>
+                      <span className="text-urbik-black">{formatter.format(property.rentPrice)}</span>
+                    </div>
+                    {property.expenses && (
+                      <p className="text-sm font-bold text-urbik-muted lg:text-right mt-1">
+                        + Expensas: {property.rentCurrency} {formatter.format(property.expenses)}
+                      </p>
+                    )}
                   </div>
-                </div>
+                )}
+              </div>
+              {property.isPriceHidden && (
+                <p className="text-xl font-black text-urbik-muted">Consultar precio</p>
               )}
             </div>
-          </div>
+          )}
+          {property.isPriceHidden && (
+            <div className="lg:text-right">
+              <p className="text-4xl font-black text-urbik-muted italic">Consultar precio</p>
+            </div>
+          )}
         </div>
 
-        <ImageGallery images={property.images} title={property.title} parcelGeom={property.parcelGeom} latitude={property.latitude} longitude={property.longitude} />
+        {/* Gallery */}
+        <ImageGallery
+          images={property.images}
+          title={property.title}
+          parcelGeom={property.parcelGeom}
+          latitude={property.latitude}
+          longitude={property.longitude}
+        />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        {/* Two-column layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12">
           <div className="lg:col-span-8 space-y-10">
-            <div>
-              <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Resumen</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <StatBox label="Superficie" value={`${property.area ?? 0} m²`} icon={<Maximize2 size={20} />} />
-                <StatBox label="Ambientes" value={property.rooms ?? "-"} icon={<BedDouble size={20} />} />
-                <StatBox label="Baños" value={property.bathrooms ?? "-"} icon={<Bath size={20} />} />
-                <StatBox label="Referencia" value={`#${property.id}`} icon={<Hash size={20} />} />
+
+            {/* Quick stats strip */}
+            {statChips.length > 0 && (
+              <div>
+                <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Resumen</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {statChips.map((chip, i) => (
+                    <StatChip key={i} icon={chip.icon} label={chip.label} value={chip.value} />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div>
-              <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Descripción</h3>
-              <div className="bg-white p-8 rounded-2xl border border-urbik-g100 shadow-sm">
-                <div className="text-urbik-black/80 leading-relaxed whitespace-pre-wrap font-serif text-lg">{property.description || "Sin descripción disponible."}</div>
+            )}
+
+            {/* Surfaces breakdown */}
+            {hasSurfaceBreakdown && (
+              <div>
+                <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Superficies</h3>
+                <div className="bg-white border border-urbik-g100 rounded-2xl px-6 py-2 shadow-sm">
+                  <SurfaceRow label="Superficie cubierta" value={property.area} />
+                  <SurfaceRow label="Superficie semicubierta" value={property.semiCoveredArea} />
+                  <SurfaceRow label="Superficie descubierta" value={property.uncoveredArea} />
+                  {(property.area || 0) + (property.semiCoveredArea || 0) + (property.uncoveredArea || 0) > 0 && (
+                    <div className="flex items-center justify-between py-2.5 pt-3 border-t border-urbik-g100">
+                      <span className="text-sm font-black text-urbik-black">Total</span>
+                      <span className="text-sm font-black text-urbik-emerald">
+                        {(property.area || 0) + (property.semiCoveredArea || 0) + (property.uncoveredArea || 0)} m²
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            <AmenitiesList data={property.amenities} />
+            )}
+
+            {/* Property details */}
+            {detailRows.length > 0 && (
+              <div>
+                <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Ficha Técnica</h3>
+                <div className="bg-white border border-urbik-g100 rounded-2xl px-6 py-2 shadow-sm">
+                  {detailRows.map((row, i) => (
+                    <DetailRow key={i} icon={row.icon} label={row.label} value={row.value} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Description */}
+            {property.description && (
+              <div>
+                <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Descripción</h3>
+                <div className="bg-white p-8 rounded-2xl border border-urbik-g100 shadow-sm">
+                  <div className="text-urbik-black/80 leading-relaxed whitespace-pre-wrap font-serif text-lg">
+                    {property.description}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Features / Amenities */}
+            <FeaturesSection
+              propertyType={property.type}
+              legacyAmenities={property.legacyAmenities}
+              featureGroups={property.featureGroups}
+            />
           </div>
 
+          {/* Sidebar */}
           <div className="lg:col-span-4 relative">
             <div className="sticky top-28 space-y-6">
+              {/* Agency card */}
               <div className="bg-urbik-white2 rounded-2xl p-8 text-urbik-dark shadow-xl border border-urbik-g100 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-urbik-emerald/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-urbik-emerald/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-8">
-                    <div className="w-16 h-16 bg-urbik-black rounded-2xl flex items-center justify-center text-urbik-white shadow-lg"><Building2 size={32} /></div>
+                    <div className="w-16 h-16 bg-urbik-black rounded-2xl flex items-center justify-center text-urbik-white shadow-lg">
+                      <Building2 size={32} />
+                    </div>
                     <div>
                       <p className="text-xs font-bold uppercase tracking-widest text-urbik-muted mb-1">Comercializa</p>
                       <Link href={`/realestate/${property.realEstateId}`} className="hover:text-urbik-emerald transition-colors">
@@ -324,46 +694,70 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                       </div>
                     </div>
                   </div>
-                  <Link href={`/realestate/${property.realEstateId}`} className="block mt-4 text-center text-xs font-bold text-urbik-muted hover:text-urbik-black underline decoration-dashed">Ver todas las propiedades</Link>
+                  <Link
+                    href={`/realestate/${property.realEstateId}`}
+                    className="block mt-4 text-center text-xs font-bold text-urbik-muted hover:text-urbik-black underline decoration-dashed"
+                  >
+                    Ver todas las propiedades
+                  </Link>
                 </div>
               </div>
-              <InquiryForm propertyId={property.id} />
+
+              {user && property.realEstateId !== user.id ? (
+                <StartChatButton propertyId={property.id} realEstateId={property.realEstateId as string} />
+              ) : (
+                <InquiryForm propertyId={property.id} />
+              )}
             </div>
           </div>
         </div>
 
+        {/* More from this agency */}
         <div className="mt-24 pt-12 border-t border-urbik-g100">
           <h3 className="text-3xl font-display text-urbik-black tracking-tighter mb-8">
             <span className="font-medium">Más propiedades de </span>
-            <span className="font-black italic uppercase text-urbik-emerald">{property.RealEstate?.agencyName || "la inmobiliaria"}</span>
+            <span className="font-black italic uppercase text-urbik-emerald">
+              {property.RealEstate?.agencyName || "la inmobiliaria"}
+            </span>
           </h3>
 
           {otherProperties.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {otherProperties.map((other: FormattedOtherProperty) => (
+              {otherProperties.map((other) => (
                 <div key={other.id} className="group relative flex flex-col h-full bg-white rounded-xl border border-urbik-g100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                   <Link href={`/property/${other.id}`} className="absolute inset-0 z-10" />
                   <div className="absolute top-3 right-3 z-20">
                     <FavoriteButton propertyId={other.id.toString()} initialIsFavorite={!!other.isFavorite} small />
                   </div>
                   <div className="relative h-48 bg-gray-200 overflow-hidden">
-                    <Image 
-                      src={other.images[0] || "/placeholder-property.jpg"} 
+                    <Image
+                      src={other.images[0] || "/placeholder-property.jpg"}
                       alt={other.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute bottom-3 left-3 flex gap-2 z-10">
-                      <span className="bg-black/70 backdrop-blur-sm text-white text-[10px] px-2 py-1 rounded font-bold uppercase">{getPropertyLabel(other.type)}</span>
+                      <span className="bg-black/70 backdrop-blur-sm text-white text-[10px] px-2 py-1 rounded font-bold uppercase">
+                        {getPropertyLabel(other.type)}
+                      </span>
                     </div>
                   </div>
                   <div className="p-5 flex flex-col grow">
-                    <h3 className="text-md font-bold mb-1 line-clamp-2 text-urbik-dark group-hover:text-urbik-emerald transition-colors">{other.title}</h3>
-                    <div className="flex items-center text-urbik-muted mb-4 text-xs font-medium"><MapPin size={12} className="mr-1" /><p>{other.city}</p></div>
+                    <h3 className="text-md font-bold mb-1 line-clamp-2 text-urbik-dark group-hover:text-urbik-emerald transition-colors">
+                      {other.title}
+                    </h3>
+                    <div className="flex items-center text-urbik-muted mb-4 text-xs font-medium">
+                      <MapPin size={12} className="mr-1" />
+                      <p>{other.city}</p>
+                    </div>
                     <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-end">
-                      <p className="text-[10px] font-bold text-urbik-muted uppercase tracking-wider">{getOperationLabel(other.operationType)}</p>
-                      <p className="text-lg font-black text-urbik-dark">{other.currency || "USD"} {(other.salePrice || other.rentPrice || 0).toLocaleString("es-AR")}</p>
+                      <p className="text-[10px] font-bold text-urbik-muted uppercase tracking-wider">
+                        {getOperationLabel(other.operationType)}
+                      </p>
+                      <p className="text-lg font-black text-urbik-dark">
+                        {other.currency} {(other.salePrice || other.rentPrice || 0).toLocaleString("es-AR")}
+                      </p>
                     </div>
                   </div>
                 </div>

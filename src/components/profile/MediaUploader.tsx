@@ -3,7 +3,6 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { Camera, Loader2, Trash2, ImagePlus, UploadCloud } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 
 interface MediaUploaderProps {
   currentUrl?: string | null;
@@ -15,7 +14,6 @@ interface MediaUploaderProps {
 export default function MediaUploader({ currentUrl, onImageChange, variant, disabled = false }: MediaUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const supabase = createClient();
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -26,15 +24,13 @@ export default function MediaUploader({ currentUrl, onImageChange, variant, disa
     setIsUploading(true);
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-      const filePath = `${variant}s/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage.from('profiles').upload(filePath, file);
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from('profiles').getPublicUrl(filePath);
-      onImageChange(data.publicUrl);
+      const body = new FormData();
+      body.append("file", file);
+      body.append("folder", `${variant}s`);
+      const res = await fetch("/api/upload", { method: "POST", body });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? `Error ${res.status}`);
+      onImageChange(json.url);
     } catch (error) {
       console.error("Upload error:", error);
       alert("Hubo un error al subir la imagen.");

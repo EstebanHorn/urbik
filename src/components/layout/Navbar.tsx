@@ -47,26 +47,36 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    const fetchRole = async () => {
+      try {
+        const res = await fetch("/api/user");
+        if (res.ok) {
+          const data = await res.json();
+          setRole(data.role || "USER");
+        } else {
+          setRole("USER");
+        }
+      } catch {
+        setRole("USER");
+      }
+    };
+
     const fetchSession = async () => {
       const { data: { session: activeSession } } = await supabase.auth.getSession();
       setSession(activeSession);
-      
-      if (activeSession) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", activeSession.user.id)
-          .single();
-        setRole(profile?.role || "USER");
-      }
+      if (activeSession) await fetchRole();
       setLoading(false);
     };
 
     fetchSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
       setSession(newSession);
-      if (!newSession) setRole(null);
+      if (newSession) {
+        await fetchRole();
+      } else {
+        setRole(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -100,7 +110,7 @@ export default function Navbar() {
       case "REALESTATE":
         return [...publicLinks, { label: "Mis Propiedades", value: "/dashboard" }, { label: "Propiedades Guardadas", value: "/saved" }];
       case "USER":
-        return [...publicLinks, { label: "Propiedades Guardadas", value: "/saved" }];
+        return [...publicLinks, { label: "Mis Mensajes", value: "/messages" }, { label: "Propiedades Guardadas", value: "/saved" }];
       default:
         return publicLinks;
     }

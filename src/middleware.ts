@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function middleware(request: NextRequest) {
   const basicAuth = request.headers.get("authorization");
@@ -58,7 +59,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
 
-    const { data: profile } = await supabase
+    const admin = createAdminClient();
+    const { data: profile } = await admin
       .from("profiles")
       .select("role")
       .eq("id", user.id)
