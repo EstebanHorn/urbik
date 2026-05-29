@@ -76,8 +76,7 @@ export function useSearch() {
   const onSelectSuggestion = useCallback((suggestion: SearchSuggestion) => {
     clearAutocomplete();
     if (suggestion.type === "ADDRESS" && suggestion.lat && suggestion.lon) {
-      const q = encodeURIComponent(suggestion.display_name || "");
-      router.push(`/properties?lat=${suggestion.lat}&lon=${suggestion.lon}&zoom=16&q=${q}`);
+      router.push(`/map?lat=${suggestion.lat}&lon=${suggestion.lon}&zoom=16`);
     } else if (suggestion.type === "REALESTATE_USER" && suggestion.id) {
       router.push(`/realestate/${suggestion.id}`);
     } else if (suggestion.type === "PROPERTY_SEARCH" && suggestion.parsedFilters) {
