@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("q")?.trim();
     const cityFilter = searchParams.get("city")?.trim();
 
-    if (!query || query.length < 2) {
+    if (!query || query.length < 3) {
       return NextResponse.json({ suggestions: [] });
     }
 
