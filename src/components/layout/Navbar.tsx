@@ -1,14 +1,28 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Search, Map, SlidersHorizontal, Menu, List } from "lucide-react"; // Añadido el ícono List
+import { Search, Map, SlidersHorizontal, Menu, List, X } from "lucide-react";
 import Image from "next/image";
 import UrbikLogo from "@/assets/Urbik_Logo.svg";
 import UrbikLogo2 from "@/assets/Urbik_Logo_Mini.svg";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import { createClient } from "@/lib/supabase/client";
+import { useSearch, type SearchSuggestion } from "@/hooks/useSearch";
+
+function getSuggestionBadge(s: SearchSuggestion): { label: string; className: string } {
+  if (s.type === "PROPERTY_SEARCH") return { label: "Propiedad", className: "bg-violet-100 text-violet-700" };
+  if (s.type === "ADDRESS") return { label: "Dirección", className: "bg-blue-50 text-blue-600" };
+  return { label: "Inmobiliaria", className: "bg-emerald-50 text-emerald-700" };
+}
+
+function getSuggestionLabel(s: SearchSuggestion): string {
+  if (s.type === "PROPERTY_SEARCH") return s.display_name || "Buscar propiedades";
+  const display = s.display_name || s.name || "";
+  const parts = display.split(",");
+  return parts.length > 3 ? parts.slice(0, 3).join(",").trim() : display.trim();
+}
 
 export default function Navbar() {
   const router = useRouter();
@@ -19,8 +33,10 @@ export default function Navbar() {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const [isScrolled, setIsScrolled] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const { query, setQuery, suggestions, isLoading: searchLoading, onSelectSuggestion, clearAutocomplete } = useSearch();
 
   const excludedPaths = ["/auth/login", "/auth/register"];
   const isExcluded = excludedPaths.includes(pathname);
@@ -46,6 +62,31 @@ export default function Navbar() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        clearAutocomplete();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [clearAutocomplete]);
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (suggestions.length > 0) {
+        onSelectSuggestion(suggestions[0]);
+      } else if (query.trim()) {
+        clearAutocomplete();
+        router.push(`/properties?q=${encodeURIComponent(query.trim())}`);
+      }
+    }
+    if (e.key === "Escape") {
+      clearAutocomplete();
+    }
+  };
 
   useEffect(() => {
     const fetchRole = async () => {
@@ -104,7 +145,7 @@ export default function Navbar() {
   }
 
   const getNavLinks = (userRole?: string | null) => {
-    const publicLinks: any[] = [];
+    const publicLinks: { label: string; value: string }[] = [];
 
     switch (userRole) {
       case "ADMIN":
@@ -196,11 +237,10 @@ export default function Navbar() {
 
         <div className="flex-1 flex justify-center px-1 md:px-4 w-full max-w-2xl mx-auto">
           {showFilterButton && (
-            <button 
+            <button
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                console.log("📢 Navbar: Botón clickeado. Enviando señal 'toggle-sidebar'...");
                 if (typeof window !== 'undefined') {
                   window.dispatchEvent(new CustomEvent('toggle-sidebar'));
                 }
@@ -212,27 +252,84 @@ export default function Navbar() {
               <SlidersHorizontal className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           )}
-          
-          <div className={`flex items-center w-full rounded-full p-1 border transition-colors duration-300 ${
-            isLightMode 
-              ? "bg-black/5 md:bg-gray-100 border-black/10 focus-within:border-black/30" 
-              : "bg-white/5 md:bg-urbik-gray1 border-white/10 focus-within:border-white/30"
-          }`}>
-            
-            <input
-              type="text"
-              placeholder="Buscar..."
-              className={`flex-1 bg-transparent border-none outline-none px-2 w-full text-sm md:text-base transition-colors duration-300 ${
-                isLightMode 
-                  ? "text-black placeholder:text-black/40" 
-                  : "text-urbik-white placeholder:text-white/40"
-              }`}
-            />
+
+          <div ref={searchContainerRef} className="relative flex-1">
+            <div className={`flex items-center w-full rounded-full px-3 py-1 border transition-colors duration-300 ${
+              isLightMode
+                ? "bg-black/5 md:bg-gray-100 border-black/10 focus-within:border-black/30"
+                : "bg-white/5 md:bg-urbik-gray1 border-white/10 focus-within:border-white/30"
+            }`}>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
+                placeholder="Buscar ciudad, dirección o propiedad..."
+                className={`flex-1 bg-transparent border-none outline-none py-1 w-full text-sm md:text-base transition-colors duration-300 ${
+                  isLightMode
+                    ? "text-black placeholder:text-black/40"
+                    : "text-urbik-white placeholder:text-white/40"
+                }`}
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={clearAutocomplete}
+                  className={`p-1 transition-colors shrink-0 ${isLightMode ? "text-black/40 hover:text-black/70" : "text-white/40 hover:text-white/70"}`}
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => {
+                  if (suggestions.length > 0) {
+                    onSelectSuggestion(suggestions[0]);
+                  } else if (query.trim()) {
+                    clearAutocomplete();
+                    router.push(`/properties?q=${encodeURIComponent(query.trim())}`);
+                  }
+                }}
+                className={`p-1 transition-colors shrink-0 ${isLightMode ? "text-black/50 hover:text-black" : "text-white/50 hover:text-white"}`}
+              >
+                {searchLoading ? (
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Search className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+
+            {!searchLoading && suggestions.length > 0 && (
+              <ul className="absolute top-full left-0 right-0 mt-1 z-[1050] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden max-h-72 overflow-y-auto">
+                {suggestions.map((suggestion, index) => {
+                  const badge = getSuggestionBadge(suggestion);
+                  const label = getSuggestionLabel(suggestion);
+                  const sub = suggestion.type === "REALESTATE_USER" && suggestion.city ? suggestion.city : null;
+                  return (
+                    <li
+                      key={`${suggestion.type}-${index}`}
+                      className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex justify-between items-center text-sm border-b last:border-none border-gray-50"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => onSelectSuggestion(suggestion)}
+                    >
+                      <div className="flex flex-col overflow-hidden mr-2">
+                        <span className="truncate text-gray-800 font-medium">{label}</span>
+                        {sub && <span className="text-[11px] text-gray-400 truncate">{sub}</span>}
+                      </div>
+                      <span className={`shrink-0 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${badge.className}`}>
+                        {badge.label}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
-          
-          {/* LINK DE ESCRITORIO ACTUALIZADO */}
-          <Link 
-            href={viewToggleHref} 
+
+          {/* LINK DE ESCRITORIO */}
+          <Link
+            href={viewToggleHref}
             className={`hidden md:flex items-center px-4 py-1.5 font-medium transition-colors duration-300 text-sm ml-2 shrink-0 rounded-full ${
               isLightMode ? "text-black/70 hover:text-black" : "text-white hover:text-gray-200"
             }`}
