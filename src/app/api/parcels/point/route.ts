@@ -54,8 +54,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // Buenos Aires / other provinces: proxy ARBA WMS GetFeatureInfo
-  // (WFS returns XML regardless of OUTPUTFORMAT; WMS GetFeatureInfo works with JSON)
   try {
     const DELTA = 0.001;
     const west = lng - DELTA;
@@ -63,7 +61,6 @@ export async function GET(request: Request) {
     const south = lat - DELTA;
     const north = lat + DELTA;
 
-    // Virtual 256x256 tile centered on the click point; pixel (128,128) = the click
     const featureInfoUrl =
       `https://geo.arba.gov.ar/geoserver/idera/ows` +
       `?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo` +

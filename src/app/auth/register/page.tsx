@@ -295,7 +295,6 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* Step 1: role selection */}
           {step === 1 && (
             <div className="space-y-4">
               <button
@@ -345,7 +344,6 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* Step 2: USER fields */}
           {step === 2 && role === "USER" && (
             <form onSubmit={handleUserSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -451,7 +449,6 @@ export default function RegisterPage() {
             </form>
           )}
 
-          {/* Step 2: REALESTATE agency fields */}
           {step === 2 && role === "REALESTATE" && (
             <form onSubmit={handleRealEstateNext} className="space-y-4">
               <div>
@@ -588,7 +585,6 @@ export default function RegisterPage() {
             </form>
           )}
 
-          {/* Step 3: REALESTATE license + credentials */}
           {step === 3 && role === "REALESTATE" && (
             <form onSubmit={handleRealEstateSubmit} className="space-y-4">
               <div>

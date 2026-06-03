@@ -20,7 +20,6 @@ export async function POST(req: Request) {
 
   const admin = createAdminClient();
 
-  // If propertyId provided, verify it belongs to realEstateId
   if (propertyId) {
     const { data: prop } = await admin
       .from("properties")
@@ -33,8 +32,6 @@ export async function POST(req: Request) {
     }
   }
 
-  // For threads with a property: upsert via UNIQUE index
-  // For general threads (no property): look up or create
   let thread: { id: string } | null = null;
   let threadError = null;
 
@@ -50,7 +47,6 @@ export async function POST(req: Request) {
     thread = res.data;
     threadError = res.error;
   } else {
-    // Find existing general thread or create one
     const { data: existing } = await admin
       .from("chat_threads")
       .select("id")
@@ -77,7 +73,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Error al crear conversación" }, { status: 500 });
   }
 
-  // Insert first message if provided
   if (firstMessage?.trim()) {
     await admin.from("chat_messages").insert({
       thread_id: thread.id,

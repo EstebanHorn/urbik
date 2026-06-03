@@ -30,90 +30,112 @@ type EnvironmentFieldKey =
   | "bathrooms"
   | "garages";
 
+// Extraemos el componente afuera para evitar que pierda el foco (re-renderizado innecesario)
+const AnimatedNumberInput = ({
+  fieldName,
+  placeholder,
+  rhf,
+}: {
+  fieldName: Path<PropertyUploadFormData>;
+  placeholder: string;
+  rhf: UseFormReturn<PropertyUploadFormData>;
+}) => {
+  const { watch, setValue } = rhf;
+  const value = watch(fieldName) ?? "";
+  const valStr = String(value);
+
+  return (
+    <div className="relative w-full flex justify-center">
+      {/* Capa visual animada */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-5">
+        {!valStr ? (
+          <span className="text-urbik-black/50">{placeholder}</span>
+        ) : (
+          <div className="flex">
+            {valStr.split("").map((char, i) => (
+              <span
+                key={`${i}-${char}`}
+                className="inline-block text-urbik-black font-medium"
+                style={{
+                  animation: "popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+                }}
+              >
+                {char}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Input real transparente */}
+      <input
+        type="number"
+        value={value as string | number}
+        onChange={(e) => setValue(fieldName, e.target.value as any)}
+        className="bg-white/30 text-center border border-white w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all text-transparent caret-urbik-black [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+      />
+    </div>
+  );
+};
+
 export function Module01PropertyData({ rhf }: ModuleProps) {
   const { watch, setValue } = rhf;
 
-  const operationType = watch("operationType");
+  const operationType = watch("operationType") ?? "SALE";
+  const propertyType = watch("type") ?? "";
+  const statusType = watch("status") ?? "AVAILABLE";
+  const saleCurrency = watch("saleCurrency") ?? "USD";
 
-  const opRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const [opPill, setOpPill] = useState({ width: 0, x: 0 });
+  const propertyOptions = [
+    { id: "HOUSE", label: "Casa" },
+    { id: "APARTMENT", label: "Departamento" },
+    { id: "COMMERCIAL_PROPERTY", label: "Local" },
+    { id: "PH", label: "PH" },
+    { id: "LAND", label: "Terreno" },
+  ];
 
-  useEffect(() => {
-    const node = opRefs.current[operationType ?? ""];
+  const operationOptions = [
+    { id: "SALE", label: "Venta" },
+    { id: "RENT", label: "Alquiler" },
+    { id: "TEMP_RENT", label: "Temporal" },
+    { id: "SALE_RENT", label: "Ambos" },
+  ];
 
-    if (node) {
-      setOpPill({
-        width: node.offsetWidth,
-        x: node.offsetLeft,
-      });
-    }
-  }, [operationType]);
+  const statusOptions = [
+    { id: "AVAILABLE", label: "Disponible" },
+    { id: "RESERVED", label: "Reservado" },
+    { id: "PAUSED", label: "Pausada" },
+  ];
+
+  const opActiveIndex = operationOptions.findIndex((opt) => opt.id === operationType);
+  const statusActiveIndex = statusOptions.findIndex((opt) => opt.id === statusType);
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        {[
-          { value: "HOUSE", label: "Casa" },
-          { value: "APARTMENT", label: "Departamento" },
-          { value: "COMMERCIAL_PROPERTY", label: "Local" },
-          { value: "PH", label: "PH" },
-          { value: "LAND", label: "Terreno" },
-        ].map((opt) => (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => {
-              setValue("type", opt.value, {
-                shouldValidate: true,
-              });
+    <div className="flex flex-col items-center w-full max-w-lg mx-auto space-y-8">
+      {/* Estilos inyectados para la animación de números */}
+      <style>{`
+        @keyframes popIn {
+          0% { opacity: 0; transform: translateY(8px) scale(0.8); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
 
-              setValue("unitType", "");
-            }}
-            className={`rounded-full px-4 py-3 font-bold text-sm border transition-all ${
-              watch("type") === opt.value
-                ? "bg-urbik-black text-white border-urbik-black shadow-md"
-                : "bg-white border-gray-200 text-gray-600 hover:border-gray-400"
-            }`}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
-
-      <div>
-        <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
-          Operación
+      {/* 1. Tipo de propiedad (Estilo simple texto como currency) */}
+      <div className="w-full text-center flex flex-col items-center">
+        <label className="block text-sm font-bold text-urbik-black/50 mb-2">
+          Tipo de propiedad
         </label>
-
-        <div className="relative flex bg-white rounded-full w-fit overflow-hidden border border-black/50">
-          <motion.div
-            className="absolute top-0 bottom-0 bg-urbik-dark rounded-full border border-black/50"
-            initial={false}
-            animate={{
-              width: opPill.width,
-              x: opPill.x,
-            }}
-          />
-
-          {[
-            { id: "SALE", label: "VENTA" },
-            { id: "RENT", label: "ALQUILER" },
-            { id: "TEMP_RENT", label: "TEMPORAL" },
-            { id: "SALE_RENT", label: "AMBOS" },
-          ].map((opt) => (
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-2">
+          {propertyOptions.map((opt) => (
             <button
               key={opt.id}
               type="button"
-              ref={(el) => {
-                opRefs.current[opt.id] = el;
+              onClick={() => {
+                setValue("type", opt.id as any, { shouldValidate: true });
+                setValue("unitType", "" as any);
               }}
-              onClick={() =>
-                setValue("operationType", opt.id)
-              }
-              className={`relative z-10 px-6 py-2.5 text-xs font-bold transition-colors rounded-full ${
-                operationType === opt.id
-                  ? "text-white"
-                  : "text-urbik-black/50"
+              className={`text-md font-bold transition-colors duration-200 ${
+                propertyType === opt.id ? "text-urbik-black/80" : "text-urbik-black/30 hover:text-urbik-black/50"
               }`}
             >
               {opt.label}
@@ -122,80 +144,105 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
         </div>
       </div>
 
-      <div className="w-full md:w-1/2">
-        <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
-          Estado
+      {/* 2. Operación */}
+      <div className="w-full text-center flex flex-col items-center">
+        <label className="block text-sm font-bold text-urbik-black/50 mb-2">
+          Operación
         </label>
-
-        <CustomDropdown
-          label="Seleccionar estado"
-          options={[
-            {
-              value: "AVAILABLE",
-              label: "Vigente / Disponible",
-            },
-            {
-              value: "RESERVED",
-              label: "Reservado",
-            },
-            {
-              value: "PAUSED",
-              label: "Pausada",
-            },
-          ]}
-          value={watch("status") ?? "AVAILABLE"}
-          onChange={(v) => setValue("status", v)}
-          variant="white2"
-        />
+        <div className="relative p-0.5 bg-white/30 rounded-full border border-white w-full overflow-hidden">
+          <div className="relative grid grid-cols-4 w-full h-full items-center min-w-[280px] sm:min-w-[360px]">
+            <div
+              className="absolute top-0 bottom-0 left-0 w-1/4 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(${opActiveIndex !== -1 ? opActiveIndex * 100 : 0}%)` }}
+            />
+            {operationOptions.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setValue("operationType", opt.id as any)}
+                className={`relative z-10 py-2.5 text-center text-md font-bold transition-colors duration-300 rounded-full cursor-pointer ${
+                  operationType === opt.id ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <label className="flex items-center gap-2 cursor-pointer">
+      {/* 3. Estado */}
+      <div className="w-full text-center flex flex-col items-center">
+        <label className="block text-sm font-bold text-urbik-black/50 mb-2">
+          Estado
+        </label>
+        <div className="relative p-0.5 bg-white/30 rounded-full border border-white w-full overflow-hidden">
+          <div className="relative grid grid-cols-3 w-full h-full items-center min-w-[280px] sm:min-w-[360px]">
+            <div
+              className="absolute top-0 bottom-0 left-0 w-1/3 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(${statusActiveIndex !== -1 ? statusActiveIndex * 100 : 0}%)` }}
+            />
+            {statusOptions.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setValue("status", opt.id as any)}
+                className={`relative z-10 py-2.5 px-2 text-center text-md font-bold transition-colors duration-300 rounded-full cursor-pointer ${
+                  statusType === opt.id ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Checkbox Sin Precio */}
+      <label className="flex items-center justify-center gap-2 cursor-pointer mt-4">
         <input
           type="checkbox"
           checked={Boolean(watch("isPriceHidden"))}
-          onChange={(e) =>
-            setValue("isPriceHidden", e.target.checked)
-          }
+          onChange={(e) => setValue("isPriceHidden", e.target.checked)}
         />
-
         <span className="text-sm font-semibold text-urbik-black/70">
           Publicar como &ldquo;Sin precio&rdquo;
         </span>
       </label>
 
+      {/* 5. Precios y Expensas */}
       {!watch("isPriceHidden") && (
-        <div className="space-y-4">
-          <div className="flex gap-3">
-            <input
-              type="number"
-              placeholder="Precio USD/ARS"
-              value={watch("salePrice") ?? ""}
-              onChange={(e) =>
-                setValue("salePrice", e.target.value)
-              }
-              className="bg-white text-urbik-black/50 border border-black/50 flex-1 px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
-            />
+        <div className="w-full space-y-6 flex flex-col items-center">
+          <div className="w-full flex flex-col items-center gap-3">
+            {/* Selector de Moneda */}
+            <div className="flex items-center gap-6">
+              <button
+                type="button"
+                onClick={() => setValue("saleCurrency", "ARS" as any)}
+                className={`font-bold transition-colors duration-200 ${
+                  saleCurrency === "ARS" ? "text-urbik-black/80" : "text-urbik-black/30"
+                }`}
+              >
+                ARS
+              </button>
+              <button
+                type="button"
+                onClick={() => setValue("saleCurrency", "USD" as any)}
+                className={`font-bold transition-colors duration-200 ${
+                  saleCurrency === "USD" ? "text-urbik-black/80" : "text-urbik-black/30"
+                }`}
+              >
+                USD
+              </button>
+            </div>
 
-            <CurrencySelector
-              value={
-                (watch("saleCurrency") as "USD" | "ARS") ??
-                "USD"
-              }
-              onChange={(v) =>
-                setValue("saleCurrency", v)
-              }
-            />
+            {/* Inputs animados arreglados */}
+            <AnimatedNumberInput rhf={rhf} fieldName="salePrice" placeholder="Precio" />
           </div>
 
-          <input
-            type="number"
-            placeholder="Expensas (opcional)"
-            value={watch("expenses") ?? ""}
-            onChange={(e) =>
-              setValue("expenses", e.target.value)
-            }
-            className="bg-white text-urbik-black/50 border border-black/50 w-full md:w-1/2 px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
-          />
+          <div className="w-full flex flex-col items-center">
+            <AnimatedNumberInput rhf={rhf} fieldName="expenses" placeholder="Expensas (opcional)" />
+          </div>
         </div>
       )}
     </div>
@@ -341,7 +388,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
             placeholder="0"
             value={(rhf.watch(f.key) as string) ?? ""}
             onChange={(e) =>
-              rhf.setValue(f.key, e.target.value)
+              rhf.setValue(f.key, e.target.value as any)
             }
             className="bg-white text-urbik-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
           />
@@ -390,7 +437,7 @@ export function Module05Environments({
             placeholder="0"
             value={(rhf.watch(f.key) as string) ?? ""}
             onChange={(e) =>
-              rhf.setValue(f.key, e.target.value)
+              rhf.setValue(f.key, e.target.value as any)
             }
             className="bg-white text-urbik-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
           />
@@ -419,7 +466,7 @@ export function Module06BasicCharacteristics({
         ]}
         value={rhf.watch("condition") ?? ""}
         onChange={(v) =>
-          rhf.setValue("condition", v)
+          rhf.setValue("condition", v as any)
         }
         variant="white2"
       />
@@ -434,7 +481,7 @@ export function Module06BasicCharacteristics({
         onChange={(e) =>
           rhf.setValue(
             "constructionYear",
-            e.target.value
+            e.target.value as any
           )
         }
         className="bg-white text-urbik-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
@@ -446,10 +493,10 @@ export function Module06BasicCharacteristics({
 export function Module07Tags({ rhf }: ModuleProps) {
   return (
     <AmenitiesGrid
-      value={rhf.watch("amenities") ?? {}}
+      value={(rhf.watch("amenities") as Record<string, boolean>) ?? {}}
       propertyType={rhf.watch("type")}
       onChange={(n: Record<string, boolean>) =>
-        rhf.setValue("amenities", n)
+        rhf.setValue("amenities", n as any)
       }
     />
   );
@@ -470,7 +517,7 @@ export function Module08BuildingInfo({
         ]}
         value={rhf.watch("buildingCondition") ?? ""}
         onChange={(v) =>
-          rhf.setValue("buildingCondition", v)
+          rhf.setValue("buildingCondition", v as any)
         }
         variant="white2"
       />
@@ -485,7 +532,7 @@ export function Module08BuildingInfo({
         onChange={(e) =>
           rhf.setValue(
             "buildingFloors",
-            e.target.value
+            e.target.value as any
           )
         }
         className="bg-white text-urbik-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
@@ -508,7 +555,7 @@ export function Module09CommercialInfo({
       ]}
       value={rhf.watch("commercialActivity") ?? ""}
       onChange={(v) =>
-        rhf.setValue("commercialActivity", v)
+        rhf.setValue("commercialActivity", v as any)
       }
       variant="white2"
     />
@@ -524,7 +571,7 @@ export function Module10FieldInfo({
       placeholder="Hectáreas"
       value={(rhf.watch("hectares") as string) ?? ""}
       onChange={(e) =>
-        rhf.setValue("hectares", e.target.value)
+        rhf.setValue("hectares", e.target.value as any)
       }
       className="bg-white text-urbik-black/50 border border-black/50 w-full md:w-1/3 px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
     />
@@ -544,7 +591,7 @@ export function Module11LandInfo({
         },
       ]}
       value={rhf.watch("landUse") ?? ""}
-      onChange={(v) => rhf.setValue("landUse", v)}
+      onChange={(v) => rhf.setValue("landUse", v as any)}
       variant="white2"
     />
   );
@@ -556,16 +603,16 @@ export function Module12Multimedia({
   return (
     <div className="space-y-6">
       <ImageUpload
-        value={rhf.watch("images") ?? []}
+        value={(rhf.watch("images") as string[]) ?? []}
         onChange={(urls: string[]) =>
-          rhf.setValue("images", urls)
+          rhf.setValue("images", urls as any)
         }
         onRemove={(u: string) =>
           rhf.setValue(
             "images",
-            (rhf.watch("images") || []).filter(
+            ((rhf.watch("images") as string[]) || []).filter(
               (i) => i !== u
-            )
+            ) as any
           )
         }
       />

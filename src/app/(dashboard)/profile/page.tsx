@@ -107,7 +107,7 @@ export default function ProfilePage() {
       setStatus("authenticated");
     } catch (err) {
       console.error("Error fetching profile:", err);
-      setStatus("authenticated"); // show form even on error
+      setStatus("authenticated");
     }
   }, []);
 
@@ -221,7 +221,6 @@ export default function ProfilePage() {
 
             {isRealEstate && (
               <>
-                {/* Profile URL */}
                 <div className="space-y-2">
                   <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide flex items-center gap-2">
                     <Link2 size={14} />
@@ -247,7 +246,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Banner + Logo uploader */}
                 <div className="bg-white rounded-4xl border border-urbik-g200 shadow-sm overflow-hidden relative mb-4">
                   <div className="h-48 md:h-64 w-full bg-urbik-g50 relative">
                     <MediaUploader
@@ -269,7 +267,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Agency name */}
                 <div className="space-y-2">
                   <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                     Nombre Comercial
@@ -283,7 +280,6 @@ export default function ProfilePage() {
                   />
                 </div>
 
-                {/* Location */}
                 <div className="space-y-2">
                   <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                     Ubicación
@@ -295,7 +291,6 @@ export default function ProfilePage() {
                   />
                 </div>
 
-                {/* Street */}
                 <div className="space-y-2">
                   <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                     Dirección
@@ -311,7 +306,6 @@ export default function ProfilePage() {
               </>
             )}
 
-            {/* Name fields for USER */}
             {!isRealEstate && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -335,7 +329,6 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Phone */}
             <div className="space-y-2">
               <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">
                 Teléfono de Contacto
@@ -353,7 +346,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Bio for REALESTATE */}
             {isRealEstate && (
               <div className="space-y-2">
                 <label className="mb-2 ml-10 text-xmd font-medium text-urbik-black opacity-40 tracking-wide">

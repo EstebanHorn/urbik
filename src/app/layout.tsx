@@ -5,7 +5,8 @@ import Navbar from "@/components/layout/Navbar";
 import { Providers } from "./providers";
 import { Inter } from "next/font/google";
 import Footer from "@/components/layout/Footer";
-import SidebarFilters from "@/components/ui/SidebarFilters";
+import SidebarFilters from "@/components/ui/PhoneFilters";
+import GoogleMapProvider from "@/components/google-map/GoogleMapProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,14 +26,16 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${inter.variable}`}>
       <body className="overflow-x-hidden">
-        <Providers>
-          <Navbar />
-          <Suspense fallback={null}>
-            <SidebarFilters />
-          </Suspense>
-          {children}
-          <Footer/>
-        </Providers>
+        <GoogleMapProvider>
+          <Providers>
+            <Navbar />
+            <Suspense fallback={null}>
+              <SidebarFilters />
+            </Suspense>
+            {children}
+            <Footer/>
+          </Providers>
+        </GoogleMapProvider>
       </body>
     </html>
   );

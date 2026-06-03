@@ -23,6 +23,7 @@ import type {
 import { mapBaseLayers } from "@/components/map/types";
 import { useMapSettings } from "@/components/map/MapSettingsProvider";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
+import GoogleMapProvider from "@/components/google-map/GoogleMapProvider";
 
 import {
   appendFiltersToApiQuery,
@@ -50,27 +51,13 @@ const PropertiesSidebar = dynamicImport(
 );
 
 const InteractiveMap = dynamicImport(
-  () =>
-    import("@/components/map/InteractiveMapClient").then(
-      (mod) => mod.InteractiveMapClient,
-    ) as Promise<
-      React.ComponentType<{
-        lat: number;
-        lon: number;
-        properties: MapProperty[];
-        onBoundsChange: (bounds: MapBounds) => void;
-        onPropertySelect: React.Dispatch<
-          React.SetStateAction<MapProperty | null>
-        >;
-        height?: string;
-      }>
-    >,
+  () => import("@/components/google-map/GoogleMapClient"),
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-slate-100 text-slate-400">
+      <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-white text-slate-400">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-slate-600"></div>
-        <span className="text-sm font-medium">Cargando mapa...</span>
+        <span className="text-sm font-medium">Cargando Google Maps...</span>
       </div>
     ),
   }
@@ -126,7 +113,6 @@ export default function MapPage() {
   const [showMobileList, setShowMobileList] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<MapProperty | null>(null);
 
-  // Escuchamos los filtros de la URL (que ahora maneja SidebarFilters)
   const [filters, setFilters] = useState<FilterState>(() =>
     parseFiltersFromQuery(new URLSearchParams(searchParams.toString())),
   );
@@ -289,16 +275,16 @@ export default function MapPage() {
   );
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 top-16 z-0 flex flex-col overflow-hidden bg-slate-100">
+    <div className="fixed bottom-0 left-0 right-0 top-16 z-0 flex flex-col overflow-hidden bg-white">
       <div className="relative flex flex-1 overflow-hidden">
         <aside
-          className={`absolute inset-0 z-30 flex flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out md:static md:h-full md:w-1/3 lg:w-1/4 ${
+          className={`absolute inset-0 z-30 flex flex-col transition-transform duration-300 ease-in-out md:static md:h-full md:w-1/3 lg:w-2/5 ${
             showMobileList
               ? "translate-x-0"
               : "-translate-x-full md:translate-x-0"
           }`}
         >
-          <div className="shrink-0 border-b bg-white p-4 shadow-sm md:hidden">
+          <div className="shrink-0 p-4 shadow-sm md:hidden">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-slate-800">
                 Resultados ({properties.length})
@@ -324,16 +310,16 @@ export default function MapPage() {
           </div>
         </aside>
 
-        <main className="relative z-10 h-full w-full flex-1 bg-gray-200">
-          <InteractiveMap
-            key={`map-${lat}-${lon}`}
-            lat={lat}
-            lon={lon}
-            properties={properties}
-            onBoundsChange={handleBoundsChange}
-            onPropertySelect={setSelectedProperty}
-            height="100%"
-          />
+        <main className="relative z-10 h-full w-full flex-1 bg-white">
+            <InteractiveMap
+              key={`map-${lat}-${lon}`}
+              lat={lat}
+              lon={lon}
+              properties={properties}
+              onBoundsChange={handleBoundsChange}
+              onPropertySelect={setSelectedProperty}
+              height="100%"
+            />
 
           {selectedProperty && (
             <div className="absolute right-0 top-0 z-[1002] flex h-full w-80 flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300">
@@ -346,14 +332,14 @@ export default function MapPage() {
                   onClick={() =>
                     setSelectedProperty(null)
                   }
-                  className="cursor-pointer rounded-full p-1 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
+                  className="cursor-pointer rounded-full p-1 text-slate-500 transition-colors hover:bg-white hover:text-slate-800"
                 >
                   <X size={18} />
                 </button>
               </div>
 
               <div className="flex-1 overflow-y-auto">
-                <div className="relative h-48 shrink-0 bg-slate-100">
+                <div className="relative h-48 shrink-0 bg-white">
                   {selectedProperty.images?.[0] ? (
                     <Image
                       src={selectedProperty.images[0]}

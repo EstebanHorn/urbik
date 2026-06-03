@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { getVisibleModules, type PropertyUploadFormData } from "./create-modal/schema";
-import { CompletionIndicator, ModuleShell } from "./create-modal/shared-ui";
+import { ModuleShell } from "./create-modal/shared-ui";
 import {
   Module01PropertyData,
   Module02Location,
@@ -210,7 +210,6 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
         <div className="flex-1 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
         <div className="w-full max-w-4xl bg-white flex flex-col shadow-2xl">
-          {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
             <div>
               <h2 className="text-lg font-black text-urbik-black">Editar propiedad</h2>
@@ -225,9 +224,7 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
             </button>
           </div>
 
-          {/* Body */}
           <div className="flex flex-1 overflow-hidden">
-            {/* Sidebar: completitud */}
             <div className="w-56 shrink-0 border-r border-gray-100 p-4 overflow-y-auto hidden md:flex flex-col">
               <CompletionIndicator
                 modules={visibleModules}
@@ -237,7 +234,6 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
               />
             </div>
 
-            {/* Módulos */}
             <form
               id="edit-property-form"
               onSubmit={handleSubmit}
@@ -266,7 +262,6 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
             </form>
           </div>
 
-          {/* Footer */}
           <div className="px-6 py-4 border-t border-gray-100 shrink-0 flex gap-3">
             <button
               type="button"

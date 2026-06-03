@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import {
   getVisibleModules,
   type PropertyUploadFormData,
 } from "./create-modal/schema";
-import { CompletionIndicator, ModuleShell } from "./create-modal/shared-ui";
 import {
   Module01PropertyData,
   Module02Location,
@@ -55,24 +54,50 @@ export default function CreatePropertyModal({
   const [error, setError] = useState<string | null>(null);
   const [parcelPickerOpen, setParcelPickerOpen] = useState(false);
 
-  if (!open) return null;
-
   const formData = rhf.watch();
   const visibleModules = getVisibleModules(formData.type);
 
-  const handleModuleClick = (id: number) => {
-    setActiveModuleId(id);
-    document
-      .getElementById(`module-${id}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const currentIndex = visibleModules.findIndex((m) => m.id === activeModuleId);
+  const safeCurrentIndex = currentIndex !== -1 ? currentIndex : 0;
+  const isFirstStep = safeCurrentIndex === 0;
+  const isLastStep = safeCurrentIndex === visibleModules.length - 1;
+  const activeModule = visibleModules[safeCurrentIndex];
+
+  useEffect(() => {
+    if (currentIndex === -1 && visibleModules.length > 0) {
+      setActiveModuleId(visibleModules[0].id);
+    }
+  }, [currentIndex, visibleModules]);
+
+  const handleNext = () => {
+    if (!isLastStep) {
+      const nextId = visibleModules[safeCurrentIndex + 1].id;
+      setActiveModuleId(nextId);
+    }
   };
+
+  const handleBack = () => {
+    if (!isFirstStep) {
+      const prevId = visibleModules[safeCurrentIndex - 1].id;
+      setActiveModuleId(prevId);
+    }
+  };
+
+  const statuses = visibleModules.map((m) => m.getStatus(formData));
+  const completeCount = statuses.filter((s) => s === "complete").length;
+  const percentage =
+    visibleModules.length > 0
+      ? Math.round((completeCount / visibleModules.length) * 100)
+      : 0;
+
+
 
   const handleParcelConfirm = (parcel: SelectedParcel) => {
     rhf.setValue("parcelCCA", parcel.cca);
     rhf.setValue("parcelPDA", parcel.pda ?? "");
     rhf.setValue(
       "parcelGeom",
-      parcel.geometry as unknown as Record<string, unknown>,
+      parcel.geometry as unknown as Record<string, unknown>
     );
     rhf.setValue("latitude", parcel.lat);
     rhf.setValue("longitude", parcel.lon);
@@ -183,80 +208,117 @@ export default function CreatePropertyModal({
     13: <Module13ContactInfo rhf={rhf} />,
   };
 
+  if (!open) return null;
+
   return (
     <>
+      <style>{`
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .step-transition {
+          animation: fadeSlideIn 0.3s ease-out forwards;
+        }
+      `}</style>
+
       <div className="fixed inset-0 z-50 flex items-center justify-center pt-20 px-6 pb-6">
         <div
           className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={onClose}
         />
 
-        <div className="relative w-full max-w-4xl h-[90vh] bg-white rounded-3xl flex flex-col shadow-2xl overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between px-8 py-5 border-b border-gray-100 shrink-0">
-            <h2 className="text-lg font-black text-urbik-black">
-              Cargar propiedad
-            </h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
-            >
-              <X size={16} />
-            </button>
-          </div>
-
-          {/* Body */}
-          <div className="flex flex-1 overflow-hidden">
-            {/* Sidebar */}
-            <div className="w-60 shrink-0 border-r border-gray-100 py-6 px-5 overflow-y-auto hidden md:flex flex-col">
-              <CompletionIndicator
-                modules={visibleModules}
-                form={formData}
-                activeModuleId={activeModuleId}
-                onModuleClick={handleModuleClick}
-              />
+        <div className="relative w-full max-w-xl h-[80vh] bg-white/70 border border-white rounded-3xl flex flex-col shadow-2xl overflow-hidden">
+          
+          <div className="flex flex-col shrink-0 bg-white/70">
+            <div className="flex items-center justify-between px-8 py-5">
+              <h2 className="text-lg font-black text-urbik-black">
+                Cargar propiedad
+              </h2>
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X size={16} />
+              </button>
             </div>
 
-            {/* Módulos */}
+            <div className="px-8 pb-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold uppercase text-urbik-black/50">
+                  Progreso de carga - Paso {safeCurrentIndex + 1} de {visibleModules.length}
+                </span>
+                <span className="text-sm font-bold">
+                  {percentage}%
+                </span>
+              </div>
+              <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-1 overflow-hidden">
             <form
               id="create-property-form"
               onSubmit={handleSubmit}
-              className="flex-1 overflow-y-auto px-8 py-6 space-y-4"
+              className="flex-1 overflow-y-auto px-8 py-6"
             >
-              {visibleModules.map((mod) => (
-                <ModuleShell
-                  key={mod.id}
-                  id={mod.id}
-                  label={mod.label}
-                  status={mod.getStatus(formData)}
-                  isOpen={activeModuleId === mod.id}
-                  onToggle={() =>
-                    setActiveModuleId(activeModuleId === mod.id ? 0 : mod.id)
-                  }
+              {activeModule && (
+                <div 
+                  key={activeModule.id} 
+                  className="step-transition opacity-0"
                 >
-                  {moduleContent[mod.id]}
-                </ModuleShell>
-              ))}
+                  <h3 className="text-xl font-bold text-center text-urbik-black/80 mb-6">
+                    {activeModule.label}
+                  </h3>
+                  {moduleContent[activeModule.id]}
+                </div>
+              )}
 
               {error && (
-                <div className="p-4 rounded-xl bg-red-50 border border-red-100">
+                <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-100">
                   <p className="text-sm text-red-600 font-medium">{error}</p>
                 </div>
               )}
             </form>
           </div>
 
-          {/* Footer */}
-          <div className="px-8 py-5 border-t border-gray-100 shrink-0">
+          <div className="px-8 flex items-center justify-between gap-4 bg-white/70">
             <button
-              type="submit"
-              form="create-property-form"
-              disabled={isSubmitting}
-              className="w-full bg-urbik-cyan text-urbik-black font-black py-3 rounded-full hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
+              type="button"
+              onClick={handleBack}
+              disabled={isFirstStep || isSubmitting}
+              className="px-6 py-3 text-urbik-black/80 font-bold hover:text-urbik-black transition-colors
+              disabled:opacity-40 cursor-pointer w-32"
             >
-              {isSubmitting ? "Guardando..." : "PUBLICAR PROPIEDAD"}
+              VOLVER
             </button>
+
+            {!isLastStep ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="px-6 py-3 text-urbik-black/80 font-bold hover:text-urbik-black transition-colors
+              disabled:opacity-40 cursor-pointer w-32"
+              >
+                SIGUIENTE
+              </button>
+            ) : (
+              <button
+                type="submit"
+                form="create-property-form"
+                disabled={isSubmitting}
+                className="px-6 py-3 text-urbik-black/80 font-bold hover:text-urbik-black transition-colors
+              disabled:opacity-40 cursor-pointer w-32"
+              >
+                {isSubmitting ? "GUARDANDO..." : "PUBLICAR PROPIEDAD"}
+              </button>
+            )}
           </div>
         </div>
       </div>

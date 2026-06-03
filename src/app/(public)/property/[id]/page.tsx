@@ -42,7 +42,6 @@ const getPropertyLabel = (type: string) => {
   }
 };
 
-// ── Amenity categories (mirrors AmenitiesGrid in the form) ──────────────────
 const AMENITY_CATEGORIES = [
   {
     key: "ambientes",
@@ -290,7 +289,6 @@ async function getPropertyData(id: number) {
   }
 }
 
-// ── Stat chip ────────────────────────────────────────────────────────────────
 function StatChip({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
   return (
     <div className="flex items-center gap-3 bg-white border border-urbik-g100 rounded-2xl px-4 py-3 shadow-sm">
@@ -303,7 +301,6 @@ function StatChip({ icon, label, value }: { icon: React.ReactNode; label: string
   );
 }
 
-// ── Surface row ──────────────────────────────────────────────────────────────
 function SurfaceRow({ label, value }: { label: string; value: number | null }) {
   if (!value) return null;
   return (
@@ -314,7 +311,6 @@ function SurfaceRow({ label, value }: { label: string; value: number | null }) {
   );
 }
 
-// ── Detail row ───────────────────────────────────────────────────────────────
 function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
   return (
     <div className="flex items-center gap-3 py-3 border-b border-urbik-g100 last:border-0">
@@ -325,7 +321,6 @@ function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: strin
   );
 }
 
-// ── Features display ─────────────────────────────────────────────────────────
 function FeaturesSection({
   propertyType,
   legacyAmenities,
@@ -335,7 +330,6 @@ function FeaturesSection({
   legacyAmenities: Record<string, boolean>;
   featureGroups: Record<string, Record<string, boolean>>;
 }) {
-  // Merge feature groups + legacy amenities into a single flat map
   const flat: Record<string, boolean> = { ...legacyAmenities };
   for (const group of Object.values(featureGroups)) {
     if (group && typeof group === "object") {
@@ -343,7 +337,6 @@ function FeaturesSection({
     }
   }
 
-  // Also unwrap if featureGroups is itself flat (some older saves)
   for (const [k, v] of Object.entries(featureGroups)) {
     if (typeof v === "boolean") flat[k] = v;
   }
@@ -352,12 +345,10 @@ function FeaturesSection({
     (cat) => cat.visibleFor.length === 0 || cat.visibleFor.includes(propertyType),
   );
 
-  // Build per-category active/inactive counts to skip empty categories
   const catsWithData = visibleCats.filter((cat) =>
     cat.tags.some((t) => flat[t.key] === true || flat[t.key] === false),
   );
 
-  // For servicios always show (even if all false – it's structural info)
   const catsToShow = visibleCats.length > 0
     ? visibleCats.filter(
         (cat) => cat.key === "servicios" || cat.tags.some((t) => flat[t.key] === true),
@@ -365,7 +356,6 @@ function FeaturesSection({
     : [];
 
   if (catsToShow.length === 0 && catsWithData.length === 0) {
-    // Fallback: show only legacy amenities
     const legacyActive = Object.entries(legacyAmenities).filter(([, v]) => v);
     if (legacyActive.length === 0) return null;
     return (
@@ -406,7 +396,6 @@ function FeaturesSection({
                   const isTrue = flat[tag.key] === true;
                   const isDefined = flat[tag.key] !== undefined;
                   if (!isTrue && !isDefined) {
-                    // Show as inactive pill if category is servicios (always show all)
                     if (cat.key !== "servicios") return null;
                   }
                   return (
@@ -435,7 +424,6 @@ function FeaturesSection({
   );
 }
 
-// ── Status badge ─────────────────────────────────────────────────────────────
 const getStatusBadge = (property: { status?: string; operationType: string }) => {
   const s = property.status || "AVAILABLE";
   if (s === "SOLD") return { label: "VENDIDA", color: "bg-urbik-rose text-white" };
@@ -444,7 +432,6 @@ const getStatusBadge = (property: { status?: string; operationType: string }) =>
   return { label: getOperationLabel(property.operationType), color: "bg-urbik-cyan text-urbik-dark" };
 };
 
-// ── Page ─────────────────────────────────────────────────────────────────────
 export default async function PropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: rawId } = await params;
   const id = Number(rawId);
@@ -466,7 +453,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   const statusBadge = getStatusBadge(property);
   const isBoth = property.operationType === "SALE_RENT";
 
-  // Build stat chips – only those with values
   const statChips = [
     property.rooms && { icon: <Home size={16} />, label: "Ambientes", value: property.rooms },
     property.bedrooms && { icon: <BedDouble size={16} />, label: "Dormitorios", value: property.bedrooms },
@@ -477,7 +463,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
     property.area && { icon: <Maximize2 size={16} />, label: "Sup. cubierta", value: `${property.area} m²` },
   ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string | number }[];
 
-  // Build property detail rows
   const detailRows = [
     property.type && { icon: <Building2 size={16} />, label: "Tipo", value: getPropertyLabel(property.type) },
     property.floor && { icon: <Layers size={16} />, label: "Piso", value: property.floor },
@@ -493,13 +478,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
     { icon: <Hash size={16} />, label: "Referencia", value: `#${property.id}` },
   ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string | number }[];
 
-  // Surface breakdown
   const hasSurfaceBreakdown =
     property.coveredArea || property.semiCoveredArea || property.uncoveredArea;
 
   return (
     <main className="min-h-screen bg-white pb-32 lg:pb-20">
-      {/* Back link */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-28 mb-6 sm:mb-8">
         <Link
           href="/dashboard"
@@ -514,7 +497,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="space-y-4 w-full lg:w-auto">
             <div className="flex flex-wrap items-center gap-3">
@@ -538,7 +520,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
-          {/* Price block */}
           {!property.isPriceHidden && (
             <div className="lg:text-right w-full lg:w-auto">
               <div className={`flex flex-col ${isBoth ? "gap-2" : ""}`}>
@@ -583,7 +564,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           )}
         </div>
 
-        {/* Gallery */}
         <ImageGallery
           images={property.images}
           title={property.title}
@@ -592,11 +572,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           longitude={property.longitude}
         />
 
-        {/* Two-column layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 mt-8 sm:mt-12">
           <div className="lg:col-span-8 space-y-10">
 
-            {/* Quick stats strip */}
             {statChips.length > 0 && (
               <div>
                 <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Resumen</h3>
@@ -608,7 +586,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
               </div>
             )}
 
-            {/* Surfaces breakdown */}
             {hasSurfaceBreakdown && (
               <div>
                 <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Superficies</h3>
@@ -628,7 +605,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
               </div>
             )}
 
-            {/* Property details */}
             {detailRows.length > 0 && (
               <div>
                 <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Ficha Técnica</h3>
@@ -640,7 +616,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
               </div>
             )}
 
-            {/* Description */}
             {property.description && (
               <div>
                 <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Descripción</h3>
@@ -652,7 +627,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
               </div>
             )}
 
-            {/* Features / Amenities */}
             <FeaturesSection
               propertyType={property.type}
               legacyAmenities={property.legacyAmenities}
@@ -660,10 +634,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             />
           </div>
 
-          {/* Sidebar */}
           <div className="lg:col-span-4 relative" id="contacto">
             <div className="sticky top-28 space-y-6">
-              {/* Agency card */}
               <div className="bg-urbik-white2 rounded-2xl p-8 text-urbik-dark shadow-xl border border-urbik-g100 overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-urbik-emerald/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                 <div className="relative z-10">
@@ -711,7 +683,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
 
-        {/* More from this agency */}
         <div className="mt-12 sm:mt-24 pt-8 sm:pt-12 border-t border-urbik-g100">
           <h3 className="text-2xl sm:text-3xl font-display text-urbik-black tracking-tighter mb-6 sm:mb-8">
             <span className="font-medium">Más propiedades de </span>
@@ -771,7 +742,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
-      {/* Mobile sticky contact bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-sm border-t border-urbik-g100 shadow-2xl px-4 py-3 flex items-center justify-between gap-4">
         <div className="min-w-0">
           {!property.isPriceHidden ? (

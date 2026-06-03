@@ -13,7 +13,6 @@ export default function SidebarFilters() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Detectar si es móvil para cambiar el comportamiento
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -21,21 +20,18 @@ export default function SidebarFilters() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Escuchar el evento del Navbar
   useEffect(() => {
     const handleToggle = () => setIsOpen((prev) => !prev);
     window.addEventListener("toggle-sidebar", handleToggle);
     return () => window.removeEventListener("toggle-sidebar", handleToggle);
   }, []);
 
-  // Ocultar si cambiamos de ruta que no sea / o /map
   useEffect(() => {
     if (pathname !== "/" && pathname !== "/map") {
       setIsOpen(false);
     }
   }, [pathname]);
 
-  // Actualización automática al tocar un filtro
   const handleFilterChange = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
     
@@ -56,7 +52,6 @@ export default function SidebarFilters() {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Fondo oscuro SOLO en móviles (en desktop el panel flota sin bloquear el mapa) */}
           {isMobile && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -67,26 +62,21 @@ export default function SidebarFilters() {
             />
           )}
 
-          {/* Panel Flotante Glassmorphism */}
           <motion.div
-            // Configuraciones de Animación
             initial={isMobile ? { y: "100%" } : { y: 50, opacity: 0, scale: 0.95 }}
             animate={isMobile ? { y: 0 } : { y: 0, opacity: 1, scale: 1 }}
             exit={isMobile ? { y: "100%" } : { y: 20, opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             
-            // Habilitar arrastre solo en escritorio
             drag={!isMobile}
-            dragMomentum={false} // Evita que siga deslizándose al soltarlo
+            dragMomentum={false}
             
-            // Estilos: Full screen en móvil | Flotante abajo izq. 66vh en Desktop
             className={`fixed z-[1003] flex flex-col overflow-hidden
               ${isMobile 
                 ? "inset-0 w-full h-full rounded-none bg-white/95" 
                 : "bottom-6 right-6 w-[340px] h-[66vh] md:rounded-[2rem] border border-white/70 bg-white/60 backdrop-blur-2xl shadow-[0_15px_50px_rgba(15,23,42,0.15)] cursor-grab active:cursor-grabbing"
               }`}
           >
-            {/* Header y Drag Handle */}
             <div className="shrink-0 pt-4 px-6 pb-2 flex flex-col relative">
               {!isMobile && (
                 <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 rounded-full bg-slate-300/80 pointer-events-none" />
@@ -103,15 +93,12 @@ export default function SidebarFilters() {
               </div>
             </div>
 
-            {/* Contenedor scrolleable de los filtros */}
             <div 
-              // Esto evita que al hacer scroll en los filtros, arrastres la ventana por error
               onPointerDownCapture={(e) => !isMobile && e.stopPropagation()}
               className="flex-1 overflow-y-auto px-6 pb-8 cursor-auto custom-scrollbar"
             >
               <div className="flex flex-col gap-8 mt-4">
                 
-                {/* Operación */}
                 <div className="flex flex-col gap-3">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Operación</span>
                   <div className="grid grid-cols-2 gap-2">
@@ -131,7 +118,6 @@ export default function SidebarFilters() {
                   </div>
                 </div>
 
-                {/* Tipo de Propiedad */}
                 <div className="flex flex-col gap-3">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tipo</span>
                   <div className="flex flex-wrap gap-2">
@@ -157,7 +143,6 @@ export default function SidebarFilters() {
                   </div>
                 </div>
 
-                {/* Comodidades */}
                 <div className="flex flex-col gap-3">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Características</span>
                   <div className="flex flex-wrap gap-2">
@@ -186,7 +171,6 @@ export default function SidebarFilters() {
                   </div>
                 </div>
                 
-                {/* Botón de limpiar filtros */}
                 <button 
                   onClick={() => router.replace(pathname, { scroll: false })}
                   className="mt-6 py-3 w-full rounded-xl border border-rose-200 text-rose-500 font-bold text-sm hover:bg-rose-50 hover:border-rose-300 transition-colors"

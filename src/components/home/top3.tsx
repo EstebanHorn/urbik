@@ -24,7 +24,7 @@ export default function Top3({ items, setHoveredPropertyId }: Top3Props) {
             onMouseLeave={() =>
               setHoveredPropertyId((current) => (current === property.id ? null : current))
             }
-            className={`group flex flex-col gap-4 p-4 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(15,23,42,0.12)] animate-fade-in-up ${glassCard}`}
+            className={`group flex flex-col gap-4 p-4 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] animate-fade-in-up ${glassCard}`}
             style={{
               animationDelay: `${index * 150}ms`,
               animationFillMode: "both"
@@ -38,22 +38,22 @@ export default function Top3({ items, setHoveredPropertyId }: Top3Props) {
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105 [mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)]"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center bg-slate-100 text-xs font-bold text-slate-400">
+                <div className="flex h-full items-center justify-center bg-white text-xs font-bold text-black/70">
                   Sin imagen
                 </div>
               )}
             </div>
-            <div className="flex flex-1 flex-col justify-between min-w-0">
+            <div className="flex flex-1 flex-col justify-between min-w-0 z-100">
               <div>
                 <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-white/20 bg-urbik-black/25 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                  <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                     {getTypeLabel(property.type)}
                   </span>
-                  <span className="rounded-full border border-white/20 bg-urbik-black/25 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                  <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                     {getOperationLabel(property.operationType)}
                   </span>
                 </div>
-                <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black/90">
+                <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
                   {property.title}
                 </h3>
                 <p className="mt-2 truncate text-xs font-semibold text-urbik-black/80">
@@ -62,7 +62,7 @@ export default function Top3({ items, setHoveredPropertyId }: Top3Props) {
               </div>
               <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/60 pt-4">
                 <span className="text-xs font-bold text-urbik-black/50 z-1">
-                  {property.rooms || 0} amb · {property.bathrooms || 0} baños
+                  {property.rooms || 0} amb · {property.area || 0} m²
                 </span>
                 <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
                   {currency} {Number(price).toLocaleString("es-AR")}

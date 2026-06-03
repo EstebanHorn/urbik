@@ -150,24 +150,24 @@ export async function GET() {
       );
     }
 
-    const { data: inquiries, error } = await admin
-      .from("inquiries")
-      .select(`
-        id,
-        message,
-        sender_name,
-        sender_email,
-        sender_phone,
-        status,
-        created_at,
-        properties (
-          id,
-          title,
-          real_estate_id
-        )
-      `)
-      .eq("properties.real_estate_id", authUser.id)
-      .order("created_at", { ascending: false });
+const { data: inquiries, error } = await admin
+  .from("inquiries")
+  .select(`
+    id,
+    message,
+    sender_name,
+    sender_email,
+    sender_phone,
+    status,
+    created_at,
+    properties!inner ( 
+      id,
+      title,
+      real_estate_id
+    )
+  `)
+  .eq("properties.real_estate_id", authUser.id)
+  .order("created_at", { ascending: false });
 
     if (error) {
       throw error;

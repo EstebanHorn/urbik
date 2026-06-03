@@ -70,7 +70,6 @@ export default function MessagesPage() {
         </h1>
 
         <div className="border border-gray-100 rounded-2xl overflow-hidden flex h-[70vh] shadow-sm">
-          {/* Thread list */}
           <div className={`w-full md:w-72 shrink-0 border-r border-gray-100 flex flex-col ${showConversation ? "hidden md:flex" : "flex"}`}>
             <div className="px-4 py-3 border-b border-gray-100 shrink-0">
               <p className="font-black text-xs text-gray-400 tracking-widest uppercase">Conversaciones</p>
@@ -85,7 +84,6 @@ export default function MessagesPage() {
             </div>
           </div>
 
-          {/* Conversation */}
           <div className={`flex-1 flex flex-col ${showConversation ? "flex" : "hidden md:flex"}`}>
             {activeThreadId && currentUserId ? (
               <>

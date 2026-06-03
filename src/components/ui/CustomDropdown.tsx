@@ -48,6 +48,7 @@ export function CustomDropdown({
     black: "text-urbik-white",
     white3: "text-urbik-black/60",
     white: "bg-urbik-white1 text-urbik-black hover:bg-urbik-white border border-black/70",
+    white1: "bg-white/50 text-urbik-black/70 hover:bg-white hover:border-black/30 border border-white/70 shadow-md",
     white2:
       "bg-urbik-white text-urbik-black/70 border border-black/70 hover:bg-urbik-dark hover:text-urbik-white",
     "map-layer":
@@ -62,7 +63,7 @@ export function CustomDropdown({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`${variantStyles[variant]} h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition flex items-center justify-center md:justify-between gap-2 min-w-10 md:min-w-[120px] ${
-          variant !== "map-layer" ? "font-extrabold" : ""
+          variant !== "map-layer" ? "font-bold" : ""
         }`}
       >
         <span className="text-md tracking-wider flex items-center justify-center">
@@ -80,7 +81,7 @@ export function CustomDropdown({
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth="4"
+            strokeWidth="3"
             d="M19 9l-7 7-7-7"
           />
         </svg>

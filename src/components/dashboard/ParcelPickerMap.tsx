@@ -48,7 +48,6 @@ function isRioNegro(province: string) {
   return /r[íi]o\s*negro/i.test(province);
 }
 
-// Rio Negro GeoJSON layer with click-to-select via Turf.js
 function RioNegroClickLayer({ onParcelClick }: { onParcelClick: (lat: number, lng: number) => void }) {
   const map = useMap();
   const [data, setData] = useState<FeatureCollection | null>(null);
@@ -120,7 +119,6 @@ function RioNegroClickLayer({ onParcelClick }: { onParcelClick: (lat: number, ln
   );
 }
 
-// Buenos Aires: WMS tiles + click handler that calls API
 function BuenosAiresClickLayer({ onParcelClick }: { onParcelClick: (lat: number, lng: number) => void }) {
   const map = useMap();
 
@@ -151,7 +149,6 @@ function BuenosAiresClickLayer({ onParcelClick }: { onParcelClick: (lat: number,
   );
 }
 
-// Highlight layer for selected parcel
 function SelectedParcelLayer({ geometry }: { geometry: Geometry | null }) {
   if (!geometry) return null;
 

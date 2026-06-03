@@ -27,7 +27,6 @@ export default function ChatPanel() {
 
   return (
     <div className="flex h-full border border-gray-100 rounded-2xl overflow-hidden">
-      {/* Thread list — hidden on mobile when conversation is open */}
       <div className={`w-full md:w-72 shrink-0 border-r border-gray-100 flex flex-col ${showConversation ? "hidden md:flex" : "flex"}`}>
         <div className="px-4 py-3 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-2">
@@ -45,11 +44,9 @@ export default function ChatPanel() {
         </div>
       </div>
 
-      {/* Conversation panel */}
       <div className={`flex-1 flex flex-col ${showConversation ? "flex" : "hidden md:flex"}`}>
         {activeThreadId && currentUserId ? (
           <>
-            {/* Mobile back button + thread title */}
             <div className="px-4 py-3 border-b border-gray-100 shrink-0 flex items-center gap-3">
               <button
                 type="button"

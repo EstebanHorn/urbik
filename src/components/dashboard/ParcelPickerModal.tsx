@@ -80,7 +80,6 @@ export default function ParcelPickerModal({
         className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 flex flex-col"
         style={{ height: "88vh" }}
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
           <div>
             <h3 className="font-black text-urbik-black">
@@ -99,7 +98,6 @@ export default function ParcelPickerModal({
           </button>
         </div>
 
-        {/* Map */}
         <div className="flex-1 min-h-0 relative">
           <ParcelPickerMap
             province={province}
@@ -149,7 +147,6 @@ export default function ParcelPickerModal({
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-5 py-4 border-t border-gray-100 shrink-0 flex items-center gap-3">
           {selected ? (
             <div className="flex-1 bg-emerald-50 rounded-xl px-4 py-2.5 flex items-center gap-2 border border-emerald-100">

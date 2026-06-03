@@ -143,7 +143,6 @@ export default function Versus({
       <div className="max-w-4xl w-full flex flex-col items-center px-0 relative z-10">
         <div className="w-full bg-black/50 backdrop-blur-md rounded-full py-3 px-8 flex items-center justify-between shadow-2xl mb-8 border border-urbik-emerald/30">
           <div className="flex items-center justify-between w-2/3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/Urbik_Logo_Smart_Zone.svg"
               alt="Urbik Smart Zone"
@@ -273,7 +272,6 @@ export default function Versus({
                     <th key={p.id} className="p-4 min-w-[200px]">
                       <div className="flex flex-col items-center gap-3">
                         <div className="w-3/4 h-32 rounded-md overflow-hidden border border-white/10 opacity-30">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={p.images[0]}
                             className="w-full h-full object-cover"

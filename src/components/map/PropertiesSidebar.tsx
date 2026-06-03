@@ -146,8 +146,8 @@ export function PropertiesSidebar({
 
   if (properties.length === 0) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center p-8 text-center text-slate-500">
-        <MapPin className="mb-2 h-10 w-10 opacity-50" />
+      <div className="flex h-full w-full flex-col items-center justify-center p-8 text-center text-urbik-black/50">
+        <MapPin className="mb-2 h-10 w-10" />
 
         <p className="font-medium">
           No se encontraron propiedades.
@@ -158,7 +158,7 @@ export function PropertiesSidebar({
 
   return (
     <div className="h-full overflow-y-auto bg-white p-4 scrollbar-thin scrollbar-thumb-slate-200">
-      <h2 className="sticky top-0 z-10 mb-4 border-b border-urbik-g100 bg-white py-2 text-xs font-black uppercase tracking-widest text-urbik-dark">
+      <h2 className="sticky top-0 z-10 mb-4 border-b border-urbik-black bg-white py-2 text-xs font-black uppercase tracking-widest text-urbik-dark">
         {properties.length} Propiedades Encontradas
       </h2>
 
@@ -180,7 +180,7 @@ export function PropertiesSidebar({
                     className="absolute inset-0 z-10"
                   />
 
-                  <div className="relative h-48 overflow-hidden bg-urbik-g200">
+                  <div className="relative h-48 overflow-hidden bg-white">
                     {prop.images?.[0] ? (
                       <Image
                         src={prop.images[0]}

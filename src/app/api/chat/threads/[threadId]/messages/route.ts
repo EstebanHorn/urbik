@@ -12,7 +12,6 @@ export async function GET(_req: Request, { params }: Params) {
   const { threadId } = await params;
   const admin = createAdminClient();
 
-  // Verify user is a participant
   const { data: thread } = await admin
     .from("chat_threads")
     .select("id, user_id, real_estate_id")
@@ -23,7 +22,6 @@ export async function GET(_req: Request, { params }: Params) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
-  // Fetch messages
   const { data: messages, error } = await admin
     .from("chat_messages")
     .select("id, thread_id, sender_id, body, created_at, read_at")
@@ -34,7 +32,6 @@ export async function GET(_req: Request, { params }: Params) {
     return NextResponse.json({ error: "Error al cargar mensajes" }, { status: 500 });
   }
 
-  // Mark unread messages from the other party as read
   const unreadIds = (messages ?? [])
     .filter((m) => m.sender_id !== user.id && !m.read_at)
     .map((m) => m.id);
@@ -63,7 +60,6 @@ export async function POST(req: Request, { params }: Params) {
 
   const admin = createAdminClient();
 
-  // Verify participant
   const { data: thread } = await admin
     .from("chat_threads")
     .select("id, user_id, real_estate_id")

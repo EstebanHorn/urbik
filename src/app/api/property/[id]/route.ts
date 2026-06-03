@@ -52,7 +52,6 @@ export async function PUT(
       );
     }
 
-    // real_estate_id can be either authUser.id (new route) or profiles.user_id (old route)
     const isOwner =
       property.real_estate_id === authUser.id ||
       (profile.user_id != null && property.real_estate_id === profile.user_id);

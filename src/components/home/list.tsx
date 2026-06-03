@@ -32,63 +32,29 @@ const AreaIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
-const PriceIcon = ({ className = "w-5 h-5" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <line x1="12" x2="12" y1="2" y2="22"/>
-    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-  </svg>
+const FeaturePill = ({ icon: Icon, value, unit }: { icon: any, value: number | string, unit: string }) => (
+  <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 border border-black/50 transition-colors group-hover:border-black ">
+    <Icon className="w-3 h-3 sm:w-4 sm:h-4 text-urbik-black/50 group-hover:text-urbik-black" />
+    <span className="text-[11px] sm:text-sm text-urbik-black/50 group-hover:text-urbik-black">
+      <strong className="font-bold text-urbik-black/50 group-hover:text-urbik-black">{value}</strong> {unit}
+    </span>
+  </div>
 );
 
 function PropertyFeatures({ property }: { property: SearchProperty }) {
   const propertyType = property.type?.toUpperCase() || "";
-  
-  let dynamicFeature1 = null;
-  let dynamicFeature2 = null;
-
-  switch (propertyType) {
-    case "TERRENO":
-    case "LOTE":
-
-      break;
-    
-    case "COCHERA":
-      break;
-
-    case "LOCAL":
-    case "OFICINA":
-      dynamicFeature1 = (
-        <div className="flex items-center gap-1.5 sm:gap-3 px-2 py-1 text-[10px] sm:text-sm md:text-xl font-bold">
-          <BathIcon className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
-          <span>{property.bathrooms || 0} ba</span>
-        </div>
-      );
-      break;
-
-    default:
-      dynamicFeature1 = (
-        <div className="flex items-center gap-1.5 sm:gap-3 px-2 py-1 text-[10px] sm:text-sm md:text-xl font-bold">
-          <RoomIcon className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
-          <span>{property.rooms || 0} amb</span>
-        </div>
-      );
-      dynamicFeature2 = (
-        <div className="flex items-center gap-1.5 sm:gap-3 px-2 py-1 text-[10px] sm:text-sm md:text-xl font-bold">
-          <BathIcon className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
-          <span>{property.bathrooms || 0} ba</span>
-        </div>
-      );
-      break;
-  }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 text-urbik-black/50">
-      {dynamicFeature1}
-      {dynamicFeature2}
-      
-      <div className="flex items-center gap-1.5 sm:gap-3 px-2 py-1 text-[10px] sm:text-sm md:text-xl font-bold">
-        <AreaIcon className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
-        <span>{property.area || 0} m²</span>
-      </div>
+    <div className="flex flex-wrap items-center gap-2">
+      {propertyType !== "TERRENO" && propertyType !== "LOTE" && propertyType !== "COCHERA" && propertyType !== "LOCAL" && propertyType !== "OFICINA" && (
+        <FeaturePill icon={RoomIcon} value={property.rooms || 0} unit="amb" />
+      )}
+
+      {propertyType !== "TERRENO" && propertyType !== "LOTE" && propertyType !== "COCHERA" && (
+        <FeaturePill icon={BathIcon} value={property.bathrooms || 0} unit="ba" />
+      )}
+
+      <FeaturePill icon={AreaIcon} value={property.area || 0} unit="m²" />
     </div>
   );
 }
@@ -117,9 +83,9 @@ function PromotedPropertyCard({
         onMouseLeave={() =>
           setHoveredPropertyId((current) => (current === property.id ? null : current))
         }
-        className="group relative flex flex-col md:flex-row items-center gap-6 overflow-hidden rounded-[30px] p-2 transition-all duration-500 hover:-translate-y-1"
+        className="group relative flex flex-col md:flex-row items-center gap-6 overflow-hidden rounded-[30px] bg-transparent p-3 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
       >
-        <div className="relative h-auto min-h-[140px] sm:h-48 md:h-80 overflow-hidden rounded-2xl w-full md:w-1/3 shrink-0">
+        <div className="relative h-auto min-h-[140px] sm:h-48 md:h-80 overflow-hidden rounded-[20px] w-full md:w-1/3 shrink-0">
           {property.images?.[0] ? (
             <img
               src={property.images[0]}
@@ -131,34 +97,41 @@ function PromotedPropertyCard({
               Sin imagen
             </div>
           )}
-          <div className="absolute top-4 left-4 rounded-full bg-urbik-white2 px-4 py-1.5 text-[10px] font-black uppercase text-urbik-black/60 shadow-lg">
+          <div className="absolute top-4 left-4 rounded-full bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-urbik-black/60 shadow-lg">
             Propiedad Patrocinada
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col justify-center p-4 md:p-6 min-w-0 z-10">
+        <div className="flex flex-1 flex-col justify-center p-4 md:p-6 min-w-0 z-10 w-full">
           <div className="mb-4 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-xs font-bold text-urbik-black uppercase shadow-sm z-1">
+            <span className="rounded-full border border-black/10 bg-urbik-black px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
               {getTypeLabel(property.type)} en {getOperationLabel(property.operationType)}
             </span>
-            <span className="rounded-full border border-emerald-200 bg-emerald-50 text-urbik-emerald px-3 py-1 text-xs font-bold uppercase shadow-sm z-1">
+            <span className="rounded-full border border-emerald-200  text-urbik-emerald px-3 py-1 text-xs font-bold uppercase shadow-sm z-1">
               OPORTUNIDAD
             </span>
           </div>
 
-          <h3 className="line-clamp-2 text-xl md:text-2xl lg:text-3xl font-black tracking-tight text-urbik-black/70 z-1">
+          <h3 className="line-clamp-2 text-xl md:text-2xl lg:text-3xl font-black tracking-tight text-urbik-black/90 z-1">
             {property.title}
           </h3>
 
-          <p className="mt-2 truncate text-sm font-semibold text-urbik-black/50 z-1">
+          <p className="mt-2 truncate text-sm font-medium text-urbik-black/50 z-1">
             {property.address}, {property.city}, {property.province}
           </p>
 
-          <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6">
+          <div className="mt-6 flex flex-col xl:flex-row xl:items-center justify-between gap-4 pt-6 border-t border-black/5">
             <PropertyFeatures property={property} />
 
-            <div className="text-2xl font-black tracking-tight md:text-4xl bg-linear-to-br from-black/90 to-gray-400 bg-clip-text text-transparent">
-              <span>{currency} {Number(price).toLocaleString("es-AR")}</span>
+            <div className="flex items-center gap-4">
+              <div className="text-2xl font-black tracking-tight md:text-4xl text-urbik-black">
+                {currency} {Number(price).toLocaleString("es-AR")}
+              </div>
+              <div className="hidden md:flex h-12 w-12 items-center justify-center rounded-full bg-black/5 text-urbik-black transition-colors duration-300 group-hover:bg-urbik-black group-hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -181,8 +154,8 @@ export default function List({ items, viewMode, premiumProperty, setHoveredPrope
     <div
       className={
         viewMode === "grid"
-          ? "grid grid-cols-1 gap-4 xl:grid-cols-2"
-          : "flex flex-col gap-2 md:gap-4"
+          ? "grid grid-cols-1 gap-6 xl:grid-cols-2"
+          : "flex flex-col gap-4 md:gap-6"
       }
     >
       {items.slice(3).map((property, index) => {
@@ -203,9 +176,9 @@ export default function List({ items, viewMode, premiumProperty, setHoveredPrope
               onMouseLeave={() =>
                 setHoveredPropertyId((current) => (current === property.id ? null : current))
               }
-              className={`group grid min-w-0 grid-cols-[110px_minmax(0,1fr)] sm:grid-cols-[180px_minmax(0,1fr)] md:grid-cols-[340px_minmax(0,1fr)] gap-3 md:gap-4 p-2 md:p-3 overflow-hidden transition-all duration-500 hover:-translate-y-[2px] hover:shadow-[0_20px_50px_rgba(15,23,42,0.10)] ${glassCard}`}
+              className={`group flex flex-col md:flex-row gap-4 p-3 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-xl rounded-2xl md:rounded-[24px] ${glassCard}`}
             >
-              <div className="relative h-auto min-h-[140px] sm:h-48 md:h-80 overflow-hidden rounded-xl md:rounded-l-2xl md:rounded-r-none">
+              <div className="relative h-48 md:h-auto md:min-h-[220px] overflow-hidden rounded-l-xl md:rounded-l-[18px] w-full md:w-[340px] shrink-0">
                 {property.images?.[0] ? (
                   <img
                     src={property.images[0]}
@@ -213,33 +186,39 @@ export default function List({ items, viewMode, premiumProperty, setHoveredPrope
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="flex h-full items-center justify-center bg-slate-100 text-[10px] md:text-xs font-bold text-slate-400">
+                  <div className="flex h-full items-center justify-center bg-gray-100 text-xs font-bold text-gray-400">
                     Sin imagen
                   </div>
                 )}
               </div>
 
-              <div className="flex min-w-0 flex-col justify-between py-1 pr-2 md:pr-0">
-                <div className="min-w-0 ml-5">
-                  <div className="mb-2 md:mb-3 flex flex-wrap items-center gap-1 md:gap-2">
-                    <span className="py-0.5  md:py-1 text-[8px] md:text-sm font-black uppercase text-urbik-black/50 z-1">
+              <div className="flex min-w-0 flex-1 flex-col justify-between px-2 pb-2 md:py-3 md:pr-4 z-100">
+                <div className="min-w-0">
+                  <div className="mb-2 md:mb-3 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-urbik-white2 group-hover:bg-urbik-black px-2 py-1 text-[10px] md:text-xs font-bold uppercase tracking-wider text-urbik-black/80">
                       {getTypeLabel(property.type)} en {getOperationLabel(property.operationType)}
                     </span>
                   </div>
-                  <h3 className="truncate text-sm sm:text-base md:text-3xl font-black tracking-tight text-urbik-black z-1">
+                  <h3 className="line-clamp-2 text-lg sm:text-xl md:text-2xl font-black tracking-tight text-urbik-black">
                     {property.title}
                   </h3>
-                  <p className="mt-0.5 md:mt-2 truncate text-[10px] sm:text-xs md:text-lg font-medium text-urbik-black">
+                  <p className="mt-1 md:mt-2 truncate text-xs sm:text-sm font-medium text-urbik-black/50">
                     {property.address}, {property.city}, {property.province}
                   </p>
                 </div>
 
-                <div className="z-1 mt-3 md:mt-5 flex flex-col sm:flex-row sm:items-end sm:justify-between border-t border-slate-200/60 pt-3 md:pt-4 gap-3 sm:gap-0">
-                  
+                <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-black/5">
                   <PropertyFeatures property={property} />
 
-                  <div className="text-2xl font-black tracking-tight md:text-4xl bg-linear-to-br from-black/70 to-gray-200 bg-clip-text text-transparent">
-                    <span>{currency} {Number(price).toLocaleString("es-AR")}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="text-xl font-black tracking-tight md:text-3xl text-urbik-black">
+                      {currency} {Number(price).toLocaleString("es-AR")}
+                    </div>
+                    <div className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-black/5 text-urbik-black transition-colors duration-300 group-hover:bg-urbik-black group-hover:text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>

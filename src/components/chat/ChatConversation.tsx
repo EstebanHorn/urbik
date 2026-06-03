@@ -71,7 +71,6 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full">
@@ -100,7 +99,6 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <div className="border-t border-gray-100 p-4 flex gap-3 items-end shrink-0">
         <textarea
           rows={2}

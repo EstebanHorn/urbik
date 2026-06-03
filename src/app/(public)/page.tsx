@@ -16,7 +16,7 @@ import {
   type FilterState,
 } from "@/utils/propertyFilters";
 
-import Sidebar from "@/components/ui/SidebarFilters";
+import Sidebar from "@/components/ui/PhoneFilters";
 import Banner from "@/components/home/banner";
 import Top3 from "@/components/home/top3";
 import MiniBanner from "@/components/home/minibanner";
@@ -98,7 +98,7 @@ export function getTypeLabel(type: string) {
 }
 
 export const glassCard =
-  "relative overflow-hidden md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(15,23,42,0.08)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(200,200,200,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
+  "relative overflow-hidden md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
 
 export default function HomePage() {
   const router = useRouter();
@@ -126,6 +126,8 @@ export default function HomePage() {
   const [filters, setFilters] = useState<FilterState>(() =>
     parseFiltersFromQuery(new URLSearchParams(searchParams.toString())),
   );
+
+  const isSearchMode = !areFiltersEqual(filters, DEFAULT_FILTERS);
 
   const {
     setQuery: setSearchQuery,
@@ -284,15 +286,16 @@ export default function HomePage() {
   }, [items]);
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-12">
-      <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-4 sm:px-6">
+    <div className="min-h-screen bg-white">
+      <div className="mx-auto w-full overflow-x-hidden">
         <div className="relative flex min-h-[800px] flex-col items-start gap-4 lg:flex-row">
           <main className="flex-1 min-w-0 w-full">
-            <Banner items={items} />
-
-            <div className="mt-10 md:mt-20 mb-5 ml-0 md:ml-10 text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl text-urbik-black/70 font-black">Elegidas para vos</h1>
-              <span className="text-urbik-black/50 text-sm md:text-base">Propiedades especialmente seleccionadas para tu perfil</span>
+            
+            {!isSearchMode && <Banner items={items} />}
+            <section className="max-w-7xl w-full mx-auto px-4 md:px-8 mt-10">
+            <div className="mt-10 md:mt-40 mb-5 ml-0 md:ml-10 text-center md:text-left">
+              <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">Propiedades Destacadas</h1>
+              <span className="text-urbik-black/50 text-sm md:text-base">Las mejores oportunidades del mercado seleccionadas para vos.</span>
             </div>
 
             {isLoading ? (
@@ -308,15 +311,15 @@ export default function HomePage() {
             ) : (
               <>
                 <Top3 items={items} setHoveredPropertyId={setHoveredPropertyId} />
-                            <div className="mt-10 md:mt-30 ml-0 md:ml-10 text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl text-urbik-black/70 font-black">Elegidas para vos</h1>
-              <span className="text-urbik-black/50 text-sm md:text-base">Propiedades especialmente seleccionadas para tu perfil</span>
-            </div>
+                <div className="mt-10 md:mt-30 ml-0 md:ml-10 text-center md:text-left">
+                  <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">Somos Urbik®</h1>
+                  <span className="text-urbik-black/50 text-sm md:text-base">Una nueva forma de comprar y vender propiedades</span>
+                </div>
                 <MiniBanner />
                 <div className="w-full h-10"/>
                 <div className="mt-10 md:mt-20 mb-5 text-center md:text-right">
-                  <h1 className="text-3xl md:text-4xl text-urbik-black/70 font-black">Elegidas para vos</h1>
-                  <span className="text-urbik-black/0 text-sm md:text-base">Propiedades especialmente seleccionadas para tu perfil</span>
+                  <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">Opciones listas para vos</h1>
+                  <span className="text-urbik-black/50 text-sm md:text-base">Explorá todo nuestro catálogo de propiedades disponibles.</span>
                 </div>
                 <List
                   items={items}
@@ -348,6 +351,7 @@ export default function HomePage() {
                 Siguiente
               </button>
             </div>
+            </section>
           </main>
         </div>
       </div>

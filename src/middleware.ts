@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import error from "./app/error";
 
 export async function middleware(request: NextRequest) {
   const basicAuth = request.headers.get("authorization");

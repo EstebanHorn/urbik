@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+/// <reference types="@types/google.maps" />
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useMapsLibrary } from "@vis.gl/react-google-maps";
 
 export interface ParsedFilters {
   propertyType: string | null;
@@ -33,6 +35,23 @@ export function useSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // Librerías de Google
+  const placesLib = useMapsLibrary('places');
+  const geocodingLib = useMapsLibrary('geocoding');
+  
+  const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
+  const geocoderService = useRef<google.maps.Geocoder | null>(null);
+
+  // Instanciar servicios de Google cuando las librerías carguen
+  useEffect(() => {
+    if (placesLib && !autocompleteService.current) {
+      autocompleteService.current = new placesLib.AutocompleteService();
+    }
+    if (geocodingLib && !geocoderService.current) {
+      geocoderService.current = new geocodingLib.Geocoder();
+    }
+  }, [placesLib, geocodingLib]);
+
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (query.trim().length < 3) {
@@ -41,6 +60,7 @@ export function useSearch() {
       }
       setIsLoading(true);
       try {
+        // 1. Llamadas a tus propias APIs
         const [searchResponse, parseResponse] = await Promise.all([
           fetch(`/api/search?q=${encodeURIComponent(query)}`),
           fetch(`/api/search/parse?q=${encodeURIComponent(query)}`),
@@ -48,17 +68,52 @@ export function useSearch() {
         const searchData = await searchResponse.json();
         const parseData = await parseResponse.json();
 
-        const addressSuggestions: SearchSuggestion[] = searchData.suggestions || [];
+        let addressSuggestions: SearchSuggestion[] = searchData.suggestions || [];
         const parsed = parseData.parsed as ParsedFilters | null;
+
+        // 2. Llamada silenciosa a Google Places API
+        if (autocompleteService.current) {
+          const request: google.maps.places.AutocompletionRequest = {
+            input: query,
+            componentRestrictions: { country: "ar" }, // Filtramos por Argentina
+            types: ['geocode'] 
+          };
+
+          const googleResults = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve) => {
+            autocompleteService.current!.getPlacePredictions(request, (predictions, status) => {
+              if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+                resolve(predictions);
+              } else {
+                resolve([]);
+              }
+            });
+          });
+
+          console.log("🕵️‍♂️ Predicciones de Google Maps:", googleResults);
+
+          // Formateamos las predicciones de Google para que calcen en tu Navbar
+          const googleSuggestions: SearchSuggestion[] = googleResults.map(p => ({
+            type: "ADDRESS",
+            id: p.place_id,
+            display_name: p.description, 
+            name: p.structured_formatting.main_text,
+            fullLabel: p.description,
+            // Aún no tenemos lat/lon, las buscamos solo si hace clic
+          }));
+
+          // Juntamos las sugerencias (Limito las de Google a 4 para no saturar tu UI)
+          addressSuggestions = [...googleSuggestions.slice(0, 4), ...addressSuggestions];
+        }
 
         const all: SearchSuggestion[] = [];
         if (parsed?.hasStructuredFilters) {
           all.push({ type: "PROPERTY_SEARCH", display_name: query, parsedFilters: parsed });
         }
         all.push(...addressSuggestions);
+        
         setSuggestions(all);
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error al buscar:", error);
         setSuggestions([]);
       } finally {
         setIsLoading(false);
@@ -73,10 +128,24 @@ export function useSearch() {
     setSuggestions([]);
   }, []);
 
-  const onSelectSuggestion = useCallback((suggestion: SearchSuggestion) => {
+  const onSelectSuggestion = useCallback(async (suggestion: SearchSuggestion) => {
     clearAutocomplete();
-    if (suggestion.type === "ADDRESS" && suggestion.lat && suggestion.lon) {
-      router.push(`/map?lat=${suggestion.lat}&lon=${suggestion.lon}&zoom=16`);
+    
+    if (suggestion.type === "ADDRESS") {
+      // Caso 1: Es una dirección de tu BD (ya tiene coordenadas)
+      if (suggestion.lat && suggestion.lon) {
+        router.push(`/map?lat=${suggestion.lat}&lon=${suggestion.lon}&zoom=16`);
+      } 
+      // Caso 2: Es una dirección de Google (tiene ID, pero no coordenadas)
+      else if (suggestion.id && geocoderService.current) {
+        geocoderService.current.geocode({ placeId: suggestion.id as string }, (results, status) => {
+          if (status === "OK" && results && results[0]) {
+            const lat = results[0].geometry.location.lat();
+            const lon = results[0].geometry.location.lng();
+            router.push(`/map?lat=${lat}&lon=${lon}&zoom=16`);
+          }
+        });
+      }
     } else if (suggestion.type === "REALESTATE_USER" && suggestion.id) {
       router.push(`/realestate/${suggestion.id}`);
     } else if (suggestion.type === "PROPERTY_SEARCH" && suggestion.parsedFilters) {

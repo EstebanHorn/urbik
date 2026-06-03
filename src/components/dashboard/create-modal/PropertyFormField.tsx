@@ -378,7 +378,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
   return (
     <div className="space-y-8">
-      {/* Título del Aviso con tooltip (Módulo F) */}
       <div className="flex flex-col">
         <div className="flex items-center gap-2 mb-2 ml-5">
           <label className="block text-md font-bold text-urbik-black/50">
@@ -415,7 +414,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         )}
       </div>
 
-      {/* Tipo de Propiedad + Operación */}
       <div className="flex flex-wrap gap-5 items-end justify-between">
         <div className="flex flex-col w-full md:w-[45%]">
           <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
@@ -471,7 +469,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         </div>
       </div>
 
-      {/* Módulo A: Tipo de Unidad (APARTMENT / PH only) */}
       {showUnitTypeSelector && (
         <div className="flex flex-col w-full md:w-[45%]">
           <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
@@ -540,7 +537,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         </div>
       )}
 
-      {/* Publicación: precio + expensas (Módulo B) */}
       <div className="flex items-center gap-2">
         <input
           id="sinPrecio"
@@ -611,7 +607,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             </div>
           )}
 
-          {/* Módulo B: Expensas */}
           {showExpenses && (
             <div className="flex flex-col w-full md:w-[45%]">
               <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
@@ -630,7 +625,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         </div>
       )}
 
-      {/* Campos dinámicos por tipo */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {filteredDynamicFields.map((field) => (
           <div key={field.key}>
@@ -648,7 +642,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         ))}
       </div>
 
-      {/* Módulo 6: Características básicas */}
       {showCharacteristicsSection && (
         <div className="rounded-2xl border border-gray-200 ">
           <button
@@ -667,7 +660,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
           {showCharacteristics && (
             <div className="p-5 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Estado del inmueble */}
                 <div>
                   <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
                     Estado del inmueble
@@ -684,7 +676,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                   />
                 </div>
 
-                {/* Orientación */}
                 <div>
                   <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
                     Orientación
@@ -701,7 +692,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                   />
                 </div>
 
-                {/* Disposición — solo para APARTMENT, PH, COMMERCIAL_PROPERTY, OFFICE */}
                 {showDisposition && (
                   <div>
                     <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
@@ -722,7 +712,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Año de construcción */}
                 <div>
                   <div className="flex items-center gap-2 mb-2 ml-1">
                     <label className="block text-sm font-bold text-urbik-black/50">
@@ -747,7 +736,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                   />
                 </div>
 
-                {/* Año de última renovación */}
                 <div>
                   <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
                     Año de última renovación
@@ -769,7 +757,6 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         </div>
       )}
 
-      {/* Módulo 8: Más sobre el edificio (APARTMENT / PH only) */}
       {showBuildingInfo && (
         <div className="rounded-2xl border border-gray-200 p-5 space-y-5">
           <p className="text-xs font-black uppercase tracking-wider text-urbik-black/60">

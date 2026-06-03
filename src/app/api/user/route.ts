@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapProperty(p: any) {
   const op = p.operation_type as string | undefined;
   const price =
@@ -48,13 +47,15 @@ export async function GET() {
   }
 
   const admin = createAdminClient();
-  const { data: profile } = await admin
+  
+  const { data: profile, error: profileError } = await admin
     .from("profiles")
-    .select("role, email, phone, is_active")
+    .select("role, email, is_active") 
     .eq("id", authUser.id)
     .single();
 
   if (!profile) {
+    console.error("🚨 ERROR SUPABASE (Profiles):", profileError);
     return NextResponse.json({ error: "Perfil no encontrado" }, { status: 404 });
   }
 
@@ -73,6 +74,7 @@ export async function GET() {
 
     return NextResponse.json({
       role: profile.role,
+      email: profile.email, 
       isActive: Boolean(profile.is_active),
       agencyData: {
         name: realEstate?.agency_name ?? null,
@@ -92,7 +94,6 @@ export async function GET() {
     });
   }
 
-  // USER / AGENT
   const { data: userProfile } = await admin
     .from("user_profiles")
     .select("first_name, last_name")
@@ -101,7 +102,8 @@ export async function GET() {
 
   return NextResponse.json({
     role: profile.role,
-    phone: profile.phone ?? null,
+    email: profile.email,
+    phone: null,
     isActive: Boolean(profile.is_active),
     firstName: userProfile?.first_name ?? null,
     lastName: userProfile?.last_name ?? null,

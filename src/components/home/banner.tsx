@@ -1,185 +1,168 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { 
   SearchProperty, 
-  glassCard, 
-  getTypeLabel, 
-  getOperationLabel 
 } from "../../app/(public)/page";
+
 import bg1 from "../../assets/banner/bg1.png";
-import front1 from "../../assets/banner/front1.png";
+import bg2 from "../../assets/banner/bg2.png";
 
 const animationStyles = `
   @keyframes kenBurns {
-    0% { transform: scale(1) translate(0, 0); }
-    50% { transform: scale(1.05) translate(-1%, 1%); }
-    100% { transform: scale(1) translate(0, 0); }
-  }
-  @keyframes kenBurnsReverse {
-    0% { transform: scale(1) translate(0, 0); }
-    50% { transform: scale(1.07) translate(1%, -1%); }
-    100% { transform: scale(1) translate(0, 0); }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
   }
   .animate-ken-burns {
-    animation: kenBurns 20s ease-in-out infinite;
-  }
-  .animate-ken-burns-reverse {
-    animation: kenBurnsReverse 25s ease-in-out infinite;
+    animation: kenBurns 40s ease-in-out infinite;
   }
 `;
 
 interface BannerProps {
-  items: SearchProperty[];
+  items: SearchProperty[]; 
 }
+
+const OPERATIONS = ["ambas", "alquilar", "comprar"] as const;
+type OperationType = (typeof OPERATIONS)[number];
+
+const backgroundImages = [bg1, bg2];
 
 export default function Banner({ items }: BannerProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const [showProperty, setShowProperty] = useState(true);
+  const [currentBgIndex, setCurrentBgIndex] = useState(0);
+  
+  const [operation, setOperation] = useState<OperationType>("ambas");
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const activeBtnRef = useRef<HTMLButtonElement>(null);
+  const [pillProps, setPillProps] = useState({ left: 0, width: 0 });
+
+  useEffect(() => {
+    const updatePill = () => {
+      if (activeBtnRef.current) {
+        setPillProps({
+          left: activeBtnRef.current.offsetLeft,
+          width: activeBtnRef.current.offsetWidth,
+        });
+      }
+    };
+
+    updatePill();
+    window.addEventListener("resize", updatePill);
+
+    return () => window.removeEventListener("resize", updatePill);
+  }, [operation]);
 
   useEffect(() => {
     setIsMounted(true);
+
+    const bgInterval = setInterval(() => {
+      setCurrentBgIndex((prev) => (prev + 1) % backgroundImages.length);
+    }, 7000);
+
+    return () => clearInterval(bgInterval);
   }, []);
-
-  useEffect(() => {
-    if (!items || items.length === 0) return;
-    
-   
-    const interval = setInterval(() => {
-      setShowProperty((prev) => !prev);
-    }, 8000); 
-    return () => clearInterval(interval);
-    
-  }, [items]);
-
-  const randomProperty = useMemo(() => {
-    if (!items || items.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * items.length);
-    return items[randomIndex];
-  }, [items]);
-
-  const displayProperty = randomProperty && showProperty;
-
-  const price = randomProperty?.salePrice ?? randomProperty?.rentPrice ?? 0;
-  const currency = randomProperty?.saleCurrency ?? randomProperty?.rentCurrency ?? "ARS";
 
   return (
     <>
       <style>{animationStyles}</style>
 
       <div
-        className={`relative mt-5 mb-8 h-[350px] md:h-[620px] w-full overflow-hidden rounded-3xl md:rounded-[30px] border border-white/20 bg-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-sm transition-all duration-1000 ease-out ${
-          isMounted ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-        } ${glassCard}`}
+        className={`relative w-full h-[230px] md:h-[650px] -mb-25 overflow-hidden bg-urbik-black transition-all duration-1000 ease-out ${
+          isMounted ? "opacity-100" : "opacity-0"
+        }`}
       >
-        <div
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            displayProperty ? "opacity-0" : "opacity-100"
-          }`}
-        >
-          <div className="absolute inset-0 z-0 overflow-hidden">
+        {backgroundImages.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 z-0 transition-opacity duration-1500 ease-in-out ${
+              currentBgIndex === index ? "opacity-100" : "opacity-0"
+            }`}
+          >
             <Image
-              src={bg1}
-              alt="Urbik Background"
+              src={image}
+              alt={`Urbik Background ${index + 1}`}
               fill
-              className="object-cover animate-ken-burns opacity-90"
-              priority
+              className="object-cover animate-ken-burns"
+              priority={index === 0}
             />
           </div>
+        ))}
 
-          <div className="absolute inset-0 z-10 bg-linear-to-r from-black/60 via-black/20 to-transparent backdrop-blur-sm" />
+        <div className="absolute inset-0 z-10 bg-linear-to-r from-black/80 via-black/50 to-black/70 backdrop-blur-[2px]" />
 
-          <div className="absolute inset-y-0 right-0 z-20 h-full w-1/2 overflow-hidden opacity-100 md:w-[45%]">
-            <Image
-              src={front1}
-              alt="Urbik Front"
-              fill
-              className="object-contain object-right animate-ken-burns-reverse drop-shadow-2xl"
-              priority
-            />
+        <div className="absolute inset-0 z-20 flex flex-col md:flex-row items-center justify-center px-4 sm:px-6 md:px-16 lg:px-54 py-8 md:py-10">
+          
+          <div 
+            className={`w-full md:w-1/2 text-center md:text-left mb-8 md:mb-0 transition-all duration-1000 delay-300 flex flex-col justify-center ${
+              isMounted ? "translate-x-0 opacity-100" : "-translate-x-8 opacity-0"
+            }`}
+          >
+            <h1 className="mb-3 text-2xl font-black tracking-tighter text-white sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-2xl">
+              Tu próximo hogar<br className="hidden md:block" /> empieza aquí<br className="hidden md:block" />
+            </h1>
+            <p className="max-w-lg text-sm sm:text-base font-medium text-slate-200 drop-shadow md:text-xl mx-auto md:mx-0 px-2 md:px-0">
+              Explorá miles de propiedades en las mejores ubicaciones con la estética que buscás.
+            </p>
           </div>
 
-          <div className="absolute inset-0 z-30 bg-linear-to-t from-black/40 via-transparent to-transparent" />
+          <div 
+            className={`w-full md:w-1/2 max-w-xl flex flex-col items-center md:items-end transition-all duration-1000 delay-500 ${
+              isMounted ? "translate-x-0 opacity-100" : "translate-x-8 opacity-0"
+            }`}
+          >
+            <div 
+              ref={containerRef}
+              className="relative mb-4 hidden md:flex p-1 rounded-full bg-white/20 mr-10 border border-white/20 backdrop-blur-md shadow-lg isolate"
+            >
+              <div 
+                className="absolute top-1 bottom-1 -z-10 rounded-full bg-urbik-white1 transition-all duration-300 ease-out shadow-md"
+                style={{ 
+                  left: `${pillProps.left}px`, 
+                  width: `${pillProps.width}px` 
+                }}
+              />
 
-          <div className="absolute inset-0 z-40 flex flex-col items-start justify-center p-6 md:p-16 lg:p-20 md:w-3/5">
-            <div className="rounded-3xl p-6 md:p-10  transition-all">
-              <h2 className="text-4xl font-black tracking-tight text-white sm:text-6xl drop-shadow-lg leading-tight">
-                Propiedades<br />Destacadas
-              </h2>
-              <p className="mt-6 max-w-lg text-base font-medium leading-relaxed text-slate-200 sm:text-lg drop-shadow">
-                Encontrá oportunidades premium con una estética limpia, moderna y minimalista en las mejores ubicaciones.
-              </p>
+              {OPERATIONS.map((op) => (
+                <button
+                  key={op}
+                  ref={operation === op ? activeBtnRef : null}
+                  onClick={() => setOperation(op)}
+                  className={`px-5 cursor-pointer py-2 md:px-6 md:py-2.5 rounded-full text-sm md:text-base font-semibold capitalize transition-all duration-300 ${
+                    operation === op 
+                      ? "text-urbik-black"
+                      : "text-white/80 hover:text-white"
+                  }`}
+                >
+                  {op}
+                </button>
+              ))}
+            </div>
+
+            <div className="w-full relative overflow-hidden rounded-full border border-white/20 bg-white/30 p-1.5 md:p-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-md flex items-center">
+              
+              <div className="pl-3 md:pl-4 pr-1 md:pr-2 text-white/70">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+              </div>
+
+              <input 
+                type="text"
+                placeholder="Busca por ciudad, barrio o calle..." 
+                className="flex-grow bg-transparent px-2 py-1 text-sm md:text-lg text-white placeholder:text-white/60 outline-none w-full"
+              />
+
+              <button className="cursor-pointer rounded-full bg-urbik-accent px-4 py-2.5 md:px-8 md:py-3 text-sm md:text-lg font-bold text-white transition-all hover:bg-urbik-accent/80 hover:scale-105 active:scale-95">
+                Buscar
+              </button>
             </div>
           </div>
-          
+
         </div>
-      
-
-        {randomProperty && (
-  <div
-    className={`absolute inset-0 transition-opacity duration-1000 flex items-stretch ${
-      displayProperty ? "opacity-100" : "opacity-0 pointer-events-none"
-    }`}
-  >
-    <div className="absolute inset-0 z-10 bg-linear-to-r from-white/70 via-white/20 to-transparent" />
-    
-    {randomProperty.images?.[0] && (
-      <Image
-        src={randomProperty.images[0]}
-        alt={randomProperty.title}
-        fill
-        className="object-cover transition-transform duration-10000 ease-linear scale-105"
-        style={displayProperty ? { transform: 'scale(1.15)' } : {}}
-      />
-    )}
-    
-    <div className="relative z-20 flex w-full max-w-sm flex-col justify-start p-6 md:p-10 text-urbik-black/60 border-r border-white/20 bg-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-md">
-      
-      <div className="mb-6 flex flex-col items-start gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-white/40 bg-white/20 px-3 py-1 text-xs font-black uppercase tracking-wide shadow-sm">
-            {getTypeLabel(randomProperty.type)}
-          </span>
-          <span className="rounded-full border border-white/40 bg-white/20 px-3 py-1 text-xs font-black uppercase tracking-wide shadow-sm">
-            {getOperationLabel(randomProperty.operationType)}
-          </span>
-        </div>
-        <span className="rounded-full border border-white/40 bg-urbik-white1 px-3 py-1 text-xs text-urbik-black/30 font-bold uppercase tracking-wide shadow-sm">
-          Recomendado
-        </span>
-      </div>
-
-      <h2 className="mb-4 line-clamp-3 text-2xl font-black tracking-tight text-urbik-black/70 drop-shadow-md md:text-4xl">
-        {randomProperty.title}
-      </h2>
-      
-      <p className="mb-8 text-sm font-medium text-urbik-black/60 drop-shadow md:text-base">
-        {randomProperty.address}, {randomProperty.city}, {randomProperty.province}
-      </p>
-
-      <div className="flex flex-col gap-6 pt-8 mt-auto">
-        <span className="text-sm font-bold text-urbik-black/60 md:text-base">
-          {randomProperty.rooms || 0} amb · {randomProperty.bathrooms || 0} baños {randomProperty.area ? `· ${randomProperty.area} m²` : ''}
-        </span>
         
-        <div className="flex flex-col items-start gap-4">
-          <span className="text-2xl font-black tracking-tight drop-shadow-md md:text-4xl bg-linear-to-br from-white to-gray-200 bg-clip-text text-transparent">
-              {currency} {Number(price).toLocaleString("es-AR")}
-          </span>
-          <Link
-            href={`/property/${randomProperty.id}`}
-            className="rounded-xl bg-urbik-white2 px-6 py-3 text-lg font-bold text-urbik-black/70 transition-all hover:bg-white/30 hover:scale-105 border border-white/10 w-full text-center"
-          >
-            Ver más
-          </Link>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-)}
       </div>
     </>
   );
