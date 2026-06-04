@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse, NextRequest } from "next/server";
 
 interface InquiryRequestBody {
-  propertyId: number;
+  propertyId: string;
   message: string;
   senderName: string;
   senderEmail: string;
@@ -11,9 +11,9 @@ interface InquiryRequestBody {
 }
 
 interface SupabaseProperty {
-  id: number | string;
+  id: string;
   title: string;
-  real_estate_id: number | string;
+  real_estate_id: string;
 }
 
 interface SupabaseInquiry {

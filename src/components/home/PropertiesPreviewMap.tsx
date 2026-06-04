@@ -12,7 +12,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 type PreviewProperty = {
-  id: number;
+  id: string;
   title: string;
   latitude: number | null;
   longitude: number | null;
@@ -22,8 +22,8 @@ interface Props {
   properties: PreviewProperty[];
   lat?: number;
   lon?: number;
-  hoveredPropertyId?: number | null;
-  onHoverProperty?: (propertyId: number | null) => void;
+  hoveredPropertyId?: string | null;
+  onHoverProperty?: (propertyId: string | null) => void;
 }
 
 function createPinIcon(isActive: boolean) {

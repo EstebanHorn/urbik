@@ -81,7 +81,7 @@ export interface FormState extends UserFormFields, RealEstateFormFields {
 
 
 export interface Property {
-  id: number;
+  id: string;
   title: string;
   description: string;
   address: string;
@@ -121,7 +121,7 @@ export interface Property {
   parcelGeom?: JsonValue | null;
 
   images: string[];
-  realEstateId: number;
+  realEstateId: string;
 
   createdAt: Date;
   updatedAt: Date;

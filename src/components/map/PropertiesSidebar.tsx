@@ -24,7 +24,7 @@ interface PropertiesSidebarProps {
 }
 
 interface FavoriteProperty {
-  id: number;
+  id: string;
 }
 
 interface SessionState {
@@ -38,7 +38,7 @@ export function PropertiesSidebar({
 }: PropertiesSidebarProps) {
   const supabase = createClient();
 
-  const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [session, setSession] = useState<SessionState | null>(null);
 
   useEffect(() => {
@@ -167,7 +167,7 @@ export function PropertiesSidebar({
           .slice(0, visualLimit)
           .map((prop) => {
             const isInitiallyFavorite =
-              favoriteIds.includes(Number(prop.id));
+              favoriteIds.includes(prop.id);
 
             return (
               <div

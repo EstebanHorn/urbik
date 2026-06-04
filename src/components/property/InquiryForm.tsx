@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Send, CheckCircle2 } from "lucide-react";
 
 interface InquiryFormProps {
-  propertyId: number;
+  propertyId: string;
 }
 
 interface FormState {

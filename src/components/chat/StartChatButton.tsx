@@ -5,7 +5,7 @@ import { MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface Props {
-  propertyId?: number;
+  propertyId?: string;
   realEstateId: string;
   label?: string;
 }

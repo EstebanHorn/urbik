@@ -9,7 +9,7 @@ import FavoriteButton from "@/components/ui/FavoriteButton";
 import type { Session } from "@supabase/supabase-js";
 
 interface FavoriteProperty {
-  id: number; title: string; type: string; operationType: string;
+  id: string; title: string; type: string; operationType: string;
   price: number | null; currency?: string | null; images: string[];
   city: string; area?: number; rooms?: number; bathrooms?: number;
   address?: string; province?: string; latitude?: number; longitude?: number;
@@ -90,7 +90,7 @@ export default function SavedPage() {
                     <div className="bg-urbik-white2 rounded-md border border-urbik-g100 overflow-hidden hover:scale-105 hover:brightness-105 hover:bg-none hover:shadow-lg transition-all h-full flex flex-col relative">
                       <Link href={`/property/${prop.id}`} className="absolute inset-0 z-10" />
                       <div className="absolute top-3 right-3 z-20">
-                        <FavoriteButton propertyId={prop.id.toString()} initialIsFavorite={true} small={true} />
+                        <FavoriteButton propertyId={prop.id} initialIsFavorite={true} small={true} />
                       </div>
                       <div className="relative h-40 bg-urbik-g200">
                         <Image

@@ -4,7 +4,7 @@ import { SearchProperty, getTypeLabel, getOperationLabel, glassCard } from "../.
 
 interface Top3Props {
   items: SearchProperty[];
-  setHoveredPropertyId: React.Dispatch<React.SetStateAction<number | null>>;
+  setHoveredPropertyId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export default function Top3({ items, setHoveredPropertyId }: Top3Props) {

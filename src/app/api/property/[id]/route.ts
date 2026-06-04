@@ -29,7 +29,7 @@ export async function PUT(
 
   try {
     const resolvedParams = await params;
-    const id = Number(resolvedParams.id);
+    const id = resolvedParams.id;
     const body = await req.json();
 
     const admin = createAdminClient();
@@ -217,7 +217,7 @@ export async function DELETE(
 
   try {
     const resolvedParams = await params;
-    const id = Number(resolvedParams.id);
+    const id = resolvedParams.id;
 
     const admin2 = createAdminClient();
     const { data: profile2 } = await admin2

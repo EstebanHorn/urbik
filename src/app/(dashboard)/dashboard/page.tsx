@@ -15,7 +15,7 @@ import ChatPanel from "@/components/chat/ChatPanel";
 import { useChatThreads } from "@/hooks/useChatThreads";
 
 export type PropertySummary = {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   price?: number;
@@ -196,7 +196,7 @@ function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { prop
   const [unreadCount, setUnreadCount] = useState(0);
   const [editingProperty, setEditingProperty] = useState<PropertySummary | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>("properties");
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => { if (autoOpenCreate) setCreateOpen(true); }, [autoOpenCreate]);

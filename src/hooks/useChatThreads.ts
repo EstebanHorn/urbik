@@ -6,7 +6,7 @@ export type ChatThread = {
   id: string;
   createdAt: string;
   lastMessageAt: string;
-  property: { id: number; title: string; image: string | null } | null;
+  property: { id: string; title: string; image: string | null } | null;
   otherParty: string;
   unreadCount: number;
 };

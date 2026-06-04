@@ -109,7 +109,7 @@ const LEGACY_ICON: Record<string, React.ReactNode> = {
 };
 
 interface Property {
-  id: number;
+  id: string;
   title: string;
   description: string | null;
   address: string;
@@ -154,7 +154,7 @@ interface Property {
 }
 
 interface FormattedOtherProperty {
-  id: number;
+  id: string;
   title: string;
   type: string;
   operationType: string;
@@ -167,7 +167,7 @@ interface FormattedOtherProperty {
   isFavorite: boolean;
 }
 
-async function getPropertyData(id: number) {
+async function getPropertyData(id: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const userId = user?.id;
@@ -189,7 +189,7 @@ async function getPropertyData(id: number) {
     }
 
     let otherProperties: Array<{
-      id: number; title: string; type: string; operation_type: string;
+      id: string; title: string; type: string; operation_type: string;
       sale_price: number | null; rent_price: number | null;
       sale_currency: string | null; rent_currency: string | null;
       city: string; province: string; images: string[] | null; isFavorite?: boolean;
@@ -433,9 +433,8 @@ const getStatusBadge = (property: { status?: string; operationType: string }) =>
 };
 
 export default async function PropertyPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id: rawId } = await params;
-  const id = Number(rawId);
-  if (isNaN(id)) return notFound();
+  const { id } = await params;
+  if (!id) return notFound();
 
   const result = await getPropertyData(id);
   if (!result) return notFound();
@@ -500,7 +499,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="space-y-4 w-full lg:w-auto">
             <div className="flex flex-wrap items-center gap-3">
-              <FavoriteButton propertyId={property.id.toString()} initialIsFavorite={property.isFavorite} />
+              <FavoriteButton propertyId={property.id} initialIsFavorite={property.isFavorite} />
               <span className="bg-urbik-black text-urbik-white text-xs font-black uppercase tracking-wider border border-urbik-g100 px-4 py-2 rounded-full">
                 {getPropertyLabel(property.type)}
               </span>
@@ -697,7 +696,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 <div key={other.id} className="group relative flex flex-col h-full bg-white rounded-xl border border-urbik-g100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                   <Link href={`/property/${other.id}`} className="absolute inset-0 z-10" />
                   <div className="absolute top-3 right-3 z-20">
-                    <FavoriteButton propertyId={other.id.toString()} initialIsFavorite={!!other.isFavorite} small />
+                    <FavoriteButton propertyId={other.id} initialIsFavorite={!!other.isFavorite} small />
                   </div>
                   <div className="relative h-48 bg-gray-200 overflow-hidden">
                     <Image

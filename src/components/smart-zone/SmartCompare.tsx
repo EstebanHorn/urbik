@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Property {
-  id: number;
+  id: string;
   title: string;
   price: number;
   area: number;
@@ -28,7 +28,7 @@ export default function Versus({
   isVersusMode: boolean;
   setIsVersusMode: (val: boolean) => void;
   hasFavorites: boolean;
-  setSelectedIds: (ids: number[]) => void;
+  setSelectedIds: (ids: string[]) => void;
 }) {
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(false);

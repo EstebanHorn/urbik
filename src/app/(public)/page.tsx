@@ -25,7 +25,7 @@ import List from "@/components/home/list";
 export type ViewMode = "list" | "grid";
 
 export type SearchProperty = {
-  id: number;
+  id: string;
   title: string;
   salePrice: number | null;
   saleCurrency: string | null;
@@ -107,7 +107,7 @@ export default function HomePage() {
 
   const [isSearchingLocation, setIsSearchingLocation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [hoveredPropertyId, setHoveredPropertyId] = useState<number | null>(null);
+  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
   const [items, setItems] = useState<SearchProperty[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);

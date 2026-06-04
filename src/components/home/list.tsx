@@ -64,7 +64,7 @@ function PromotedPropertyCard({
   setHoveredPropertyId,
 }: {
   property: SearchProperty;
-  setHoveredPropertyId: React.Dispatch<React.SetStateAction<number | null>>;
+  setHoveredPropertyId: React.Dispatch<React.SetStateAction<string | null>>;
 }) {
   const price = property.salePrice ?? property.rentPrice ?? 0;
   const currency = property.saleCurrency ?? property.rentCurrency ?? "ARS";
@@ -144,7 +144,7 @@ interface ListProps {
   items: SearchProperty[];
   viewMode: ViewMode;
   premiumProperty: SearchProperty | null;
-  setHoveredPropertyId: React.Dispatch<React.SetStateAction<number | null>>;
+  setHoveredPropertyId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export default function List({ items, viewMode, premiumProperty, setHoveredPropertyId }: ListProps) {

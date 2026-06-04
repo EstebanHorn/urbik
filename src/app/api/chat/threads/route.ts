@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
   const body = await req.json();
   const { propertyId, realEstateId, firstMessage } = body as {
-    propertyId?: number | null;
+    propertyId?: string | null;
     realEstateId: string;
     firstMessage?: string;
   };

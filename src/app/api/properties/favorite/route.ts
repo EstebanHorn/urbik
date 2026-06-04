@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       .from("favorites")
       .select("id")
       .eq("user_id", user.id)
-      .eq("property_id", Number(propertyId))
+      .eq("property_id", propertyId)
       .maybeSingle();
 
     if (existingFavorite) {
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
     await supabase.from("favorites").insert({
       user_id: user.id,
-      property_id: Number(propertyId),
+      property_id: propertyId,
     });
 
     return NextResponse.json({
