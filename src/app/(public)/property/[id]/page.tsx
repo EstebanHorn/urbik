@@ -14,6 +14,7 @@ import FavoriteButton from "@/components/ui/FavoriteButton";
 import ImageGallery from "@/components/property/ImageGallery";
 import InquiryForm from "@/components/property/InquiryForm";
 import StartChatButton from "@/components/chat/StartChatButton";
+import TrackPropertyView from "@/components/analytics/TrackPropertyView";
 
 export const dynamic = "force-dynamic";
 
@@ -482,6 +483,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
   return (
     <main className="min-h-screen bg-white pb-32 lg:pb-20">
+      <TrackPropertyView propertyId={String(property.id)} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-28 mb-6 sm:mb-8">
         <Link
           href="/dashboard"

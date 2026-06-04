@@ -6,11 +6,11 @@ import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from "recharts";
-import { Mail, Phone, Building2, Clock, CheckCheck, Inbox, BarChart3, Home, MessageSquare, Bell } from "lucide-react";
+import { Mail, Phone, Building2, CheckCheck, Inbox, BarChart3, Home, MessageSquare, Bell } from "lucide-react";
 
 import CreatePropertyModal from "@/components/dashboard/CreatePropertyModal";
 import EditPropertyModal from "@/components/dashboard/EditPropertyModal";
+import StatsPanel from "@/components/dashboard/stats/StatsPanel";
 import ChatPanel from "@/components/chat/ChatPanel";
 import { useChatThreads } from "@/hooks/useChatThreads";
 
@@ -68,12 +68,6 @@ const deleteProperty = async (id: string | number) => {
   }
   return res.json();
 };
-
-const mockViews = [
-  { name: "Ene", views: 200 }, { name: "Feb", views: 250 }, { name: "Mar", views: 180 },
-  { name: "Abr", views: 220 }, { name: "May", views: 190 }, { name: "Jun", views: 240 },
-  { name: "Jul", views: 280 },
-];
 
 function ConfirmationModal({ isOpen, onClose, onConfirm, title, message, isLoading }: any) {
   if (!isOpen) return null;
@@ -203,8 +197,6 @@ function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { prop
   useEffect(() => { fetch("/api/inquiries").then((r) => r.json()).then((data) => { if (Array.isArray(data)) setUnreadCount(data.filter((i) => i.status === "UNREAD").length); }).catch(() => {}); }, []);
 
   const { totalUnread: unreadChatCount } = useChatThreads();
-  const mostViewed = useMemo(() => properties[0] ?? null, [properties]);
-  const lastMonthViews = useMemo(() => mockViews.reduce((acc, x) => acc + x.views, 0), []);
 
   const handleConfirmDelete = async () => {
     if (!deletingId) return;
@@ -300,51 +292,14 @@ function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { prop
         )}
 
         {activeTab === "statistics" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-              <div className="p-5 border-b border-gray-100">
-                <div className="text-md font-bold text-urbik-black/60 ml-2">Rendimiento</div>
-                <div className="text-3xl italic font-black text-urbik-black">Vistas</div>
-              </div>
-              <div className="p-4">
-                <ResponsiveContainer width="100%" height={280}>
-                  <AreaChart data={mockViews}>
-                    <defs>
-                      <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#00F0FF" stopOpacity={0.16} />
-                        <stop offset="95%" stopColor="#00F0FF" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <Tooltip contentStyle={{ borderRadius: "14px", border: "1px solid rgba(0,0,0,0.06)", boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }} labelStyle={{ fontWeight: 800 }} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#9CA3AF", fontSize: 12 }} dy={10} />
-                    <Area type="monotone" dataKey="views" stroke="#00F0FF" strokeWidth={3} fillOpacity={1} fill="url(#colorViews)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="p-5 border-t border-gray-100 flex items-center justify-between">
-                <span className="text-sm font-bold text-gray-500">Total del último mes</span>
-                <span className="text-2xl font-black text-gray-900">{lastMonthViews}</span>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden flex flex-col">
-              <div className="p-5 border-b border-gray-100">
-                <div className="text-md font-bold text-urbik-black/60 ml-2">Tendencia</div>
-                <div className="text-2xl italic font-black text-urbik-black">Más vista</div>
-              </div>
-              <div className="flex-1 bg-gray-100 relative min-h-[200px]">
-                {mostViewed?.images?.[0] ? <img src={mostViewed.images[0]} alt="Most viewed" className="object-cover w-full h-full absolute inset-0" /> : <div className="w-full h-full absolute inset-0 flex items-center justify-center text-gray-400 font-bold bg-gray-50">Sin imagen</div>}
-              </div>
-              <div className="p-5">
-                <h3 className="font-black text-base leading-tight text-gray-900 line-clamp-2">{mostViewed?.title ?? "Aún no hay datos"}</h3>
-                <p className="text-gray-500 text-xs mt-1 font-medium">{mostViewed?.city ?? "—"}</p>
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <div className="text-lg font-black text-gray-900">{typeof mostViewed?.price === "number" ? `USD ${mostViewed.price.toLocaleString("es-AR")}` : "—"}</div>
-                  <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">{mostViewed?.operationType ?? ""}</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <StatsPanel
+            properties={properties.map((p) => ({
+              id: p.id,
+              title: p.title,
+              city: p.city,
+              province: p.province,
+            }))}
+          />
         )}
       </div>
 

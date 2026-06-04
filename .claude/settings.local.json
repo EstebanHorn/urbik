@@ -31,7 +31,10 @@
       "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\app\\\\api\\\\chat\\\\threads\")",
       "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\hooks\")",
       "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\components\\\\chat\")",
-      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\app\\\\messages\")"
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\app\\\\messages\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\" -Force)"
     ]
   }
 }

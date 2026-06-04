@@ -8,6 +8,8 @@ import bgImage from "@/assets/login_bg.png";
 import AdminActions from "@/components/administrate/AdminActions";
 import { createClient } from "@/lib/supabase/server";
 import StartChatButton from "@/components/chat/StartChatButton";
+import RealEstateReviews from "@/components/realestate/RealEstateReviews";
+import TrackAgencyView from "@/components/analytics/TrackAgencyView";
 
 const PROPERTY_LABELS: Record<string, string> = {
   HOUSE: "Casa",
@@ -101,6 +103,7 @@ export default async function RealEstatePage({
 
   return (
     <div className="min-h-screen">
+      <TrackAgencyView realEstateId={realEstate.profile_id} />
       <div className="max-w-7xl mx-auto px-4 py-8 mt-20">
         {isAdmin && (
           <div className="mb-6">
@@ -183,6 +186,14 @@ export default async function RealEstatePage({
             </p>
           </div>
         )}
+
+        <div className="border-t border-urbik-g200 my-8" />
+
+        <RealEstateReviews
+          realEstateId={id}
+          currentUserId={user?.id ?? null}
+          isOwner={!!user && user.id === id}
+        />
 
         <div className="border-t border-urbik-g200 my-8" />
 
