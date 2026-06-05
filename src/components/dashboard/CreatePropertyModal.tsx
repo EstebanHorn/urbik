@@ -310,8 +310,8 @@ export default function CreatePropertyModal({
               </button>
             ) : (
               <button
-                type="submit"
-                form="create-property-form"
+                type="button"
+                onClick={() => handleSubmit()}
                 disabled={isSubmitting}
                 className="px-6 py-3 text-urbik-black/80 font-bold hover:text-urbik-black transition-colors
               disabled:opacity-40 cursor-pointer w-32"

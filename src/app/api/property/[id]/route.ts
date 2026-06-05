@@ -35,7 +35,7 @@ export async function PUT(
     const admin = createAdminClient();
     const { data: profile } = await admin
       .from("profiles")
-      .select("role, user_id")
+      .select("role")
       .eq("id", authUser.id)
       .single();
 
@@ -52,9 +52,7 @@ export async function PUT(
       );
     }
 
-    const isOwner =
-      property.real_estate_id === authUser.id ||
-      (profile.user_id != null && property.real_estate_id === profile.user_id);
+    const isOwner = property.real_estate_id === authUser.id;
     const isAdmin = profile.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {
@@ -222,7 +220,7 @@ export async function DELETE(
     const admin2 = createAdminClient();
     const { data: profile2 } = await admin2
       .from("profiles")
-      .select("role, user_id")
+      .select("role")
       .eq("id", authUser.id)
       .single();
 
@@ -239,9 +237,7 @@ export async function DELETE(
       );
     }
 
-    const isOwner =
-      property.real_estate_id === authUser.id ||
-      (profile2.user_id != null && property.real_estate_id === profile2.user_id);
+    const isOwner = property.real_estate_id === authUser.id;
     const isAdmin = profile2.role === "ADMIN";
 
     if (!isOwner && !isAdmin) {
