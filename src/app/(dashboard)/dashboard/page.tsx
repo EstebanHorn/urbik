@@ -14,6 +14,8 @@ import StatsPanel from "@/components/dashboard/stats/StatsPanel";
 import ChatPanel from "@/components/chat/ChatPanel";
 import { useChatThreads } from "@/hooks/useChatThreads";
 
+const glassCard = "md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
+
 export type PropertySummary = {
   id: string;
   title: string;
@@ -126,7 +128,7 @@ function InquiriesPanel({ onRead }: { onRead?: () => void }) {
   if (isLoading) return <div className="space-y-3 mt-4">{[1, 2, 3].map((n) => <div key={n} className="h-20 rounded-xl bg-gray-100 animate-pulse border border-gray-100" />)}</div>;
 
   if (inquiries.length === 0) return (
-    <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-gray-100 shadow-sm mt-4">
+    <div className="flex flex-col items-center justify-center py-20 text-center mt-4">
       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4"><Inbox size={28} className="text-gray-400" /></div>
       <h3 className="text-base font-bold text-urbik-black/60">No tenés consultas por el momento.</h3>
     </div>
@@ -212,7 +214,7 @@ function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { prop
 
   return (
     <div className="pb-28">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-0 sm:mt-5">
+      <div className="flex flex-col md:flex-row md:items-center ml-5 md:justify-between gap-4 mb-6 mt-0 sm:mt-5">
         <h1 className="text-2xl font-black text-urbik-black">
           {activeTab === "properties" && "Mis Propiedades"}
           {activeTab === "statistics" && "Estadísticas"}
@@ -221,7 +223,7 @@ function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { prop
         </h1>
         {activeTab === "properties" && (
           <div className="flex items-center gap-2 justify-end">
-            <button onClick={() => setCreateOpen(true)} className="bg-urbik-cyan text-urbik-black/80 py-3 px-6 rounded-full border border-white font-black text-md hover:bg-urbik-white hover:border-urbik-cyan cursor-pointer hover:text-urbik-cyan transition-all shadow-cyan-500/20 transform active:scale-95">Cargar propiedad</button>
+            <button onClick={() => setCreateOpen(true)} className="bg-white text-urbik-black/80 py-3 px-6 rounded-full border border-black/10 font-bold shadow-md text-md cursor-pointer hover:text-urbik-black/60 transition-all hover:scale-105 transform active:scale-95">Cargar propiedad</button>
           </div>
         )}
       </div>
@@ -238,56 +240,93 @@ function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { prop
         )}
 
         {activeTab === "properties" && (
-          <div className=" overflow-hidden rounded-xl">
-            <div className="p-2 sm:p-4">
-              {properties.length === 0 ? (
-                <div className="text-center py-16 flex flex-col items-center justify-center">
-                  <h3 className="text-lg font-bold text-gray-900">Aún no hay propiedades</h3>
-                  <p className="text-gray-500 max-w-sm mt-2">Cargá tu primera propiedad usando el botón de arriba.</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="text-md text-urbik-black/50 font-bold tracking-wider border-b border-gray-200">
-                        <th className="px-7 py-5">Propiedad</th>
-                        <th className="px-7 py-5">Precio</th>
-                        <th className="px-10 py-5">Estado</th>
-                        <th className="px-6 py-5 text-right">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-sm divide-y divide-gray-100">
-                      {properties.map((prop) => (
-                        <tr key={prop.id} onClick={() => router.push(`/property/${prop.id}`)} className="group hover:bg-gray-50 transition-colors cursor-pointer">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-4">
-                              <div className="h-14 w-14 rounded-sm bg-gray-200 overflow-hidden shrink-0 border border-gray-200">
-                                {prop.images && prop.images.length > 0 ? <img src={prop.images[0]} alt={prop.title} className="object-cover w-full h-full" /> : <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs font-bold">URBIK</div>}
-                              </div>
-                              <div>
-                                <div className="font-bold text-gray-900 truncate max-w-[220px]"><Link href={`/property/${prop.id}`}>{prop.title}</Link></div>
-                                <div className="text-xs text-gray-500 mt-0.5">{prop.city ?? "—"}, {prop.province ?? "—"}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 font-bold text-gray-900">{prop.price ? `USD ${prop.price.toLocaleString("es-AR")}` : <span className="text-gray-400">—</span>}</td>
-                          <td className="px-6 py-4">
-                            {prop.status === "AVAILABLE" ? <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-emerald-50 text-urbik-emerald border border-emerald-100"><span className="w-1.5 h-1.5 rounded-full bg-urbik-emerald"></span>Activa</span> : <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-500 border border-gray-200"><span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>Pausada</span>}
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                              <Link href={`/property/${prop.id}`} target="_blank" onClick={(e) => e.stopPropagation()} className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-urbik-cyan text-urbik-cyan hover:text-white hover:border-white hover:bg-urbik-cyan transition-colors" title="Ver publicación">↗</Link>
-                              <button onClick={(e) => { e.stopPropagation(); setEditingProperty(prop); }} className="w-8 h-8 cursor-pointer flex items-center justify-center rounded-full bg-white border border-urbik-emerald text-urbik-emerald hover:text-white hover:bg-urbik-emerald transition-colors" title="Editar">✎</button>
-                              <button onClick={(e) => { e.stopPropagation(); setDeletingId(prop.id); setIsModalOpen(true); }} className="w-8 h-8 cursor-pointer flex items-center justify-center rounded-full bg-white border border-urbik-rose text-urbik-rose hover:text-white hover:bg-urbik-rose transition-colors" title="Eliminar">✕</button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+          <div className="w-full">
+            {properties.length === 0 ? (
+              <div className="text-center py-16 flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900">Aún no hay propiedades</h3>
+                <p className="text-gray-500 max-w-sm mt-2">Cargá tu primera propiedad usando el botón de arriba.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {properties.map((prop, index) => {
+                  return (
+                    <div
+                      key={prop.id}
+                      onClick={() => router.push(`/property/${prop.id}`)}
+                      className={`group flex flex-col gap-4 p-4 cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] animate-fade-in-up relative ${glassCard}`}
+                      style={{
+                        animationDelay: `${index * 100}ms`,
+                        animationFillMode: "both"
+                      }}
+                    >
+                      {/* Acciones Superpuestas (Editar/Eliminar) */}
+                      <div className="absolute top-6 right-6 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setEditingProperty(prop); }} 
+                          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/50 backdrop-blur-sm border border-white text-urbik-white shadow-sm transition-all hover:scale-110" 
+                          title="Editar"
+                        >
+                          ✎
+                        </button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setDeletingId(prop.id); setIsModalOpen(true); }} 
+                          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/50 backdrop-blur-sm border border-white text-urbik-white shadow-sm transition-all hover:scale-110" 
+                          title="Eliminar"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl">
+                        {prop.images && prop.images.length > 0 ? (
+                          <img
+                            src={prop.images[0]}
+                            alt={prop.title}
+                            className="h-full w-full object-cover transition duration-700 group-hover:scale-105 [mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)]"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-white text-xs font-bold text-black/70">
+                            Sin imagen
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
+                        <div>
+                          <div className="mb-3 flex flex-wrap items-center gap-2">
+                            <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                              {prop.type || "Inmueble"}
+                            </span>
+                            <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                              {prop.operationType === 'SALE' ? 'Venta' : prop.operationType === 'RENT' ? 'Alquiler' : 'Venta/Alq'}
+                            </span>
+                            {prop.status === "AVAILABLE" ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-urbik-white2 text-urbik-black/60 shadow-sm z-1">Activa</span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-gray-100 text-gray-500 border border-gray-200 shadow-sm z-1"><span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>Pausada</span>
+                            )}
+                          </div>
+                          <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
+                            {prop.title}
+                          </h3>
+                          <p className="mt-2 truncate text-xs font-semibold text-urbik-black/80">
+                            {prop.address || "Sin dirección"}, {prop.city || "—"}, {prop.province || "—"}
+                          </p>
+                        </div>
+                        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/60 pt-4">
+                          <span className="text-xs font-bold text-urbik-black/50 z-1">
+                            {prop.rooms || 0} amb · {prop.area || 0} m²
+                          </span>
+                          <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
+                            {prop.price ? `USD ${prop.price.toLocaleString("es-AR")}` : <span className="text-gray-400">—</span>}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 

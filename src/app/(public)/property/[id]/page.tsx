@@ -314,7 +314,7 @@ function SurfaceRow({ label, value }: { label: string; value: number | null }) {
 
 function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
   return (
-    <div className="flex items-center gap-3 py-3 border-b border-urbik-g100 last:border-0">
+    <div className="flex items-center gap-3 py-3">
       <span className="text-urbik-muted shrink-0">{icon}</span>
       <span className="text-sm font-semibold text-urbik-muted flex-1">{label}</span>
       <span className="text-sm font-black text-urbik-black">{value}</span>
@@ -427,10 +427,10 @@ function FeaturesSection({
 
 const getStatusBadge = (property: { status?: string; operationType: string }) => {
   const s = property.status || "AVAILABLE";
-  if (s === "SOLD") return { label: "VENDIDA", color: "bg-urbik-rose text-white" };
-  if (s === "RENTED") return { label: "ALQUILADA", color: "bg-orange-500 text-white" };
-  if (s === "PAUSED") return { label: "PAUSADA", color: "bg-urbik-g300 text-white" };
-  return { label: getOperationLabel(property.operationType), color: "bg-urbik-cyan text-urbik-dark" };
+  if (s === "SOLD") return { label: "VENDIDA", color: "bg-urbik-white2 text-urbik-dark" };
+  if (s === "RENTED") return { label: "ALQUILADA", color: "bg-urbik-white2 text-urbik-dark" };
+  if (s === "PAUSED") return { label: "PAUSADA", color: "bg-urbik-white2 text-urbik-dark" };
+  return { label: getOperationLabel(property.operationType), color: "bg-urbik-white2 text-urbik-dark" };
 };
 
 export default async function PropertyPage({ params }: { params: Promise<{ id: string }> }) {
@@ -475,7 +475,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
     property.constructionYear && { icon: <CalendarDays size={16} />, label: "Año de construcción", value: property.constructionYear },
     property.frontLength && { icon: <FlipVertical size={16} />, label: "Frente", value: `${property.frontLength} m` },
     property.backLength && { icon: <FlipVertical size={16} />, label: "Fondo", value: `${property.backLength} m` },
-    { icon: <Hash size={16} />, label: "Referencia", value: `#${property.id}` },
   ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string | number }[];
 
   const hasSurfaceBreakdown =
@@ -484,52 +483,64 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   return (
     <main className="min-h-screen bg-white pb-32 lg:pb-20">
       <TrackPropertyView propertyId={String(property.id)} />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-28 mb-6 sm:mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-25 mb-6 sm:mb-2">
         <Link
           href="/dashboard"
           className="group text-urbik-black/50 inline-flex items-center gap-2 text-sm font-bold hover:text-urbik-black transition-colors"
         >
-          <div className="p-2 bg-urbik-g100 rounded-full group-hover:bg-urbik-g200 transition-colors">
+          <div className="p-2 group-hover:text-urbik-black transition-colors">
             <ChevronLeft size={18} />
           </div>
           Volver al listado
         </Link>
         {isAdmin && <AdminActions id={property.id} currentStatus={property.status} type="property" />}
       </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mb-15">
+              <ImageGallery
+          images={property.images}
+          title={property.title}
+          parcelGeom={property.parcelGeom}
+          latitude={property.latitude}
+          longitude={property.longitude}
+        />
+      </div>
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="space-y-4 w-full lg:w-auto">
-            <div className="flex flex-wrap items-center gap-3">
-              <FavoriteButton propertyId={property.id} initialIsFavorite={property.isFavorite} />
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-2 sm:gap-3 px-5 mb-10 sm:mb-20">
+          <div className="space-y-2 w-full lg:w-auto">
+            <h1 className="text-3xl md:text-4xl lg:text-4xl font-display font-black text-urbik-black italic tracking-tighter leading-tight">
+              {property.title}
+            </h1>
+            <div className="flex justify-end items-center gap-2 text-urbik-muted font-medium italic">
+              <MapPin size={16} className="text-urbik-black/60 shrink-0 sm:w-5 sm:h-5" />
+              <span className="text-urbik-black/60 sm:text-lg">
+                {property.address}{property.neighborhood ? `, ${property.neighborhood}` : ""}, {property.city}
+                {property.locality && property.locality !== property.city ? ` (${property.locality})` : ""}
+              </span>
+            </div>
+
+          </div>
+
+          {!property.isPriceHidden && (
+            <div className="lg:text-right w-full lg:w-auto">
+              <div className={`flex flex-col ${isBoth ? "gap-2" : ""}`}>
+              <div className="flex flex-wrap justify-end items-center gap-3 mb-2 z-100">
               <span className="bg-urbik-black text-urbik-white text-xs font-black uppercase tracking-wider border border-urbik-g100 px-4 py-2 rounded-full">
                 {getPropertyLabel(property.type)}
               </span>
               <span className={`text-xs font-black uppercase px-4 py-2 rounded-full tracking-wider shadow-sm ${statusBadge.color}`}>
                 {statusBadge.label}
               </span>
-            </div>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-black text-urbik-black italic tracking-tighter leading-tight">
-              {property.title}
-            </h1>
-            <div className="flex items-center gap-2 text-urbik-muted font-medium italic">
-              <MapPin size={16} className="text-urbik-emerald shrink-0 sm:w-5 sm:h-5" />
-              <span className="text-base sm:text-lg">
-                {property.address}{property.neighborhood ? `, ${property.neighborhood}` : ""}, {property.city}
-                {property.locality && property.locality !== property.city ? ` (${property.locality})` : ""}
-              </span>
-            </div>
-          </div>
+                            <FavoriteButton propertyId={property.id} initialIsFavorite={property.isFavorite} />
 
-          {!property.isPriceHidden && (
-            <div className="lg:text-right w-full lg:w-auto">
-              <div className={`flex flex-col ${isBoth ? "gap-2" : ""}`}>
+            </div>
                 {(property.operationType === "SALE" || isBoth) && property.salePrice && (
                   <div className="flex flex-col lg:items-end">
                     {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1">Venta</span>}
-                    <div className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
-                      <span className="text-urbik-emerald mr-2 font-black text-0.5em">{property.saleCurrency}</span>
-                      <span className="text-urbik-black">{formatter.format(property.salePrice)}</span>
+                    <div className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-5xl"} font-display font-bold tracking-tighter flex items-baseline`}>
+                      <span className="text-urbik-black/30 mr-2 font-black text-0.5em">{property.saleCurrency}</span>
+                      <span className="text-urbik-black">${formatter.format(property.salePrice)}</span>
                     </div>
                     {property.expenses && (
                       <p className="text-sm font-bold text-urbik-muted lg:text-right mt-1">
@@ -542,7 +553,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                   <div className="flex flex-col lg:items-end">
                     {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1 mt-2">Alquiler</span>}
                     <div className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
-                      <span className="text-urbik-emerald mr-2 font-black text-0.5em">{property.rentCurrency}</span>
+                      <span className="text-urbik-black/30 mr-2 font-black text-0.5em">{property.rentCurrency}</span>
                       <span className="text-urbik-black">{formatter.format(property.rentPrice)}</span>
                     </div>
                     {property.expenses && (
@@ -564,14 +575,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             </div>
           )}
         </div>
-
-        <ImageGallery
-          images={property.images}
-          title={property.title}
-          parcelGeom={property.parcelGeom}
-          latitude={property.latitude}
-          longitude={property.longitude}
-        />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 mt-8 sm:mt-12">
           <div className="lg:col-span-8 space-y-10">
@@ -609,7 +612,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             {detailRows.length > 0 && (
               <div>
                 <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Ficha Técnica</h3>
-                <div className="bg-white border border-urbik-g100 rounded-2xl px-6 py-2 shadow-sm">
+                <div className="px-6 py-2">
                   {detailRows.map((row, i) => (
                     <DetailRow key={i} icon={row.icon} label={row.label} value={row.value} />
                   ))}
@@ -637,57 +640,54 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
           <div className="lg:col-span-4 relative" id="contacto">
             <div className="sticky top-28 space-y-6">
-              <div className="bg-urbik-white2 rounded-2xl p-8 text-urbik-dark shadow-xl border border-urbik-g100 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-urbik-emerald/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <div className="md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none">
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-8">
-                    <div className="w-16 h-16 bg-urbik-black rounded-2xl flex items-center justify-center text-urbik-white shadow-lg">
-                      <Building2 size={32} />
-                    </div>
-                    <div>
+  
+                    <div className="flex flex-col w-full justify-center items-center mt-5">
                       <p className="text-xs font-bold uppercase tracking-widest text-urbik-muted mb-1">Comercializa</p>
-                      <Link href={`/realestate/${property.realEstateId}`} className="hover:text-urbik-emerald transition-colors">
+                      <Link href={`/realestate/${property.realEstateId}`} className="hover:text-urbik-black/50 transition-colors">
                         <h4 className="text-xl font-black leading-tight">{property.RealEstate?.agencyName || "Inmobiliaria"}</h4>
                       </Link>
                     </div>
                   </div>
-                  <div className="space-y-3 mb-8">
-                    <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-urbik-g100">
-                      <div className="bg-urbik-g100 p-2 rounded-full"><Phone size={18} className="text-urbik-dark" /></div>
+                  <div className="space-y-3 mb-8 ml-3">
+                    <div className="flex items-center gap-4 p-4">
+                      <div className="p-2"><Phone size={18} className="text-urbik-dark" /></div>
                       <div>
                         <p className="text-[10px] font-bold text-urbik-muted uppercase">Teléfono</p>
-                        <span className="font-bold text-sm">{property.RealEstate?.phone || "No disponible"}</span>
+                        <span className="font-bold text-md">{property.RealEstate?.phone || "No disponible"}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-urbik-g100">
-                      <div className="bg-urbik-g100 p-2 rounded-full"><Mail size={18} className="text-urbik-dark" /></div>
+                    <div className="flex items-center gap-4 p-4">
+                      <div className="p-2"><Mail size={18} className="text-urbik-dark" /></div>
                       <div>
                         <p className="text-[10px] font-bold text-urbik-muted uppercase">Email</p>
-                        <span className="font-bold text-sm">Consultar</span>
+                        <span className="font-bold text-md">Consultar</span>
                       </div>
                     </div>
                   </div>
                   <Link
                     href={`/realestate/${property.realEstateId}`}
-                    className="block mt-4 text-center text-xs font-bold text-urbik-muted hover:text-urbik-black underline decoration-dashed"
+                    className="block mt-4 mb-5 italic text-center text-xs font-bold text-urbik-muted hover:text-urbik-black underline decoration-dashed"
                   >
                     Ver todas las propiedades
                   </Link>
                 </div>
               </div>
 
-              <InquiryForm propertyId={property.id} />
-              {property.realEstateId && property.realEstateId !== user?.id && (
-                <StartChatButton propertyId={property.id} realEstateId={property.realEstateId as string} />
-              )}
             </div>
           </div>
         </div>
 
+              <InquiryForm propertyId={property.id} />
+              {property.realEstateId && property.realEstateId !== user?.id && (
+                <StartChatButton propertyId={property.id} realEstateId={property.realEstateId as string} />
+              )}
         <div className="mt-12 sm:mt-24 pt-8 sm:pt-12 border-t border-urbik-g100">
           <h3 className="text-2xl sm:text-3xl font-display text-urbik-black tracking-tighter mb-6 sm:mb-8">
             <span className="font-medium">Más propiedades de </span>
-            <span className="font-black italic uppercase text-urbik-emerald">
+            <span className="font-black italic uppercase text-urbik-black">
               {property.RealEstate?.agencyName || "la inmobiliaria"}
             </span>
           </h3>
@@ -695,7 +695,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           {otherProperties.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               {otherProperties.map((other) => (
-                <div key={other.id} className="group relative flex flex-col h-full bg-white rounded-xl border border-urbik-g100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div key={other.id} className="group relative flex flex-col h-full bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                   <Link href={`/property/${other.id}`} className="absolute inset-0 z-10" />
                   <div className="absolute top-3 right-3 z-20">
                     <FavoriteButton propertyId={other.id} initialIsFavorite={!!other.isFavorite} small />
@@ -715,7 +715,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                     </div>
                   </div>
                   <div className="p-5 flex flex-col grow">
-                    <h3 className="text-md font-bold mb-1 line-clamp-2 text-urbik-dark group-hover:text-urbik-emerald transition-colors">
+                    <h3 className="text-md font-bold mb-1 line-clamp-2 text-urbik-dark group-hover:text-urbik-black/60 transition-colors">
                       {other.title}
                     </h3>
                     <div className="flex items-center text-urbik-muted mb-4 text-xs font-medium">

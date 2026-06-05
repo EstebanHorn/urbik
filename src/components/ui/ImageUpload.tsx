@@ -94,7 +94,7 @@ export default function ImageUpload({
           <p className="text-[10px] text-gray-400 font-medium px-1">Arrastrá las fotos para reordenarlas. La posición 1 será la foto de portada.</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             {value.map((url, index) => (
-              <div key={`${url}-${index}`} draggable onDragStart={(e) => handleImageDragStart(e, index)} onDragOver={(e) => handleImageDragOver(e, index)} onDrop={(e) => handleImageDrop(e, index)} onDragEnd={handleImageDragEnd} className={`relative aspect-square rounded-xl overflow-hidden border group bg-gray-50 shadow-sm animate-in fade-in zoom-in duration-300 cursor-grab active:cursor-grabbing transition-all ${dragOverIndex === index && draggedIndex !== index ? "border-emerald-400 scale-105 shadow-md" : draggedIndex === index ? "border-urbik-black/30 opacity-50" : "border-urbik-black/10"}`}>
+              <div key={`${url}-${index}`} draggable onDragStart={(e) => handleImageDragStart(e, index)} onDragOver={(e) => handleImageDragOver(e, index)} onDrop={(e) => handleImageDrop(e, index)} onDragEnd={handleImageDragEnd} className={`relative aspect-square rounded-xl overflow-hidden border group bg-white/30 shadow-sm animate-in fade-in zoom-in duration-300 cursor-grab active:cursor-grabbing transition-all ${dragOverIndex === index && draggedIndex !== index ? "border-emerald-400 scale-105 shadow-md" : draggedIndex === index ? "border-urbik-black/30 opacity-50" : "border-urbik-black/10"}`}>
                 {index === 0 && <span className="absolute top-2 left-2 z-10 bg-urbik-black text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">Portada</span>}
                 
                 <Image 
@@ -114,17 +114,16 @@ export default function ImageUpload({
       )}
 
       {remaining > 0 && (
-        <div onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop} onClick={() => !isUploading && fileInputRef.current?.click()} className={`group relative flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer overflow-hidden ${isDragActive ? "border-emerald-500 bg-emerald-50/50 scale-[1.02]" : "border-gray-300 bg-gray-50/50 hover:bg-emerald-50/30 hover:border-emerald-500/50"} ${isUploading ? "pointer-events-none opacity-80" : ""}`}>
+        <div onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop} onClick={() => !isUploading && fileInputRef.current?.click()} className={`group relative flex flex-col shadow-md items-center justify-center w-full h-32 rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer overflow-hidden ${isDragActive ? "border-white scale-[1.02]" : "border-white hover:border-black"} ${isUploading ? "pointer-events-none opacity-80" : ""}`}>
           <input type="file" multiple accept="image/*" className="hidden" ref={fileInputRef} onChange={onInputChange} disabled={isUploading} />
           <div className="flex flex-col items-center gap-2 z-10">
             {isUploading ? (
-              <div className="flex flex-col items-center gap-2"><div className="w-8 h-8 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" /><span className="text-xs font-bold text-emerald-600 animate-pulse">Subiendo...</span></div>
+              <div className="flex flex-col items-center gap-2"><div className="w-8 h-8 border border-white rounded-full animate-spin" /><span className="text-xs font-bold text-urbik-black animate-pulse">Subiendo...</span></div>
             ) : (
               <>
-                <div className={`p-3 bg-white rounded-full shadow-sm border border-gray-100 transition-all duration-300 ${isDragActive ? "scale-110 shadow-md" : "group-hover:scale-110 group-hover:shadow-md"}`}>+</div>
                 <div className="text-center">
-                  <span className={`text-sm font-bold transition-colors ${isDragActive ? "text-emerald-700" : "text-gray-500 group-hover:text-emerald-600"}`}>{isDragActive ? "¡Soltá las fotos acá!" : "Hacé click o arrastrá fotos"}</span>
-                  <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-widest">JPG, PNG, WEBP · Máx 10MB</p>
+                  <span className={`text-sm font-bold transition-colors ${isDragActive ? "text-urbik-black" : "text-urbik-black/60 group-hover:text-urbik-black"}`}>{isDragActive ? "¡Soltá las fotos acá!" : "Hacé click o arrastrá fotos"}</span>
+                  <p className="text-[10px] text-urbik-black/60 mt-1 uppercase ">JPG, PNG, WEBP · Máx 10MB</p>
                 </div>
               </>
             )}

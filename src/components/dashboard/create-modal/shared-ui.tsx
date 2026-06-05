@@ -232,17 +232,14 @@ export function AmenitiesGrid({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-black uppercase tracking-wider text-urbik-black/60 mb-1">
-        Características y amenities
-      </p>
 
       {visibleCategories.map((cat) => (
         <div
           key={cat.key}
-          className="rounded-2xl border border-gray-200 overflow-hidden"
+          className="overflow-hidden"
         >
-          <div className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 text-left">
-            <span className="text-[11px] font-black uppercase tracking-wider text-urbik-black/60">
+          <div className="w-full flex items-center justify-between px-4 py-3text-left">
+            <span className="text-md font-bold text-urbik-black/60">
               {cat.label}
             </span>
           </div>
@@ -258,17 +255,12 @@ export function AmenitiesGrid({
                   onClick={() => handleToggle(tag.key, !active)}
                   className={`rounded-full border px-3 py-2 text-xs font-bold transition-all text-left flex items-center justify-between gap-1 ${
                     active
-                      ? "bg-urbik-black text-white border-urbik-black shadow-sm"
-                      : "border-gray-300 text-urbik-black/60 bg-white hover:bg-gray-50"
+                      ? "bg-urbik-white text-urbik-black/80 border-none"
+                      : "border-white text-urbik-black/60 bg-white/30 hover:bg-gray-50"
                   }`}
                 >
                   <span className="truncate">{tag.label}</span>
 
-                  <div
-                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                      active ? "bg-urbik-rose" : "bg-gray-200"
-                    }`}
-                  />
                 </button>
               );
             })}

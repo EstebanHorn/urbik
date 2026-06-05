@@ -12,15 +12,10 @@ import {
   Module02Location,
   Module03Content,
   Module04Surfaces,
-  Module05Environments,
-  Module06BasicCharacteristics,
-  Module07Tags,
-  Module08BuildingInfo,
-  Module09CommercialInfo,
-  Module10FieldInfo,
-  Module11LandInfo,
-  Module12Multimedia,
-  Module13ContactInfo,
+  Module05BasicCharacteristics,
+  Module06Tags,
+  Module10Multimedia,
+  Module11ContactInfo,
 } from "./create-modal/form-modules";
 import ParcelPickerModal, { type SelectedParcel } from "./ParcelPickerModal";
 
@@ -89,8 +84,6 @@ export default function CreatePropertyModal({
     visibleModules.length > 0
       ? Math.round((completeCount / visibleModules.length) * 100)
       : 0;
-
-
 
   const handleParcelConfirm = (parcel: SelectedParcel) => {
     rhf.setValue("parcelCCA", parcel.cca);
@@ -168,6 +161,13 @@ export default function CreatePropertyModal({
           parcelGeom: data.parcelGeom || null,
           latitude: data.latitude || null,
           longitude: data.longitude || null,
+          
+          // Enviamos los datos específicos que ahora se cargan en Module 1
+          buildingCondition: data.buildingCondition || null,
+          buildingFloors: data.buildingFloors || null,
+          commercialActivity: data.commercialActivity || null,
+          hectares: data.hectares || null,
+          landUse: data.landUse || null,
         }),
       });
 
@@ -197,15 +197,10 @@ export default function CreatePropertyModal({
     ),
     3: <Module03Content rhf={rhf} />,
     4: <Module04Surfaces rhf={rhf} />,
-    5: <Module05Environments rhf={rhf} />,
-    6: <Module06BasicCharacteristics rhf={rhf} />,
-    7: <Module07Tags rhf={rhf} />,
-    8: <Module08BuildingInfo rhf={rhf} />,
-    9: <Module09CommercialInfo rhf={rhf} />,
-    10: <Module10FieldInfo rhf={rhf} />,
-    11: <Module11LandInfo rhf={rhf} />,
-    12: <Module12Multimedia rhf={rhf} />,
-    13: <Module13ContactInfo rhf={rhf} />,
+    5: <Module05BasicCharacteristics rhf={rhf} />,
+    6: <Module06Tags rhf={rhf} />,
+    10: <Module10Multimedia rhf={rhf} />,
+    11: <Module11ContactInfo rhf={rhf} />,
   };
 
   if (!open) return null;

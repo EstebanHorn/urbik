@@ -74,7 +74,7 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[1, 2, 3, 4, 5, 6].map((n) => (
-          <div key={n} className="h-28 rounded-xl bg-gray-100 animate-pulse border border-gray-100" />
+          <div key={n} className="h-28 animate-pulse=" />
         ))}
       </div>
     );
@@ -94,8 +94,8 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-gray-100">
+        <div className="lg:col-span-2 rounded-xl overflow-hidden">
+          <div className="p-5">
             <div className="text-md font-bold text-urbik-black/60 ml-2">Rendimiento</div>
             <div className="text-3xl italic font-black text-urbik-black">Vistas a tus propiedades</div>
             <p className="text-xs text-gray-500 ml-2 mt-1">Últimos 30 días</p>
@@ -105,8 +105,8 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden flex flex-col">
-          <div className="p-5 border-b border-gray-100">
+        <div className="rounded-xl  overflow-hidden flex flex-col">
+          <div className="p-5">
             <div className="text-md font-bold text-urbik-black/60 ml-2">Perfil de agencia</div>
             <div className="text-2xl italic font-black text-urbik-black">Visitas</div>
             <p className="text-xs text-gray-500 ml-2 mt-1">Últimos 30 días · {kpis.agencyViews30d} totales</p>
@@ -118,8 +118,8 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-gray-100">
+        <div className="lg:col-span-2 overflow-hidden">
+          <div className="p-5">
             <div className="text-md font-bold text-urbik-black/60 ml-2">Ranking</div>
             <div className="text-2xl italic font-black text-urbik-black">Top 5 más vistas</div>
           </div>
@@ -128,8 +128,8 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-gray-100">
+        <div className="overflow-hidden">
+          <div className="p-5">
             <div className="text-md font-bold text-urbik-black/60 ml-2">Engagement</div>
             <div className="text-2xl italic font-black text-urbik-black">Por propiedad</div>
           </div>
@@ -139,8 +139,8 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-gray-100">
+      <div className="overflow-hidden">
+        <div className="p-5">
           <div className="text-md font-bold text-urbik-black/60 ml-2">Precios</div>
           <div className="text-2xl italic font-black text-urbik-black">Historial por propiedad</div>
           <p className="text-xs text-gray-500 ml-2 mt-1">Hacé clic en una propiedad para ver su evolución de precio</p>

@@ -10,15 +10,10 @@ import {
   Module02Location,
   Module03Content,
   Module04Surfaces,
-  Module05Environments,
-  Module06BasicCharacteristics,
-  Module07Tags,
-  Module08BuildingInfo,
-  Module09CommercialInfo,
-  Module10FieldInfo,
-  Module11LandInfo,
-  Module12Multimedia,
-  Module13ContactInfo,
+  Module05BasicCharacteristics,
+  Module06Tags,
+  Module10Multimedia,
+  Module11ContactInfo,
 } from "./create-modal/form-modules";
 import type { PropertySummary } from "@/app/(dashboard)/dashboard/page";
 import ParcelPickerModal, { type SelectedParcel } from "./ParcelPickerModal";
@@ -30,6 +25,9 @@ type EditableProperty = Omit<PropertySummary, "type" | "description" | "property
   featureGroups?: Record<string, Record<string, boolean>>;
   youtubeUrl?: string;
   tour360Url?: string;
+  commercialActivity?: string;
+  hectares?: number;
+  landUse?: string;
 };
 
 interface EditPropertyModalProps {
@@ -75,6 +73,13 @@ function toDefaultValues(p: EditableProperty): PropertyUploadFormData {
     parcelGeom: p.parcelGeom as Record<string, unknown> | undefined,
     latitude: p.latitude ?? undefined,
     longitude: p.longitude ?? undefined,
+    
+    // Campos dinámicos del Módulo 1
+    buildingCondition: p.buildingCondition ?? undefined,
+    buildingFloors: p.buildingFloors ?? undefined,
+    commercialActivity: p.commercialActivity ?? undefined,
+    hectares: p.hectares ?? undefined,
+    landUse: p.landUse ?? undefined,
   };
 }
 
@@ -161,12 +166,16 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
           renovationYear: data.renovationYear,
           buildingCondition: data.buildingCondition,
           buildingFloors: data.buildingFloors,
-          unitsPerFloor: data.unitsPerFloor,
           parcelCCA: data.parcelCCA || null,
           parcelPDA: data.parcelPDA || null,
           parcelGeom: data.parcelGeom || null,
           latitude: data.latitude || null,
           longitude: data.longitude || null,
+          
+          // Campos dinámicos del Módulo 1 actualizados
+          commercialActivity: data.commercialActivity || null,
+          hectares: data.hectares || null,
+          landUse: data.landUse || null,
         }),
       });
 
@@ -193,15 +202,10 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
     ),
     3: <Module03Content rhf={rhf} />,
     4: <Module04Surfaces rhf={rhf} />,
-    5: <Module05Environments rhf={rhf} />,
-    6: <Module06BasicCharacteristics rhf={rhf} />,
-    7: <Module07Tags rhf={rhf} />,
-    8: <Module08BuildingInfo rhf={rhf} />,
-    9: <Module09CommercialInfo rhf={rhf} />,
-    10: <Module10FieldInfo rhf={rhf} />,
-    11: <Module11LandInfo rhf={rhf} />,
-    12: <Module12Multimedia rhf={rhf} />,
-    13: <Module13ContactInfo rhf={rhf} />,
+    5: <Module05BasicCharacteristics rhf={rhf} />,
+    6: <Module06Tags rhf={rhf} />,
+    10: <Module10Multimedia rhf={rhf} />,
+    11: <Module11ContactInfo rhf={rhf} />,
   };
 
   return (

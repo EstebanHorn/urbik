@@ -57,14 +57,26 @@ export default function LocationSelectors({
 
   useEffect(() => {
     fetch("https://apis.datos.gob.ar/georef/api/provincias?campos=id,nombre")
-      .then((res) => res.json())
-      .then((data) =>
-        setProvincias(
-          data.provincias.sort((a: GeorefItem, b: GeorefItem) =>
-            a.nombre.localeCompare(b.nombre),
-          ),
-        ),
-      );
+      .then((res) => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && Array.isArray(data.provincias)) {
+          setProvincias(
+            data.provincias.sort((a: GeorefItem, b: GeorefItem) =>
+              a.nombre.localeCompare(b.nombre),
+            ),
+          );
+        } else {
+          console.warn("API responded, but 'provincias' array is missing:", data);
+          setProvincias([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch provinces:", error);
+        setProvincias([]);
+      });
 
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -216,14 +228,14 @@ export default function LocationSelectors({
   );
 
   return (
-    <div className={`flex flex-col sm:flex-row gap-2 w-full ${showLocality ? "flex-wrap" : ""}`}>
+    <div className={`flex flex-col gap-2 w-full ${showLocality ? "flex-wrap" : ""}`}>
       <div className="relative flex-1" ref={provRef}>
         <button
           type="button"
           onClick={() =>
             setOpenDropdown(openDropdown === "province" ? null : "province")
           }
-          className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold"
+          className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 mb-2 bg-white/30 shadow-md border border-white font-bold"
         >
           {provinceValue || provinceLabel}
           <ChevronDown />
@@ -250,7 +262,7 @@ export default function LocationSelectors({
           onClick={() =>
             setOpenDropdown(openDropdown === "city" ? null : "city")
           }
-          className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold disabled:opacity-30"
+          className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 mb-2 bg-white/30 border border-white font-bold disabled:opacity-30"
         >
           {loadingCiudades ? "..." : !hasCities && provinceValue ? "SIN DATOS" : cityValue || cityLabel}
           <ChevronDown />
@@ -279,7 +291,7 @@ export default function LocationSelectors({
             onClick={() =>
               setOpenDropdown(openDropdown === "locality" ? null : "locality")
             }
-            className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 bg-urbik-g300 font-bold disabled:opacity-30"
+            className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 mb-2 bg-white/30 border border-white font-bold disabled:opacity-30"
           >
             {loadingLocalidades ? "..." : !hasLocalidades && cityValue ? "SIN DATOS" : localityValue || localityLabel}
             <ChevronDown />

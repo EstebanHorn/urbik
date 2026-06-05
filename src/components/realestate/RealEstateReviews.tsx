@@ -160,7 +160,7 @@ export default function RealEstateReviews({
   return (
     <section className="pb-12">
       <div className="mb-6 flex items-baseline justify-between">
-        <h2 className="text-2xl font-black text-urbik-black uppercase tracking-tight">
+        <h2 className="text-2xl font-black text-urbik-black/90 uppercase tracking-tight">
           Reseñas
         </h2>
         {summary.total > 0 && (
@@ -181,12 +181,12 @@ export default function RealEstateReviews({
           )}
 
           {isOwner ? (
-            <div className="rounded-2xl border border-urbik-g100 bg-urbik-white2 p-6 text-sm text-urbik-muted font-medium">
+            <div className=" p-6 text-sm text-urbik-muted font-medium">
               Esta es la página pública de tu inmobiliaria. Las reseñas que
               dejen los usuarios aparecerán acá.
             </div>
           ) : !currentUserId ? (
-            <div className="rounded-2xl border border-urbik-g100 bg-urbik-white2 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className=" p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <p className="font-bold text-urbik-black">
                   ¿Querés dejar tu opinión?
@@ -212,7 +212,7 @@ export default function RealEstateReviews({
           ) : showForm ? (
             <form
               onSubmit={handleSubmit}
-              className="rounded-2xl border border-urbik-g100 bg-urbik-white2 p-6"
+              className="rounded-2xl shadow-sm bg-white p-6"
             >
               <h3 className="font-bold text-urbik-black mb-3">
                 {myReview ? "Editar tu reseña" : "Dejá tu reseña"}
@@ -290,7 +290,7 @@ export default function RealEstateReviews({
 function SummaryCard({ summary }: { summary: ReviewSummary }) {
   const maxBar = Math.max(1, ...Object.values(summary.distribution));
   return (
-    <div className="rounded-2xl border border-urbik-g100 bg-urbik-white2 p-6">
+    <div className=" p-6">
       <div className="flex items-center gap-4 mb-4">
         <div className="text-5xl font-black text-urbik-black leading-none">
           {summary.total > 0 ? summary.average.toFixed(1) : "—"}
@@ -344,7 +344,7 @@ function MyReviewCard({
   busy: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-urbik-g100 bg-urbik-white2 p-6">
+    <div className=" p-6">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-urbik-muted mb-2">
@@ -422,7 +422,7 @@ function ReviewsList({
 
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <article className="rounded-2xl border border-urbik-g100 bg-white p-5">
+    <article className=" p-5">
       <header className="flex items-start gap-3 mb-3">
         <div className="w-10 h-10 rounded-full bg-urbik-black text-white font-black text-sm flex items-center justify-center shrink-0">
           {getInitials(review.user.name)}

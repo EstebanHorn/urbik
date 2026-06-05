@@ -18,12 +18,19 @@ interface ImageGalleryProps {
 export default function ImageGallery({ images = [], title, parcelGeom, latitude, longitude }: ImageGalleryProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const extraImagesCount = images.length > 4 ? images.length - 4 : 0;
 
   const openModal = (index: number) => { setCurrentIndex(index); setIsOpen(true); document.body.style.overflow = "hidden"; };
   const closeModal = () => { setIsOpen(false); document.body.style.overflow = "unset"; };
-  const nextImage = useCallback((e?: React.MouseEvent) => { e?.stopPropagation(); setCurrentIndex((prev) => (prev + 1) % images.length); }, [images.length]);
-  const prevImage = useCallback((e?: React.MouseEvent) => { e?.stopPropagation(); setCurrentIndex((prev) => (prev - 1 + images.length) % images.length); }, [images.length]);
+  
+  const nextImage = useCallback((e?: React.MouseEvent) => { 
+    e?.stopPropagation(); 
+    setCurrentIndex((prev) => (prev + 1) % images.length); 
+  }, [images.length]);
+  
+  const prevImage = useCallback((e?: React.MouseEvent) => { 
+    e?.stopPropagation(); 
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length); 
+  }, [images.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -36,54 +43,123 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, nextImage, prevImage]);
 
+  // Genera el array para el carrusel de miniaturas
+  const getVisibleThumbnails = () => {
+    if (images.length === 0) return [];
+    // Si hay 5 o menos, las mostramos todas sin rotación cíclica visual
+    if (images.length <= 5) return images.map((img, i) => ({ img, originalIndex: i }));
+    
+    const thumbs = [];
+    for (let i = -2; i <= 2; i++) {
+        let idx = (currentIndex + i) % images.length;
+        if (idx < 0) idx += images.length;
+        thumbs.push({ img: images[idx], originalIndex: idx });
+    }
+    return thumbs;
+  };
+
+  const visibleThumbnails = getVisibleThumbnails();
+
   return (
     <>
-      <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[400px] md:h-[600px] mb-12 rounded-2xl overflow-hidden">
-        <div className="col-span-4 md:col-span-2 row-span-2 relative group overflow-hidden bg-gray-100 cursor-pointer" onClick={() => images[0] && openModal(0)}>
-          {images[0] ? (
-            <Image src={images[0]} alt={`Principal ${title}`} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+      <div className="relative w-full h-[480px] md:h-[650px] mb-12 bg-white rounded-2xl flex flex-col justify-end shadow-[0_-15px_40px_rgba(0,0,0,0.05)]">
+        
+        <div 
+          className="absolute inset-0 w-full h-full cursor-pointer overflow-hidden" 
+          onClick={() => images.length > 0 && openModal(currentIndex)}
+        >
+          {images.length > 0 ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0"
+              >
+                <Image 
+                  src={images[currentIndex]} 
+                  fill 
+                  alt={`${title} - Vista ${currentIndex + 1}`}
+                  className="object-cover transition-transform duration-1000 hover:scale-105 [mask:linear-gradient(to_bottom,transparent_0%,black_0%,black_50%,transparent_90%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_80%,transparent_100%)]"
+                  priority
+                />
+              </motion.div>
+            </AnimatePresence>
           ) : (
-            <div className="flex items-center justify-center h-full text-urbik-g300 flex-col gap-2"><Building2 size={64} /><span className="text-sm font-bold">Sin imágenes</span></div>
-          )}
-          {images.length > 1 && (
-            <div className="absolute bottom-3 right-3 md:hidden bg-black/65 text-white text-xs font-bold px-3 py-2 rounded-lg backdrop-blur-sm flex items-center gap-1.5 pointer-events-none z-10">
-              <span>+{images.length - 1} fotos</span>
+            <div className="flex items-center justify-center h-full text-urbik-g300 flex-col gap-2 bg-gray-50 [mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_80%,transparent_100%)]">
+              <Building2 size={64} />
+              <span className="text-sm font-bold">Sin imágenes</span>
             </div>
           )}
         </div>
 
-        <div className="hidden md:block col-span-1 row-span-1 relative overflow-hidden bg-gray-100 cursor-pointer group" onClick={() => images[1] && openModal(1)}>
-          {images[1] ? <Image src={images[1]} fill className="object-cover group-hover:opacity-90 transition duration-300 group-hover:scale-105" alt="Vista 2" /> : <div className="w-full h-full bg-urbik-g100/50" />}
-        </div>
-
-        <div className="hidden md:block col-span-1 row-span-1 relative overflow-hidden bg-gray-100 cursor-pointer group" onClick={() => images[2] && openModal(2)}>
-          {images[2] ? <Image src={images[2]} fill className="object-cover group-hover:opacity-90 transition duration-300 group-hover:scale-105" alt="Vista 3" /> : <div className="w-full h-full bg-urbik-g100/50" />}
-        </div>
-
-        <div className="hidden md:block col-span-1 row-span-1 relative overflow-hidden bg-gray-100 cursor-pointer group" onClick={() => images[3] && openModal(3)}>
-          {images[3] ? (
-            <div className="relative w-full h-full">
-              <Image src={images[3]} fill className={`object-cover transition duration-300 group-hover:scale-105 ${extraImagesCount > 0 ? "brightness-50" : "hover:opacity-90"}`} alt="Vista 4" />
-              {extraImagesCount > 0 && <div className="absolute inset-0 flex items-center justify-center text-white font-black text-2xl drop-shadow-md pointer-events-none z-10">+{extraImagesCount}</div>}
+        {/* Small Map Overlay */}
+        {parcelGeom && latitude && longitude && (
+          <div className="absolute top-6 right-6 z-20 w-32 h-32 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-2xl border-4 border-white hidden sm:block opacity-80 hover:opacity-100 transition-opacity">
+            <PropertyParcelMap lat={latitude} lon={longitude} selectedGeom={parcelGeom as GeoJsonObject} allProperties={[]} />
+            <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 text-[10px] font-bold rounded shadow flex items-center gap-1 z-40 text-urbik-black">
+              <MapPin size={10} className="text-urbik-emerald" /> Mapa
             </div>
-          ) : <div className="w-full h-full bg-urbik-g100/50" />}
-        </div>
+          </div>
+        )}
 
-        <div className="hidden md:block col-span-1 row-span-1 relative overflow-hidden bg-urbik-dark2/5 border border-urbik-dark2/10">
-          {parcelGeom && latitude && longitude ? (
-            <div className="w-full h-full opacity-90 hover:opacity-100 transition-opacity relative">
-              <PropertyParcelMap lat={latitude} lon={longitude} selectedGeom={parcelGeom as GeoJsonObject} allProperties={[]} />
-              <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 text-[10px] font-bold rounded shadow flex items-center gap-1 pointer-events-none z-400"><MapPin size={10} /> Ubicación</div>
+        {images.length > 1 && (
+            <>
+                <button onClick={prevImage} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/30 backdrop-blur hover:bg-white/60 rounded-full text-urbik-black transition-all hover:scale-110 shadow-lg hidden sm:flex">
+                    <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
+                </button>
+                <button onClick={nextImage} className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/30 backdrop-blur hover:bg-white/60 rounded-full text-urbik-black transition-all hover:scale-110 shadow-lg hidden sm:flex">
+                    <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
+                </button>
+            </>
+        )}
+
+        {images.length > 1 && (
+          <div className="relative z-20 pb-8 w-full flex justify-center items-center px-4 pointer-events-none">
+            <div className="flex items-center justify-center gap-3 sm:gap-6 pointer-events-auto min-h-[100px] sm:min-h-[140px]">
+              <AnimatePresence mode="popLayout">
+                {visibleThumbnails.map((thumb) => {
+                  const isActive = thumb.originalIndex === currentIndex;
+                  
+                  return (
+                    <motion.button
+                      layout // Magia de framer-motion para deslizar los elementos automáticamente
+                      initial={{ opacity: 0, scale: 0.8, x: 20 }}
+                      animate={{ 
+                        opacity: isActive ? 1 : 0.6, 
+                        scale: isActive ? 1.15 : 1,
+                        x: 0
+                      }}
+                      exit={{ opacity: 0, scale: 0.8, x: -20 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                      key={thumb.originalIndex}
+                      onClick={(e) => { e.stopPropagation(); setCurrentIndex(thumb.originalIndex); }}
+                      className={`relative overflow-hidden shadow-sm cursor-pointer hover:opacity-100 z-10 ${
+                        isActive ? "w-24 sm:w-40 aspect-video z-30 shadow-sm" : "w-20 sm:w-32 aspect-video"
+                      }`}
+                    >
+                      <Image 
+                        src={thumb.img} 
+                        fill 
+                        className="object-cover" 
+                        alt={`Miniatura ${thumb.originalIndex + 1}`} 
+                        sizes="(max-width: 768px) 150px, 200px"
+                      />
+                    </motion.button>
+                  );
+                })}
+              </AnimatePresence>
             </div>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 font-bold text-xs uppercase flex-col gap-2"><MapPin size={24} /><span>Sin ubicación</span></div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
+      {/* Modal Pantalla Completa */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-9999 flex items-center justify-center bg-black/95 backdrop-blur-sm" onClick={closeModal}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-sm" onClick={closeModal}>
             <button onClick={closeModal} className="absolute top-6 right-6 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"><X size={32} /></button>
             <button onClick={prevImage} className="absolute left-2 md:left-8 z-50 p-2 md:p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all hover:scale-110 active:scale-95"><ChevronLeft className="w-5 h-5 md:w-10 md:h-10" /></button>
             
@@ -110,7 +186,7 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
             
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex gap-2 max-w-[80vw] overflow-x-auto pb-2 scrollbar-hide z-50" onClick={(e) => e.stopPropagation()}>
               {images.map((img, idx) => (
-                <button key={idx} onClick={() => setCurrentIndex(idx)} className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${idx === currentIndex ? "border-urbik-emerald scale-110" : "border-transparent opacity-50 hover:opacity-100"}`}>
+                <button key={idx} onClick={() => setCurrentIndex(idx)} className={`relative w-20 aspect-video rounded-lg overflow-hidden transition-all shadow-md ${idx === currentIndex ? "scale-110 opacity-100" : "opacity-50 hover:opacity-100"}`}>
                   <Image src={img} fill className="object-cover" alt="thumbnail" />
                 </button>
               ))}

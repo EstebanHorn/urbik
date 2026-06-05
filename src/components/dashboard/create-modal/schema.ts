@@ -28,10 +28,7 @@ export interface ModuleDefinition {
 }
 
 const ALL: string[] = [];
-const APARTMENT_LIKE = ["APARTMENT", "PH"];
-const COMMERCIAL_LIKE = ["COMMERCIAL_PROPERTY", "OFFICE"];
 const SURFACES_TYPES = ["HOUSE", "APARTMENT", "PH", "COUNTRY", "COMMERCIAL_PROPERTY", "OFFICE", "WAREHOUSE", "LAND", "FIELD", "DEVELOPMENT"];
-const ENVIRONMENTS_TYPES = ["HOUSE", "APARTMENT", "PH", "COUNTRY", "COMMERCIAL_PROPERTY", "OFFICE", "WAREHOUSE"];
 const CHARACTERISTICS_TYPES = ["HOUSE", "APARTMENT", "PH", "COMMERCIAL_PROPERTY", "OFFICE"];
 
 function hasValue(v: unknown): boolean {
@@ -46,6 +43,7 @@ function partial(filled: number, total: number): ModuleStatus {
   return "partial";
 }
 
+// Los IDs ahora coinciden exactamente con las keys de moduleContent en los modales: 1, 2, 3, 4, 5, 6, 10, 11
 export const MODULE_DEFINITIONS: ModuleDefinition[] = [
   {
     id: 1, label: "Datos de la Propiedad", visibleFor: ALL,
@@ -69,28 +67,35 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
       if (t && d) return "complete"; if (t || d) return "partial"; return "empty";
     },
   },
-  { id: 4, label: "Superficies", visibleFor: SURFACES_TYPES, getStatus(form) { return hasValue(form.areaM2) ? "complete" : "empty"; } },
-  { id: 5, label: "Ambientes", visibleFor: ENVIRONMENTS_TYPES, getStatus(form) { return partial([form.rooms, form.bathrooms, form.toilets, form.garages, form.plants].filter(hasValue).length, 2); } },
-  { id: 6, label: "Características Básicas", visibleFor: CHARACTERISTICS_TYPES, getStatus(form) { return partial([form.condition, form.orientation, form.constructionYear].filter(hasValue).length, 3); } },
+  { 
+    id: 4, label: "Superficies y Ambientes", visibleFor: SURFACES_TYPES, 
+    getStatus(form) { 
+      // Se unificó Superficies y Ambientes en el mismo módulo (Module04Surfaces)
+      return hasValue(form.areaM2) ? "complete" : "empty"; 
+    } 
+  },
+  { 
+    id: 5, label: "Características Básicas", visibleFor: CHARACTERISTICS_TYPES, 
+    getStatus(form) { return partial([form.condition, form.orientation, form.constructionYear].filter(hasValue).length, 3); } 
+  },
   {
-    id: 7, label: "Tags y Servicios", visibleFor: ALL,
+    id: 6, label: "Tags y Servicios", visibleFor: ALL,
     getStatus(form) {
       const c = Object.values(form.amenities || {}).filter(Boolean).length;
       if (c >= 3) return "complete"; if (c > 0) return "partial"; return "empty";
     },
   },
-  { id: 8, label: "Información del Edificio", visibleFor: APARTMENT_LIKE, getStatus(form) { return partial([form.buildingCondition, form.buildingFloors, form.unitsPerFloor].filter(hasValue).length, 3); } },
-  { id: 9, label: "Información Comercial", visibleFor: COMMERCIAL_LIKE, getStatus(form) { return hasValue(form.commercialActivity) ? "complete" : "empty"; } },
-  { id: 10, label: "Información del Campo", visibleFor: ["FIELD"], getStatus(form) { return hasValue(form.hectares) || hasValue(form.soilType) ? "partial" : "empty"; } },
-  { id: 11, label: "Información del Terreno", visibleFor: ["LAND"], getStatus(form) { return hasValue(form.landUse) ? "complete" : "empty"; } },
   {
-    id: 12, label: "Multimedia", visibleFor: ALL,
+    id: 10, label: "Multimedia", visibleFor: ALL,
     getStatus(form) {
       const ic = (form.images || []).length; const hv = hasValue(form.youtubeUrl) || hasValue(form.tour360Url);
       if (ic >= 5) return "complete"; if (ic > 0 || hv) return "partial"; return "empty";
     },
   },
-  { id: 13, label: "Información de Contacto", visibleFor: ALL, getStatus(form) { return partial([form.contactName, form.contactPhone, form.contactEmail].filter(hasValue).length, 3); } },
+  { 
+    id: 11, label: "Información de Contacto", visibleFor: ALL, 
+    getStatus(form) { return partial([form.contactName, form.contactPhone, form.contactEmail].filter(hasValue).length, 3); } 
+  },
 ];
 
 export function getVisibleModules(propertyType: string | undefined): ModuleDefinition[] {
