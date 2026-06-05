@@ -55,7 +55,7 @@ export default function CreatePropertyModal({
   const currentIndex = visibleModules.findIndex((m) => m.id === activeModuleId);
   const safeCurrentIndex = currentIndex !== -1 ? currentIndex : 0;
   const isFirstStep = safeCurrentIndex === 0;
-  const isLastStep = safeCurrentIndex === visibleModules.length - 1;
+  const isLastStep = currentIndex !== -1 && safeCurrentIndex === visibleModules.length - 1;
   const activeModule = visibleModules[safeCurrentIndex];
 
   useEffect(() => {
@@ -261,6 +261,11 @@ export default function CreatePropertyModal({
             <form
               id="create-property-form"
               onSubmit={handleSubmit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA") {
+                  e.preventDefault();
+                }
+              }}
               className="flex-1 overflow-y-auto px-8 py-6"
             >
               {activeModule && (

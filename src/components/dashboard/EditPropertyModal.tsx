@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
-import { getVisibleModules, type PropertyUploadFormData } from "./create-modal/schema";
+import { getVisibleModules, type PropertyUploadFormData, type ModuleDefinition, type ModuleStatus } from "./create-modal/schema";
 import { ModuleShell } from "./create-modal/shared-ui";
 import {
   Module01PropertyData,
@@ -28,6 +28,8 @@ type EditableProperty = Omit<PropertySummary, "type" | "description" | "property
   commercialActivity?: string;
   hectares?: number;
   landUse?: string;
+  buildingCondition?: string | null;
+  buildingFloors?: number | null;
 };
 
 interface EditPropertyModalProps {
@@ -81,6 +83,46 @@ function toDefaultValues(p: EditableProperty): PropertyUploadFormData {
     hectares: p.hectares ?? undefined,
     landUse: p.landUse ?? undefined,
   };
+}
+
+function CompletionIndicator({
+  modules,
+  form,
+  activeModuleId,
+  onModuleClick,
+}: {
+  modules: ModuleDefinition[];
+  form: PropertyUploadFormData;
+  activeModuleId: number;
+  onModuleClick: (id: number) => void;
+}) {
+  const dot: Record<ModuleStatus, string> = {
+    empty: "bg-red-400",
+    partial: "bg-amber-400",
+    complete: "bg-emerald-500",
+  };
+  return (
+    <div className="space-y-1">
+      <p className="text-[10px] font-black uppercase text-urbik-muted mb-3">Secciones</p>
+      {modules.map((mod) => {
+        const status = mod.getStatus(form);
+        const isActive = mod.id === activeModuleId;
+        return (
+          <button
+            key={mod.id}
+            type="button"
+            onClick={() => onModuleClick(mod.id)}
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-colors ${
+              isActive ? "bg-urbik-black/5 text-urbik-black" : "text-urbik-black/60 hover:bg-gray-50"
+            }`}
+          >
+            <div className={`w-2 h-2 rounded-full shrink-0 ${dot[status]}`} />
+            <span className="text-[11px] font-bold truncate">{mod.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function EditPropertyModal({ open, property, onClose, onUpdated }: EditPropertyModalProps) {

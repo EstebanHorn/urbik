@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
+import geoData from "@/data/argentina-geo.json";
 
 interface GeorefItem {
   id: string;
@@ -36,13 +37,14 @@ export default function LocationSelectors({
   cityApiEndpoint = "municipios",
   showLocality = false,
 }: LocationSelectorsProps) {
-  const [provincias, setProvincias] = useState<GeorefItem[]>([]);
-  const [ciudades, setCiudades] = useState<GeorefItem[]>([]);
   const [localidades, setLocalidades] = useState<GeorefItem[]>([]);
-  const [loadingCiudades, setLoadingCiudades] = useState(false);
   const [loadingLocalidades, setLoadingLocalidades] = useState(false);
-  const [hasCities, setHasCities] = useState(true);
   const [hasLocalidades, setHasLocalidades] = useState(true);
+
+  const provincias = geoData.provincias as GeorefItem[];
+  const ciudades: GeorefItem[] = provinceValue
+    ? ((geoData.departamentos as Record<string, GeorefItem[]>)[provinceValue] ?? [])
+    : [];
   const [openDropdown, setOpenDropdown] = useState<"province" | "city" | "locality" | null>(null);
 
   const provRef = useRef<HTMLDivElement>(null);
@@ -56,28 +58,6 @@ export default function LocationSelectors({
   const scrollRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   useEffect(() => {
-    fetch("https://apis.datos.gob.ar/georef/api/provincias?campos=id,nombre")
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
-      .then((data) => {
-        if (data && Array.isArray(data.provincias)) {
-          setProvincias(
-            data.provincias.sort((a: GeorefItem, b: GeorefItem) =>
-              a.nombre.localeCompare(b.nombre),
-            ),
-          );
-        } else {
-          console.warn("API responded, but 'provincias' array is missing:", data);
-          setProvincias([]);
-        }
-      })
-      .catch((error) => {
-        console.error("Failed to fetch provinces:", error);
-        setProvincias([]);
-      });
-
     const handleClickOutside = (e: MouseEvent) => {
       if (
         provRef.current &&
@@ -93,35 +73,6 @@ export default function LocationSelectors({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    if (!provinceValue) {
-      setCiudades([]);
-      setHasCities(true);
-      return;
-    }
-    setLoadingCiudades(true);
-    const endpoint = cityApiEndpoint === "departamentos"
-      ? `https://apis.datos.gob.ar/georef/api/departamentos?provincia=${encodeURIComponent(provinceValue)}&max=200&campos=id,nombre`
-      : `https://apis.datos.gob.ar/georef/api/municipios?provincia=${encodeURIComponent(provinceValue)}&max=1000&campos=id,nombre,centroide`;
-    fetch(endpoint)
-      .then((res) => res.json())
-      .then((data) => {
-        const items = data.departamentos || data.municipios || [];
-        setCiudades(
-          items.sort((a: GeorefItem, b: GeorefItem) =>
-            a.nombre.localeCompare(b.nombre),
-          ),
-        );
-        setHasCities(items.length > 0);
-        setLoadingCiudades(false);
-      })
-      .catch(() => {
-        setCiudades([]);
-        setHasCities(false);
-        setLoadingCiudades(false);
-      });
-  }, [provinceValue, cityApiEndpoint]);
 
   useEffect(() => {
     if (!showLocality || !cityValue) {
@@ -258,17 +209,17 @@ export default function LocationSelectors({
       <div className="relative flex-1" ref={cityRef}>
         <button
           type="button"
-          disabled={!provinceValue || !hasCities}
+          disabled={!provinceValue || ciudades.length === 0}
           onClick={() =>
             setOpenDropdown(openDropdown === "city" ? null : "city")
           }
           className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 mb-2 bg-white/30 border border-white font-bold disabled:opacity-30"
         >
-          {loadingCiudades ? "..." : !hasCities && provinceValue ? "SIN DATOS" : cityValue || cityLabel}
+          {provinceValue && ciudades.length === 0 ? "SIN DATOS" : cityValue || cityLabel}
           <ChevronDown />
         </button>
 
-        {hasCities && (
+        {ciudades.length > 0 && (
           <DropdownMenu
             items={ciudades}
             isOpen={openDropdown === "city"}

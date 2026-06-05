@@ -43,6 +43,8 @@ export type PropertySummary = {
   parcelCCA?: string | null;
   parcelPDA?: string | null;
   parcelGeom?: unknown;
+  buildingCondition?: string | null;
+  buildingFloors?: number | null;
 };
 
 type ProfileData = {
@@ -194,6 +196,7 @@ function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { prop
   const [activeTab, setActiveTab] = useState<ActiveTab>("properties");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => { if (autoOpenCreate) setCreateOpen(true); }, [autoOpenCreate]);
   useEffect(() => { fetch("/api/inquiries").then((r) => r.json()).then((data) => { if (Array.isArray(data)) setUnreadCount(data.filter((i) => i.status === "UNREAD").length); }).catch(() => {}); }, []);
@@ -202,11 +205,17 @@ function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { prop
 
   const handleConfirmDelete = async () => {
     if (!deletingId) return;
+    setIsDeleting(true);
     try {
       await deleteProperty(deletingId);
       onRefresh();
       setIsModalOpen(false);
-    } catch (error: any) { alert(error.message || "Error al eliminar"); } finally { setDeletingId(null); }
+    } catch (error: any) {
+      alert(error.message || "Error al eliminar");
+    } finally {
+      setDeletingId(null);
+      setIsDeleting(false);
+    }
   };
 
   const tabs: ActiveTab[] = ["properties", "statistics", "inquiries", "chat"];
@@ -393,7 +402,7 @@ function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { prop
         </div>
       </div>
 
-      <ConfirmationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={handleConfirmDelete} title="¿Eliminar propiedad?" message="Esta acción es permanente y la propiedad dejará de estar visible." isLoading={deletingId !== null} />
+      <ConfirmationModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setDeletingId(null); setIsDeleting(false); }} onConfirm={handleConfirmDelete} title="¿Eliminar propiedad?" message="Esta acción es permanente y la propiedad dejará de estar visible." isLoading={isDeleting} />
       <CreatePropertyModal open={isCreateOpen} onClose={() => setCreateOpen(false)} onCreated={onRefresh} />
 
       {editingProperty && (
