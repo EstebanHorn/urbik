@@ -10,6 +10,7 @@ import React, {
   useRef,
 } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { SlidersHorizontal, ChevronDown } from "lucide-react";
 
 import { useSearch, type SearchSuggestion } from "@/hooks/useSearch";
 import {
@@ -26,6 +27,8 @@ import Banner from "@/components/home/banner";
 import Top3 from "@/components/home/top3";
 import MiniBanner from "@/components/home/minibanner";
 import List from "@/components/home/list";
+import PriceFilterCard from "@/components/search/PriceFilterCard";
+import RoomsFilterCard from "@/components/search/RoomsFilterCard";
 
 export type ViewMode = "list" | "grid";
 
@@ -129,6 +132,7 @@ export default function HomePage() {
   const searchParams = useSearchParams();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(
     null,
   );
@@ -350,6 +354,14 @@ export default function HomePage() {
     return () => window.clearTimeout(timeoutId);
   }, [fetchData]);
 
+  const handleRoomsChange = useCallback(
+    (field: "rooms" | "bedrooms" | "bathrooms", value: string | null) => {
+      setFilters((prev) => ({ ...prev, [field]: value ? [value] : [] }));
+      setPage(1);
+    },
+    [],
+  );
+
   const premiumProperty = useMemo(() => {
     if (items.length === 0) return null;
     return [...items].sort((a, b) => {
@@ -390,6 +402,62 @@ export default function HomePage() {
                 <span className="text-urbik-black/50 text-sm md:text-base">
                   Las mejores oportunidades del mercado seleccionadas para vos.
                 </span>
+              </div>
+
+              <div className="mb-6 ml-0 md:ml-10">
+                <button
+                  type="button"
+                  onClick={() => setShowFilters((v) => !v)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-slate-200 text-sm font-bold text-slate-700 shadow-sm hover:shadow transition-all cursor-pointer"
+                >
+                  <SlidersHorizontal size={15} />
+                  Filtros
+                  {(filters.minPrice ||
+                    filters.maxPrice ||
+                    filters.rooms.length > 0 ||
+                    filters.bedrooms.length > 0 ||
+                    filters.bathrooms.length > 0) && (
+                    <span className="h-5 w-5 flex items-center justify-center rounded-full bg-urbik-cyan text-[10px] font-black text-white">
+                      ●
+                    </span>
+                  )}
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {showFilters && (
+                  <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)]">
+                    <PriceFilterCard
+                      minPrice={filters.minPrice}
+                      maxPrice={filters.maxPrice}
+                      currency={filters.currency}
+                      operationType={filters.operationType}
+                      propertyType={filters.propertyType}
+                      onChangeMin={(v) => {
+                        setFilters((prev) => ({ ...prev, minPrice: v }));
+                        setPage(1);
+                      }}
+                      onChangeMax={(v) => {
+                        setFilters((prev) => ({ ...prev, maxPrice: v }));
+                        setPage(1);
+                      }}
+                      onChangeCurrency={(v) => {
+                        setFilters((prev) => ({ ...prev, currency: v }));
+                        setPage(1);
+                      }}
+                    />
+                    <div className="md:border-l md:border-slate-200/60 md:pl-6">
+                      <RoomsFilterCard
+                        rooms={filters.rooms}
+                        bedrooms={filters.bedrooms}
+                        bathrooms={filters.bathrooms}
+                        onChange={handleRoomsChange}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {isLoading ? (

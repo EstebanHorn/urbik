@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { ChevronDown, ChevronRight, TrendingDown, TrendingUp } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
+const glassCardStyles = 
+  "relative border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
+
 type PriceEntry = {
   id: string;
   sale_price: number | null;
@@ -53,7 +56,7 @@ function PriceRow({ history }: { history: PriceEntry[] }) {
     <div className="space-y-4">
       {history.length >= 2 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+          <div className="rounded-lg border border-white/50 bg-white/40 p-3 backdrop-blur-sm">
             <p className="text-[10px] font-bold text-urbik-muted uppercase">Primer registro</p>
             <p className="text-sm font-black text-urbik-black mt-1">
               {formatPrice(first.sale_price, first.sale_currency) ??
@@ -61,7 +64,7 @@ function PriceRow({ history }: { history: PriceEntry[] }) {
             </p>
             <p className="text-[11px] text-gray-500 mt-0.5">{formatDate(first.changed_at)}</p>
           </div>
-          <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+          <div className="rounded-lg border border-white/50 bg-white/40 p-3 backdrop-blur-sm">
             <p className="text-[10px] font-bold text-urbik-muted uppercase">Actual</p>
             <p className="text-sm font-black text-urbik-black mt-1 flex items-center gap-2">
               {formatPrice(last.sale_price, last.sale_currency) ??
@@ -92,7 +95,9 @@ function PriceRow({ history }: { history: PriceEntry[] }) {
             <Tooltip
               contentStyle={{
                 borderRadius: "10px",
-                border: "1px solid rgba(0,0,0,0.06)",
+                border: "1px solid rgba(255,255,255,0.5)",
+                backgroundColor: "rgba(255,255,255,0.8)",
+                backdropFilter: "blur(8px)",
                 fontSize: 11,
               }}
             />
@@ -102,18 +107,18 @@ function PriceRow({ history }: { history: PriceEntry[] }) {
         </ResponsiveContainer>
       )}
 
-      <div className="rounded-lg border border-gray-100 overflow-hidden">
+      <div className="rounded-lg border border-white/50 overflow-hidden bg-white/30 backdrop-blur-sm">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="text-[10px] uppercase text-urbik-black/50 font-bold border-b border-gray-100 bg-gray-50">
+            <tr className="text-[10px] uppercase text-urbik-black/50 font-bold border-b border-white/50 bg-white/40">
               <th className="px-3 py-2">Fecha</th>
               <th className="px-3 py-2 text-right">Venta</th>
               <th className="px-3 py-2 text-right">Alquiler</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-white/50">
             {[...history].reverse().map((h) => (
-              <tr key={h.id}>
+              <tr key={h.id} className="hover:bg-white/20 transition-colors">
                 <td className="px-3 py-2 text-xs text-gray-600">{formatDate(h.changed_at)}</td>
                 <td className="px-3 py-2 text-right text-xs font-bold text-urbik-black">
                   {formatPrice(h.sale_price, h.sale_currency) ?? "—"}
@@ -146,10 +151,10 @@ function PropertyAccordion({ property }: { property: PropertyLite }) {
   }, [open, property.id, history]);
 
   return (
-    <div className="border border-gray-100 rounded-xl bg-white shadow-sm overflow-hidden">
+    <div className={`rounded-xl overflow-hidden ${glassCardStyles}`}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer"
+        className="relative z-10 w-full px-5 py-4 flex items-center justify-between hover:bg-white/30 transition-colors cursor-pointer"
       >
         <div className="text-left min-w-0">
           <p className="font-bold text-urbik-black text-sm truncate">
@@ -159,10 +164,13 @@ function PropertyAccordion({ property }: { property: PropertyLite }) {
             {property.city ?? "—"}, {property.province ?? "—"}
           </p>
         </div>
-        {open ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+        <div className="text-urbik-black/60">
+          {open ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+        </div>
       </button>
+      
       {open && (
-        <div className="px-5 py-4 border-t border-gray-100">
+        <div className="relative z-10 px-5 py-4 border-t border-white/40">
           {loading && <div className="text-sm text-gray-500">Cargando historial...</div>}
           {!loading && history && history.length === 0 && (
             <div className="text-sm text-gray-500">Sin cambios de precio registrados.</div>

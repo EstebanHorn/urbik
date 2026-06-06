@@ -44,40 +44,39 @@ export default function Contact() {
           >
             <span>Ponete en</span><br />
             <div className="flex flex-wrap items-baseline gap-x-3">
-              <span className="font-black italic text-7xl text-urbik-black">contacto.</span>
+              <span className="font-black text-7xl text-urbik-black">contacto.</span>
             </div>
           </motion.h1>
 
-          <p className="text-urbik-dark2 mb-12 max-w-md font-medium text-lg">
+          <p className="text-urbik-black/60 font-medium text-lg">
             ¿Tenés dudas sobre una propiedad o querés publicar con nosotros? 
+          </p>
+          <p className="text-urbik-black/80 mb-12 max-w-md font-bold text-lg">
             Nuestro equipo de expertos está listo para ayudarte.
           </p>
 
           <div className="space-y-4">
-            <div className="flex items-center bg-urbik-white2 w-fit px-3 py-1 rounded-full">
-              <div className="bg-urbik-black p-2 rounded-full text-white"><Mail size={18} /></div>
+            <div className="flex items-center bg-white border border-black/10 shadow-sm w-fit px-4 py-2 rounded-full">
+              <div className="text-urbik-black/80"><Mail size={18} /></div>
               <div className="ml-5">
-                <p className="text-xmd font-medium text-urbik-dark opacity-40 tracking-wide italic">Email</p>
                 <p className="font-bold text-urbik-dark">hola@urbik.com</p>
               </div>
             </div>
 
-            <div className="flex items-center bg-urbik-white2 w-fit px-3 py-1 rounded-full">
-              <div className="bg-urbik-black p-2 rounded-full text-white">
+            <div className="flex items-center bg-white border border-black/10 shadow-sm w-fit px-4 py-2 rounded-full">
+              <div className="text-urbik-black/80">
                 <Phone size={18} />
               </div>
               <div className="ml-5">
-                <p className="text-xmd font-medium text-urbik-dark opacity-40 tracking-wide italic">Teléfono</p>
                 <p className="font-bold text-urbik-dark">+54 11 1234-5678</p>
               </div>
             </div>
 
-            <div className="flex items-center bg-urbik-white2 w-fit px-3 py-1 rounded-full">
-              <div className="bg-urbik-black p-2 rounded-full text-white">
+            <div className="flex items-center bg-white border border-black/10 shadow-sm w-fit px-4 py-2 rounded-full">
+              <div className="text-urbik-black/80">
                 <MapPin size={18} />
               </div>
               <div className="ml-5">
-                <p className="text-xmd font-medium text-urbik-dark opacity-40 tracking-wide italic">Oficina</p>
                 <p className="font-bold text-urbik-dark">La Plata, Argentina</p>
               </div>
             </div>

@@ -38,47 +38,17 @@ const AnimatedInput = ({
 }) => {
   const { watch, setValue } = rhf;
   const value = watch(fieldName) ?? "";
-  const valStr = String(value);
 
-  const justifyClass = align === "center" ? "justify-center" : "justify-start";
   const textAlignClass = align === "center" ? "text-center" : "text-left";
 
   return (
-    <div className="relative w-full flex">
-      <style>{`
-        @keyframes popIn {
-          0% { opacity: 0; transform: translateY(8px) scale(0.8); }
-          100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}</style>
-
-      <div className={`absolute inset-0 flex items-center pointer-events-none px-5 overflow-hidden ${justifyClass}`}>
-        {!valStr ? (
-          <span className="text-urbik-black/50 whitespace-nowrap">{placeholder}</span>
-        ) : (
-          <div className="flex whitespace-pre">
-            {valStr.split("").map((char, i) => (
-              <span
-                key={`${i}-${char}`}
-                className="inline-block text-urbik-black font-medium"
-                style={{
-                  animation: "popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
-                }}
-              >
-                {char === " " ? " " : char}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <input
-        type={type}
-        value={value as string | number}
-        onChange={(e) => setValue(fieldName, e.target.value as any)}
-        className={`${inputClassName} ${textAlignClass} text-transparent caret-urbik-black [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]`}
-      />
-    </div>
+    <input
+      type={type}
+      value={value as string | number}
+      placeholder={placeholder}
+      onChange={(e) => setValue(fieldName, e.target.value as any)}
+      className={`${inputClassName} ${textAlignClass} text-urbik-black placeholder:text-urbik-black/50 caret-urbik-black [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]`}
+    />
   );
 };
 
@@ -96,7 +66,9 @@ const CounterInput = ({
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <span className="text-xs font-bold text-urbik-black/50 text-center whitespace-nowrap">{label}</span>
+      <span className="text-xs font-bold text-urbik-black/50 text-center whitespace-nowrap">
+        {label}
+      </span>
       <div className="flex items-center gap-2 bg-white/30 shadow-md border border-white rounded-full px-3 py-2">
         <button
           type="button"
@@ -151,8 +123,12 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
     { id: "PAUSED", label: "Pausada" },
   ];
 
-  const opActiveIndex = operationOptions.findIndex((opt) => opt.id === operationType);
-  const statusActiveIndex = statusOptions.findIndex((opt) => opt.id === statusType);
+  const opActiveIndex = operationOptions.findIndex(
+    (opt) => opt.id === operationType,
+  );
+  const statusActiveIndex = statusOptions.findIndex(
+    (opt) => opt.id === statusType,
+  );
 
   return (
     <div className="flex flex-col items-center w-full max-w-lg mx-auto space-y-8">
@@ -170,7 +146,9 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 setValue("unitType", "" as any);
               }}
               className={`text-md font-bold transition-colors duration-200 ${
-                propertyType === opt.id ? "text-urbik-black/80" : "text-urbik-black/30 hover:text-urbik-black/50"
+                propertyType === opt.id
+                  ? "text-urbik-black/80"
+                  : "text-urbik-black/30 hover:text-urbik-black/50"
               }`}
             >
               {opt.label}
@@ -187,7 +165,9 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
           <div className="relative grid grid-cols-4 w-full h-full items-center min-w-[280px] sm:min-w-[360px]">
             <div
               className="absolute top-0 bottom-0 left-0 w-1/4 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
-              style={{ transform: `translateX(${opActiveIndex !== -1 ? opActiveIndex * 100 : 0}%)` }}
+              style={{
+                transform: `translateX(${opActiveIndex !== -1 ? opActiveIndex * 100 : 0}%)`,
+              }}
             />
             {operationOptions.map((opt) => (
               <button
@@ -195,7 +175,9 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 type="button"
                 onClick={() => setValue("operationType", opt.id as any)}
                 className={`relative z-10 py-2.5 text-center text-md font-bold transition-colors duration-300 rounded-full cursor-pointer ${
-                  operationType === opt.id ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"
+                  operationType === opt.id
+                    ? "text-urbik-black/80"
+                    : "text-urbik-black/50 hover:text-urbik-black"
                 }`}
               >
                 {opt.label}
@@ -213,7 +195,9 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
           <div className="relative grid grid-cols-3 w-full h-full items-center min-w-[280px] sm:min-w-[360px]">
             <div
               className="absolute top-0 bottom-0 left-0 w-1/3 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
-              style={{ transform: `translateX(${statusActiveIndex !== -1 ? statusActiveIndex * 100 : 0}%)` }}
+              style={{
+                transform: `translateX(${statusActiveIndex !== -1 ? statusActiveIndex * 100 : 0}%)`,
+              }}
             />
             {statusOptions.map((opt) => (
               <button
@@ -221,7 +205,9 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 type="button"
                 onClick={() => setValue("status", opt.id as any)}
                 className={`relative z-10 py-2.5 px-2 text-center text-md font-bold transition-colors duration-300 rounded-full cursor-pointer ${
-                  statusType === opt.id ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"
+                  statusType === opt.id
+                    ? "text-urbik-black/80"
+                    : "text-urbik-black/50 hover:text-urbik-black"
                 }`}
               >
                 {opt.label}
@@ -250,7 +236,9 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 type="button"
                 onClick={() => setValue("saleCurrency", "ARS" as any)}
                 className={`font-bold transition-colors duration-200 ${
-                  saleCurrency === "ARS" ? "text-urbik-black/80" : "text-urbik-black/30"
+                  saleCurrency === "ARS"
+                    ? "text-urbik-black/80"
+                    : "text-urbik-black/30"
                 }`}
               >
                 ARS
@@ -259,32 +247,51 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 type="button"
                 onClick={() => setValue("saleCurrency", "USD" as any)}
                 className={`font-bold transition-colors duration-200 ${
-                  saleCurrency === "USD" ? "text-urbik-black/80" : "text-urbik-black/30"
+                  saleCurrency === "USD"
+                    ? "text-urbik-black/80"
+                    : "text-urbik-black/30"
                 }`}
               >
                 USD
               </button>
             </div>
 
-            <AnimatedInput type="number" align="center" rhf={rhf} fieldName="salePrice" placeholder="Precio" />
+            <AnimatedInput
+              type="number"
+              align="center"
+              rhf={rhf}
+              fieldName="salePrice"
+              placeholder="Precio"
+            />
           </div>
 
           <div className="w-full flex flex-col items-center">
-            <AnimatedInput type="number" align="center" rhf={rhf} fieldName="expenses" placeholder="Expensas (opcional)" />
+            <AnimatedInput
+              type="number"
+              align="center"
+              rhf={rhf}
+              fieldName="expenses"
+              placeholder="Expensas (opcional)"
+            />
           </div>
         </div>
       )}
 
       {propertyType && (
         <div className="w-full pt-6 mt-6 border-t border-white/40 space-y-6">
-
           {/* APARTMENT / PH — building info only */}
           {(propertyType === "APARTMENT" || propertyType === "PH") && (
             <div className="w-full space-y-4">
               <div className="w-full text-center flex flex-col items-center md:items-start">
-                <label className="block text-sm font-bold text-urbik-black/50 mb-2 md:pl-2">Estado del edificio</label>
+                <label className="block text-sm font-bold text-urbik-black/50 mb-2 md:pl-2">
+                  Estado del edificio
+                </label>
                 {(() => {
-                  const opts = [{ value: "bueno", label: "Bueno" }, { value: "mediano", label: "Mediano" }, { value: "malo", label: "Malo" }];
+                  const opts = [
+                    { value: "bueno", label: "Bueno" },
+                    { value: "mediano", label: "Mediano" },
+                    { value: "malo", label: "Malo" },
+                  ];
                   const cur = watch("buildingCondition") ?? "bueno";
                   const idx = opts.findIndex((o) => o.value === cur);
                   return (
@@ -292,11 +299,19 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                       <div className="relative grid grid-cols-3 w-full h-full items-center">
                         <div
                           className="absolute top-0 bottom-0 left-0 w-1/3 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
-                          style={{ transform: `translateX(${idx !== -1 ? idx * 100 : 0}%)` }}
+                          style={{
+                            transform: `translateX(${idx !== -1 ? idx * 100 : 0}%)`,
+                          }}
                         />
                         {opts.map((opt) => (
-                          <button key={opt.value} type="button" onClick={() => setValue("buildingCondition", opt.value as any)}
-                            className={`relative z-10 py-2.5 text-center text-xs sm:text-sm font-bold transition-colors duration-300 rounded-full cursor-pointer ${cur === opt.value ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}>
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() =>
+                              setValue("buildingCondition", opt.value as any)
+                            }
+                            className={`relative z-10 py-2.5 text-center text-xs sm:text-sm font-bold transition-colors duration-300 rounded-full cursor-pointer ${cur === opt.value ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+                          >
                             {opt.label}
                           </button>
                         ))}
@@ -305,24 +320,66 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                   );
                 })()}
               </div>
-              <AnimatedInput type="number" rhf={rhf} fieldName="buildingFloors" placeholder="Cantidad de pisos" />
-              <AnimatedInput type="number" rhf={rhf} fieldName="unitsPerFloor" placeholder="Departamentos por piso" />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="buildingFloors"
+                placeholder="Cantidad de pisos"
+              />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="unitsPerFloor"
+                placeholder="Departamentos por piso"
+              />
             </div>
           )}
 
           {/* LAND */}
           {propertyType === "LAND" && (
             <div className="space-y-4">
-              <AnimatedInput type="number" rhf={rhf} fieldName="hectares" placeholder="Hectáreas"
-                inputClassName={SURFACE_INPUT_CLASS} />
-              <CustomDropdown label="Tipo de lote" options={[
-                { value: "lote", label: "Lote" }, { value: "manzana", label: "Manzana" }, { value: "fraccion", label: "Fracción" },
-              ]} value={watch("landUse") ?? ""} onChange={(v) => setValue("landUse", v as any)} variant="white2" />
-              <AnimatedInput type="number" rhf={rhf} fieldName="buildabilityIndex" placeholder="FOT (índice de edificabilidad)" />
-              <AnimatedInput type="number" rhf={rhf} fieldName="occupancyIndex" placeholder="FOS (índice de ocupación)" />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="hectares"
+                placeholder="Hectáreas"
+                inputClassName={SURFACE_INPUT_CLASS}
+              />
+              <CustomDropdown
+                label="Tipo de lote"
+                options={[
+                  { value: "lote", label: "Lote" },
+                  { value: "manzana", label: "Manzana" },
+                  { value: "fraccion", label: "Fracción" },
+                ]}
+                value={watch("landUse") ?? ""}
+                onChange={(v) => setValue("landUse", v as any)}
+                variant="white2"
+              />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="buildabilityIndex"
+                placeholder="FOT (índice de edificabilidad)"
+              />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="occupancyIndex"
+                placeholder="FOS (índice de ocupación)"
+              />
               <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" checked={Boolean(watch("hasConstruction"))} onChange={(e) => setValue("hasConstruction", e.target.checked)} className="w-4 h-4" />
-                <span className="text-sm font-semibold text-urbik-black/70">Tiene construcción existente</span>
+                <input
+                  type="checkbox"
+                  checked={Boolean(watch("hasConstruction"))}
+                  onChange={(e) =>
+                    setValue("hasConstruction", e.target.checked)
+                  }
+                  className="w-4 h-4"
+                />
+                <span className="text-sm font-semibold text-urbik-black/70">
+                  Tiene construcción existente
+                </span>
               </label>
             </div>
           )}
@@ -330,25 +387,69 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
           {/* FIELD */}
           {propertyType === "FIELD" && (
             <div className="space-y-4">
-              <AnimatedInput type="number" rhf={rhf} fieldName="hectares" placeholder="Hectáreas"
-                inputClassName={SURFACE_INPUT_CLASS} />
-              <CustomDropdown label="Tipo de explotación" options={[
-                { value: "agricola", label: "Agrícola" }, { value: "ganadero", label: "Ganadero" },
-                { value: "mixto", label: "Mixto" }, { value: "forestal", label: "Forestal" },
-                { value: "tambero", label: "Tambero" }, { value: "apicola", label: "Apícola" },
-              ]} value={watch("soilType") ?? ""} onChange={(v) => setValue("soilType", v as any)} variant="white2" />
-              <CustomDropdown label="Fuente de agua" options={[
-                { value: "rio", label: "Río" }, { value: "arroyo", label: "Arroyo" }, { value: "lago", label: "Lago" },
-                { value: "perforacion", label: "Perforación" }, { value: "represa", label: "Represa" },
-              ]} value={(watch("extraData")?.waterSource as string) ?? ""} onChange={(v) => setValue("extraData", { ...(watch("extraData") ?? {}), waterSource: v })} variant="white2" />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="hectares"
+                placeholder="Hectáreas"
+                inputClassName={SURFACE_INPUT_CLASS}
+              />
+              <CustomDropdown
+                label="Tipo de explotación"
+                options={[
+                  { value: "agricola", label: "Agrícola" },
+                  { value: "ganadero", label: "Ganadero" },
+                  { value: "mixto", label: "Mixto" },
+                  { value: "forestal", label: "Forestal" },
+                  { value: "tambero", label: "Tambero" },
+                  { value: "apicola", label: "Apícola" },
+                ]}
+                value={watch("soilType") ?? ""}
+                onChange={(v) => setValue("soilType", v as any)}
+                variant="white2"
+              />
+              <CustomDropdown
+                label="Fuente de agua"
+                options={[
+                  { value: "rio", label: "Río" },
+                  { value: "arroyo", label: "Arroyo" },
+                  { value: "lago", label: "Lago" },
+                  { value: "perforacion", label: "Perforación" },
+                  { value: "represa", label: "Represa" },
+                ]}
+                value={(watch("extraData")?.waterSource as string) ?? ""}
+                onChange={(v) =>
+                  setValue("extraData", {
+                    ...(watch("extraData") ?? {}),
+                    waterSource: v,
+                  })
+                }
+                variant="white2"
+              />
               <div className="flex flex-col gap-3">
                 <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" checked={Boolean(watch("hasIrrigation"))} onChange={(e) => setValue("hasIrrigation", e.target.checked)} className="w-4 h-4" />
-                  <span className="text-sm font-semibold text-urbik-black/70">Tiene riego</span>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(watch("hasIrrigation"))}
+                    onChange={(e) =>
+                      setValue("hasIrrigation", e.target.checked)
+                    }
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-semibold text-urbik-black/70">
+                    Tiene riego
+                  </span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" checked={Boolean(watch("hasFencing"))} onChange={(e) => setValue("hasFencing", e.target.checked)} className="w-4 h-4" />
-                  <span className="text-sm font-semibold text-urbik-black/70">Tiene alambrado</span>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(watch("hasFencing"))}
+                    onChange={(e) => setValue("hasFencing", e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-semibold text-urbik-black/70">
+                    Tiene alambrado
+                  </span>
                 </label>
               </div>
             </div>
@@ -357,47 +458,108 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
           {/* COMMERCIAL_PROPERTY */}
           {propertyType === "COMMERCIAL_PROPERTY" && (
             <div className="space-y-4">
-              <CustomDropdown label="Rubro principal" options={[
-                { value: "gastronomia", label: "Gastronomía" }, { value: "comercio_minorista", label: "Comercio minorista" },
-                { value: "salud", label: "Salud" }, { value: "educacion", label: "Educación" },
-                { value: "servicio", label: "Servicio" }, { value: "industria", label: "Industria" }, { value: "otro", label: "Otro" },
-              ]} value={watch("commercialActivity") ?? ""} onChange={(v) => setValue("commercialActivity", v as any)} variant="white2" />
-              <CustomDropdown label="Ubicación del local" options={[
-                { value: "calle", label: "A la calle" }, { value: "galeria", label: "En galería" },
-                { value: "shopping", label: "En shopping" }, { value: "edificio", label: "En edificio" },
-              ]} value={(watch("extraData")?.commercialLocation as string) ?? ""} onChange={(v) => setValue("extraData", { ...(watch("extraData") ?? {}), commercialLocation: v })} variant="white2" />
-              <CustomDropdown label="Estado comercial" options={[
-                { value: "en_actividad", label: "En actividad" }, { value: "sin_actividad", label: "Sin actividad" },
-                { value: "en_reforma", label: "En reforma" },
-              ]} value={(watch("extraData")?.commercialStatus as string) ?? ""} onChange={(v) => setValue("extraData", { ...(watch("extraData") ?? {}), commercialStatus: v })} variant="white2" />
+              <CustomDropdown
+                label="Rubro principal"
+                options={[
+                  { value: "gastronomia", label: "Gastronomía" },
+                  { value: "comercio_minorista", label: "Comercio minorista" },
+                  { value: "salud", label: "Salud" },
+                  { value: "educacion", label: "Educación" },
+                  { value: "servicio", label: "Servicio" },
+                  { value: "industria", label: "Industria" },
+                  { value: "otro", label: "Otro" },
+                ]}
+                value={watch("commercialActivity") ?? ""}
+                onChange={(v) => setValue("commercialActivity", v as any)}
+                variant="white2"
+              />
+              <CustomDropdown
+                label="Ubicación del local"
+                options={[
+                  { value: "calle", label: "A la calle" },
+                  { value: "galeria", label: "En galería" },
+                  { value: "shopping", label: "En shopping" },
+                  { value: "edificio", label: "En edificio" },
+                ]}
+                value={(watch("extraData")?.commercialLocation as string) ?? ""}
+                onChange={(v) =>
+                  setValue("extraData", {
+                    ...(watch("extraData") ?? {}),
+                    commercialLocation: v,
+                  })
+                }
+                variant="white2"
+              />
+              <CustomDropdown
+                label="Estado comercial"
+                options={[
+                  { value: "en_actividad", label: "En actividad" },
+                  { value: "sin_actividad", label: "Sin actividad" },
+                  { value: "en_reforma", label: "En reforma" },
+                ]}
+                value={(watch("extraData")?.commercialStatus as string) ?? ""}
+                onChange={(v) =>
+                  setValue("extraData", {
+                    ...(watch("extraData") ?? {}),
+                    commercialStatus: v,
+                  })
+                }
+                variant="white2"
+              />
             </div>
           )}
 
           {/* BUSINESS_BACKGROUND */}
           {propertyType === "BUSINESS_BACKGROUND" && (
-            <CustomDropdown label="Rubro del negocio" options={[
-              { value: "gastronomia", label: "Gastronomía" }, { value: "comercio_minorista", label: "Comercio minorista" },
-              { value: "salud", label: "Salud" }, { value: "educacion", label: "Educación" },
-              { value: "servicio", label: "Servicio" }, { value: "industria", label: "Industria" }, { value: "otro", label: "Otro" },
-            ]} value={watch("commercialActivity") ?? ""} onChange={(v) => setValue("commercialActivity", v as any)} variant="white2" />
+            <CustomDropdown
+              label="Rubro del negocio"
+              options={[
+                { value: "gastronomia", label: "Gastronomía" },
+                { value: "comercio_minorista", label: "Comercio minorista" },
+                { value: "salud", label: "Salud" },
+                { value: "educacion", label: "Educación" },
+                { value: "servicio", label: "Servicio" },
+                { value: "industria", label: "Industria" },
+                { value: "otro", label: "Otro" },
+              ]}
+              value={watch("commercialActivity") ?? ""}
+              onChange={(v) => setValue("commercialActivity", v as any)}
+              variant="white2"
+            />
           )}
 
           {/* WAREHOUSE */}
           {propertyType === "WAREHOUSE" && (
             <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" checked={Boolean(watch("hasLoadingDock"))} onChange={(e) => setValue("hasLoadingDock", e.target.checked)} className="w-4 h-4" />
-              <span className="text-sm font-semibold text-urbik-black/70">Tiene playa de carga</span>
+              <input
+                type="checkbox"
+                checked={Boolean(watch("hasLoadingDock"))}
+                onChange={(e) => setValue("hasLoadingDock", e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-semibold text-urbik-black/70">
+                Tiene playa de carga
+              </span>
             </label>
           )}
 
           {/* DEVELOPMENT */}
           {propertyType === "DEVELOPMENT" && (
             <div className="space-y-4">
-              <AnimatedInput type="number" rhf={rhf} fieldName="buildingFloors" placeholder="Cantidad de pisos" />
-              <AnimatedInput type="number" rhf={rhf} fieldName="unitsPerFloor" placeholder="Unidades por piso" />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="buildingFloors"
+                placeholder="Cantidad de pisos"
+              />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="unitsPerFloor"
+                placeholder="Unidades por piso"
+              />
             </div>
           )}
-
         </div>
       )}
     </div>
@@ -426,8 +588,16 @@ export function Module02Location({
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <AnimatedInput rhf={rhf} fieldName="neighborhood" placeholder="Barrio" />
-        <AnimatedInput rhf={rhf} fieldName="street" placeholder="Calle / Dirección *" />
+        <AnimatedInput
+          rhf={rhf}
+          fieldName="neighborhood"
+          placeholder="Barrio"
+        />
+        <AnimatedInput
+          rhf={rhf}
+          fieldName="street"
+          placeholder="Calle / Dirección *"
+        />
         <AnimatedInput rhf={rhf} fieldName="number" placeholder="Altura *" />
       </div>
 
@@ -445,8 +615,8 @@ export function Module02Location({
           {isSearchingCity
             ? "Buscando zona..."
             : selectedParcelPDA
-            ? `Parcela vinculada (PDA: ${selectedParcelPDA})`
-            : "Seleccionar parcela catastral en el mapa"}
+              ? `Parcela vinculada (PDA: ${selectedParcelPDA})`
+              : "Seleccionar parcela catastral en el mapa"}
         </button>
       )}
     </div>
@@ -456,7 +626,11 @@ export function Module02Location({
 export function Module03Content({ rhf }: ModuleProps) {
   return (
     <div className="space-y-5">
-      <AnimatedInput rhf={rhf} fieldName="title" placeholder="Título. Ej: Departamento 3 amb con pileta" />
+      <AnimatedInput
+        rhf={rhf}
+        fieldName="title"
+        placeholder="Título. Ej: Departamento 3 amb con pileta"
+      />
 
       <textarea
         rows={6}
@@ -473,7 +647,13 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
   const { watch } = rhf;
   const propertyType = watch("type") ?? "";
 
-  const showFrontBack = ["HOUSE", "LAND", "FIELD", "COMMERCIAL_PROPERTY", "COUNTRY"].includes(propertyType);
+  const showFrontBack = [
+    "HOUSE",
+    "LAND",
+    "FIELD",
+    "COMMERCIAL_PROPERTY",
+    "COUNTRY",
+  ].includes(propertyType);
   const showRooms = !["LAND", "FIELD"].includes(propertyType) && !!propertyType;
 
   type RoomField = { key: Path<PropertyUploadFormData>; label: string };
@@ -531,19 +711,37 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
           <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
             M2 cubiertos (m²) *
           </label>
-          <AnimatedInput type="number" rhf={rhf} fieldName="areaM2" placeholder="0" inputClassName={SURFACE_INPUT_CLASS} />
+          <AnimatedInput
+            type="number"
+            rhf={rhf}
+            fieldName="areaM2"
+            placeholder="0"
+            inputClassName={SURFACE_INPUT_CLASS}
+          />
         </div>
         <div>
           <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
             Sup. semicubierta (m²)
           </label>
-          <AnimatedInput type="number" rhf={rhf} fieldName="semiCoveredArea" placeholder="0" inputClassName={SURFACE_INPUT_CLASS} />
+          <AnimatedInput
+            type="number"
+            rhf={rhf}
+            fieldName="semiCoveredArea"
+            placeholder="0"
+            inputClassName={SURFACE_INPUT_CLASS}
+          />
         </div>
         <div>
           <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
             Sup. descubierta (m²)
           </label>
-          <AnimatedInput type="number" rhf={rhf} fieldName="uncoveredArea" placeholder="0" inputClassName={SURFACE_INPUT_CLASS} />
+          <AnimatedInput
+            type="number"
+            rhf={rhf}
+            fieldName="uncoveredArea"
+            placeholder="0"
+            inputClassName={SURFACE_INPUT_CLASS}
+          />
         </div>
 
         {showFrontBack && (
@@ -552,13 +750,25 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
               <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
                 Frente (m)
               </label>
-              <AnimatedInput type="number" rhf={rhf} fieldName="frontLength" placeholder="0" inputClassName={SURFACE_INPUT_CLASS} />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="frontLength"
+                placeholder="0"
+                inputClassName={SURFACE_INPUT_CLASS}
+              />
             </div>
             <div>
               <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
                 Fondo (m)
               </label>
-              <AnimatedInput type="number" rhf={rhf} fieldName="backLength" placeholder="0" inputClassName={SURFACE_INPUT_CLASS} />
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="backLength"
+                placeholder="0"
+                inputClassName={SURFACE_INPUT_CLASS}
+              />
             </div>
           </>
         )}
@@ -569,7 +779,12 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
           <hr className="border-white/50" />
           <div className="flex flex-wrap gap-4 justify-center">
             {roomFields.map((f) => (
-              <CounterInput key={f.key} label={f.label} fieldName={f.key} rhf={rhf} />
+              <CounterInput
+                key={f.key}
+                label={f.label}
+                fieldName={f.key}
+                rhf={rhf}
+              />
             ))}
           </div>
         </>
@@ -582,9 +797,21 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
   const { watch, setValue } = rhf;
   const propertyType = watch("type") ?? "";
 
-  const CONDITION_TYPES = ["HOUSE", "APARTMENT", "PH", "COMMERCIAL_PROPERTY", "OFFICE", "COUNTRY"];
+  const CONDITION_TYPES = [
+    "HOUSE",
+    "APARTMENT",
+    "PH",
+    "COMMERCIAL_PROPERTY",
+    "OFFICE",
+    "COUNTRY",
+  ];
   const ORIENTATION_TYPES = ["HOUSE", "APARTMENT", "PH", "OFFICE", "COUNTRY"];
-  const DISPOSITION_TYPES = ["APARTMENT", "PH", "COMMERCIAL_PROPERTY", "OFFICE"];
+  const DISPOSITION_TYPES = [
+    "APARTMENT",
+    "PH",
+    "COMMERCIAL_PROPERTY",
+    "OFFICE",
+  ];
   const YEAR_TYPES = ["HOUSE", "APARTMENT", "PH", "COUNTRY"];
 
   const showCondition = CONDITION_TYPES.includes(propertyType);
@@ -592,7 +819,8 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
   const showDisposition = DISPOSITION_TYPES.includes(propertyType);
   const showYears = YEAR_TYPES.includes(propertyType);
   const isAptOrPH = propertyType === "APARTMENT" || propertyType === "PH";
-  const isHouseOrCountry = propertyType === "HOUSE" || propertyType === "COUNTRY";
+  const isHouseOrCountry =
+    propertyType === "HOUSE" || propertyType === "COUNTRY";
 
   const conditionOptions = [
     { value: "excelente", label: "Excelente" },
@@ -603,28 +831,41 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
   ];
 
   const orientationOptions = [
-    { value: "N", label: "Norte" }, { value: "NE", label: "Noreste" },
-    { value: "E", label: "Este" }, { value: "SE", label: "Sureste" },
-    { value: "S", label: "Sur" }, { value: "SO", label: "Suroeste" },
-    { value: "O", label: "Oeste" }, { value: "NO", label: "Noroeste" },
+    { value: "N", label: "Norte" },
+    { value: "NE", label: "Noreste" },
+    { value: "E", label: "Este" },
+    { value: "SE", label: "Sureste" },
+    { value: "S", label: "Sur" },
+    { value: "SO", label: "Suroeste" },
+    { value: "O", label: "Oeste" },
+    { value: "NO", label: "Noroeste" },
   ];
 
   const dispositionOptions = [
-    { value: "frente", label: "Frente" }, { value: "contrafrente", label: "Contrafrente" },
-    { value: "lateral", label: "Lateral" }, { value: "interior", label: "Interior" },
+    { value: "frente", label: "Frente" },
+    { value: "contrafrente", label: "Contrafrente" },
+    { value: "lateral", label: "Lateral" },
+    { value: "interior", label: "Interior" },
   ];
 
   const viewOptions = [
-    { value: "rio", label: "Río" }, { value: "mar", label: "Mar" }, { value: "lago", label: "Lago" },
-    { value: "montana", label: "Montaña" }, { value: "bosque", label: "Bosque" },
-    { value: "abierta", label: "Abierta" }, { value: "ciudad", label: "Ciudad" }, { value: "golf", label: "Golf" },
+    { value: "rio", label: "Río" },
+    { value: "mar", label: "Mar" },
+    { value: "lago", label: "Lago" },
+    { value: "montana", label: "Montaña" },
+    { value: "bosque", label: "Bosque" },
+    { value: "abierta", label: "Abierta" },
+    { value: "ciudad", label: "Ciudad" },
+    { value: "golf", label: "Golf" },
   ];
 
   return (
     <div className="flex flex-col items-center w-full mx-auto space-y-6">
       {showCondition && (
         <div className="w-full">
-          <label className="block text-sm font-bold text-urbik-black/50 mb-2">Estado del inmueble</label>
+          <label className="block text-sm font-bold text-urbik-black/50 mb-2">
+            Estado del inmueble
+          </label>
           <CustomDropdown
             label="Seleccioná estado"
             options={conditionOptions}
@@ -682,7 +923,9 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
       {isAptOrPH && (
         <>
           <div className="w-full pt-4 border-t border-white/40 space-y-4">
-            <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">Detalles adicionales</p>
+            <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">
+              Detalles adicionales
+            </p>
             <CustomDropdown
               label="Tipo de cochera"
               options={[
@@ -708,9 +951,12 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
             <CustomDropdown
               label="Tipo de piso"
               options={[
-                { value: "madera", label: "Madera" }, { value: "ceramica", label: "Cerámica" },
-                { value: "porcelana", label: "Porcelana" }, { value: "marmol", label: "Mármol" },
-                { value: "cemento", label: "Cemento" }, { value: "otro", label: "Otro" },
+                { value: "madera", label: "Madera" },
+                { value: "ceramica", label: "Cerámica" },
+                { value: "porcelana", label: "Porcelana" },
+                { value: "marmol", label: "Mármol" },
+                { value: "cemento", label: "Cemento" },
+                { value: "otro", label: "Otro" },
               ]}
               value={watch("floorType") ?? ""}
               onChange={(v) => setValue("floorType", v as any)}
@@ -731,7 +977,9 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
       {isHouseOrCountry && (
         <>
           <div className="w-full pt-4 border-t border-white/40 space-y-4">
-            <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">Terreno y entorno</p>
+            <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">
+              Terreno y entorno
+            </p>
             <CustomDropdown
               label="Pendiente del terreno"
               options={[
@@ -746,7 +994,9 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
             <CustomDropdown
               label="Costa"
               options={[
-                { value: "rio", label: "Río" }, { value: "lago", label: "Lago" }, { value: "mar", label: "Mar" },
+                { value: "rio", label: "Río" },
+                { value: "lago", label: "Lago" },
+                { value: "mar", label: "Mar" },
               ]}
               value={watch("coastType") ?? ""}
               onChange={(v) => setValue("coastType", v as any)}
@@ -762,13 +1012,18 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
           </div>
 
           <div className="w-full space-y-4">
-            <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">Edificación</p>
+            <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">
+              Edificación
+            </p>
             <CustomDropdown
               label="Tipo de piso"
               options={[
-                { value: "madera", label: "Madera" }, { value: "ceramica", label: "Cerámica" },
-                { value: "porcelana", label: "Porcelana" }, { value: "marmol", label: "Mármol" },
-                { value: "cemento", label: "Cemento alisado" }, { value: "otro", label: "Otro" },
+                { value: "madera", label: "Madera" },
+                { value: "ceramica", label: "Cerámica" },
+                { value: "porcelana", label: "Porcelana" },
+                { value: "marmol", label: "Mármol" },
+                { value: "cemento", label: "Cemento alisado" },
+                { value: "otro", label: "Otro" },
               ]}
               value={watch("floorType") ?? ""}
               onChange={(v) => setValue("floorType", v as any)}
@@ -777,9 +1032,12 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
             <CustomDropdown
               label="Tipo de techo"
               options={[
-                { value: "losa", label: "Losa" }, { value: "teja", label: "Teja" },
-                { value: "chapa", label: "Chapa" }, { value: "madera", label: "Madera" },
-                { value: "pizarra", label: "Pizarra" }, { value: "otro", label: "Otro" },
+                { value: "losa", label: "Losa" },
+                { value: "teja", label: "Teja" },
+                { value: "chapa", label: "Chapa" },
+                { value: "madera", label: "Madera" },
+                { value: "pizarra", label: "Pizarra" },
+                { value: "otro", label: "Otro" },
               ]}
               value={watch("roofType") ?? ""}
               onChange={(v) => setValue("roofType", v as any)}
@@ -797,7 +1055,9 @@ export function Module06Tags({ rhf }: ModuleProps) {
     <AmenitiesGrid
       value={(rhf.watch("amenities") as Record<string, boolean>) ?? {}}
       propertyType={rhf.watch("type")}
-      onChange={(n: Record<string, boolean>) => rhf.setValue("amenities", n as any)}
+      onChange={(n: Record<string, boolean>) =>
+        rhf.setValue("amenities", n as any)
+      }
     />
   );
 }
@@ -809,7 +1069,12 @@ export function Module10Multimedia({ rhf }: ModuleProps) {
         value={(rhf.watch("images") as string[]) ?? []}
         onChange={(urls: string[]) => rhf.setValue("images", urls as any)}
         onRemove={(u: string) =>
-          rhf.setValue("images", ((rhf.watch("images") as string[]) || []).filter((i) => i !== u) as any)
+          rhf.setValue(
+            "images",
+            ((rhf.watch("images") as string[]) || []).filter(
+              (i) => i !== u,
+            ) as any,
+          )
         }
       />
 
@@ -819,7 +1084,7 @@ export function Module10Multimedia({ rhf }: ModuleProps) {
           rhf={rhf}
           fieldName="youtubeUrl"
           placeholder="URL video de YouTube"
-          inputClassName="bg-white-30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
+          inputClassName="bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
         />
       </div>
     </div>
