@@ -126,6 +126,7 @@ export interface PropertyFormValues {
   contactPhone?: string;
   contactEmail?: string;
   contactWhatsapp?: string;
+  bedrooms: string;
   condition?: string;
   orientation?: string;
   disposition?: string;
@@ -134,6 +135,13 @@ export interface PropertyFormValues {
   buildingCondition?: string;
   buildingFloors?: string;
   unitsPerFloor?: string;
+  garageType?: string;
+  balconyType?: string;
+  viewType?: string;
+  floorType?: string;
+  roofType?: string;
+  slope?: string;
+  coastType?: string;
 }
 
 function buildDefaultValues(
@@ -171,6 +179,7 @@ function buildDefaultValues(
       frontLength: "",
       backLength: "",
       rooms: "",
+      bedrooms: "",
       bathrooms: "",
       toilets: "",
       garages: "",
@@ -215,6 +224,7 @@ function buildDefaultValues(
     frontLength: initialData.frontLength?.toString() ?? "",
     backLength: initialData.backLength?.toString() ?? "",
     rooms: initialData.rooms?.toString() ?? "",
+    bedrooms: (initialData.extraData?.bedrooms as string | number | undefined)?.toString() ?? "",
     bathrooms: initialData.bathrooms?.toString() ?? "",
     toilets: initialData.toilets?.toString() ?? "",
     garages: initialData.garages?.toString() ?? "",
@@ -390,6 +400,14 @@ export function usePropertyUploadForm(
         ...(form.unitsPerFloor && {
           unitsPerFloor: Number(form.unitsPerFloor),
         }),
+        ...(form.bedrooms && { bedrooms: Number(form.bedrooms) }),
+        ...(form.garageType && { garageType: form.garageType }),
+        ...(form.balconyType && { balconyType: form.balconyType }),
+        ...(form.viewType && { viewType: form.viewType }),
+        ...(form.floorType && { floorType: form.floorType }),
+        ...(form.roofType && { roofType: form.roofType }),
+        ...(form.slope && { slope: form.slope }),
+        ...(form.coastType && { coastType: form.coastType }),
       },
       hasWater: amenities["agua"] ?? amenities["hasWater"] ?? false,
       hasElectricity:

@@ -203,6 +203,97 @@ const TAG_CATEGORIES: AmenityCategory[] = [
       { key: "hasPhone", label: "Teléfono" },
     ],
   },
+
+  {
+    key: "climatizacion",
+    label: "Climatización",
+    visibleFor: ["HOUSE", "APARTMENT", "PH", "COMMERCIAL_PROPERTY", "OFFICE", "COUNTRY"],
+    tags: [
+      { key: "hasAirConditioning", label: "Aire acondicionado", isLegacy: true },
+      { key: "hasCentralAC", label: "AC central" },
+      { key: "hasHeating", label: "Calefacción" },
+      { key: "hasCentralHeating", label: "Calefacción central" },
+      { key: "hasRadiators", label: "Radiadores" },
+      { key: "hasFloorHeating", label: "Losa radiante" },
+      { key: "hasGasHeater", label: "Estufa tiro balanceado" },
+      { key: "hasFireplace", label: "Hogar a leña" },
+      { key: "hasBoiler", label: "Caldera" },
+    ],
+  },
+
+  {
+    key: "equipamiento",
+    label: "Equipamiento",
+    visibleFor: ["HOUSE", "APARTMENT", "PH", "COMMERCIAL_PROPERTY", "COUNTRY"],
+    tags: [
+      { key: "hasEquippedKitchen", label: "Cocina equipada" },
+      { key: "hasKitchenFurniture", label: "Muebles de cocina" },
+      { key: "isFurnished", label: "Amoblado" },
+      { key: "hasJacuzzi", label: "Hidromasaje" },
+      { key: "hasPool", label: "Piscina / Pileta", isLegacy: true },
+      { key: "hasSafe", label: "Caja fuerte" },
+    ],
+  },
+
+  {
+    key: "infraestructura",
+    label: "Infraestructura",
+    visibleFor: ["APARTMENT", "PH", "COMMERCIAL_PROPERTY", "OFFICE"],
+    tags: [
+      { key: "hasSecurity", label: "Seguridad" },
+      { key: "hasSurveillance", label: "Vigilancia" },
+      { key: "hasCCTV", label: "Vigilancia por cámaras" },
+      { key: "hasSharedParking", label: "Estacionamiento común", isLegacy: true },
+      { key: "hasDisabledAccess", label: "Acceso movilidad reducida" },
+      { key: "hasAsphalt", label: "Asfalto" },
+    ],
+  },
+
+  {
+    key: "edificio",
+    label: "Edificio / Amenities",
+    visibleFor: ["APARTMENT", "PH"],
+    tags: [
+      { key: "hasSUM", label: "SUM" },
+      { key: "hasGym", label: "Gimnasio" },
+      { key: "hasLaundry", label: "Laundry", isLegacy: true },
+      { key: "hasRooftopTerrace", label: "Terraza común" },
+      { key: "hasGreenSpaces", label: "Espacios verdes" },
+    ],
+  },
+
+  {
+    key: "locales",
+    label: "Características del local",
+    visibleFor: ["COMMERCIAL_PROPERTY"],
+    tags: [
+      { key: "hasDisplay", label: "Vidriera" },
+      { key: "hasDepot", label: "Depósito" },
+      { key: "hasPrivateOffice", label: "Oficina privada" },
+      { key: "hasChangeRoom", label: "Vestuario" },
+      { key: "hasCommercialKitchen", label: "Cocina" },
+      { key: "hasFourWindows", label: "Salida 4 vientos" },
+      { key: "inGallery", label: "En galería" },
+      { key: "inShopping", label: "En shopping" },
+      { key: "isStreetFacing", label: "A la calle" },
+    ],
+  },
+
+  {
+    key: "campo",
+    label: "Infraestructura de campo",
+    visibleFor: ["FIELD"],
+    tags: [
+      { key: "hasTrough", label: "Bebedero" },
+      { key: "hasCattleChute", label: "Manga" },
+      { key: "hasPens", label: "Corrales" },
+      { key: "hasBarn", label: "Galpón" },
+      { key: "hasHouse", label: "Vivienda" },
+      { key: "hasForestry", label: "Forestación" },
+      { key: "hasPasture", label: "Potrero" },
+      { key: "hasDam", label: "Represa" },
+    ],
+  },
 ];
 
 interface AmenitiesGridProps {

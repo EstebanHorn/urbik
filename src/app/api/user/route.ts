@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -124,4 +124,126 @@ export async function GET() {
     lastName: userProfile?.last_name ?? null,
     properties: [],
   });
+}
+
+export async function PUT(req: NextRequest) {
+  const supabase = await createClient();
+
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (!authUser) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
+  const admin = createAdminClient();
+
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("role")
+    .eq("id", authUser.id)
+    .single();
+
+  if (!profile) {
+    return NextResponse.json({ error: "Perfil no encontrado" }, { status: 404 });
+  }
+
+  const body = await req.json();
+
+  try {
+    if (profile.role === "REALESTATE" || profile.role === "ADMIN") {
+      const { name, phone, address, street, logoUrl, website, instagram, bio, city, province } = body;
+      const { error } = await admin
+        .from("real_estates")
+        .update({
+          ...(name !== undefined && { agency_name: name }),
+          ...(phone !== undefined && { phone }),
+          ...(address !== undefined && { address }),
+          ...(street !== undefined && { street }),
+          ...(logoUrl !== undefined && { logo_url: logoUrl }),
+          ...(website !== undefined && { website }),
+          ...(instagram !== undefined && { instagram }),
+          ...(bio !== undefined && { bio }),
+          ...(city !== undefined && { city }),
+          ...(province !== undefined && { province }),
+        })
+        .eq("profile_id", authUser.id);
+
+      if (error) throw error;
+    } else {
+      const { firstName, lastName } = body;
+
+      const { data: existing } = await admin
+        .from("user_profiles")
+        .select("profile_id")
+        .eq("profile_id", authUser.id)
+        .maybeSingle();
+
+      if (existing) {
+        const { error } = await admin
+          .from("user_profiles")
+          .update({
+            ...(firstName !== undefined && { first_name: firstName }),
+            ...(lastName !== undefined && { last_name: lastName }),
+          })
+          .eq("profile_id", authUser.id);
+        if (error) throw error;
+      } else {
+        const { error } = await admin
+          .from("user_profiles")
+          .insert({ profile_id: authUser.id, first_name: firstName ?? "", last_name: lastName ?? "" });
+        if (error) throw error;
+      }
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error actualizando perfil:", error);
+    const msg = error instanceof Error ? error.message : "Error al guardar";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (!authUser) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+
+  const admin = createAdminClient();
+  const { action } = await req.json();
+
+  try {
+    if (action === "toggle-pause") {
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("is_active")
+        .eq("id", authUser.id)
+        .single();
+
+      if (!profile) return NextResponse.json({ error: "Perfil no encontrado" }, { status: 404 });
+
+      const { error } = await admin
+        .from("profiles")
+        .update({ is_active: !profile.is_active })
+        .eq("id", authUser.id);
+
+      if (error) throw error;
+      return NextResponse.json({ success: true, isActive: !profile.is_active });
+    }
+    return NextResponse.json({ error: "Acción no válida" }, { status: 400 });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Error al procesar";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}
+
+export async function DELETE() {
+  const supabase = await createClient();
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (!authUser) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+
+  const admin = createAdminClient();
+
+  const { error } = await admin.auth.admin.deleteUser(authUser.id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ success: true });
 }

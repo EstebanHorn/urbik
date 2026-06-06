@@ -16,6 +16,8 @@ export interface PropertyUploadFormData {
   contactPhone?: string; contactEmail?: string; contactWhatsapp?: string; showAgencyContact?: boolean;
   id?: number | string; parcelCCA?: string; parcelPDA?: string; parcelGeom?: Record<string, unknown>;
   latitude?: number; longitude?: number; extraData?: Record<string, unknown>;
+  garageType?: string; balconyType?: string; viewType?: string; floorType?: string;
+  roofType?: string; slope?: string; coastType?: string;
 }
 
 export type ModuleStatus = "empty" | "partial" | "complete";

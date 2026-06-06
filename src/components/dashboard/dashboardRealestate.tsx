@@ -101,6 +101,7 @@ function ConfirmationModal({ isOpen, onClose, onConfirm, title, message, isLoadi
 
 function EditAgencyProfileModal({ isOpen, onClose, profile, onSaved }: { isOpen: boolean, onClose: () => void, profile: ProfileData | null, onSaved: () => void }) {
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: profile?.agencyData?.name || profile?.name || "",
     phone: profile?.phone || "",
@@ -145,12 +146,30 @@ function EditAgencyProfileModal({ isOpen, onClose, profile, onSaved }: { isOpen:
 
   const handleSave = async () => {
     setIsSaving(true);
+    setSaveError(null);
     try {
-      await new Promise(resolve => setTimeout(resolve, 800)); 
+      const res = await fetch("/api/user", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          city: formData.city,
+          province: formData.province,
+          street: formData.street,
+          address: formData.address,
+          logoUrl: formData.logoUrl,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "Error al guardar");
+      }
       onSaved();
       onClose();
     } catch (error) {
       console.error(error);
+      setSaveError(error instanceof Error ? error.message : "Error al guardar");
     } finally {
       setIsSaving(false);
     }
@@ -185,14 +204,23 @@ function EditAgencyProfileModal({ isOpen, onClose, profile, onSaved }: { isOpen:
             <LocationSelectors provinceValue={formData.province} cityValue={formData.city} onChange={handleLocationChange} showLocality={false} />
           </div>
           <div>
-            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">Dirección Física</label>
-            <input type="text" name="address" value={formData.street + " " + formData.address} onChange={handleChange} className="w-full border border-white bg-white/30 rounded-full px-4 py-3 text-sm focus:outline-none shadow-sm" />
+            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">Calle</label>
+            <input type="text" name="street" value={formData.street} onChange={handleChange} className="w-full border border-white bg-white/30 rounded-full px-4 py-3 text-sm focus:outline-none shadow-sm" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">Número / Piso / Depto</label>
+            <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full border border-white bg-white/30 rounded-full px-4 py-3 text-sm focus:outline-none shadow-sm" />
           </div>
         </div>
 
-        <div className="p-6 bg-white/30 border-t border-white/40 flex justify-end gap-3 backdrop-blur-md">
-          <button onClick={onClose} disabled={isSaving} className="px-6 py-2.5 cursor-pointer text-sm font-bold text-urbik-black/70 transition hover:text-urbik-black/50">Cancelar</button>
-          <button onClick={handleSave} disabled={isSaving} className="px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold text-urbik-black/70 hover:text-urbik-black/50 bg-white/30 border border-black/10 transition shadow-md">{isSaving ? "Guardando..." : "Guardar Cambios"}</button>
+        <div className="p-6 bg-white/30 border-t border-white/40 flex flex-col gap-3 backdrop-blur-md">
+          {saveError && (
+            <p className="text-xs font-bold text-red-500 text-center">{saveError}</p>
+          )}
+          <div className="flex justify-end gap-3">
+            <button onClick={onClose} disabled={isSaving} className="px-6 py-2.5 cursor-pointer text-sm font-bold text-urbik-black/70 transition hover:text-urbik-black/50">Cancelar</button>
+            <button onClick={handleSave} disabled={isSaving} className="px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold text-urbik-black/70 hover:text-urbik-black/50 bg-white/30 border border-black/10 transition shadow-md">{isSaving ? "Guardando..." : "Guardar Cambios"}</button>
+          </div>
         </div>
 
       </div>
