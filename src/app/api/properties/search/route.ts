@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const buildNumericSelectionFilter = (values: string[]) => {
   if (values.length === 0) return null;
@@ -129,6 +130,7 @@ export async function GET(request: Request) {
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const currency = searchParams.get("currency");
+  const rooms = searchParams.getAll("rooms");
   const bedrooms = searchParams.getAll("bedrooms");
   const bathrooms = searchParams.getAll("bathrooms");
   const minArea = searchParams.get("minArea");
@@ -159,10 +161,21 @@ export async function GET(request: Request) {
   );
 
   try {
+    const admin = createAdminClient();
+    const { data: inactiveProfiles } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("is_active", false);
+    const inactiveIds = (inactiveProfiles ?? []).map((p: { id: string }) => p.id);
+
     let query = supabase
       .from("properties")
       .select(PROPERTY_SELECT, { count: "exact" })
       .eq("status", "AVAILABLE");
+
+    if (inactiveIds.length > 0) {
+      query = query.or(`real_estate_id.is.null,real_estate_id.not.in.(${inactiveIds.join(",")})`);
+    }
 
     if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
       const latDelta = radiusKm / 111;
@@ -198,7 +211,9 @@ export async function GET(request: Request) {
       );
     }
 
-    const roomsFilter = buildNumericSelectionFilter(bedrooms);
+    // rooms param = ambientes (total rooms); bedrooms param = habitaciones (same column for now)
+    const ambientesValues = rooms.length > 0 ? rooms : bedrooms;
+    const roomsFilter = buildNumericSelectionFilter(ambientesValues);
 
     if (roomsFilter) {
       const conditions: string[] = [];

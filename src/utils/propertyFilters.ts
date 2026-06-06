@@ -4,6 +4,7 @@ export type FilterState = {
   currency: string;
   minPrice: string;
   maxPrice: string;
+  rooms: string[];
   bedrooms: string[];
   bathrooms: string[];
   minArea: string;
@@ -58,6 +59,7 @@ export const DEFAULT_FILTERS: FilterState = {
   currency: "",
   minPrice: "",
   maxPrice: "",
+  rooms: [],
   bedrooms: [],
   bathrooms: [],
   minArea: "",
@@ -86,11 +88,8 @@ export function parseFiltersFromQuery(params: URLSearchParams): FilterState {
     currency: params.get("currency") || "",
     minPrice: params.get("minPrice") || "",
     maxPrice: params.get("maxPrice") || "",
-    bedrooms: params.getAll("bedrooms").length
-      ? params.getAll("bedrooms")
-      : params.get("rooms")
-        ? [params.get("rooms") as string]
-        : [],
+    rooms: params.getAll("rooms"),
+    bedrooms: params.getAll("bedrooms"),
     bathrooms: params.getAll("bathrooms"),
     minArea: params.get("minArea") || "",
     maxArea: params.get("maxArea") || "",
@@ -136,6 +135,7 @@ export function areFiltersEqual(a: FilterState, b: FilterState) {
     a.hasGarden === b.hasGarden &&
     a.hasLaundry === b.hasLaundry &&
     a.hasAirConditioning === b.hasAirConditioning &&
+    a.rooms.join("|") === b.rooms.join("|") &&
     a.bedrooms.join("|") === b.bedrooms.join("|") &&
     a.bathrooms.join("|") === b.bathrooms.join("|")
   );
@@ -164,8 +164,10 @@ export function applyFiltersToParams(
   setOrDelete("province", filters.province);
   setOrDelete("q", filters.q);
 
+  next.delete("rooms");
   next.delete("bedrooms");
   next.delete("bathrooms");
+  filters.rooms.forEach((value) => next.append("rooms", value));
   filters.bedrooms.forEach((value) => next.append("bedrooms", value));
   filters.bathrooms.forEach((value) => next.append("bathrooms", value));
 
@@ -193,6 +195,7 @@ export function appendFiltersToApiQuery(
   if (filters.province) query.append("province", filters.province);
   if (filters.q) query.append("q", filters.q);
 
+  filters.rooms.forEach((v) => query.append("rooms", v));
   filters.bedrooms.forEach((bedroom) => query.append("bedrooms", bedroom));
   filters.bathrooms.forEach((bathroom) => query.append("bathrooms", bathroom));
 

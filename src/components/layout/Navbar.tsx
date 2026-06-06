@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { Search, Map, SlidersHorizontal, Menu, List, X } from "lucide-react";
+import { Search, Map, SlidersHorizontal, Menu, List, X, ChevronDown } from "lucide-react";
 import Image from "next/image";
 
 import UrbikLogo from "@/assets/Urbik_Logo.svg";
@@ -13,6 +13,8 @@ import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import { createClient } from "@/lib/supabase/client";
 import { useSearch, type SearchSuggestion } from "@/hooks/useSearch";
 import { areFiltersEqual, DEFAULT_FILTERS, parseFiltersFromQuery } from "@/utils/propertyFilters";
+import PriceFilterCard from "@/components/search/PriceFilterCard";
+import RoomsFilterCard from "@/components/search/RoomsFilterCard";
 
 function getSuggestionBadge(s: SearchSuggestion): { label: string; className: string } {
   if (s.type === "PROPERTY_SEARCH") return { label: "Propiedad", className: "bg-violet-100 text-violet-700" };
@@ -37,9 +39,14 @@ export default function Navbar() {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<"price" | "rooms" | null>(null);
+  const [localMinPrice, setLocalMinPrice] = useState("");
+  const [localMaxPrice, setLocalMaxPrice] = useState("");
 
   const mobileSearchRef = useRef<HTMLDivElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
+  const filterPanelRef = useRef<HTMLDivElement>(null);
+  const priceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const { query, setQuery, suggestions, isLoading: searchLoading, onSelectSuggestion, clearAutocomplete } = useSearch();
 
@@ -59,11 +66,56 @@ export default function Navbar() {
   const ViewToggleIcon = isMapView ? List : Map;
 
   useEffect(() => {
+    setLocalMinPrice(searchParams.get("minPrice") || "");
+    setLocalMaxPrice(searchParams.get("maxPrice") || "");
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!activeFilter) return;
+    const handleOutside = (e: MouseEvent) => {
+      if (filterPanelRef.current && !filterPanelRef.current.contains(e.target as Node)) {
+        setActiveFilter(null);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [activeFilter]);
+
+  const handleNavParamChange = useCallback((key: string, value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set(key, value); else params.delete(key);
+    params.set("page", "1");
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [pathname, router, searchParams]);
+
+  const handleNavPriceChange = useCallback((field: "minPrice" | "maxPrice", value: string) => {
+    if (field === "minPrice") setLocalMinPrice(value); else setLocalMaxPrice(value);
+    if (priceTimerRef.current) clearTimeout(priceTimerRef.current);
+    priceTimerRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      const newMin = field === "minPrice" ? value : localMinPrice;
+      const newMax = field === "maxPrice" ? value : localMaxPrice;
+      if (newMin) params.set("minPrice", newMin); else params.delete("minPrice");
+      if (newMax) params.set("maxPrice", newMax); else params.delete("maxPrice");
+      params.set("page", "1");
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, 500);
+  }, [pathname, router, searchParams, localMinPrice, localMaxPrice]);
+
+  const handleNavRoomsChange = useCallback((field: "rooms" | "bedrooms" | "bathrooms", value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(field);
+    if (value) params.set(field, value);
+    params.set("page", "1");
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [pathname, router, searchParams]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       const inMobile = mobileSearchRef.current?.contains(target);
       const inDesktop = desktopSearchRef.current?.contains(target);
-      
+
       if (!inMobile && !inDesktop) {
         clearAutocomplete();
       }
@@ -349,52 +401,132 @@ export default function Navbar() {
       </nav>
 
       {showFilterButton && showSearchAndMap && (
-        <div className="hidden md:flex fixed top-[76px] left-0 right-0 w-full bg-white/70 backdrop-blur-3xl shadow-sm border-b border-gray-200 z-[1000] h-[60px] items-center px-6 transition-all duration-300">
-          <div className="mx-auto w-full md:px-10 flex items-center justify-center gap-4">
-                        
-            <div className="flex items-center gap-4 flex-1 max-w-md justify-end">
-              {renderSearchBar(desktopSearchRef, true)}
-              
-            </div>
-            <div className="flex items-center gap-3">
+        <>
+          <div className="hidden md:flex fixed top-[76px] left-0 right-0 w-full bg-white/70 backdrop-blur-3xl shadow-sm border-b border-gray-200 z-[1000] h-[60px] items-center px-6 transition-all duration-300">
+            <div className="mx-auto w-full md:px-10 flex items-center justify-center gap-4">
+              <div className="flex items-center gap-4 flex-1 max-w-md justify-end">
+                {renderSearchBar(desktopSearchRef, true)}
+              </div>
 
-              <CustomDropdown 
-                label="Operación" 
-                value={currentFilters.operationType || ""} 
-                options={[{label: "Venta", value: "SALE"}, {label: "Alquiler", value: "RENT"}]} 
-                onChange={(val) => console.log(val)} 
-                variant="white1"
-              />
-              <CustomDropdown 
-                label="Tipo de Propiedad" 
-                value="" 
-                options={[{label: "Casa", value: "HOUSE"}, {label: "Departamento", value: "APARTMENT"}]} 
-                onChange={() => {}} 
-                variant="white1"
-              />
-              <CustomDropdown 
-                label="Precio" 
-                value="" 
-                options={[{label: "Hasta $50.000", value: "50000"}, {label: "$50.000 - $100.000", value: "100000"}]} 
-                onChange={() => {}} 
-                variant="white1"
-              />
-              <CustomDropdown 
-                label="Ambientes" 
-                value="" 
-                options={[{label: "1 Ambiente", value: "1"}, {label: "2 Ambientes", value: "2"}, {label: "3+ Ambientes", value: "3"}]} 
-                onChange={() => {}} 
-                variant="white1"
-              />
-            </div>
-                          <Link
+              <div className="flex items-center gap-2">
+                {/* Operación */}
+                <CustomDropdown
+                  label={currentFilters.operationType ? (currentFilters.operationType === "SALE" ? "Venta" : currentFilters.operationType === "RENT" ? "Alquiler" : "Temporal") : "Operación"}
+                  value={currentFilters.operationType || ""}
+                  options={[
+                    { label: "Venta", value: "SALE" },
+                    { label: "Alquiler", value: "RENT" },
+                    { label: "Temporal", value: "TEMP_RENT" },
+                  ]}
+                  onChange={(val) => {
+                    const current = searchParams.get("operationType") || "";
+                    handleNavParamChange("operationType", val === current ? null : val);
+                  }}
+                  variant={currentFilters.operationType ? "black" : "white2"}
+                />
+
+                {/* Tipo */}
+                <CustomDropdown
+                  label={currentFilters.propertyType ? (() => {
+                    const map: Record<string, string> = { HOUSE: "Casa", APARTMENT: "Depto", PH: "PH", LAND: "Terreno", COMMERCIAL_PROPERTY: "Local", OFFICE: "Oficina", GARAGE: "Cochera", FIELD: "Campo", WAREHOUSE: "Galpón" };
+                    return map[currentFilters.propertyType] || "Tipo";
+                  })() : "Tipo"}
+                  value={currentFilters.propertyType || ""}
+                  options={[
+                    { label: "Casa", value: "HOUSE" },
+                    { label: "Departamento", value: "APARTMENT" },
+                    { label: "PH", value: "PH" },
+                    { label: "Terreno", value: "LAND" },
+                    { label: "Local", value: "COMMERCIAL_PROPERTY" },
+                    { label: "Oficina", value: "OFFICE" },
+                    { label: "Cochera", value: "GARAGE" },
+                    { label: "Campo", value: "FIELD" },
+                    { label: "Galpón", value: "WAREHOUSE" },
+                  ]}
+                  onChange={(val) => {
+                    const current = searchParams.get("propertyType") || "";
+                    handleNavParamChange("propertyType", val === current ? null : val);
+                  }}
+                  variant={currentFilters.propertyType ? "black" : "white2"}
+                />
+
+                {/* Precio */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter((v) => (v === "price" ? null : "price"))}
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                    currentFilters.minPrice || currentFilters.maxPrice || currentFilters.currency
+                      ? "bg-urbik-black text-white border-urbik-black"
+                      : activeFilter === "price"
+                        ? "bg-white border-urbik-black text-urbik-black shadow-sm"
+                        : "bg-white/70 text-slate-600 border-slate-200 hover:bg-white"
+                  }`}
+                >
+                  {currentFilters.minPrice || currentFilters.maxPrice
+                    ? `${currentFilters.currency || ""}${currentFilters.minPrice ? ` ≥${Number(currentFilters.minPrice).toLocaleString("es-AR")}` : ""}${currentFilters.maxPrice ? ` ≤${Number(currentFilters.maxPrice).toLocaleString("es-AR")}` : ""}`
+                    : "Precio"}
+                  <ChevronDown size={12} className={`transition-transform ${activeFilter === "price" ? "rotate-180" : ""}`} />
+                </button>
+
+                {/* Ambientes */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter((v) => (v === "rooms" ? null : "rooms"))}
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                    currentFilters.rooms.length > 0 || currentFilters.bedrooms.length > 0 || currentFilters.bathrooms.length > 0
+                      ? "bg-urbik-black text-white border-urbik-black"
+                      : activeFilter === "rooms"
+                        ? "bg-white border-urbik-black text-urbik-black shadow-sm"
+                        : "bg-white/70 text-slate-600 border-slate-200 hover:bg-white"
+                  }`}
+                >
+                  {currentFilters.rooms[0]
+                    ? `${currentFilters.rooms[0]} amb.`
+                    : currentFilters.bedrooms[0]
+                      ? `${currentFilters.bedrooms[0]} hab.`
+                      : "Ambientes"}
+                  <ChevronDown size={12} className={`transition-transform ${activeFilter === "rooms" ? "rotate-180" : ""}`} />
+                </button>
+              </div>
+
+              <Link
                 href={viewToggleHref}
                 className="flex items-center px-4 py-1.5 font-medium transition-colors duration-300 text-sm shrink-0 text-urbik-black/80 hover:text-urbik-black"
               >
                 {viewToggleText}
               </Link>
+            </div>
           </div>
-        </div>
+
+          {/* Floating filter panel */}
+          {activeFilter && (
+            <div
+              ref={filterPanelRef}
+              className="hidden md:block fixed top-[136px] left-1/2 -translate-x-1/2 z-[999] w-80 rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-xl shadow-[0_15px_50px_rgba(15,23,42,0.12)] p-5"
+            >
+              {activeFilter === "price" && (
+                <PriceFilterCard
+                  minPrice={localMinPrice}
+                  maxPrice={localMaxPrice}
+                  currency={searchParams.get("currency") || ""}
+                  operationType={searchParams.get("operationType") || ""}
+                  propertyType={searchParams.get("propertyType") || ""}
+                  onChangeMin={(v) => handleNavPriceChange("minPrice", v)}
+                  onChangeMax={(v) => handleNavPriceChange("maxPrice", v)}
+                  onChangeCurrency={(v) => handleNavParamChange("currency", v || null)}
+                />
+              )}
+              {activeFilter === "rooms" && (
+                <RoomsFilterCard
+                  rooms={searchParams.getAll("rooms")}
+                  bedrooms={searchParams.getAll("bedrooms")}
+                  bathrooms={searchParams.getAll("bathrooms")}
+                  onChange={handleNavRoomsChange}
+                />
+              )}
+            </div>
+          )}
+        </>
       )}
     </>
   );

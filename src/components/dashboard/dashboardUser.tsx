@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { User, Bookmark, MapPin, Phone, Mail } from "lucide-react";
 import { ProfileData } from "@/app/(dashboard)/dashboard/page";
-import { SecuritySection, DangerZone } from "@/components/dashboard/AccountActions";
+import { SecuritySection, PauseAccountZone, DangerZone } from "@/components/dashboard/AccountActions";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 
 type UserTab = "profile" | "saved";
@@ -42,7 +42,8 @@ const getPropertyLabel = (type: string) => {
 export default function DashboardUser({ profile, onRefresh }: { profile: ProfileData | null; onRefresh: () => void; }) {
   const [activeTab, setActiveTab] = useState<UserTab>("profile");
   const [isSaving, setIsSaving] = useState(false);
-  
+  const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
   const [favorites, setFavorites] = useState<FavoriteProperty[]>([]);
   const [loadingFavorites, setLoadingFavorites] = useState(false);
 
@@ -60,10 +61,28 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
-    setTimeout(() => {
+    setSaveMessage(null);
+    try {
+      const res = await fetch("/api/user", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Error al guardar");
+      }
+      setSaveMessage({ type: "success", text: "¡Cambios guardados!" });
       onRefresh();
+    } catch (err) {
+      setSaveMessage({ type: "error", text: err instanceof Error ? err.message : "Error al guardar" });
+    } finally {
       setIsSaving(false);
-    }, 800);
+      setTimeout(() => setSaveMessage(null), 3500);
+    }
   };
 
   const fetchFavorites = useCallback(async () => {
@@ -138,9 +157,14 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
               </div>
             </div>
 
-            <div className="mt-8 flex justify-end">
-              <button 
-                onClick={handleSaveProfile} disabled={isSaving} 
+            <div className="mt-8 flex flex-col items-end gap-2">
+              {saveMessage && (
+                <p className={`text-xs font-bold ${saveMessage.type === "success" ? "text-green-600" : "text-red-500"}`}>
+                  {saveMessage.text}
+                </p>
+              )}
+              <button
+                onClick={handleSaveProfile} disabled={isSaving}
                 className="px-8 py-3 cursor-pointer rounded-full text-sm font-bold text-white bg-urbik-black hover:opacity-90 transition shadow-md disabled:opacity-50"
               >
                 {isSaving ? "Guardando..." : "Guardar Cambios"}
@@ -151,6 +175,11 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
           {profile?.id && (
             <div className="space-y-6">
               <SecuritySection />
+              <PauseAccountZone
+                isPaused={profile.isActive === false}
+                userId={profile.id}
+                onToggleSuccess={onRefresh}
+              />
               <DangerZone itemName="tu cuenta" userId={profile.id} />
             </div>
           )}

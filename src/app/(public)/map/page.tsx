@@ -33,7 +33,9 @@ import {
   type FilterState,
 } from "@/utils/propertyFilters";
 
-import { Map as MapIcon, List, X } from "lucide-react";
+import { Map as MapIcon, List, X, SlidersHorizontal, ChevronDown } from "lucide-react";
+import PriceFilterCard from "@/components/search/PriceFilterCard";
+import RoomsFilterCard from "@/components/search/RoomsFilterCard";
 
 const PropertiesSidebar = dynamicImport(
   () =>
@@ -111,6 +113,7 @@ export default function MapPage() {
   const [properties, setProperties] = useState<MapProperty[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showMobileList, setShowMobileList] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<MapProperty | null>(null);
 
   const [filters, setFilters] = useState<FilterState>(() =>
@@ -269,6 +272,10 @@ export default function MapPage() {
     return () => window.clearTimeout(timeoutId);
   }, [filters, fetchFilteredProperties]);
 
+  const handleMapRoomsChange = useCallback((field: "rooms" | "bedrooms" | "bathrooms", value: string | null) => {
+    setFilters((prev) => ({ ...prev, [field]: value ? [value] : [] }));
+  }, []);
+
   const layerOptions = useMemo(
     () => Object.values(mapBaseLayers),
     [],
@@ -299,6 +306,46 @@ export default function MapPage() {
                 <X size={20} />
               </button>
             </div>
+          </div>
+
+          <div className="shrink-0 border-b border-slate-100 p-4">
+            <button
+              type="button"
+              onClick={() => setShowFilters((v) => !v)}
+              className="flex w-full items-center justify-between gap-2 rounded-xl bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <SlidersHorizontal size={15} />
+                Filtros
+                {(filters.minPrice || filters.maxPrice || filters.rooms.length > 0 || filters.bedrooms.length > 0 || filters.bathrooms.length > 0) && (
+                  <span className="h-5 w-5 flex items-center justify-center rounded-full bg-urbik-cyan text-[10px] font-black text-white">●</span>
+                )}
+              </span>
+              <ChevronDown size={14} className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
+            </button>
+
+            {showFilters && (
+              <div className="mt-4 space-y-6">
+                <PriceFilterCard
+                  minPrice={filters.minPrice}
+                  maxPrice={filters.maxPrice}
+                  currency={filters.currency}
+                  operationType={filters.operationType}
+                  propertyType={filters.propertyType}
+                  onChangeMin={(v) => setFilters((prev) => ({ ...prev, minPrice: v }))}
+                  onChangeMax={(v) => setFilters((prev) => ({ ...prev, maxPrice: v }))}
+                  onChangeCurrency={(v) => setFilters((prev) => ({ ...prev, currency: v }))}
+                />
+                <div className="border-t border-slate-100 pt-6">
+                  <RoomsFilterCard
+                    rooms={filters.rooms}
+                    bedrooms={filters.bedrooms}
+                    bathrooms={filters.bathrooms}
+                    onChange={handleMapRoomsChange}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto">

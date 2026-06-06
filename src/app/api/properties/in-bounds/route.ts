@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const buildNumericSelectionFilter = (values: string[]) => {
   if (values.length === 0) return null;
@@ -166,6 +167,13 @@ export async function GET(request: Request) {
   }
 
   try {
+    const admin = createAdminClient();
+    const { data: inactiveProfiles } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("is_active", false);
+    const inactiveIds = (inactiveProfiles ?? []).map((p: { id: string }) => p.id);
+
     let query = supabase
       .from("properties")
       .select(PROPERTY_SELECT)
@@ -174,6 +182,10 @@ export async function GET(request: Request) {
       .lte("latitude", maxLat)
       .gte("longitude", minLon)
       .lte("longitude", maxLon);
+
+    if (inactiveIds.length > 0) {
+      query = query.or(`real_estate_id.is.null,real_estate_id.not.in.(${inactiveIds.join(",")})`);
+    }
 
     if (operationType) {
       query = query.eq("operation_type", operationType);

@@ -2,7 +2,13 @@
 
 export const dynamic = "force-dynamic";
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 import { useSearch, type SearchSuggestion } from "@/hooks/useSearch";
@@ -16,7 +22,6 @@ import {
   type FilterState,
 } from "@/utils/propertyFilters";
 
-import Sidebar from "@/components/ui/PhoneFilters";
 import Banner from "@/components/home/banner";
 import Top3 from "@/components/home/top3";
 import MiniBanner from "@/components/home/minibanner";
@@ -71,29 +76,47 @@ const PAGE_SIZE_DEFAULT = 24;
 
 export function getOperationLabel(type: string) {
   switch (type) {
-    case "SALE": return "Venta";
-    case "RENT": return "Alquiler";
-    case "TEMP_RENT": return "Temporal";
-    case "SALE_RENT": return "Venta y Alquiler";
-    default: return type;
+    case "SALE":
+      return "Venta";
+    case "RENT":
+      return "Alquiler";
+    case "TEMP_RENT":
+      return "Temporal";
+    case "SALE_RENT":
+      return "Venta y Alquiler";
+    default:
+      return type;
   }
 }
 
 export function getTypeLabel(type: string) {
   switch (type) {
-    case "HOUSE": return "Casa";
-    case "APARTMENT": return "Departamento";
-    case "PH": return "PH";
-    case "COUNTRY": return "Country";
-    case "LAND": return "Terreno";
-    case "FIELD": return "Campo";
-    case "BUSINESS_BACKGROUND": return "Fondo de comercio";
-    case "GARAGE": return "Cochera";
-    case "WAREHOUSE": return "Galpón";
-    case "DEVELOPMENT": return "Desarrollo";
-    case "COMMERCIAL_PROPERTY": return "Local";
-    case "OFFICE": return "Oficina";
-    default: return type;
+    case "HOUSE":
+      return "Casa";
+    case "APARTMENT":
+      return "Departamento";
+    case "PH":
+      return "PH";
+    case "COUNTRY":
+      return "Country";
+    case "LAND":
+      return "Terreno";
+    case "FIELD":
+      return "Campo";
+    case "BUSINESS_BACKGROUND":
+      return "Fondo de comercio";
+    case "GARAGE":
+      return "Cochera";
+    case "WAREHOUSE":
+      return "Galpón";
+    case "DEVELOPMENT":
+      return "Desarrollo";
+    case "COMMERCIAL_PROPERTY":
+      return "Local";
+    case "OFFICE":
+      return "Oficina";
+    default:
+      return type;
   }
 }
 
@@ -105,18 +128,34 @@ export default function HomePage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
+  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(
+    null,
+  );
   const [items, setItems] = useState<SearchProperty[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const skipUrlSync = useRef(true);
   const parsedQueryRef = useRef("");
-  const [userCoords, setUserCoords] = useState<{ lat: number; lon: number; } | null>(null);
+  const [userCoords, setUserCoords] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
 
-  const initialPage = Math.max(1, Number.parseInt(searchParams.get("page") || "1", 10) || 1);
-  const initialPageSize = Math.min(50, Math.max(1, Number.parseInt(searchParams.get("pageSize") || String(PAGE_SIZE_DEFAULT), 10) || PAGE_SIZE_DEFAULT));
+  const initialPage = Math.max(
+    1,
+    Number.parseInt(searchParams.get("page") || "1", 10) || 1,
+  );
+  const initialPageSize = Math.min(
+    50,
+    Math.max(
+      1,
+      Number.parseInt(
+        searchParams.get("pageSize") || String(PAGE_SIZE_DEFAULT),
+        10,
+      ) || PAGE_SIZE_DEFAULT,
+    ),
+  );
   const initialView = searchParams.get("view") === "grid" ? "grid" : "list";
 
   const [page, setPage] = useState(initialPage);
@@ -153,57 +192,84 @@ export default function HomePage() {
     return Number.isNaN(parsed) ? undefined : parsed;
   }, [searchParams]);
 
+  const radius = useMemo(() => searchParams.get("radius"), [searchParams]);
+
   useEffect(() => {
     if (lat !== undefined && lon !== undefined) return;
     if (typeof window === "undefined" || !navigator.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setUserCoords({ lat: position.coords.latitude, lon: position.coords.longitude });
+        setUserCoords({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        });
       },
-      () => { setUserCoords(null); },
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 120000 }
+      () => {
+        setUserCoords(null);
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 120000 },
     );
   }, [lat, lon]);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     const nextFilters = parseFiltersFromQuery(params);
-    const nextPage = Math.max(1, Number.parseInt(params.get("page") || "1", 10) || 1);
+    const nextPage = Math.max(
+      1,
+      Number.parseInt(params.get("page") || "1", 10) || 1,
+    );
     const nextView: ViewMode = params.get("view") === "grid" ? "grid" : "list";
 
-    setFilters((prev) => areFiltersEqual(prev, nextFilters) ? prev : nextFilters);
+    setFilters((prev) =>
+      areFiltersEqual(prev, nextFilters) ? prev : nextFilters,
+    );
     setPage((prev) => (prev === nextPage ? prev : nextPage));
     setViewMode((prev) => (prev === nextView ? prev : nextView));
     skipUrlSync.current = true;
   }, [searchParams]);
 
-  const syncUrl = useCallback((nextFilters: FilterState, nextPage: number, nextView: ViewMode) => {
-    const paramsWithFilters = applyFiltersToParams(new URLSearchParams(searchParams.toString()), nextFilters);
-    paramsWithFilters.set("page", String(nextPage));
-    paramsWithFilters.set("pageSize", String(pageSize));
-    paramsWithFilters.set("view", nextView);
+  const syncUrl = useCallback(
+    (nextFilters: FilterState, nextPage: number, nextView: ViewMode) => {
+      const paramsWithFilters = applyFiltersToParams(
+        new URLSearchParams(searchParams.toString()),
+        nextFilters,
+      );
+      paramsWithFilters.set("page", String(nextPage));
+      paramsWithFilters.set("pageSize", String(pageSize));
+      paramsWithFilters.set("view", nextView);
 
-    const nextQuery = paramsWithFilters.toString();
-    if (nextQuery === searchParams.toString()) return;
+      const nextQuery = paramsWithFilters.toString();
+      if (nextQuery === searchParams.toString()) return;
 
-    router.replace(`${pathname}?${nextQuery}`, { scroll: false });
-  }, [pageSize, pathname, router, searchParams]);
+      router.replace(`${pathname}?${nextQuery}`, { scroll: false });
+    },
+    [pageSize, pathname, router, searchParams],
+  );
 
   useEffect(() => {
-    if (skipUrlSync.current) { skipUrlSync.current = false; return; }
+    if (skipUrlSync.current) {
+      skipUrlSync.current = false;
+      return;
+    }
     syncUrl(filters, page, viewMode);
   }, [filters, page, syncUrl, viewMode]);
 
   useEffect(() => {
     const query = filters.q.trim();
-    if (!query) { parsedQueryRef.current = ""; return; }
+    if (!query) {
+      parsedQueryRef.current = "";
+      return;
+    }
     if (parsedQueryRef.current === query) return;
 
     const controller = new AbortController();
     const timeoutId = window.setTimeout(async () => {
       try {
-        const response = await fetch(`/api/search/parse?q=${encodeURIComponent(query)}`, { signal: controller.signal });
+        const response = await fetch(
+          `/api/search/parse?q=${encodeURIComponent(query)}`,
+          { signal: controller.signal },
+        );
         if (!response.ok) return;
 
         const data = await response.json();
@@ -239,22 +305,31 @@ export default function HomePage() {
       }
     }, 260);
 
-    return () => { controller.abort(); window.clearTimeout(timeoutId); };
+    return () => {
+      controller.abort();
+      window.clearTimeout(timeoutId);
+    };
   }, [filters.q]);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+      const query = new URLSearchParams({
+        page: String(page),
+        pageSize: String(pageSize),
+      });
       appendFiltersToApiQuery(query, filters);
 
       if (typeof lat === "number") query.set("lat", String(lat));
       if (typeof lon === "number") query.set("lon", String(lon));
-      if (searchParams.get("radius")) query.set("radius", searchParams.get("radius") as string);
+      if (radius) query.set("radius", radius);
 
       const res = await fetch(`/api/properties/search?${query.toString()}`);
       if (!res.ok) {
-        setItems([]); setTotal(0); setTotalPages(1); return;
+        setItems([]);
+        setTotal(0);
+        setTotalPages(1);
+        return;
       }
 
       const data = await res.json();
@@ -266,18 +341,34 @@ export default function HomePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [filters, lat, lon, page, pageSize, searchParams]);
+  }, [filters, lat, lon, page, pageSize, radius]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => { fetchData(); }, 180);
+    const timeoutId = window.setTimeout(() => {
+      fetchData();
+    }, 350);
     return () => window.clearTimeout(timeoutId);
   }, [fetchData]);
 
   const premiumProperty = useMemo(() => {
     if (items.length === 0) return null;
     return [...items].sort((a, b) => {
-      const scoreA = [a.hasPool, a.hasGarden, a.hasGrill, a.hasBalcony, a.hasAirConditioning, a.hasParking].filter(Boolean).length;
-      const scoreB = [b.hasPool, b.hasGarden, b.hasGrill, b.hasBalcony, b.hasAirConditioning, b.hasParking].filter(Boolean).length;
+      const scoreA = [
+        a.hasPool,
+        a.hasGarden,
+        a.hasGrill,
+        a.hasBalcony,
+        a.hasAirConditioning,
+        a.hasParking,
+      ].filter(Boolean).length;
+      const scoreB = [
+        b.hasPool,
+        b.hasGarden,
+        b.hasGrill,
+        b.hasBalcony,
+        b.hasAirConditioning,
+        b.hasParking,
+      ].filter(Boolean).length;
       if (scoreA !== scoreB) return scoreB - scoreA;
       const priceA = a.salePrice ?? a.rentPrice ?? 0;
       const priceB = b.salePrice ?? b.rentPrice ?? 0;
@@ -290,67 +381,88 @@ export default function HomePage() {
       <div className="mx-auto w-full overflow-x-hidden">
         <div className="relative flex min-h-[800px] flex-col items-start gap-4 lg:flex-row">
           <main className="flex-1 min-w-0 w-full">
-            
             {!isSearchMode && <Banner items={items} />}
             <section className="max-w-7xl w-full mx-auto px-4 md:px-8 mt-10">
-            <div className="mt-10 md:mt-40 mb-5 ml-0 md:ml-10 text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">Propiedades Destacadas</h1>
-              <span className="text-urbik-black/50 text-sm md:text-base">Las mejores oportunidades del mercado seleccionadas para vos.</span>
-            </div>
-
-            {isLoading ? (
-              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                {Array.from({ length: 6 }).map((_, idx) => (
-                  <div key={idx} className={`${glassCard} h-36 animate-pulse`} />
-                ))}
+              <div className="mt-10 md:mt-40 mb-5 ml-0 md:ml-10 text-center md:text-left">
+                <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">
+                  Propiedades Destacadas
+                </h1>
+                <span className="text-urbik-black/50 text-sm md:text-base">
+                  Las mejores oportunidades del mercado seleccionadas para vos.
+                </span>
               </div>
-            ) : items.length === 0 ? (
-              <div className={`${glassCard} p-10 text-center text-sm font-semibold text-slate-500`}>
-                No se encontraron propiedades con esos filtros.
-              </div>
-            ) : (
-              <>
-                <Top3 items={items} setHoveredPropertyId={setHoveredPropertyId} />
-                <div className="mt-10 md:mt-30 ml-0 md:ml-10 text-center md:text-left">
-                  <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">Somos Urbik®</h1>
-                  <span className="text-urbik-black/50 text-sm md:text-base">Una nueva forma de comprar y vender propiedades</span>
-                </div>
-                <MiniBanner />
-                <div className="w-full h-10"/>
-                <div className="mt-10 md:mt-20 mb-5 text-center md:text-right">
-                  <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">Opciones listas para vos</h1>
-                  <span className="text-urbik-black/50 text-sm md:text-base">Explorá todo nuestro catálogo de propiedades disponibles.</span>
-                </div>
-                <List
-                  items={items}
-                  viewMode={viewMode}
-                  premiumProperty={premiumProperty}
-                  setHoveredPropertyId={setHoveredPropertyId}
-                />
-              </>
-            )}
 
-            <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-5">
-              <button
-                type="button"
-                disabled={page <= 1}
-                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                className="rounded-full border border-slate-200 bg-white px-4 md:px-5 py-2 text-[10px] md:text-xs font-black tracking-wide text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-30"
-              >
-                Anterior
-              </button>
-              <span className="text-[10px] md:text-xs font-bold tracking-wide text-slate-500">
-                Página {page} de {totalPages}
-              </span>
-              <button
-                type="button"
-                disabled={page >= totalPages}
-                onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                className="rounded-full border border-slate-200 bg-white px-4 md:px-5 py-2 text-[10px] md:text-xs font-black tracking-wide text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-30"
-              >
-                Siguiente
-              </button>
-            </div>
+              {isLoading ? (
+                <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`${glassCard} h-36 animate-pulse`}
+                    />
+                  ))}
+                </div>
+              ) : items.length === 0 ? (
+                <div
+                  className={`${glassCard} p-10 text-center text-sm font-semibold text-slate-500`}
+                >
+                  No se encontraron propiedades con esos filtros.
+                </div>
+              ) : (
+                <>
+                  <Top3
+                    items={items}
+                    setHoveredPropertyId={setHoveredPropertyId}
+                  />
+                  <div className="mt-10 md:mt-30 ml-0 md:ml-10 text-center md:text-left">
+                    <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">
+                      Somos Urbik®
+                    </h1>
+                    <span className="text-urbik-black/50 text-sm md:text-base">
+                      Una nueva forma de comprar y vender propiedades
+                    </span>
+                  </div>
+                  <MiniBanner />
+                  <div className="w-full h-10" />
+                  <div className="mt-10 md:mt-20 mb-5 text-center md:text-right">
+                    <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">
+                      Opciones listas para vos
+                    </h1>
+                    <span className="text-urbik-black/50 text-sm md:text-base">
+                      Explorá todo nuestro catálogo de propiedades disponibles.
+                    </span>
+                  </div>
+                  <List
+                    items={items}
+                    viewMode={viewMode}
+                    premiumProperty={premiumProperty}
+                    setHoveredPropertyId={setHoveredPropertyId}
+                  />
+                </>
+              )}
+
+              <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-5">
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                  className="rounded-full border border-slate-200 bg-white px-4 md:px-5 py-2 text-[10px] md:text-xs font-black tracking-wide text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-30"
+                >
+                  Anterior
+                </button>
+                <span className="text-[10px] md:text-xs font-bold tracking-wide text-slate-500">
+                  Página {page} de {totalPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={page >= totalPages}
+                  onClick={() =>
+                    setPage((prev) => Math.min(totalPages, prev + 1))
+                  }
+                  className="rounded-full border border-slate-200 bg-white px-4 md:px-5 py-2 text-[10px] md:text-xs font-black tracking-wide text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-30"
+                >
+                  Siguiente
+                </button>
+              </div>
             </section>
           </main>
         </div>

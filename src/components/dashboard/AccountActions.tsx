@@ -1,83 +1,61 @@
 "use client";
 
 import React, { useState } from "react";
-import { Lock, Eye, EyeOff, X, AlertTriangle, Play, Pause } from "lucide-react";
+import { Lock, X, AlertTriangle, Play, Pause } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 export function SecuritySection() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
-  const [newPassword, setNewPassword] = useState("");
   const supabase = createClient();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendReset = async () => {
     setLoading(true);
-    
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    
+    setMessage({ type: "", text: "" });
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) {
+      setMessage({ type: "error", text: "No se encontró el email de tu cuenta." });
+      setLoading(false);
+      return;
+    }
+
+    const redirectTo = `${window.location.origin}/auth/reset-password`;
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, { redirectTo });
+
     if (error) {
       setMessage({ type: "error", text: error.message });
     } else {
-      setMessage({ type: "success", text: "¡Contraseña actualizada!" });
-      setTimeout(() => setIsOpen(false), 2000);
+      setMessage({ type: "success", text: `Te enviamos un link a ${user.email}. Revisá tu bandeja de entrada.` });
     }
     setLoading(false);
   };
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-10 md:mb-30">
-        <div className="flex items-center gap-4">
-          <div className="text-urbik-black"><Lock size={24} /></div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-800">Seguridad de la cuenta</h3>
-            <p className="text-sm text-gray-500">Cambia tu contraseña periódicamente</p>
-          </div>
+    <div className="flex items-start justify-between gap-4 mb-10 md:mb-30">
+      <div className="flex items-center gap-4">
+        <div className="text-urbik-black"><Lock size={24} /></div>
+        <div>
+          <h3 className="text-xl font-bold text-gray-800">Seguridad de la cuenta</h3>
+          {message.text ? (
+            <p className={`text-sm font-semibold mt-1 ${message.type === "error" ? "text-red-500" : "text-green-600"}`}>
+              {message.text}
+            </p>
+          ) : (
+            <p className="text-sm text-gray-500">Recibirás un email con un link para cambiar tu contraseña.</p>
+          )}
         </div>
-        <button onClick={() => setIsOpen(true)} className="px-6 py-3 cursor-pointer bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-all">Cambiar Contraseña</button>
       </div>
-
-      <AnimatePresence>
-        {isOpen && (
-          <div className="fixed inset-0 h-full z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white/70 backdrop-blur-2xl border border-white/60 w-full rounded-xl p-8 md:p-12 shadow-2xl relative">
-              <button onClick={() => setIsOpen(false)} className="absolute cursor-pointer right-8 top-8 text-urbik-black/70 hover:text-black"><X size={24} /></button>
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-2 text-urbik-black/80"><Lock size={22} /></div>
-                <h2 className="text-2xl font-bold text-urbik-black/80">Actualizar Contraseña</h2>
-              </div>
-              <form className="space-y-5" onSubmit={handleSubmit}>
-                <div className="space-y-2 relative">
-                  <label className="text-xs font-bold ml-5 text-urbik-black/80 uppercase">Nueva Contraseña</label>
-                  <motion.input 
-                    whileFocus={{ scale: 1.02, boxShadow: "0px 4px 15px rgba(0,0,0,0.05)" }}
-                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    type={showPassword ? "text" : "password"} 
-                    required 
-                    className="w-full px-6 py-4 rounded-full bg-white/50 border border-white shadow-sm focus:ring-2 focus:ring-black outline-none font-medium text-black transition-colors" 
-                    value={newPassword} 
-                    onChange={(e) => setNewPassword(e.target.value)} 
-                    placeholder="Mínimo 6 caracteres" 
-                  />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute cursor-pointer right-6 top-[2.7rem] text-urbik-black/50 hover:text-black">
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-                {message.text && <p className={`text-center text-sm font-bold ${message.type === "error" ? "text-red-500" : "text-green-600"}`}>{message.text}</p>}
-                <div className="pt-4">
-                  <button type="submit" disabled={loading} className="w-full cursor-pointer py-4 bg-black text-white font-bold rounded-full hover:bg-urbik-black/70 disabled:bg-gray-400">{loading ? "Procesando..." : "Guardar Cambios"}</button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-    </>
+      <button
+        onClick={handleSendReset}
+        disabled={loading}
+        className="shrink-0 px-6 py-3 cursor-pointer bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-all disabled:opacity-50"
+      >
+        {loading ? "Enviando..." : "Cambiar Contraseña"}
+      </button>
+    </div>
   );
 }
 
@@ -86,9 +64,15 @@ export function PauseAccountZone({ isPaused, userId, onToggleSuccess }: { isPaus
   const supabase = createClient();
 
   const handleToggle = async () => {
-    await supabase.from('profiles').update({ is_active: !isPaused }).eq('id', userId);
-    onToggleSuccess();
-    setShowModal(false);
+    const res = await fetch("/api/user", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "toggle-pause" }),
+    });
+    if (res.ok) {
+      onToggleSuccess();
+      setShowModal(false);
+    }
   };
 
   return (
@@ -139,9 +123,11 @@ export function DangerZone({ userId }: { itemName: string, userId: string }) {
   const router = useRouter();
 
   const handleDelete = async () => {
-    await supabase.from('profiles').delete().eq('id', userId);
-    await supabase.auth.signOut();
-    router.push('/');
+    const res = await fetch("/api/user", { method: "DELETE" });
+    if (res.ok) {
+      await supabase.auth.signOut();
+      router.push('/');
+    }
   };
 
   return (
