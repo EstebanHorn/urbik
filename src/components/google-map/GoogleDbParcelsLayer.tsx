@@ -9,6 +9,8 @@ import { getDynamicParcelStyle } from "@/components/map/utils";
 import { useMapSettings } from "@/components/map/MapSettingsProvider";
 import { Geometry, Polygon, MultiPolygon, Position } from "geojson";
 
+const glassCard = "md:rounded-[10px] rounded-2xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[10px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
+
 interface ExtendedMapProperty extends MapProperty {
   salePrice?: number | null;
   rentPrice?: number | null;
@@ -136,25 +138,32 @@ export function GoogleDbParcelsLayer({ properties, onPropertySelect }: { propert
       })}
 
       {hoveredProp && hoverPos && (
-        <InfoWindow position={hoverPos} disableAutoPan={true} headerDisabled={true}>
-          <div className="w-52 overflow-hidden shadow-2xl flex flex-col rounded-2xl bg-urbik-white2 p-0 m-0">
-            <div className="h-28 w-full relative parcel-layer-shadow">
-              {hoveredProp.images?.[0] ? (
-                <Image src={hoveredProp.images[0]} alt={hoveredProp.title || "Propiedad"} fill className="object-cover" />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-slate-100 text-[10px] text-slate-400">Sin imagen</div>
-              )}
-            </div>
-            <div className="p-2.5 text-left">
-              <h4 className="text-sm font-black truncate italic text-slate-800 mb-1">{hoveredProp.title}</h4>
-              <div className="pt-2 border-t border-slate-100 flex justify-end">
-                <span className="text-md font-black text-slate-900">
-                  USD {getDisplayPrice(hoveredProp).toLocaleString("es-AR")}
+        <AdvancedMarker position={hoverPos} zIndex={99999}>
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-4 pointer-events-none">
+            <div className={`relative w-40 overflow-hidden flex flex-col pb-1.5 ${glassCard}`}>
+              <div className="h-24 w-full relative overflow-hidden bg-slate-100">
+                {hoveredProp.images?.[0] ? (
+                  <Image 
+                    src={hoveredProp.images[0]} 
+                    alt={hoveredProp.title || "Propiedad"} 
+                    fill 
+                    className="object-cover" 
+                    sizes="160px"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-[10px] text-slate-400 font-medium">Sin imagen</div>
+                )}
+              </div>
+              
+              <div className="pt-2 pb-1 text-center z-10">
+                <span className="text-sm font-black text-slate-950 tracking-tight">
+                  {hoveredProp.operationType === 'RENT' ? 'ARS ' : '$ '}
+                  {getDisplayPrice(hoveredProp).toLocaleString("es-AR")}
                 </span>
               </div>
             </div>
           </div>
-        </InfoWindow>
+        </AdvancedMarker>
       )}
     </>
   );

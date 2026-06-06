@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { X } from "lucide-react";
 import {
   getVisibleModules,
@@ -18,16 +18,6 @@ import {
   Module11ContactInfo,
 } from "./create-modal/form-modules";
 import ParcelPickerModal, { type SelectedParcel } from "./ParcelPickerModal";
-
-const MODAL_ANIMATION_STYLES = `
-  @keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .step-transition {
-    animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-`;
 
 interface CreatePropertyModalProps {
   open: boolean;
@@ -46,6 +36,51 @@ const DEFAULT_VALUES: PropertyUploadFormData = {
   featureGroups: {},
 };
 
+const modalStyles = `
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .step-transition {
+    animation: fadeSlideIn 0.3s ease-out forwards;
+  }
+`;
+
+function CreateProgressBar({
+  rhf,
+  visibleModules,
+  currentIndex,
+}: {
+  rhf: UseFormReturn<PropertyUploadFormData>;
+  visibleModules: ReturnType<typeof getVisibleModules>;
+  currentIndex: number;
+}) {
+  const formData = rhf.watch();
+  const statuses = visibleModules.map((m) => m.getStatus(formData));
+  const completeCount = statuses.filter((s) => s === "complete").length;
+  const percentage =
+    visibleModules.length > 0
+      ? Math.round((completeCount / visibleModules.length) * 100)
+      : 0;
+
+  return (
+    <div className="px-8 pb-4">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-bold uppercase text-urbik-black/50">
+          Progreso de carga - Paso {currentIndex + 1} de {visibleModules.length}
+        </span>
+        <span className="text-sm font-bold">{percentage}%</span>
+      </div>
+      <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500"
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function CreatePropertyModal({
   open,
   onClose,
@@ -59,13 +94,19 @@ export default function CreatePropertyModal({
   const [error, setError] = useState<string | null>(null);
   const [parcelPickerOpen, setParcelPickerOpen] = useState(false);
 
-  const formData = rhf.watch();
-  const visibleModules = getVisibleModules(formData.type);
+  const propertyType = rhf.watch("type");
+  const parcelPDA = rhf.watch("parcelPDA");
+  const parcelCCA = rhf.watch("parcelCCA");
+  const province = rhf.watch("province");
+  const city = rhf.watch("city");
+
+  const visibleModules = getVisibleModules(propertyType);
 
   const currentIndex = visibleModules.findIndex((m) => m.id === activeModuleId);
   const safeCurrentIndex = currentIndex !== -1 ? currentIndex : 0;
   const isFirstStep = safeCurrentIndex === 0;
-  const isLastStep = currentIndex !== -1 && safeCurrentIndex === visibleModules.length - 1;
+  const isLastStep =
+    currentIndex !== -1 && safeCurrentIndex === visibleModules.length - 1;
   const activeModule = visibleModules[safeCurrentIndex];
 
   useEffect(() => {
@@ -87,13 +128,6 @@ export default function CreatePropertyModal({
       setActiveModuleId(prevId);
     }
   };
-
-  const statuses = visibleModules.map((m) => m.getStatus(formData));
-  const completeCount = statuses.filter((s) => s === "complete").length;
-  const percentage =
-    visibleModules.length > 0
-      ? Math.round((completeCount / visibleModules.length) * 100)
-      : 0;
 
   const handleParcelConfirm = (parcel: SelectedParcel) => {
     rhf.setValue("parcelCCA", parcel.cca);
@@ -200,7 +234,7 @@ export default function CreatePropertyModal({
       <Module02Location
         rhf={rhf}
         onOpenMap={() => setParcelPickerOpen(true)}
-        selectedParcelPDA={formData.parcelPDA || formData.parcelCCA}
+        selectedParcelPDA={parcelPDA || parcelCCA}
       />
     ),
     3: <Module03Content rhf={rhf} />,
@@ -215,7 +249,7 @@ export default function CreatePropertyModal({
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: MODAL_ANIMATION_STYLES }} />
+      <style>{modalStyles}</style>
 
       <div className="fixed inset-0 z-50 flex items-center justify-center pt-20 px-6 pb-6">
         <div
@@ -224,7 +258,6 @@ export default function CreatePropertyModal({
         />
 
         <div className="relative w-full max-w-xl h-[80vh] bg-white/70 border border-white rounded-3xl flex flex-col shadow-2xl overflow-hidden">
-          
           <div className="flex flex-col shrink-0 bg-white/70">
             <div className="flex items-center justify-between px-8 py-5">
               <h2 className="text-lg font-black text-urbik-black">
@@ -239,22 +272,11 @@ export default function CreatePropertyModal({
               </button>
             </div>
 
-            <div className="px-8 pb-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold uppercase text-urbik-black/50">
-                  Progreso de carga - Paso {safeCurrentIndex + 1} de {visibleModules.length}
-                </span>
-                <span className="text-sm font-bold">
-                  {percentage}%
-                </span>
-              </div>
-              <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${percentage}%` }}
-                />
-              </div>
-            </div>
+            <CreateProgressBar
+              rhf={rhf}
+              visibleModules={visibleModules}
+              currentIndex={safeCurrentIndex}
+            />
           </div>
 
           <div className="flex flex-1 overflow-hidden">
@@ -262,16 +284,19 @@ export default function CreatePropertyModal({
               id="create-property-form"
               onSubmit={handleSubmit}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA") {
+                if (
+                  e.key === "Enter" &&
+                  (e.target as HTMLElement).tagName !== "TEXTAREA"
+                ) {
                   e.preventDefault();
                 }
               }}
               className="flex-1 overflow-y-auto px-8 py-6"
             >
               {activeModule && (
-                <div 
-                  key={activeModule.id} 
-                  className="step-transition"
+                <div
+                  key={activeModule.id}
+                  className="step-transition opacity-0"
                 >
                   <h3 className="text-xl font-bold text-center text-urbik-black/80 mb-6">
                     {activeModule.label}
@@ -325,8 +350,8 @@ export default function CreatePropertyModal({
 
       <ParcelPickerModal
         open={parcelPickerOpen}
-        province={formData.province ?? ""}
-        city={formData.city}
+        province={province ?? ""}
+        city={city}
         onClose={() => setParcelPickerOpen(false)}
         onConfirm={handleParcelConfirm}
       />

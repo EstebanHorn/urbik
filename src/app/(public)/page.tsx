@@ -330,23 +330,23 @@ export default function HomePage() {
               </>
             )}
 
-            <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-5">
+            <div className="mt-8 flex items-center justify-between pt-5 mb-10">
               <button
                 type="button"
                 disabled={page <= 1}
                 onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                className="rounded-full border border-slate-200 bg-white px-4 md:px-5 py-2 text-[10px] md:text-xs font-black tracking-wide text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-30"
+                className=" px-4 md:px-5 py-2 text-md md:text-md font-bold text-urbik-black/70 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-30"
               >
                 Anterior
               </button>
-              <span className="text-[10px] md:text-xs font-bold tracking-wide text-slate-500">
+              <span className="text-[10px] md:text-xs font-bold tracking-wide text-urbik-black/70">
                 Página {page} de {totalPages}
               </span>
               <button
                 type="button"
                 disabled={page >= totalPages}
                 onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                className="rounded-full border border-slate-200 bg-white px-4 md:px-5 py-2 text-[10px] md:text-xs font-black tracking-wide text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-30"
+                className=" px-4 md:px-5 py-2 text-md md:text-md font-bold text-urbik-black/70 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-30"
               >
                 Siguiente
               </button>

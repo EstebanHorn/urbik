@@ -1,40 +1,41 @@
 import type { FeatureCollection, Polygon, MultiPolygon, Geometry, Feature } from "geojson";
 
-export type BaseLayerId = "cartoLight" | "osm" | "satellite" | "darkMatter";
+export type BaseLayerId = "roadmap" | "satellite" | "hybrid" | "terrain";
 
 type BaseLayerConfig = {
   id: BaseLayerId;
   label: string;
   description: string;
-  url: string;
-  attribution: string;
 };
 
 export const mapBaseLayers: Record<BaseLayerId, BaseLayerConfig> = {
-  cartoLight: {
-    id: "cartoLight", label: "Callejero limpio", description: "Carto Light, ideal para resaltar capas y datos.",
-    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+  roadmap: {
+    id: "roadmap", 
+    label: "Plano", 
+    description: "Mapa de calles estándar.",
   },
-  osm: {
-    id: "osm", label: "Clásico OSM", description: "OpenStreetMap estándar, balanceado y familiar.",
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+  terrain: {
+    id: "terrain", 
+    label: "Relieve", 
+    description: "Mapa con topografía y relieve natural.",
   },
   satellite: {
-    id: "satellite", label: "Satelital", description: "Fotografía aérea de Esri, ideal para revisar el terreno.",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, IGN y otros",
+    id: "satellite", 
+    label: "Satelital", 
+    description: "Fotografía aérea pura del terreno.",
   },
-  darkMatter: {
-    id: "darkMatter", label: "Oscuro", description: "Carto Dark Matter, contraste alto para mapas nocturnos.",
-    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+  hybrid: {
+    id: "hybrid", 
+    label: "Híbrido", 
+    description: "Satelital con nombres de calles y rutas.",
   },
 };
 
-export const defaultBaseLayerId: BaseLayerId = "cartoLight";
-export function isBaseLayerId(value: string): value is BaseLayerId { return value in mapBaseLayers; }
+export const defaultBaseLayerId: BaseLayerId = "roadmap";
+
+export function isBaseLayerId(value: string): value is BaseLayerId { 
+  return value in mapBaseLayers; 
+}
 
 export type ParcelaProps = { CCA?: string; PDA?: string; [key: string]: unknown; };
 export type LaplataGeoJSON = FeatureCollection<Polygon | MultiPolygon, ParcelaProps>;

@@ -77,7 +77,7 @@ const deleteProperty = async (id: string | number) => {
 function ConfirmationModal({ isOpen, onClose, onConfirm, title, message, isLoading }: any) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden transform transition-all">
         <div className="p-6">
           <div className="flex items-center justify-center w-12 h-12 mx-auto bg-urbik-rose/10 rounded-full">

@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import React from "react";
 import { UseFormReturn, Path } from "react-hook-form";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import LocationSelectors from "@/components/ui/LocationSelectors";
 import ImageUpload from "@/components/ui/ImageUpload";
-import { CurrencySelector, AmenitiesGrid } from "./shared-ui";
+import { AmenitiesGrid } from "./shared-ui";
 import type { PropertyUploadFormData } from "./schema";
 
 interface ModuleProps {
@@ -47,47 +46,17 @@ const AnimatedInput = ({
 }) => {
   const { watch, setValue } = rhf;
   const value = watch(fieldName) ?? "";
-  const valStr = String(value);
 
-  const justifyClass = align === "center" ? "justify-center" : "justify-start";
   const textAlignClass = align === "center" ? "text-center" : "text-left";
 
   return (
-    <div className="relative w-full flex">
-      <style>{`
-        @keyframes popIn {
-          0% { opacity: 0; transform: translateY(8px) scale(0.8); }
-          100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}</style>
-      
-      <div className={`absolute inset-0 flex items-center pointer-events-none px-5 overflow-hidden ${justifyClass}`}>
-        {!valStr ? (
-          <span className="text-urbik-black/50 whitespace-nowrap">{placeholder}</span>
-        ) : (
-          <div className="flex whitespace-pre">
-            {valStr.split("").map((char, i) => (
-              <span
-                key={`${i}-${char}`}
-                className="inline-block text-urbik-black font-medium"
-                style={{
-                  animation: "popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
-                }}
-              >
-                {char === " " ? "\u00A0" : char}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <input
-        type={type}
-        value={value as string | number}
-        onChange={(e) => setValue(fieldName, e.target.value as any)}
-        className={`${inputClassName} ${textAlignClass} text-transparent caret-urbik-black [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]`}
-      />
-    </div>
+    <input
+      type={type}
+      value={value as string | number}
+      placeholder={placeholder}
+      onChange={(e) => setValue(fieldName, e.target.value as any)}
+      className={`${inputClassName} ${textAlignClass} text-urbik-black placeholder:text-urbik-black/50 caret-urbik-black [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]`}
+    />
   );
 };
 
@@ -519,7 +488,7 @@ export function Module10Multimedia({ rhf }: ModuleProps) {
           rhf={rhf} 
           fieldName="youtubeUrl" 
           placeholder="URL video de YouTube" 
-          inputClassName="bg-white-30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all text-sm" 
+          inputClassName="bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all text-sm" 
         />
       </div>
     </div>

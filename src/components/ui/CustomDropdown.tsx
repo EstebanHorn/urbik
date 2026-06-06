@@ -14,6 +14,7 @@ interface CustomDropdownProps {
   onChange: (value: string) => void;
   className?: string;
   variant?: "white" | "white2" | "map-layer" | "black" | "mobile-black"; 
+  direction?: "up" | "down" | "responsive";
 }
 
 export function CustomDropdown({
@@ -23,6 +24,7 @@ export function CustomDropdown({
   onChange,
   className = "",
   variant = "white",
+  direction = "responsive",
 }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -56,6 +58,15 @@ export function CustomDropdown({
     "mobile-black": 
       "text-urbik-white md:bg-urbik-white1 md:text-urbik-black md:hover:bg-urbik-white",
   };
+
+  let positionClasses = "";
+  if (direction === "up") {
+    positionClasses = "bottom-full mb-3 right-0";
+  } else if (direction === "down") {
+    positionClasses = "top-full mt-3 right-0 md:left-0 md:right-auto";
+  } else {
+    positionClasses = "bottom-full mb-3 md:bottom-auto md:top-full md:mt-3 right-0 md:left-0 md:right-auto";
+  }
 
   return (
     <div className={`relative ${className}`} ref={containerRef}>
@@ -94,7 +105,7 @@ export function CustomDropdown({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className={`absolute w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden bottom-full mb-3 md:bottom-auto md:top-full md:mt-3 right-0 md:left-0 md:right-auto`}
+            className={`absolute w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden ${positionClasses}`}
           >
             {options
               .filter((opt) => opt.value !== "")

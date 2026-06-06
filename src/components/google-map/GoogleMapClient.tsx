@@ -1,7 +1,6 @@
 "use client";
 
 import { Map } from '@vis.gl/react-google-maps';
-import GoogleSearchBar from './GoogleSearchBar';
 import { GoogleDbParcelsLayer } from './GoogleDbParcelsLayer';
 import { GoogleStaticParcelsLayer } from './GoogleStaticParcelsLayer';
 import type { MapProperty, MapBounds } from "@/components/map/types";
@@ -9,6 +8,7 @@ import type { MapProperty, MapBounds } from "@/components/map/types";
 export interface GoogleMapClientProps {
   lat: number;
   lon: number;
+  baseLayer?: string;
   properties?: MapProperty[];
   onBoundsChange?: (bounds: MapBounds) => void;
   onPropertySelect?: (prop: MapProperty) => void;
@@ -18,6 +18,7 @@ export interface GoogleMapClientProps {
 export default function GoogleMapClient({
   lat,
   lon,
+  baseLayer = "roadmap",
   properties = [],
   onBoundsChange,
   onPropertySelect,
@@ -25,11 +26,11 @@ export default function GoogleMapClient({
 }: GoogleMapClientProps) {
   return (
     <div className="relative w-full overflow-hidden" style={{ height }}>
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] w-full max-w-md">
-        <GoogleSearchBar />
-      </div>
+
 
       <Map
+        mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID as string}
+        mapTypeId={baseLayer}
         defaultCenter={{ lat, lng: lon }}
         defaultZoom={15}
         minZoom={3}

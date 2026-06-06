@@ -5,31 +5,32 @@ type Props = {
   value: number | string;
   hint?: string;
   icon?: React.ReactNode;
-  accent?: "cyan" | "emerald" | "rose" | "neutral";
 };
 
-const ACCENT: Record<NonNullable<Props["accent"]>, string> = {
-  cyan: "bg-urbik-cyan/10 text-urbik-black",
-  emerald: "bg-emerald-50 text-urbik-emerald",
-  rose: "bg-rose-50 text-urbik-rose",
-  neutral: "bg-gray-100 text-gray-600",
-};
+const glassCardStyles = 
+  "relative md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
 
-export default function KpiCard({ label, value, hint, icon, accent = "neutral" }: Props) {
+export default function KpiCard({ label, value, hint, icon }: Props) {
   return (
-    <div className="rounded-xl border border-gray-100 bg-white shadow-sm p-5 flex flex-col gap-2">
-      <div className="flex items-center justify-between">
+    <div className={`flex flex-col gap-2 p-6 ${glassCardStyles}`}>
+      
+      <div className="relative z-10 flex items-center justify-between h-10">
         <span className="text-xs font-bold uppercase tracking-wide text-urbik-black/50">
           {label}
         </span>
-        {icon && (
-          <span className={`w-8 h-8 rounded-full flex items-center justify-center ${ACCENT[accent]}`}>
-            {icon}
-          </span>
-        )}
+        {icon && <div className="text-urbik-black/50">{icon}</div>}
       </div>
-      <div className="text-3xl font-black text-urbik-black leading-none">{value}</div>
-      {hint && <div className="text-xs font-medium text-gray-500">{hint}</div>}
+
+      <div className="relative z-10 text-4xl font-black text-urbik-black/70 leading-none">
+        {value}
+      </div>
+
+      {hint && (
+        <div className="relative z-10 text-xs font-medium text-gray-500">
+          {hint}
+        </div>
+      )}
+      
     </div>
   );
 }

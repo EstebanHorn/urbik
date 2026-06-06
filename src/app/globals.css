@@ -127,6 +127,15 @@ a {
     );
   }
 
+  .bg-urbik-black2 {
+    background-image: linear-gradient(
+      to right, 
+      var(--color-urbik-black) 0%, 
+      var(--color-urbik-black) 15%, 
+      var(--color-urbik-black) 100%
+    );
+  }
+
       .bg-urbik-white1 {
     background-image: linear-gradient(
       to right, 

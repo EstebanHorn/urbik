@@ -11,7 +11,7 @@ function formatDay(day: string) {
 
 export default function ViewsAreaChart({
   data,
-  color = "#00F0FF",
+  color = "#374151",
   gradientId = "colorViews",
   height = 280,
 }: {
@@ -27,40 +27,43 @@ export default function ViewsAreaChart({
       <AreaChart data={formatted} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={color} stopOpacity={0.25} />
+            <stop offset="5%" stopColor={color} stopOpacity={0} />
             <stop offset="95%" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.04)" vertical={false} />
+        
+        <CartesianGrid strokeDasharray="4 4" stroke="rgba(0,0,0,0.03)" vertical={false} />
+        
         <XAxis
           dataKey="label"
           axisLine={false}
           tickLine={false}
-          tick={{ fill: "#9CA3AF", fontSize: 11 }}
+          tick={{ fill: "#A1A1AA", fontSize: 11, fontWeight: 500 }}
           interval={Math.max(0, Math.floor(formatted.length / 8) - 1)}
+          dy={10}
         />
+        
         <YAxis
           axisLine={false}
           tickLine={false}
-          tick={{ fill: "#9CA3AF", fontSize: 11 }}
+          tick={{ fill: "#A1A1AA", fontSize: 11, fontWeight: 500 }}
           allowDecimals={false}
           width={32}
+          dx={-10}
         />
+        
         <Tooltip
-          contentStyle={{
-            borderRadius: "12px",
-            border: "1px solid rgba(0,0,0,0.06)",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-            fontSize: 12,
-          }}
-          labelStyle={{ fontWeight: 800 }}
+          content={() => null}
+          cursor={{ stroke: "rgba(0,0,0,0.1)", strokeWidth: 1, strokeDasharray: "4 4" }}
         />
+        
         <Area
           type="monotone"
           dataKey="views"
           stroke={color}
-          strokeWidth={2.5}
+          strokeWidth={2}
           fill={`url(#${gradientId})`}
+          activeDot={{ r: 4, fill: color, stroke: "#ffffff", strokeWidth: 2 }}
         />
       </AreaChart>
     </ResponsiveContainer>
