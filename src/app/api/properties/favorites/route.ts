@@ -22,26 +22,28 @@ interface SupabaseProperty {
   created_at: string;
 }
 
-const mapProperty = (property: SupabaseProperty) => ({
-  id: property.id,
-  title: property.title,
-  salePrice: property.sale_price,
-  saleCurrency: property.sale_currency,
-  rentPrice: property.rent_price,
-  rentCurrency: property.rent_currency,
-  latitude: property.latitude,
-  longitude: property.longitude,
-  city: property.city,
-  province: property.province,
-  operationType: property.operation_type,
-  type: property.type,
-  images: property.images,
-  address: property.address,
-  rooms: property.rooms,
-  bathrooms: property.bathrooms,
-  area: property.area,
-  createdAt: property.created_at,
-});
+const mapProperty = (property: SupabaseProperty) => {
+  const price = property.operation_type === 'RENT' ? property.rent_price : property.sale_price;
+  const currency = property.operation_type === 'RENT' ? property.rent_currency : property.sale_currency;
+
+  return {
+    id: property.id,
+    title: property.title,
+    type: property.type,
+    operationType: property.operation_type,
+    price: price,
+    currency: currency,
+    images: property.images || [],
+    city: property.city,
+    area: property.area,
+    rooms: property.rooms,
+    bathrooms: property.bathrooms,
+    address: property.address,
+    province: property.province,
+    latitude: property.latitude,
+    longitude: property.longitude,
+  };
+};
 
 export async function GET() {
   try {
@@ -64,7 +66,7 @@ export async function GET() {
         created_at,
         property:properties(*)
       `)
-      .eq("user_id", user.id)
+      .eq("profile_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) {

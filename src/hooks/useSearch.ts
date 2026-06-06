@@ -35,14 +35,12 @@ export function useSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Librerías de Google
   const placesLib = useMapsLibrary('places');
   const geocodingLib = useMapsLibrary('geocoding');
   
   const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
   const geocoderService = useRef<google.maps.Geocoder | null>(null);
 
-  // Instanciar servicios de Google cuando las librerías carguen
   useEffect(() => {
     if (placesLib && !autocompleteService.current) {
       autocompleteService.current = new placesLib.AutocompleteService();
@@ -60,7 +58,6 @@ export function useSearch() {
       }
       setIsLoading(true);
       try {
-        // 1. Llamadas a tus propias APIs
         const [searchResponse, parseResponse] = await Promise.all([
           fetch(`/api/search?q=${encodeURIComponent(query)}`),
           fetch(`/api/search/parse?q=${encodeURIComponent(query)}`),
@@ -71,11 +68,10 @@ export function useSearch() {
         let addressSuggestions: SearchSuggestion[] = searchData.suggestions || [];
         const parsed = parseData.parsed as ParsedFilters | null;
 
-        // 2. Llamada silenciosa a Google Places API
         if (autocompleteService.current) {
           const request: google.maps.places.AutocompletionRequest = {
             input: query,
-            componentRestrictions: { country: "ar" }, // Filtramos por Argentina
+            componentRestrictions: { country: "ar" },
             types: ['geocode'] 
           };
 
@@ -91,17 +87,14 @@ export function useSearch() {
 
           console.log("🕵️‍♂️ Predicciones de Google Maps:", googleResults);
 
-          // Formateamos las predicciones de Google para que calcen en tu Navbar
           const googleSuggestions: SearchSuggestion[] = googleResults.map(p => ({
             type: "ADDRESS",
             id: p.place_id,
             display_name: p.description, 
             name: p.structured_formatting.main_text,
             fullLabel: p.description,
-            // Aún no tenemos lat/lon, las buscamos solo si hace clic
           }));
 
-          // Juntamos las sugerencias (Limito las de Google a 4 para no saturar tu UI)
           addressSuggestions = [...googleSuggestions.slice(0, 4), ...addressSuggestions];
         }
 
@@ -132,11 +125,9 @@ export function useSearch() {
     clearAutocomplete();
     
     if (suggestion.type === "ADDRESS") {
-      // Caso 1: Es una dirección de tu BD (ya tiene coordenadas)
       if (suggestion.lat && suggestion.lon) {
         router.push(`/map?lat=${suggestion.lat}&lon=${suggestion.lon}&zoom=16`);
       } 
-      // Caso 2: Es una dirección de Google (tiene ID, pero no coordenadas)
       else if (suggestion.id && geocoderService.current) {
         geocoderService.current.geocode({ placeId: suggestion.id as string }, (results, status) => {
           if (status === "OK" && results && results[0]) {

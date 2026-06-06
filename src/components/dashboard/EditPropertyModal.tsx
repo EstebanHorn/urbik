@@ -17,6 +17,16 @@ import {
 import type { PropertySummary } from "@/app/(dashboard)/dashboard/page";
 import ParcelPickerModal, { type SelectedParcel } from "./ParcelPickerModal";
 
+const MODAL_ANIMATION_STYLES = `
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .step-transition {
+    animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+`;
+
 type EditableProperty = Omit<PropertySummary, "type" | "description" | "propertySubtype" | "featureGroups" | "youtubeUrl" | "tour360Url"> & {
   type?: string;
   description: string;
@@ -235,15 +245,7 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
 
   return (
     <>
-      <style>{`
-        @keyframes fadeSlideIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .step-transition {
-          animation: fadeSlideIn 0.3s ease-out forwards;
-        }
-      `}</style>
+      <style dangerouslySetInnerHTML={{ __html: MODAL_ANIMATION_STYLES }} />
 
       <div className="fixed inset-0 z-50 flex items-center justify-center pt-20 px-6 pb-6">
         <div
@@ -287,7 +289,7 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
           <div className="flex flex-1 overflow-hidden">
             <div className="flex-1 overflow-y-auto px-8 py-6">
               {activeModule && (
-                <div key={activeModule.id} className="step-transition opacity-0">
+                <div key={activeModule.id} className="step-transition">
                   <h3 className="text-xl font-bold text-center text-urbik-black/80 mb-6">
                     {activeModule.label}
                   </h3>

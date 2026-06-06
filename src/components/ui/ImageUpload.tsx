@@ -84,8 +84,7 @@ export default function ImageUpload({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-end px-1">
-        <div className="text-xs font-bold text-urbik-black/50 uppercase tracking-widest">Galería de la Propiedad</div>
+      <div className="flex justify-end items-end px-1">
         <span className="text-[10px] text-urbik-black/40 font-medium">{value.length} / {maxFiles} IMÁGENES</span>
       </div>
 

@@ -30,18 +30,21 @@ export default function FavoriteButton({ propertyId, initialIsFavorite, small = 
 
         const previousState = isFavorite;
         setIsFavorite(!previousState);
-
-        try {
+try {
             const res = await fetch("/api/properties/favorite", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ propertyId }),
             });
-            if (!res.ok) throw new Error();
-        } catch (error) {
-            console.error("Error al actualizar favorito:", error);
+            
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || "Error desconocido al contactar la API");
+            }
+        } catch (error: any) {
+            console.error("Error al actualizar favorito:", error.message);
             setIsFavorite(previousState);
-            alert("No se pudo actualizar el favorito.");
+            alert(`Error: ${error.message}`);
         }
     };
 

@@ -72,7 +72,19 @@ export async function GET() {
       .eq("real_estate_id", authUser.id)
       .order("id", { ascending: false });
 
+    const { data: reviews } = await admin
+      .from("real_estate_reviews")
+      .select("rating")
+      .eq("real_estate_id", authUser.id);
+
+      let averageRating = 0;
+    if (reviews && reviews.length > 0) {
+      const sum = reviews.reduce((acc, curr) => acc + curr.rating, 0);
+      averageRating = sum / reviews.length;
+    }
+
     return NextResponse.json({
+      id: authUser.id,
       role: profile.role,
       email: profile.email, 
       isActive: Boolean(profile.is_active),
@@ -90,6 +102,8 @@ export async function GET() {
         logoUrl: realEstate?.logo_url ?? null,
         bannerUrl: realEstate?.banner_url ?? null,
         properties: (properties ?? []).map(mapProperty),
+        reviewCount: reviews?.length ?? 0,
+        reviewAverage: averageRating,
       },
     });
   }
@@ -101,6 +115,7 @@ export async function GET() {
     .single();
 
   return NextResponse.json({
+    id: authUser.id,
     role: profile.role,
     email: profile.email,
     phone: null,

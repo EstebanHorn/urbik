@@ -29,7 +29,6 @@ const OPERATION_LABELS: Record<string, string> = {
   SALE_RENT: "Venta / Alquiler",
 };
 
-// --- NUEVA ESTÉTICA: Glass Card ---
 const glassCard = "md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
 
 type Property = {
@@ -58,15 +57,12 @@ function formatPrice(
   return `${symbol} ${price.toLocaleString("es-AR")}`;
 }
 
-// --- COMPONENTE: Estrellas con soporte para fracciones ---
 function HeaderFractionalStars({ average, total }: { average: number; total: number }) {
   return (
     <div className="flex items-center gap-2 mb-3 mt-1">
       <div className="flex gap-0.5">
         {[1, 2, 3, 4, 5].map((star) => {
-          // Calculamos cuánto debe llenarse esta estrella específica (0 a 100)
           const fillPercentage = Math.max(0, Math.min(100, (average - star + 1) * 100));
-          // ID único pero determinista para evitar errores de hidratación
           const gradientId = `star-grad-${star}-${fillPercentage.toFixed(0)}`;
 
           return (
@@ -79,8 +75,8 @@ function HeaderFractionalStars({ average, total }: { average: number; total: num
             >
               <defs>
                 <linearGradient id={gradientId} x1="0" x2="100%" y1="0" y2="0">
-                  <stop offset={`${fillPercentage}%`} stopColor="#000000" /> {/* Color dorado */}
-                  <stop offset={`${fillPercentage}%`} stopColor="#bfbfbf" /> {/* Color gris de fondo */}
+                  <stop offset={`${fillPercentage}%`} stopColor="#000000" />
+                  <stop offset={`${fillPercentage}%`} stopColor="#bfbfbf" />
                 </linearGradient>
               </defs>
               <path
@@ -259,7 +255,6 @@ export default async function RealEstatePage({
                     animationFillMode: "both"
                   }}
                 >
-                  {/* --- IMAGEN CON MÁSCARA Y HOVER --- */}
                   <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-urbik-g200">
                     {property.images?.[0] ? (
                       <Image
@@ -279,10 +274,8 @@ export default async function RealEstatePage({
                     )}
                   </div>
 
-                  {/* --- CONTENIDO --- */}
                   <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
                     <div>
-                      {/* ETIQUETAS ESTILO GLASS */}
                       <div className="mb-3 flex flex-wrap items-center gap-2">
                         <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                           {PROPERTY_LABELS[property.type] ?? property.type}
@@ -305,7 +298,6 @@ export default async function RealEstatePage({
                       </p>
                     </div>
 
-                    {/* --- PRECIO Y PIE DE TARJETA --- */}
                     <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-white/60 pt-4">
                       <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
                         {formatPrice(

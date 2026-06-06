@@ -138,33 +138,12 @@ export default function Navbar() {
     );
   }
 
-  const getNavLinks = (userRole?: string | null) => {
-    const publicLinks: { label: string; value: string }[] = [];
-
-    switch (userRole) {
-      case "ADMIN":
-        return [...publicLinks, { label: "Administrar", value: "/administrate" }];
-      case "REALESTATE":
-        return [...publicLinks, { label: "Mis Propiedades", value: "/dashboard" }, { label: "Propiedades Guardadas", value: "/saved" }];
-      case "USER":
-        return [...publicLinks, { label: "Mis Mensajes", value: "/messages" }, { label: "Propiedades Guardadas", value: "/saved" }];
-      default:
-        return publicLinks;
-    }
-  };
-
-  const navLinks = getNavLinks(role);
-
   const profileOptions = session
     ? [
-        ...navLinks,
-        ...(role !== "ADMIN" ? [{ label: "Editar Perfil", value: "/profile" }] : []),
-        ...(role === "REALESTATE" ? [{ label: "Publicar Propiedad", value: "/dashboard?nueva=1" }] : []),
         { label: "Configuración", value: "/settings" },
         { label: "Cerrar Sesión", value: "logout" },
       ]
     : [
-        ...navLinks,
         { label: "Iniciar Sesión", value: "/auth/login" },
         { label: "Registrarse", value: "/auth/register" },
       ];
@@ -265,6 +244,39 @@ export default function Navbar() {
     );
   };
 
+  const renderNavLinks = () => {
+    const linkClass = "text-sm md:text-base text-urbik-white hover:text-white/70 font-semibold transition-colors";
+
+    if (!session) {
+      return (
+        <>
+          <Link href="/?operationType=SALE" className={linkClass}>Comprar</Link>
+          <Link href="/?operationType=RENT" className={linkClass}>Alquilar</Link>
+          <Link href="/dashboard?nueva=1" className={linkClass}>Publicar</Link>
+          <Link href="/for-agencies" className={linkClass}>Para Inmobiliarias</Link>
+        </>
+      );
+    }
+
+    if (role === "REALESTATE") {
+      return (
+        <>
+          <Link href="/dashboard?nueva=1" className={linkClass}>Publicar</Link>
+          <Link href="/dashboard" className={linkClass}>Mi Perfil</Link>
+          <Link href="/?operationType=SALE" className={linkClass}>Comprar</Link>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Link href="/?operationType=SALE" className={linkClass}>Comprar</Link>
+        <Link href="/?operationType=RENT" className={linkClass}>Alquilar</Link>
+        <Link href="/dashboard" className={linkClass}>Mi Perfil</Link>
+      </>
+    );
+  };
+
   return (
     <>
       <nav className="fixed z-[1001] bottom-0 top-auto md:bottom-auto md:top-0 left-0 right-0 w-full py-3 px-4 md:py-4 md:px-6 bg-urbik-black text-urbik-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] md:shadow-xl flex items-center h-[60px] md:h-[76px] box-border">
@@ -317,18 +329,7 @@ export default function Navbar() {
             )}
 
             <div className="hidden md:flex items-center justify-center gap-4 md:gap-8 overflow-x-auto no-scrollbar whitespace-nowrap px-2 w-full">
-              <Link href="/?operationType=SALE" className="text-sm md:text-base text-urbik-white hover:text-white/70 font-semibold transition-colors">
-                Comprar
-              </Link>
-              <Link href="/?operationType=RENT" className="text-sm md:text-base text-urbik-white hover:text-white/70 font-semibold transition-colors">
-                Alquilar
-              </Link>
-              <Link href="/dashboard?nueva=1" className="text-sm md:text-base text-urbik-white hover:text-white/70 font-semibold transition-colors">
-                Publicar
-              </Link>
-              <Link href="/for-agencies" className="text-sm md:text-base text-urbik-white hover:text-white/70 font-semibold transition-colors">
-                Para Inmobiliarias
-              </Link>
+              {renderNavLinks()}
             </div>
 
           </div>

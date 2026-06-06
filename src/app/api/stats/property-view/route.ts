@@ -40,12 +40,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Propiedad inexistente" }, { status: 404 });
     }
 
-    // Self-view: el dueño no infla sus propios stats
     if (user && property.real_estate_id === user.id) {
       return new NextResponse(null, { status: 204 });
     }
 
-    // Dedup 30 min por (property_id, session_id)
     const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
     const { data: existing } = await admin
       .from("property_views")

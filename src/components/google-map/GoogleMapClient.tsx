@@ -25,7 +25,6 @@ export default function GoogleMapClient({
 }: GoogleMapClientProps) {
   return (
     <div className="relative w-full overflow-hidden" style={{ height }}>
-      {/* Barra de Búsqueda de Google */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] w-full max-w-md">
         <GoogleSearchBar />
       </div>
@@ -36,8 +35,7 @@ export default function GoogleMapClient({
         minZoom={3}
         maxZoom={19}
         disableDefaultUI={true}
-        gestureHandling="greedy" // Permite hacer zoom con scroll directamente
-        // Usamos onIdle para disparar la búsqueda de la DB solo cuando el mapa se detiene, evitando spam a la API
+        gestureHandling="greedy"
         onIdle={(e) => {
           if (!onBoundsChange) return;
           const bounds = e.map.getBounds();

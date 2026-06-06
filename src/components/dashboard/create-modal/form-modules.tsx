@@ -123,7 +123,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
   const opActiveIndex = operationOptions.findIndex((opt) => opt.id === operationType);
   const statusActiveIndex = statusOptions.findIndex((opt) => opt.id === statusType);
 
-  // Opciones condicionales para Departamento/PH
   const buildingConditionOptions = [
     { value: "bueno", label: "Bueno" },
     { value: "mediano", label: "Mediano" },
@@ -134,7 +133,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
 
   return (
     <div className="flex flex-col items-center w-full max-w-lg mx-auto space-y-8">
-      {/* 1. Tipo de propiedad */}
       <div className="w-full text-center flex flex-col items-center">
         <label className="block text-sm font-bold text-urbik-black/50 mb-2">
           Tipo de propiedad
@@ -158,7 +156,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
         </div>
       </div>
 
-      {/* 2. Operación */}
       <div className="w-full text-center flex flex-col items-center">
         <label className="block text-sm font-bold text-urbik-black/50 mb-2">
           Operación
@@ -185,7 +182,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
         </div>
       </div>
 
-      {/* 3. Estado */}
       <div className="w-full text-center flex flex-col items-center">
         <label className="block text-sm font-bold text-urbik-black/50 mb-2">
           Estado
@@ -212,7 +208,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
         </div>
       </div>
 
-      {/* 4. Checkbox Sin Precio */}
       <label className="flex items-center justify-center gap-2 cursor-pointer mt-4">
         <input
           type="checkbox"
@@ -224,7 +219,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
         </span>
       </label>
 
-      {/* 5. Precios y Expensas */}
       {!watch("isPriceHidden") && (
         <div className="w-full space-y-6 flex flex-col items-center">
           <div className="w-full flex flex-col items-center gap-3">
@@ -258,11 +252,9 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
         </div>
       )}
 
-      {/* 6. CAMPOS DINÁMICOS POR TIPO DE PROPIEDAD */}
       {propertyType && (
         <div className="w-full pt-6 mt-6 border-t border-white/40 space-y-6">
           
-          {/* DEPARTAMENTO o PH */}
           {(propertyType === "APARTMENT" || propertyType === "PH") && (
             <div className="w-full grid grid-cols-1 gap-4 items-end">
               <div className="w-full text-center flex flex-col items-center md:items-start">
@@ -299,7 +291,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
             </div>
           )}
 
-          {/* LOCAL COMERCIAL */}
           {propertyType === "COMMERCIAL_PROPERTY" && (
             <CustomDropdown
               label="Rubro principal"
@@ -310,7 +301,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
             />
           )}
 
-          {/* TERRENO */}
           {propertyType === "LAND" && (
             <div className="space-y-4">
               <AnimatedInput 
@@ -416,7 +406,6 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
 
   return (
     <div className="space-y-8">
-      {/* Sección 1: Superficies */}
       <div className="grid grid-cols-1 gap-4">
         {surfaceFields.map((f) => (
           <div key={f.key}>
@@ -436,7 +425,6 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
 
       <hr className="border-white/50" />
 
-      {/* Sección 2: Ambientes */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {envFields.map((f) => (
           <div key={f.key}>
@@ -458,7 +446,6 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
 }
 
 export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
-  // Ahora este módulo queda solo para lo esencial que comparten todas
   const conditionOptions = [
     { value: "excelente", label: "Excelente" },
     { value: "bueno", label: "Bueno" },

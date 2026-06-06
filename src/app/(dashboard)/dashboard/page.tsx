@@ -4,23 +4,20 @@ export const dynamic = "force-dynamic";
 
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Mail, Phone, Building2, CheckCheck, Inbox, BarChart3, Home, MessageSquare, Bell } from "lucide-react";
 
-import CreatePropertyModal from "@/components/dashboard/CreatePropertyModal";
-import EditPropertyModal from "@/components/dashboard/EditPropertyModal";
-import StatsPanel from "@/components/dashboard/stats/StatsPanel";
-import ChatPanel from "@/components/chat/ChatPanel";
-import { useChatThreads } from "@/hooks/useChatThreads";
-
-const glassCard = "md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
+import DashboardRealestate from "@/components/dashboard/dashboardRealestate";
+import DashboardUser from "@/components/dashboard/dashboardUser";
 
 export type PropertySummary = {
   id: string;
   title: string;
   description?: string;
   price?: number;
+  sale_price?: number;
+  rent_price?: number;
+  sale_currency?: string;
+  rent_currency?: string;
   city?: string;
   province?: string;
   address?: string;
@@ -47,370 +44,30 @@ export type PropertySummary = {
   buildingFloors?: number | null;
 };
 
-type ProfileData = {
+export type ProfileData = {
+  id?: string;
   role?: string;
+  isActive?: boolean;
   email?: string;
   name?: string;
   firstName?: string | null;
   lastName?: string | null;
+  phone?: string | null;
+  city?: string | null;
+  province?: string | null;
+  address?: string | null;
   agencyData?: { 
     name?: string | null; 
     slug?: string | null; 
     logoUrl?: string | null; 
-    properties?: PropertySummary[] | null 
+    properties?: PropertySummary[] | null;
+    reviews?: any[] | null;
+    reviewCount?: number;
+    reviewAverage?: number;
   };
   properties?: PropertySummary[] | null;
+  savedProperties?: PropertySummary[] | null;
 };
-
-type ActiveTab = "properties" | "statistics" | "inquiries" | "chat";
-
-const deleteProperty = async (id: string | number) => {
-  const res = await fetch(`/api/property/${id}`, { method: "DELETE" });
-  if (!res.ok) {
-    const data = await res.json();
-    throw new Error(data.error ?? "Error al eliminar la propiedad");
-  }
-  return res.json();
-};
-
-function ConfirmationModal({ isOpen, onClose, onConfirm, title, message, isLoading }: any) {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden transform transition-all">
-        <div className="p-6">
-          <div className="flex items-center justify-center w-12 h-12 mx-auto bg-urbik-rose/10 rounded-full">
-            <span className="text-urbik-rose text-xl font-bold">!</span>
-          </div>
-          <div className="mt-4 text-center">
-            <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-            <p className="mt-2 text-sm text-gray-500">{message}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 p-4 bg-gray-50">
-          <button onClick={onClose} disabled={isLoading} className="flex-1 cursor-pointer px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-urbik-black/70 hover:border-urbik-white rounded-full hover:bg-urbik-black/70 hover:text-urbik-white disabled:opacity-50 transition-all">Cancelar</button>
-          <button onClick={onConfirm} disabled={isLoading} className="flex-1 cursor-pointer px-4 py-2 text-sm font-medium border border-urbik-white text-white bg-urbik-rose rounded-full hover:bg-urbik-white hover:text-urbik-rose hover:border-urbik-rose disabled:opacity-50 flex justify-center items-center transition-all">
-            {isLoading ? "Eliminando..." : "Eliminar"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function InquiriesPanel({ onRead }: { onRead?: () => void }) {
-  const [inquiries, setInquiries] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [markingId, setMarkingId] = useState<number | null>(null);
-
-  const fetchInquiries = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/inquiries");
-      if (!res.ok) throw new Error("Error al cargar consultas");
-      setInquiries(await res.json());
-    } catch (err) { console.error(err); } finally { setIsLoading(false); }
-  }, []);
-
-  useEffect(() => { fetchInquiries(); }, [fetchInquiries]);
-
-  async function markAsRead(id: number) {
-    setMarkingId(id);
-    try {
-      const res = await fetch(`/api/inquiries/${id}`, { method: "PATCH" });
-      if (!res.ok) throw new Error("Error");
-      setInquiries((prev) => prev.map((inq) => inq.id === id ? { ...inq, status: "READ" } : inq));
-      onRead?.();
-    } catch (err) { console.error(err); } finally { setMarkingId(null); }
-  }
-
-  const unreadCount = inquiries.filter((i) => i.status === "UNREAD").length;
-
-  if (isLoading) return <div className="space-y-3 mt-4">{[1, 2, 3].map((n) => <div key={n} className="h-20 rounded-xl bg-gray-100 animate-pulse border border-gray-100" />)}</div>;
-
-  if (inquiries.length === 0) return (
-    <div className="flex flex-col items-center justify-center py-20 text-center mt-4">
-      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4"><Inbox size={28} className="text-gray-400" /></div>
-      <h3 className="text-base font-bold text-urbik-black/60">No tenés consultas por el momento.</h3>
-    </div>
-  );
-
-  return (
-    <div className="mt-4">
-      {unreadCount > 0 && <p className="text-xs font-bold text-urbik-muted mb-3 ml-1">{unreadCount} consulta(s) sin leer</p>}
-      <div className="space-y-2">
-        {inquiries.map((inq) => {
-          const isExpanded = expandedId === inq.id;
-          const isUnread = inq.status === "UNREAD";
-          return (
-            <div key={inq.id} className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-urbik-cyan/40 bg-urbik-cyan/5" : "border-gray-100 bg-white"} hover:shadow-sm`} onClick={() => { setExpandedId(isExpanded ? null : inq.id); if (!isExpanded && isUnread) markAsRead(inq.id); }}>
-              <div className="p-4 flex items-start gap-4">
-                <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-black text-sm ${isUnread ? "bg-urbik-black text-urbik-cyan" : "bg-gray-100 text-gray-500"}`}>{inq.senderName.charAt(0).toUpperCase()}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-sm text-urbik-black">{inq.senderName}</span>
-                      {isUnread ? <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-urbik-cyan text-urbik-dark">Nuevo</span> : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-500"><CheckCheck size={10} /> Leído</span>}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <Building2 size={11} className="text-urbik-emerald shrink-0" />
-                    <span className="text-xs text-urbik-muted font-medium truncate">{inq.property.title}</span>
-                  </div>
-                  {!isExpanded && <p className="text-xs text-gray-500 mt-1.5 line-clamp-1 font-medium">{inq.message}</p>}
-                </div>
-              </div>
-              {isExpanded && (
-                <div className="px-4 pb-5 space-y-4" onClick={(e) => e.stopPropagation()}>
-                  <div className="h-px bg-gray-100" />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="bg-white p-1.5 rounded-full border border-gray-200"><Mail size={14} className="text-urbik-dark" /></div>
-                      <div><p className="text-[10px] font-bold text-urbik-muted uppercase">Email</p><a href={`mailto:${inq.senderEmail}`} className="text-xs font-bold text-urbik-black hover:text-urbik-emerald transition-colors">{inq.senderEmail}</a></div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="bg-white p-1.5 rounded-full border border-gray-200"><Phone size={14} className="text-urbik-dark" /></div>
-                      <div><p className="text-[10px] font-bold text-urbik-muted uppercase">Teléfono</p><a href={`tel:${inq.senderPhone}`} className="text-xs font-bold text-urbik-black hover:text-urbik-emerald transition-colors">{inq.senderPhone}</a></div>
-                    </div>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <p className="text-[10px] font-bold text-urbik-muted uppercase mb-2">Mensaje</p>
-                    <p className="text-sm text-urbik-black leading-relaxed whitespace-pre-wrap">{inq.message}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function DashboardMain({ properties, onRefresh, autoOpenCreate = false }: { properties: PropertySummary[]; onRefresh: () => void; autoOpenCreate?: boolean; }) {
-  const router = useRouter();
-  const [isCreateOpen, setCreateOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [editingProperty, setEditingProperty] = useState<PropertySummary | null>(null);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("properties");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => { if (autoOpenCreate) setCreateOpen(true); }, [autoOpenCreate]);
-  useEffect(() => { fetch("/api/inquiries").then((r) => r.json()).then((data) => { if (Array.isArray(data)) setUnreadCount(data.filter((i) => i.status === "UNREAD").length); }).catch(() => {}); }, []);
-
-  const { totalUnread: unreadChatCount } = useChatThreads();
-
-  const handleConfirmDelete = async () => {
-    if (!deletingId) return;
-    setIsDeleting(true);
-    try {
-      await deleteProperty(deletingId);
-      onRefresh();
-      setIsModalOpen(false);
-    } catch (error: any) {
-      alert(error.message || "Error al eliminar");
-    } finally {
-      setDeletingId(null);
-      setIsDeleting(false);
-    }
-  };
-
-  const tabs: ActiveTab[] = ["properties", "statistics", "inquiries", "chat"];
-  const activeIndex = tabs.indexOf(activeTab);
-
-  return (
-    <div className="pb-28">
-      <div className="flex flex-col md:flex-row md:items-center ml-5 md:justify-between gap-4 mb-6 mt-0 sm:mt-5">
-        <h1 className="text-2xl font-black text-urbik-black">
-          {activeTab === "properties" && "Mis Propiedades"}
-          {activeTab === "statistics" && "Estadísticas"}
-          {activeTab === "inquiries" && "Consultas Recibidas"}
-          {activeTab === "chat" && "Mensajes"}
-        </h1>
-        {activeTab === "properties" && (
-          <div className="flex items-center gap-2 justify-end">
-            <button onClick={() => setCreateOpen(true)} className="bg-white text-urbik-black/80 py-3 px-6 rounded-full border border-black/10 font-bold shadow-md text-md cursor-pointer hover:text-urbik-black/60 transition-all hover:scale-105 transform active:scale-95">Cargar propiedad</button>
-          </div>
-        )}
-      </div>
-
-      <div className="w-full">
-        {activeTab === "chat" && (
-          <div className="h-[70vh]">
-            <ChatPanel />
-          </div>
-        )}
-
-        {activeTab === "inquiries" && (
-          <InquiriesPanel onRead={() => setUnreadCount((n) => Math.max(0, n - 1))} />
-        )}
-
-        {activeTab === "properties" && (
-          <div className="w-full">
-            {properties.length === 0 ? (
-              <div className="text-center py-16 flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-gray-100">
-                <h3 className="text-lg font-bold text-gray-900">Aún no hay propiedades</h3>
-                <p className="text-gray-500 max-w-sm mt-2">Cargá tu primera propiedad usando el botón de arriba.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {properties.map((prop, index) => {
-                  return (
-                    <div
-                      key={prop.id}
-                      onClick={() => router.push(`/property/${prop.id}`)}
-                      className={`group flex flex-col gap-4 p-4 cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] animate-fade-in-up relative ${glassCard}`}
-                      style={{
-                        animationDelay: `${index * 100}ms`,
-                        animationFillMode: "both"
-                      }}
-                    >
-                      {/* Acciones Superpuestas (Editar/Eliminar) */}
-                      <div className="absolute top-6 right-6 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setEditingProperty(prop); }} 
-                          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/50 backdrop-blur-sm border border-white text-urbik-white shadow-sm transition-all hover:scale-110" 
-                          title="Editar"
-                        >
-                          ✎
-                        </button>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setDeletingId(prop.id); setIsModalOpen(true); }} 
-                          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/50 backdrop-blur-sm border border-white text-urbik-white shadow-sm transition-all hover:scale-110" 
-                          title="Eliminar"
-                        >
-                          ✕
-                        </button>
-                      </div>
-
-                      <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl">
-                        {prop.images && prop.images.length > 0 ? (
-                          <img
-                            src={prop.images[0]}
-                            alt={prop.title}
-                            className="h-full w-full object-cover transition duration-700 group-hover:scale-105 [mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)]"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center bg-white text-xs font-bold text-black/70">
-                            Sin imagen
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
-                        <div>
-                          <div className="mb-3 flex flex-wrap items-center gap-2">
-                            <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
-                              {prop.type || "Inmueble"}
-                            </span>
-                            <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
-                              {prop.operationType === 'SALE' ? 'Venta' : prop.operationType === 'RENT' ? 'Alquiler' : 'Venta/Alq'}
-                            </span>
-                            {prop.status === "AVAILABLE" ? (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-urbik-white2 text-urbik-black/60 shadow-sm z-1">Activa</span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-gray-100 text-gray-500 border border-gray-200 shadow-sm z-1"><span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>Pausada</span>
-                            )}
-                          </div>
-                          <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
-                            {prop.title}
-                          </h3>
-                          <p className="mt-2 truncate text-xs font-semibold text-urbik-black/80">
-                            {prop.address || "Sin dirección"}, {prop.city || "—"}, {prop.province || "—"}
-                          </p>
-                        </div>
-                        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/60 pt-4">
-                          <span className="text-xs font-bold text-urbik-black/50 z-1">
-                            {prop.rooms || 0} amb · {prop.area || 0} m²
-                          </span>
-                          <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
-                            {prop.price ? `USD ${prop.price.toLocaleString("es-AR")}` : <span className="text-gray-400">—</span>}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "statistics" && (
-          <StatsPanel
-            properties={properties.map((p) => ({
-              id: p.id,
-              title: p.title,
-              city: p.city,
-              province: p.province,
-            }))}
-          />
-        )}
-      </div>
-
-      <div className="fixed bottom-16 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 p-0.5 rounded-full backdrop-blur-xl bg-white/50 border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] w-[90vw] sm:w-max">
-        <div className="relative grid grid-cols-4 w-full h-full items-center">
-          <div 
-            className="absolute top-0 bottom-0 left-0 w-1/4 bg-urbik-white1/70 backdrop-blur-3xl rounded-full shadow-md transition-transform duration-300 ease-out"
-            style={{ transform: `translateX(${activeIndex * 100}%)` }}
-          />
-
-          <button 
-            onClick={() => setActiveTab("properties")} 
-            className={`relative z-10 flex items-center justify-center py-3 sm:py-3 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "properties" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
-          >
-            <Home size={22} className="sm:hidden" />
-            <span className="hidden sm:inline font-bold text-sm">Propiedades</span>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab("statistics")} 
-            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "statistics" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
-          >
-            <BarChart3 size={22} className="sm:hidden" />
-            <span className="hidden sm:inline font-bold text-sm">Estadísticas</span>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab("inquiries")} 
-            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "inquiries" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
-          >
-            <div className="relative flex items-center justify-center">
-              <Bell size={22} className="sm:hidden" />
-              <span className="hidden sm:inline font-bold text-sm">Consultas</span>
-              {unreadCount > 0 && (
-                <span className="absolute -top-1.5 -right-2.5 sm:-top-1 sm:-right-3 w-3 h-3 bg-red-500 rounded-full border-[2px] border-white shadow-sm" />
-              )}
-            </div>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab("chat")} 
-            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "chat" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
-          >
-            <div className="relative flex items-center justify-center">
-              <MessageSquare size={22} className="sm:hidden" />
-              <span className="hidden sm:inline font-bold text-sm">Mensajes</span>
-              {unreadChatCount > 0 && (
-                <span className="absolute -top-1.5 -right-2.5 sm:-top-1 sm:-right-3 w-3 h-3 bg-urbik-cyan rounded-full border-[2px] border-white shadow-sm" />
-              )}
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <ConfirmationModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setDeletingId(null); setIsDeleting(false); }} onConfirm={handleConfirmDelete} title="¿Eliminar propiedad?" message="Esta acción es permanente y la propiedad dejará de estar visible." isLoading={isDeleting} />
-      <CreatePropertyModal open={isCreateOpen} onClose={() => setCreateOpen(false)} onCreated={onRefresh} />
-
-      {editingProperty && (
-        <EditPropertyModal open={true} property={{ ...editingProperty, type: editingProperty.type || undefined, description: editingProperty.description || "", propertySubtype: editingProperty.propertySubtype || undefined, featureGroups: editingProperty.featureGroups || undefined, youtubeUrl: editingProperty.youtubeUrl || undefined, tour360Url: editingProperty.tour360Url || undefined }} onClose={() => setEditingProperty(null)} onUpdated={onRefresh} />
-      )}
-    </div>
-  );
-}
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -423,6 +80,11 @@ export default function DashboardPage() {
 
   const fetchProfile = useCallback(async () => {
     try {
+      const cachedProfile = sessionStorage.getItem("urbik_profile_cache");
+      if (cachedProfile) {
+        setProfile(JSON.parse(cachedProfile));
+      }
+
       const res = await fetch("/api/user");
       
       if (!res.ok) {
@@ -432,7 +94,9 @@ export default function DashboardPage() {
       }
 
       const data = await res.json();
+      
       setProfile(data);
+      sessionStorage.setItem("urbik_profile_cache", JSON.stringify(data));
     } catch (error) {
       console.error("❌ Fallo en fetchProfile:", error);
     }
@@ -455,10 +119,10 @@ export default function DashboardPage() {
     return profile.properties ?? [];
   }, [profile]);
 
-  if (status === "loading") {
+  if (status === "loading" || (status === "authenticated" && !profile)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="animate-pulse text-gray-400 font-medium">Cargando Urbik...</div>
+        <div className="animate-pulse text-gray-400 font-medium">Cargando perfil...</div>
       </div>
     );
   }
@@ -468,7 +132,7 @@ export default function DashboardPage() {
       <div className="flex min-h-screen items-center justify-center bg-white px-4">
         <div className="max-w-md rounded-md border border-gray-200 bg-gray-50 p-8 shadow-sm text-center">
           <h1 className="text-2xl font-black text-black">Iniciá sesión para ver tu panel</h1>
-          <p className="mt-2 text-sm text-gray-500">Vas a poder ver estadísticas y cargar propiedades.</p>
+          <p className="mt-2 text-sm text-gray-500">Vas a poder ver estadísticas y gestionar tu cuenta.</p>
           <button onClick={() => router.push("/auth/login")} className="mt-6 rounded-full cursor-pointer bg-urbik-black px-6 py-3 text-sm font-bold text-white hover:opacity-90 transition">
             Iniciar sesión
           </button>
@@ -480,7 +144,19 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white pt-0 sm:pt-15">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <DashboardMain properties={properties} onRefresh={fetchProfile} autoOpenCreate={autoOpenCreate} />
+        {profile?.role === "REALESTATE" ? (
+          <DashboardRealestate 
+            profile={profile} 
+            properties={properties} 
+            onRefresh={fetchProfile} 
+            autoOpenCreate={autoOpenCreate} 
+          />
+        ) : (
+          <DashboardUser 
+            profile={profile} 
+            onRefresh={fetchProfile} 
+          />
+        )}
       </div>
     </div>
   );

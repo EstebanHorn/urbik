@@ -42,7 +42,6 @@ async function main() {
       console.log(`ERROR: ${err.message}`);
       departamentos[prov.nombre] = [];
     }
-    // Pequeña pausa para no saturar la API
     await new Promise((r) => setTimeout(r, 120));
   }
 

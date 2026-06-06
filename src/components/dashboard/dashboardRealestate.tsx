@@ -1,0 +1,824 @@
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { 
+  Mail, Phone, Building2, CheckCheck, Inbox, 
+  BarChart3, Home, MessageSquare, Bell, MapPin, 
+  Camera, Edit2, X, Share2, Bookmark
+} from "lucide-react";
+
+import CreatePropertyModal from "@/components/dashboard/CreatePropertyModal";
+import EditPropertyModal from "@/components/dashboard/EditPropertyModal";
+import StatsPanel from "@/components/dashboard/stats/StatsPanel";
+import ChatPanel from "@/components/chat/ChatPanel";
+import { useChatThreads } from "@/hooks/useChatThreads";
+import FavoriteButton from "@/components/ui/FavoriteButton";
+
+import {
+  SecuritySection,
+  DangerZone,
+  PauseAccountZone,
+} from "@/components/dashboard/AccountActions";
+
+import LocationSelectors from "@/components/ui/LocationSelectors";
+import ImageUpload from "@/components/ui/ImageUpload";
+import { ProfileData, PropertySummary } from "./page";
+
+const glassCard = "md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
+
+const PROPERTY_LABELS: Record<string, string> = {
+  HOUSE: "Casa", APARTMENT: "Departamento", PH: "PH",
+  COUNTRY: "Country", LAND: "Terreno", FIELD: "Campo",
+  COMMERCIAL_PROPERTY: "Local Comercial", OFFICE: "Oficina",
+};
+
+const OPERATION_LABELS: Record<string, string> = {
+  SALE: "Venta", RENT: "Alquiler", TEMP_RENT: "Temporal", SALE_RENT: "Venta / Alquiler",
+};
+
+const getOperationLabel = (type: string) => {
+  switch (type) {
+    case "SALE": return "Venta";
+    case "RENT": return "Alquiler";
+    case "SALE_RENT": return "Venta y Alquiler";
+    default: return type;
+  }
+};
+
+const getPropertyLabel = (type: string) => {
+  switch (type) {
+    case "HOUSE": return "CASA";
+    case "APARTMENT": return "DPTO";
+    case "LAND": return "TERRENO";
+    case "COMMERCIAL_PROPERTY": return "LOCAL";
+    case "OFFICE": return "OFICINA";
+    default: return type;
+  }
+};
+
+function formatPrice(price?: number | null, currency?: string | null): string {
+  if (!price) return "Consultar";
+  const symbol = currency === "ARS" ? "$" : "USD";
+  return `${symbol} ${price.toLocaleString("es-AR")}`;
+}
+
+const deleteProperty = async (id: string | number) => {
+  const res = await fetch(`/api/property/${id}`, { method: "DELETE" });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error ?? "Error al eliminar la propiedad");
+  }
+  return res.json();
+};
+
+function ConfirmationModal({ isOpen, onClose, onConfirm, title, message, isLoading }: any) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden transform transition-all">
+        <div className="p-6">
+          <div className="flex items-center justify-center w-12 h-12 mx-auto bg-urbik-rose/10 rounded-full">
+            <span className="text-urbik-rose text-xl font-bold">!</span>
+          </div>
+          <div className="mt-4 text-center">
+            <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+            <p className="mt-2 text-sm text-gray-500">{message}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 p-4 bg-gray-50">
+          <button onClick={onClose} disabled={isLoading} className="flex-1 cursor-pointer px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-urbik-black/70 hover:border-urbik-white rounded-full hover:bg-urbik-black/70 hover:text-urbik-white disabled:opacity-50 transition-all">Cancelar</button>
+          <button onClick={onConfirm} disabled={isLoading} className="flex-1 cursor-pointer px-4 py-2 text-sm font-medium border border-urbik-white text-white bg-urbik-rose rounded-full hover:bg-urbik-white hover:text-urbik-rose hover:border-urbik-rose disabled:opacity-50 flex justify-center items-center transition-all">
+            {isLoading ? "Eliminando..." : "Eliminar"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EditAgencyProfileModal({ isOpen, onClose, profile, onSaved }: { isOpen: boolean, onClose: () => void, profile: ProfileData | null, onSaved: () => void }) {
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    name: profile?.agencyData?.name || profile?.name || "",
+    phone: profile?.phone || "",
+    city: profile?.city || "",
+    province: profile?.province || "",
+    street: profile?.agencyData?.street || "",
+    address: profile?.address || "",
+    logoUrl: profile?.agencyData?.logoUrl || "",
+  });
+
+  useEffect(() => {
+    if (isOpen && profile) {
+      setFormData({
+        name: profile.agencyData?.name || profile.name || "",
+        phone: profile.agencyData?.phone || profile.phone || "",
+        city: profile.agencyData?.city || profile.city || "",
+        province: profile.agencyData?.province || profile.province || "",
+        street: profile?.agencyData?.street || profile.street || "",
+        address: profile.agencyData?.address || profile.address || "",
+        logoUrl: profile.agencyData?.logoUrl || "",
+      });
+    }
+  }, [isOpen, profile]);
+
+  if (!isOpen) return null;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLocationChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (urls: string[]) => {
+    setFormData((prev) => ({ ...prev, logoUrl: urls.length > 0 ? urls[0] : "" }));
+  };
+
+  const handleImageRemove = () => {
+    setFormData((prev) => ({ ...prev, logoUrl: "" }));
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 800)); 
+      onSaved();
+      onClose();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div className="max-w-lg w-full mt-20 overflow-hidden transform transition-all flex flex-col rounded-3xl bg-white/70 border border-white backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)]">
+        
+        <div className="flex justify-between items-center bg-white/70 p-6">
+          <h3 className="text-xl font-black text-urbik-black/90">Editar Perfil Inmobiliaria</h3>
+          <button onClick={onClose} className="p-2 transition hover:text-urbik-black/70 cursor-pointer">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-5 overflow-y-auto max-h-[65vh] custom-scrollbar">
+          <div>
+            <label className="block text-xs font-bold text-urbik-black/90 uppercase -mb-3">Logo de la Inmobiliaria</label>
+            <ImageUpload value={formData.logoUrl ? [formData.logoUrl] : []} onChange={handleImageChange} onRemove={handleImageRemove} maxFiles={1} />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">Nombre de la Inmobiliaria</label>
+            <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full border border-white bg-white/30 rounded-full px-4 py-3 text-sm focus:outline-none shadow-sm" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">Teléfono</label>
+            <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="w-full border border-white bg-white/30 rounded-full px-4 py-3 text-sm focus:outline-none shadow-sm" />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">Ubicación</label>
+            <LocationSelectors provinceValue={formData.province} cityValue={formData.city} onChange={handleLocationChange} showLocality={false} />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">Dirección Física</label>
+            <input type="text" name="address" value={formData.street + " " + formData.address} onChange={handleChange} className="w-full border border-white bg-white/30 rounded-full px-4 py-3 text-sm focus:outline-none shadow-sm" />
+          </div>
+        </div>
+
+        <div className="p-6 bg-white/30 border-t border-white/40 flex justify-end gap-3 backdrop-blur-md">
+          <button onClick={onClose} disabled={isSaving} className="px-6 py-2.5 cursor-pointer text-sm font-bold text-urbik-black/70 transition hover:text-urbik-black/50">Cancelar</button>
+          <button onClick={handleSave} disabled={isSaving} className="px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold text-urbik-black/70 hover:text-urbik-black/50 bg-white/30 border border-black/10 transition shadow-md">{isSaving ? "Guardando..." : "Guardar Cambios"}</button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+function InquiriesPanel({ onRead }: { onRead?: () => void }) {
+  const [inquiries, setInquiries] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [markingId, setMarkingId] = useState<number | null>(null);
+
+  const fetchInquiries = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/inquiries");
+      if (!res.ok) throw new Error("Error al cargar consultas");
+      setInquiries(await res.json());
+    } catch (err) { console.error(err); } finally { setIsLoading(false); }
+  }, []);
+
+  useEffect(() => { fetchInquiries(); }, [fetchInquiries]);
+
+  async function markAsRead(id: number) {
+    setMarkingId(id);
+    try {
+      const res = await fetch(`/api/inquiries/${id}`, { method: "PATCH" });
+      if (!res.ok) throw new Error("Error");
+      setInquiries((prev) => prev.map((inq) => inq.id === id ? { ...inq, status: "READ" } : inq));
+      onRead?.();
+    } catch (err) { console.error(err); } finally { setMarkingId(null); }
+  }
+
+  const unreadCount = inquiries.filter((i) => i.status === "UNREAD").length;
+
+  if (isLoading) return <div className="space-y-3 mt-4">{[1, 2, 3].map((n) => <div key={n} className="h-20 rounded-xl bg-gray-100 animate-pulse border border-gray-100" />)}</div>;
+
+  if (inquiries.length === 0) return (
+    <div className="flex flex-col items-center justify-center py-20 text-center mt-4">
+      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4"><Inbox size={28} className="text-gray-400" /></div>
+      <h3 className="text-base font-bold text-urbik-black/60">No tenés consultas por el momento.</h3>
+    </div>
+  );
+
+  return (
+    <div className="mt-4">
+      {unreadCount > 0 && <p className="text-xs font-bold text-urbik-muted mb-3 ml-1">{unreadCount} consulta(s) sin leer</p>}
+      <div className="space-y-2">
+        {inquiries.map((inq) => {
+          const isExpanded = expandedId === inq.id;
+          const isUnread = inq.status === "UNREAD";
+          return (
+            <div key={inq.id} className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-urbik-cyan/40 bg-urbik-cyan/5" : "border-gray-100 bg-white"} hover:shadow-sm`} onClick={() => { setExpandedId(isExpanded ? null : inq.id); if (!isExpanded && isUnread) markAsRead(inq.id); }}>
+              <div className="p-4 flex items-start gap-4">
+                <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-black text-sm ${isUnread ? "bg-urbik-black text-urbik-cyan" : "bg-gray-100 text-gray-500"}`}>{inq.senderName.charAt(0).toUpperCase()}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-sm text-urbik-black">{inq.senderName}</span>
+                      {isUnread ? <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-urbik-cyan text-urbik-dark">Nuevo</span> : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-500"><CheckCheck size={10} /> Leído</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Building2 size={11} className="text-urbik-emerald shrink-0" />
+                    <span className="text-xs text-urbik-muted font-medium truncate">{inq.property.title}</span>
+                  </div>
+                  {!isExpanded && <p className="text-xs text-gray-500 mt-1.5 line-clamp-1 font-medium">{inq.message}</p>}
+                </div>
+              </div>
+              {isExpanded && (
+                <div className="px-4 pb-5 space-y-4" onClick={(e) => e.stopPropagation()}>
+                  <div className="h-px bg-gray-100" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                      <div className="bg-white p-1.5 rounded-full border border-gray-200"><Mail size={14} className="text-urbik-dark" /></div>
+                      <div><p className="text-[10px] font-bold text-urbik-muted uppercase">Email</p><a href={`mailto:${inq.senderEmail}`} className="text-xs font-bold text-urbik-black hover:text-urbik-emerald transition-colors">{inq.senderEmail}</a></div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                      <div className="bg-white p-1.5 rounded-full border border-gray-200"><Phone size={14} className="text-urbik-dark" /></div>
+                      <div><p className="text-[10px] font-bold text-urbik-muted uppercase">Teléfono</p><a href={`tel:${inq.senderPhone}`} className="text-xs font-bold text-urbik-black hover:text-urbik-emerald transition-colors">{inq.senderPhone}</a></div>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <p className="text-[10px] font-bold text-urbik-muted uppercase mb-2">Mensaje</p>
+                    <p className="text-sm text-urbik-black leading-relaxed whitespace-pre-wrap">{inq.message}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function HeaderFractionalStars({ average, total }: { average: number; total: number }) {
+  return (
+    <div className="flex items-center gap-2 mb-3 mt-1">
+      <div className="flex gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => {
+          const fillPercentage = Math.max(0, Math.min(100, (average - star + 1) * 100));
+          const gradientId = `dash-star-grad-${star}-${fillPercentage.toFixed(0)}`;
+
+          return (
+            <svg key={star} viewBox="0 0 24 24" className="w-5 h-5 stroke-1 text-red-500" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id={gradientId} x1="0" x2="100%" y1="0" y2="0">
+                  <stop offset={`${fillPercentage}%`} stopColor="#000000" />
+                  <stop offset={`${fillPercentage}%`} stopColor="#bfbfbf" />
+                </linearGradient>
+              </defs>
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill={`url(#${gradientId})`} />
+            </svg>
+          );
+        })}
+      </div>
+      <span className="text-xs text-urbik-muted font-medium">({total} {total === 1 ? 'reseña' : 'reseñas'})</span>
+    </div>
+  );
+}
+
+type ActiveTab = "properties" | "statistics" | "inquiries" | "chat" | "saved";
+
+interface FavoriteProperty {
+  id: string; title: string; type: string; operationType: string;
+  price: number | null; currency?: string | null; images: string[];
+  city: string; area?: number; rooms?: number; bathrooms?: number;
+  address?: string; province?: string; latitude?: number; longitude?: number;
+}
+
+export default function DashboardRealestate({ profile, properties, onRefresh, autoOpenCreate = false }: { profile: ProfileData | null; properties: PropertySummary[]; onRefresh: () => void; autoOpenCreate?: boolean; }) {
+  const router = useRouter();
+  const [isCreateOpen, setCreateOpen] = useState(false);
+  const [isProfileEditOpen, setProfileEditOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [editingProperty, setEditingProperty] = useState<PropertySummary | null>(null);
+  const [activeTab, setActiveTab] = useState<ActiveTab>("properties");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const [favorites, setFavorites] = useState<FavoriteProperty[]>([]);
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
+
+  const fetchFavorites = useCallback(async () => {
+    try {
+      setLoadingFavorites(true);
+      const res = await fetch("/api/properties/favorites");
+      if (res.ok) setFavorites(await res.json());
+    } catch {
+      console.error("Error cargando favoritos");
+    } finally {
+      setLoadingFavorites(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "saved" && favorites.length === 0) {
+      fetchFavorites();
+    }
+  }, [activeTab, favorites.length, fetchFavorites]);
+
+  const handleShareProfile = async () => {
+    if (!profile?.id) {
+      console.error("🚨 Error: profile.id es undefined", profile);
+      alert("No se pudo generar el enlace porque falta el ID del perfil.");
+      return;
+    }
+    const url = `${window.location.origin}/realestate/${profile.id}`;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = url;
+        textArea.style.position = "absolute";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (!successful) throw new Error("Fallback: execCommand falló");
+      }
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000); 
+    } catch (err) {
+      console.error("❌ Error al copiar al portapapeles:", err);
+      alert(`Tu enlace es: ${url}`);
+    }
+  };
+
+  useEffect(() => { if (autoOpenCreate) setCreateOpen(true); }, [autoOpenCreate]);
+  useEffect(() => { fetch("/api/inquiries").then((r) => r.json()).then((data) => { if (Array.isArray(data)) setUnreadCount(data.filter((i) => i.status === "UNREAD").length); }).catch(() => {}); }, []);
+
+  const { totalUnread: unreadChatCount } = useChatThreads();
+
+  const handleConfirmDelete = async () => {
+    if (!deletingId) return;
+    setIsDeleting(true);
+    try {
+      await deleteProperty(deletingId);
+      onRefresh();
+      setIsModalOpen(false);
+    } catch (error: any) {
+      alert(error.message || "Error al eliminar");
+    } finally {
+      setDeletingId(null);
+      setIsDeleting(false);
+    }
+  };
+
+  const getTransformIndex = () => {
+    switch (activeTab) {
+      case "properties": return 0;
+      case "statistics": return 1;
+      case "inquiries": return 2;
+      case "chat": return 3;
+      case "saved": return 4;
+      default: return 0;
+    }
+  };
+
+  const agencyName = profile?.agencyData?.name || profile?.name || "Mi Inmobiliaria";
+  const logoUrl = profile?.agencyData?.logoUrl;
+  
+  return (
+    <div className="pb-28">
+      {activeTab !== "properties" && (
+        <div className="flex flex-col md:flex-row md:items-center ml-5 md:justify-between gap-4 mb-6 mt-0 sm:mt-5">
+          <h1 className="text-2xl font-black text-urbik-black">
+            {activeTab === "statistics" && "Estadísticas"}
+            {activeTab === "inquiries" && "Consultas Recibidas"}
+            {activeTab === "chat" && "Mensajes"}
+            {activeTab === "saved" && "Propiedades Guardadas"}
+          </h1>
+        </div>
+      )}
+
+      <div className="w-full">
+        {activeTab === "chat" && (
+          <div className={activeTab === "chat" ? "block h-[70vh]" : "hidden"}>
+            <ChatPanel />
+          </div>
+        )}
+
+        <div className={activeTab === "inquiries" ? "block" : "hidden"}>
+          <InquiriesPanel onRead={() => setUnreadCount((n) => Math.max(0, n - 1))} />
+        </div>
+
+        <div className={activeTab === "statistics" ? "block" : "hidden"}>
+          <StatsPanel
+            properties={properties.map((p) => ({
+              id: p.id,
+              title: p.title,
+              city: p.city,
+              province: p.province,
+            }))}
+          />
+        </div>
+
+        <div className={activeTab === "saved" ? "block w-full" : "hidden"}>
+          {loadingFavorites ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 animate-pulse">
+              {[1, 2, 3].map((i) => <div key={i} className={`bg-urbik-g200 h-96 ${glassCard}`} />)}
+            </div>
+          ) : favorites.length === 0 ? (
+            <div className="text-center py-20 border-2 border-dashed border-urbik-g200 rounded-2xl mx-2 md:mx-6">
+              <Bookmark size={32} className="mx-auto text-urbik-g400 mb-4" />
+              <p className="text-urbik-muted font-bold text-lg">
+                Aún no tenés propiedades guardadas en tus favoritos.
+              </p>
+              <Link href="/" className="text-urbik-black font-bold underline mt-4 block">Explorar propiedades</Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {favorites.map((prop, index) => (
+                <div 
+                  key={prop.id} 
+                  className={`group flex flex-col gap-4 p-4 cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] animate-fade-in-up relative h-full ${glassCard}`}
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    animationFillMode: "both"
+                  }}
+                >
+                  <Link href={`/property/${prop.id}`} className="absolute inset-0 z-10" />
+                  
+                  <div className="absolute top-6 right-6 z-20">
+                    <FavoriteButton propertyId={prop.id} initialIsFavorite={true} small={true} />
+                  </div>
+
+                  <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-urbik-g200">
+                    <Image
+                      src={prop.images[0] || "/placeholder-property.jpg"}
+                      alt={prop.title}
+                      fill
+                      className="object-cover transition duration-700 group-hover:scale-105 [mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)]"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  </div>
+
+                  <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
+                    <div>
+                      <div className="mb-3 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                          {getPropertyLabel(prop.type)}
+                        </span>
+                        <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                          {getOperationLabel(prop.operationType)}
+                        </span>
+                      </div>
+
+                      <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black uppercase">
+                        {prop.title}
+                      </h3>
+
+                      <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-urbik-black/80">
+                        <MapPin size={12} className="shrink-0 text-urbik-cyan" strokeWidth={3} />
+                        {prop.address ? `${prop.address}, ` : ''}{prop.city}
+                      </p>
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-white/60 pt-4">
+                      <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
+                        {prop.currency === 'USD' ? 'USD' : '$'} {prop.price?.toLocaleString("es-AR") ?? "Consultar"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={activeTab === "properties" ? "block w-full" : "hidden"}>
+            <div className="relative overflow-hidden group mb-20 mt-4">
+              <div className="relative z-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+                
+                <div 
+                  className="flex items-center gap-8 min-w-0 w-full group/info cursor-pointer rounded-xl hover:opacity-80 transition-colors p-2 -ml-2"
+                  onClick={() => setProfileEditOpen(true)}
+                >
+                  <div
+                    className="w-28 h-28 shrink-0 rounded-full flex items-center justify-center bg-cover bg-center overflow-hidden bg-urbik-g200 relative group/logo"
+                    style={{ backgroundImage: logoUrl ? `url(${logoUrl})` : 'none' }}
+                  >
+                    {!logoUrl && (
+                      <Building2 size={40} className="text-urbik-g400" />
+                    )}
+                    
+                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover/logo:opacity-100 transition-opacity duration-300">
+                      <Camera className="text-white mb-1" size={24} />
+                      <span className="text-[10px] text-white font-bold uppercase tracking-wider">Cambiar</span>
+                    </div>
+                  </div>
+
+                  <div className="min-w-0 w-full flex flex-col items-start justify-center relative">
+                    <h1 className="text-3xl md:text-4xl font-black text-urbik-black/90 uppercase tracking-tighter mb-1 flex items-center gap-3">
+                      {agencyName}
+                    </h1>
+
+                    <p className="flex items-center gap-2 text-urbik-black/60 font-medium mb-3">
+                      <MapPin size={16} />
+                      {profile?.agencyData?.city || profile?.city || "Ciudad"}, {profile?.agencyData?.province || profile?.province || "Provincia"}. 
+                      {profile?.agencyData?.street ? ` ${profile.agencyData.street}` : ""} {profile?.agencyData?.address ? ` ${profile.agencyData.address}` : ""}
+                    </p>
+                    
+                    <div className="mb-3 mt-1">
+                        {profile?.agencyData?.reviewCount ? (
+                          <HeaderFractionalStars 
+                            average={profile.agencyData.reviewAverage || 0} 
+                            total={profile.agencyData.reviewCount} 
+                          />
+                        ) : (
+                          <div className="mb-3 mt-1">
+                            <span className="text-sm font-medium text-urbik-muted bg-urbik-g100 px-2.5 py-1 rounded-md">
+                              Sin reseñas todavía
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-center gap-3 justify-end md:mr-8 w-full md:w-1/4">
+                  
+                  <div className="flex items-center w-full justify-between gap-2">
+                    <button 
+                      onClick={() => setProfileEditOpen(true)} 
+                      className="text-center flex-1 px-3 py-2 text-md font-bold text-urbik-black/80 cursor-pointer hover:text-urbik-black/50 transform transition duration-200"
+                    >
+                      Editar Perfil
+                    </button>
+                    
+                    <button 
+                      onClick={handleShareProfile}
+                      title="Compartir perfil"
+                      className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md cursor-pointer border shadow-sm border-black/10 text-urbik-black/80 hover:scale-105 hover:bg-white transition duration-200"
+                    >
+                      {isCopied ? (
+                        <CheckCheck size={18} className="text-urbik-emerald" />
+                      ) : (
+                        <Share2 size={18} />
+                      )}
+                    </button>
+                  </div>
+
+                  <button 
+                    onClick={() => setCreateOpen(true)} 
+                    className="text-center w-full rounded-full bg-white cursor-pointer border shadow-md border-black/10 px-5 py-2 text-sm font-bold text-urbik-black/80 hover:scale-105 hover:text-urbik-black/50 transform transition duration-200"
+                  >
+                    Cargar Propiedad
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-5 flex items-baseline justify-between px-2 md:px-10">
+              <h2 className="text-2xl font-black text-urbik-black/90 uppercase tracking-tight">
+                Cartera de Propiedades
+              </h2>
+              <span className="text-sm font-bold text-urbik-muted hidden sm:block">
+                {properties.length} {properties.length === 1 ? "propiedad" : "propiedades"}
+              </span>
+            </div>
+
+            {properties.length === 0 ? (
+              <div className="text-center py-20 border-2 border-dashed border-urbik-g200 rounded-2xl mx-2 md:mx-6">
+                <p className="text-urbik-muted font-bold text-lg">
+                  Aún no hay propiedades publicadas en tu cartera.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {properties.map((prop, index) => {
+                  return (
+                    <div
+                      key={prop.id}
+                      onClick={() => router.push(`/property/${prop.id}`)}
+                      className={`group flex flex-col gap-4 p-4 cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] animate-fade-in-up relative ${glassCard}`}
+                      style={{
+                        animationDelay: `${index * 100}ms`,
+                        animationFillMode: "both"
+                      }}
+                    >
+                      <div className="absolute top-6 right-6 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setEditingProperty(prop); }} 
+                          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md border border-white text-urbik-black shadow-sm transition-all hover:scale-110 hover:bg-white" 
+                          title="Editar"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setDeletingId(prop.id); setIsModalOpen(true); }} 
+                          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md border border-white text-urbik-rose shadow-sm transition-all hover:scale-110 hover:bg-white" 
+                          title="Eliminar"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+
+                      <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-urbik-g200">
+                        {prop.images && prop.images.length > 0 ? (
+                          <img
+                            src={prop.images[0]}
+                            alt={prop.title}
+                            className="h-full w-full object-cover transition duration-700 group-hover:scale-105 [mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)]"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-white text-xs font-bold text-black/70">
+                            <Building2 size={36} className="text-urbik-g400" />
+                          </div>
+                        )}
+                        
+                        {prop.status !== "AVAILABLE" && (
+                           <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-gray-100/90 backdrop-blur-sm text-gray-500 border border-gray-200 shadow-sm flex items-center gap-1.5">
+                             <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                             Pausada
+                           </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
+                        <div>
+                          <div className="mb-3 flex flex-wrap items-center gap-2">
+                            <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                              {prop.type ? (PROPERTY_LABELS[prop.type] ?? prop.type) : "Inmueble"}
+                            </span>
+                            <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                              {prop.operationType ? (OPERATION_LABELS[prop.operationType] ?? prop.operationType) : 'Venta/Alq'}
+                            </span>
+                          </div>
+
+                          <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
+                            {prop.title}
+                          </h3>
+
+                          <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-urbik-black/80">
+                            <MapPin size={12} className="shrink-0 text-urbik-cyan" />
+                            {prop.address || "Sin dirección"}, {prop.city || "—"}
+                          </p>
+                        </div>
+
+                        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/60 pt-4">
+                          <span className="text-xs font-bold text-urbik-black/50 z-1">
+                            {prop.rooms || 0} amb · {prop.area || 0} m²
+                          </span>
+                          <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
+                            {formatPrice(
+                              prop.price || prop.sale_price || prop.rent_price || null, 
+                              prop.sale_currency || prop.rent_currency || null
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="mt-20 border-t border-urbik-black/10 pt-10 px-2 md:px-10 mb-10 w-full flex flex-col items-center justify-center">
+              <h2 className="text-2xl font-black text-urbik-black/90 uppercase tracking-tight mb-8">
+                Configuración de la Cuenta
+              </h2>
+              <div className="space-y-8 w-full max-w-3xl mt-10">
+                <SecuritySection />
+
+                {profile?.role === "REALESTATE" && profile?.id && (
+                  <div className={!(profile.isActive ?? true) ? "opacity-50 transition-opacity" : "transition-opacity"}>
+                    <PauseAccountZone
+                      isPaused={!(profile.isActive ?? true)}
+                      userId={profile.id}
+                      onToggleSuccess={onRefresh}
+                    />
+                  </div>
+                )}
+
+                {profile?.id && (
+                  <DangerZone
+                    itemName={agencyName}
+                    userId={profile.id}
+                  />
+                )}
+              </div>
+            </div>
+            
+          </div>
+      </div>
+
+      <div className="fixed bottom-16 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 p-0.5 rounded-full backdrop-blur-xl bg-white/50 border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] w-[95vw] sm:w-max">
+        <div className="relative grid grid-cols-5 w-full h-full items-center">
+          <div 
+            className="absolute top-0 bottom-0 left-0 w-1/5 bg-urbik-white1/70 backdrop-blur-3xl rounded-full shadow-md transition-transform duration-300 ease-out"
+            style={{ transform: `translateX(${getTransformIndex() * 100}%)` }}
+          />
+
+          <button 
+            onClick={() => setActiveTab("properties")} 
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-3 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "properties" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+          >
+            <Home size={22} className="sm:hidden" />
+            <span className="hidden sm:inline font-bold text-sm">Mi Perfil</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab("statistics")} 
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "statistics" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+          >
+            <BarChart3 size={22} className="sm:hidden" />
+            <span className="hidden sm:inline font-bold text-sm">Estadísticas</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab("inquiries")} 
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "inquiries" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+          >
+            <div className="relative flex items-center justify-center">
+              <Bell size={22} className="sm:hidden" />
+              <span className="hidden sm:inline font-bold text-sm">Consultas</span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1.5 -right-2.5 sm:-top-1 sm:-right-3 w-3 h-3 bg-red-500 rounded-full border-[2px] border-white shadow-sm" />
+              )}
+            </div>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab("chat")} 
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "chat" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+          >
+            <div className="relative flex items-center justify-center">
+              <MessageSquare size={22} className="sm:hidden" />
+              <span className="hidden sm:inline font-bold text-sm">Mensajes</span>
+              {unreadChatCount > 0 && (
+                <span className="absolute -top-1.5 -right-2.5 sm:-top-1 sm:-right-3 w-3 h-3 bg-urbik-cyan rounded-full border-[2px] border-white shadow-sm" />
+              )}
+            </div>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab("saved")} 
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "saved" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+          >
+            <Bookmark size={22} className="sm:hidden" />
+            <span className="hidden sm:inline font-bold text-sm">Guardados</span>
+          </button>
+        </div>
+      </div>
+
+      <EditAgencyProfileModal 
+        isOpen={isProfileEditOpen} 
+        onClose={() => setProfileEditOpen(false)} 
+        profile={profile}
+        onSaved={onRefresh} 
+      />
+
+      <ConfirmationModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setDeletingId(null); setIsDeleting(false); }} onConfirm={handleConfirmDelete} title="¿Eliminar propiedad?" message="Esta acción es permanente y la propiedad dejará de estar visible." isLoading={isDeleting} />
+      <CreatePropertyModal open={isCreateOpen} onClose={() => setCreateOpen(false)} onCreated={onRefresh} />
+
+      {editingProperty && (
+        <EditPropertyModal open={true} property={{ ...editingProperty, type: editingProperty.type || undefined, description: editingProperty.description || "", propertySubtype: editingProperty.propertySubtype || undefined, featureGroups: editingProperty.featureGroups || undefined, youtubeUrl: editingProperty.youtubeUrl || undefined, tour360Url: editingProperty.tour360Url || undefined }} onClose={() => setEditingProperty(null)} onUpdated={onRefresh} />
+      )}
+    </div>
+  );
+}

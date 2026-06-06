@@ -19,6 +19,16 @@ import {
 } from "./create-modal/form-modules";
 import ParcelPickerModal, { type SelectedParcel } from "./ParcelPickerModal";
 
+const MODAL_ANIMATION_STYLES = `
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .step-transition {
+    animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+`;
+
 interface CreatePropertyModalProps {
   open: boolean;
   onClose: () => void;
@@ -161,8 +171,6 @@ export default function CreatePropertyModal({
           parcelGeom: data.parcelGeom || null,
           latitude: data.latitude || null,
           longitude: data.longitude || null,
-          
-          // Enviamos los datos específicos que ahora se cargan en Module 1
           buildingCondition: data.buildingCondition || null,
           buildingFloors: data.buildingFloors || null,
           commercialActivity: data.commercialActivity || null,
@@ -207,15 +215,7 @@ export default function CreatePropertyModal({
 
   return (
     <>
-      <style>{`
-        @keyframes fadeSlideIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .step-transition {
-          animation: fadeSlideIn 0.3s ease-out forwards;
-        }
-      `}</style>
+      <style dangerouslySetInnerHTML={{ __html: MODAL_ANIMATION_STYLES }} />
 
       <div className="fixed inset-0 z-50 flex items-center justify-center pt-20 px-6 pb-6">
         <div
@@ -271,7 +271,7 @@ export default function CreatePropertyModal({
               {activeModule && (
                 <div 
                   key={activeModule.id} 
-                  className="step-transition opacity-0"
+                  className="step-transition"
                 >
                   <h3 className="text-xl font-bold text-center text-urbik-black/80 mb-6">
                     {activeModule.label}

@@ -43,10 +43,8 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, nextImage, prevImage]);
 
-  // Genera el array para el carrusel de miniaturas
   const getVisibleThumbnails = () => {
     if (images.length === 0) return [];
-    // Si hay 5 o menos, las mostramos todas sin rotación cíclica visual
     if (images.length <= 5) return images.map((img, i) => ({ img, originalIndex: i }));
     
     const thumbs = [];
@@ -95,7 +93,6 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
           )}
         </div>
 
-        {/* Small Map Overlay */}
         {parcelGeom && latitude && longitude && (
           <div className="absolute top-6 right-6 z-20 w-32 h-32 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-2xl border-4 border-white hidden sm:block opacity-80 hover:opacity-100 transition-opacity">
             <PropertyParcelMap lat={latitude} lon={longitude} selectedGeom={parcelGeom as GeoJsonObject} allProperties={[]} />
@@ -125,7 +122,7 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
                   
                   return (
                     <motion.button
-                      layout // Magia de framer-motion para deslizar los elementos automáticamente
+                      layout
                       initial={{ opacity: 0, scale: 0.8, x: 20 }}
                       animate={{ 
                         opacity: isActive ? 1 : 0.6, 
@@ -156,7 +153,6 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
         )}
       </div>
 
-      {/* Modal Pantalla Completa */}
       <AnimatePresence>
         {isOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-sm" onClick={closeModal}>

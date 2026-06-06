@@ -25,18 +25,22 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: existingFavorite } = await supabase
+    const { data: existingFavorite, error: selectError } = await supabase
       .from("favorites")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("profile_id", user.id) 
       .eq("property_id", propertyId)
       .maybeSingle();
 
+    if (selectError) throw selectError;
+
     if (existingFavorite) {
-      await supabase
+      const { error: deleteError } = await supabase
         .from("favorites")
         .delete()
         .eq("id", existingFavorite.id);
+        
+      if (deleteError) throw deleteError;
 
       return NextResponse.json({
         message: "Eliminado de favoritos",
@@ -44,10 +48,12 @@ export async function POST(req: Request) {
       });
     }
 
-    await supabase.from("favorites").insert({
-      user_id: user.id,
+    const { error: insertError } = await supabase.from("favorites").insert({
+      profile_id: user.id,
       property_id: propertyId,
     });
+
+    if (insertError) throw insertError;
 
     return NextResponse.json({
       message: "Guardado en favoritos",

@@ -43,7 +43,6 @@ function partial(filled: number, total: number): ModuleStatus {
   return "partial";
 }
 
-// Los IDs ahora coinciden exactamente con las keys de moduleContent en los modales: 1, 2, 3, 4, 5, 6, 10, 11
 export const MODULE_DEFINITIONS: ModuleDefinition[] = [
   {
     id: 1, label: "Datos de la Propiedad", visibleFor: ALL,
@@ -70,7 +69,6 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
   { 
     id: 4, label: "Superficies y Ambientes", visibleFor: SURFACES_TYPES, 
     getStatus(form) { 
-      // Se unificó Superficies y Ambientes en el mismo módulo (Module04Surfaces)
       return hasValue(form.areaM2) ? "complete" : "empty"; 
     } 
   },

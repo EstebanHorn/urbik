@@ -51,9 +51,6 @@ export async function GET() {
 
   try {
     const admin = createAdminClient();
-
-    // Owner ambiguity fallback: algunas filas legacy pueden tener
-    // real_estate_id apuntando a profiles.user_id en vez de auth.uid()
     const { data: profile } = await admin
       .from("profiles")
       .select("user_id")
@@ -81,7 +78,6 @@ export async function GET() {
     const days30Iso = new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString();
     const days7Iso = new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    // Vistas a propiedades (últimas 30d para serie + KPIs derivados)
     let propertyViewRows: ViewRow[] = [];
     if (propertyIds.length > 0) {
       const { data, error } = await admin
@@ -94,7 +90,6 @@ export async function GET() {
       propertyViewRows = (data ?? []) as ViewRow[];
     }
 
-    // Vistas a la agencia
     const { data: agencyViewsRaw, error: avErr } = await admin
       .from("real_estate_views")
       .select("created_at")
