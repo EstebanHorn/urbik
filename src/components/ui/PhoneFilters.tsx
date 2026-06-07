@@ -88,7 +88,6 @@ export default function SidebarFilters() {
             >
               <div className="flex flex-col gap-8 mt-4">
 
-                {/* Operación */}
                 <div className="flex flex-col gap-3">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Operación</span>
                   <div className="grid grid-cols-3 gap-2">
@@ -112,7 +111,6 @@ export default function SidebarFilters() {
                   </div>
                 </div>
 
-                {/* Tipo */}
                 <div className="flex flex-col gap-3">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tipo</span>
                   <div className="flex flex-wrap gap-2">
@@ -142,7 +140,6 @@ export default function SidebarFilters() {
                   </div>
                 </div>
 
-                {/* Amenidades */}
                 <div className="flex flex-col gap-3">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Características</span>
                   <div className="flex flex-wrap gap-2">

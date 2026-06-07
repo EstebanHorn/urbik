@@ -1,9 +1,4 @@
-/**
- * Descarga provincias y departamentos de Argentina desde la API Georef
- * y guarda el resultado en src/data/argentina-geo.json.
- *
- * Uso: node scripts/fetch-georef.mjs
- */
+
 
 import { writeFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";

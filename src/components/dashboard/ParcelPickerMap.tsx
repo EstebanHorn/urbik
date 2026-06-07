@@ -1,8 +1,16 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, WMSTileLayer, GeoJSON, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, WMSTileLayer, GeoJSON, useMap, useMapEvents, Marker } from "react-leaflet";
 import type { FeatureCollection, Geometry } from "geojson";
+import L from "leaflet";
+
+const manualPinIcon = L.divIcon({
+  className: "custom-manual-pin",
+  html: `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill: #10b981; drop-shadow: 0 4px 6px rgba(0,0,0,0.3);"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="#ffffff"/></svg>`,
+  iconSize: [36, 36],
+  iconAnchor: [18, 36],
+});
 
 const PROVINCE_CENTERS: Record<string, [number, number]> = {
   "Buenos Aires": [-36.7, -60.3],
@@ -81,7 +89,7 @@ function RioNegroClickLayer({ onParcelClick }: { onParcelClick: (lat: number, ln
         }
         cacheRef.current.set(key, json);
         setData(json);
-      } catch { /* ignore abort */ }
+      } catch { }
     }, 250);
   };
 
@@ -94,7 +102,13 @@ function RioNegroClickLayer({ onParcelClick }: { onParcelClick: (lat: number, ln
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
-  useMapEvents({ moveend: fetchParcels, zoomend: fetchParcels });
+  useMapEvents({ 
+    moveend: fetchParcels, 
+    zoomend: fetchParcels,
+    click: (e) => {
+      onParcelClick(e.latlng.lat, e.latlng.lng);
+    }
+  });
 
   useEffect(() => {
     const prev = map.getContainer().style.cursor;
@@ -209,6 +223,7 @@ interface ParcelPickerMapProps {
   city?: string;
   onParcelClick: (lat: number, lng: number) => void;
   selectedGeometry: Geometry | null;
+  manualPin?: { lat: number; lng: number } | null;
 }
 
 export default function ParcelPickerMap({
@@ -216,6 +231,7 @@ export default function ParcelPickerMap({
   city,
   onParcelClick,
   selectedGeometry,
+  manualPin,
 }: ParcelPickerMapProps) {
   const center = getProvinceCenter(province);
   const rioNegro = isRioNegro(province);
@@ -242,6 +258,11 @@ export default function ParcelPickerMap({
       )}
 
       <SelectedParcelLayer geometry={selectedGeometry} />
+
+      {manualPin && (
+        <Marker position={[manualPin.lat, manualPin.lng]} icon={manualPinIcon} />
+      )}
+      
     </MapContainer>
   );
 }
