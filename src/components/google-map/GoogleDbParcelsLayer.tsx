@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useMap, AdvancedMarker, InfoWindow } from "@vis.gl/react-google-maps";
+import { useMap, AdvancedMarker } from "@vis.gl/react-google-maps";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import type { MapProperty } from "@/components/map/types";
@@ -117,17 +117,34 @@ export function GoogleDbParcelsLayer({ properties, onPropertySelect }: { propert
     <>
       {properties.map((rawProp) => {
         const prop = rawProp as ExtendedMapProperty;
-        if (!prop.parcelGeom) return null;
-        
-        let geometry: Geometry | null = null;
-        try { geometry = typeof prop.parcelGeom === "string" ? JSON.parse(prop.parcelGeom) : prop.parcelGeom as Geometry; } 
-        catch { return null; }
+        let position: { lat: number; lng: number } | null = null;
 
-        const position = getCenterOfGeometry(geometry!);
+        if (prop.parcelGeom) {
+          let geometry: Geometry | null = null;
+          try { geometry = typeof prop.parcelGeom === "string" ? JSON.parse(prop.parcelGeom) : prop.parcelGeom as Geometry; } 
+          catch {  }
+          if (geometry) {
+             position = getCenterOfGeometry(geometry);
+          }
+        }
+
+        if (!position && prop.latitude && prop.longitude) {
+          position = { lat: prop.latitude, lng: prop.longitude };
+        }
+
         if (!position) return null;
 
         return (
-          <AdvancedMarker key={`marker-${prop.id}`} position={position} zIndex={100}>
+          <AdvancedMarker 
+            key={`marker-${prop.id}`} 
+            position={position} 
+            zIndex={100}
+            onMouseEnter={() => {
+              setHoveredProp(prop);
+              setHoverPos(position);
+            }}
+            onMouseLeave={() => setHoveredProp(null)}
+          >
             <div className="price-tag-container">
               <div className={`price-tag-badge ${prop.operationType === "SALE" ? "is-sale" : "is-rent"}`}>
                 {formatPriceShort(getDisplayPrice(prop))}

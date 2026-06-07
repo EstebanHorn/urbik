@@ -278,7 +278,6 @@ export default function RegisterPage() {
         }
       `}</style>
 
-      {/* BLOBS Y DIVS DE CRISTAL (Misma estructura que el login) */}
       <div className={`absolute top-[-10%] left-[-10%] w-200 h-200 bg-urbik-black/20 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0s')}></div>
       <div className={`absolute -bottom-10 right-[-10%] w-200 h-200 bg-white/10 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0.1s')}></div>
 

@@ -211,7 +211,6 @@ export async function GET(request: Request) {
       );
     }
 
-    // rooms param = ambientes (total rooms); bedrooms param = habitaciones (same column for now)
     const ambientesValues = rooms.length > 0 ? rooms : bedrooms;
     const roomsFilter = buildNumericSelectionFilter(ambientesValues);
 

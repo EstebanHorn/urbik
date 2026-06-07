@@ -416,7 +416,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white relative">
       
-      {/* OVERLAY DE TRANSICIÓN DESDE LOGIN */}
       {showAuthOverlay && (
         <div className="fixed inset-0 z-[9999] bg-[#0a0a0a] overflow-hidden pointer-events-none animate-reveal-up">
           <style>{`
@@ -444,7 +443,7 @@ export default function HomePage() {
                   Las mejores oportunidades del mercado seleccionadas para vos.
                 </span>
               </div>
-
+{/*
               <div className="mb-6 ml-0 md:ml-10">
                 <button
                   type="button"
@@ -500,7 +499,7 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
-
+*/}
               {isLoading ? (
                 <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                   {Array.from({ length: 6 }).map((_, idx) => (

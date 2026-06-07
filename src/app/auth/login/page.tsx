@@ -119,7 +119,6 @@ export default function LoginPage() {
           animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Le sacamos el 'from { opacity: 1 }' para que no rompa el opacity-50 de Tailwind */
         @keyframes slideDownFade {
           to { opacity: 0; transform: translateY(100px); }
         }
@@ -129,17 +128,14 @@ export default function LoginPage() {
         }
       `}</style>
 
-      {/* BLOBS */}
       <div className={`absolute top-[-10%] left-[-10%] w-200 h-200 bg-urbik-black/20 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0s')}></div>
       <div className={`absolute -bottom-10 right-[-10%] w-200 h-200 bg-white/10 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0.1s')}></div>
 
-      {/* TUS DIVS EXACTOS (Ahora se animan bien) */}
       <div className={`absolute opacity-50 -bottom-10 -left-10 w-240 h-160 bg-linear-to-tr from-white/5 to-transparent backdrop-blur-md border border-white/10 rounded-3xl pointer-events-none z-0 hidden md:block ${animClass}`} style={getAnimStyle('0.2s')}></div>
       <div className={`absolute opacity-50 -bottom-10 right-60 w-280 h-180 bg-white/3 backdrop-blur-xl border border-white/10 rounded-3xl pointer-events-none z-0 hidden md:block ${animClass}`} style={getAnimStyle('0.3s')}></div>
       <div className={`absolute opacity-50 -bottom-10 right-[10%] w-160 h-120 bg-white/1 backdrop-blur-xl border border-white/10 rounded-3xl pointer-events-none z-0 shadow-2xl hidden lg:block ${animClass}`} style={getAnimStyle('0.4s')}></div>
       <div className={`absolute opacity-50 -bottom-10 -left-60 w-220 h-120 bg-white/3 backdrop-blur-xl border border-white/20 rounded-3xl pointer-events-none z-0 shadow-2xl hidden lg:block ${animClass}`} style={getAnimStyle('0.5s')}></div>
 
-      {/* CONTENEDOR DEL FORM (Este tiene la clase de salida, lo de adentro NO) */}
       <div className="w-full flex flex-col items-center justify-center p-6 lg:p-12 relative z-10">
         <div className={`w-full max-w-xl mx-auto p-8 lg:p-10 bg-white/3 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.6)] ${animClass}`} style={getAnimStyle('0.15s')}>
           

@@ -279,7 +279,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
 
       {propertyType && (
         <div className="w-full pt-6 mt-6 border-t border-white/40 space-y-6">
-          {/* APARTMENT / PH — building info only */}
           {(propertyType === "APARTMENT" || propertyType === "PH") && (
             <div className="w-full space-y-4">
               <div className="w-full text-center flex flex-col items-center md:items-start">
@@ -335,7 +334,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
             </div>
           )}
 
-          {/* LAND */}
           {propertyType === "LAND" && (
             <div className="space-y-4">
               <AnimatedInput
@@ -384,7 +382,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
             </div>
           )}
 
-          {/* FIELD */}
           {propertyType === "FIELD" && (
             <div className="space-y-4">
               <AnimatedInput
@@ -455,7 +452,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
             </div>
           )}
 
-          {/* COMMERCIAL_PROPERTY */}
           {propertyType === "COMMERCIAL_PROPERTY" && (
             <div className="space-y-4">
               <CustomDropdown
@@ -509,7 +505,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
             </div>
           )}
 
-          {/* BUSINESS_BACKGROUND */}
           {propertyType === "BUSINESS_BACKGROUND" && (
             <CustomDropdown
               label="Rubro del negocio"
@@ -528,7 +523,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
             />
           )}
 
-          {/* WAREHOUSE */}
           {propertyType === "WAREHOUSE" && (
             <label className="flex items-center gap-3 cursor-pointer">
               <input
@@ -543,7 +537,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
             </label>
           )}
 
-          {/* DEVELOPMENT */}
           {propertyType === "DEVELOPMENT" && (
             <div className="space-y-4">
               <AnimatedInput
@@ -919,7 +912,6 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
         </>
       )}
 
-      {/* Depto / PH extras */}
       {isAptOrPH && (
         <>
           <div className="w-full pt-4 border-t border-white/40 space-y-4">
@@ -973,7 +965,6 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
         </>
       )}
 
-      {/* Casa / Country extras */}
       {isHouseOrCountry && (
         <>
           <div className="w-full pt-4 border-t border-white/40 space-y-4">

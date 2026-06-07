@@ -227,12 +227,6 @@ export default function MapPage() {
     return () => window.clearTimeout(timeoutId);
   }, [filters, fetchFilteredProperties]);
 
-  const handleMapRoomsChange = useCallback(
-    (field: "rooms" | "bedrooms" | "bathrooms", value: string | null) => {
-      setFilters((prev) => ({ ...prev, [field]: value ? [value] : [] }));
-    },
-    [],
-  );
 
   const handleMapRoomsChange = useCallback(
     (field: "rooms" | "bedrooms" | "bathrooms", value: string | null) => {
@@ -266,7 +260,7 @@ export default function MapPage() {
               </button>
             </div>
           </div>
-
+{/*
           <div className="shrink-0 border-b border-slate-100 p-4">
             <button
               type="button"
@@ -321,6 +315,7 @@ export default function MapPage() {
               </div>
             )}
           </div>
+*/}
           <div className="flex-1 overflow-y-auto">
             <PropertiesSidebar
               properties={properties}

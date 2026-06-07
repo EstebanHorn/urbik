@@ -17,9 +17,9 @@ import PriceFilterCard from "@/components/search/PriceFilterCard";
 import RoomsFilterCard from "@/components/search/RoomsFilterCard";
 
 function getSuggestionBadge(s: SearchSuggestion): { label: string; className: string } {
-  if (s.type === "PROPERTY_SEARCH") return { label: "Propiedad", className: "bg-violet-100 text-violet-700" };
-  if (s.type === "ADDRESS") return { label: "Dirección", className: "bg-blue-50 text-blue-600" };
-  return { label: "Inmobiliaria", className: "bg-emerald-50 text-emerald-700" };
+  if (s.type === "PROPERTY_SEARCH") return { label: "Propiedad", className: "bg-violet-100/80 text-violet-700" };
+  if (s.type === "ADDRESS") return { label: "Dirección", className: "bg-blue-50/80 text-blue-600" };
+  return { label: "Inmobiliaria", className: "bg-emerald-50/80 text-emerald-700" };
 }
 
 function getSuggestionLabel(s: SearchSuggestion): string {
@@ -216,7 +216,8 @@ export default function Navbar() {
     </span>
   );
 
-  const renderSearchBar = (ref: React.RefObject<HTMLDivElement | null>, isDesktop: boolean) => {
+  // Modificado para aceptar una clase extra para animaciones
+  const renderSearchBar = (ref: React.RefObject<HTMLDivElement | null>, isDesktop: boolean, extraClass: string = "") => {
     const containerClass = isDesktop 
       ? "bg-white/50 border border-white/70 shadow-md"
       : "bg-white/10 border-white/10 focus-within:border-white/30";
@@ -228,7 +229,7 @@ export default function Navbar() {
     const iconClass = isDesktop ? "text-gray-500 hover:text-gray-700" : "text-white/50 hover:text-white";
 
     return (
-      <div ref={ref} className="relative flex-1 w-full">
+      <div ref={ref} className={`relative flex-1 w-full ${extraClass}`}>
         <div className={`flex items-center w-full rounded-full px-3 py-1 border transition-colors duration-300 ${containerClass}`}>
           <input
             type="text"
@@ -268,7 +269,7 @@ export default function Navbar() {
         </div>
 
         {!searchLoading && suggestions.length > 0 && (
-          <ul className="absolute bottom-full mb-1 md:bottom-auto md:top-full md:mb-0 md:mt-1 left-0 right-0 z-[1050] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden max-h-72 overflow-y-auto">
+          <ul className="absolute bottom-full mb-1 md:bottom-auto md:top-full md:mb-0 md:mt-1 left-0 right-0 z-[1050] bg-white/70 backdrop-blur-2xl rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] border border-white/40 overflow-hidden max-h-72 overflow-y-auto">
             {suggestions.map((suggestion, index) => {
               const badge = getSuggestionBadge(suggestion);
               const label = getSuggestionLabel(suggestion);
@@ -276,13 +277,13 @@ export default function Navbar() {
               return (
                 <li
                   key={`${suggestion.type}-${index}`}
-                  className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex justify-between items-center text-sm border-b last:border-none border-gray-50"
+                  className="px-4 py-3 cursor-pointer hover:bg-white/50 transition-colors flex justify-between items-center text-sm border-b last:border-none border-white/30"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => onSelectSuggestion(suggestion)}
                 >
                   <div className="flex flex-col overflow-hidden mr-2">
                     <span className="truncate text-gray-800 font-medium">{label}</span>
-                    {sub && <span className="text-[11px] text-gray-400 truncate">{sub}</span>}
+                    {sub && <span className="text-[11px] text-gray-500 truncate">{sub}</span>}
                   </div>
                   <span className={`shrink-0 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${badge.className}`}>
                     {badge.label}
@@ -402,132 +403,165 @@ export default function Navbar() {
 
       {showFilterButton && showSearchAndMap && (
         <>
-          <div className="hidden md:flex fixed top-[76px] left-0 right-0 w-full bg-white/70 backdrop-blur-3xl shadow-sm border-b border-gray-200 z-[1000] h-[60px] items-center px-6 transition-all duration-300">
+          <div className="hidden md:flex fixed top-[76px] left-0 right-0 w-full bg-white/70 backdrop-blur-3xl shadow-sm border-b border-gray-200 z-[1000] h-[60px] items-center px-6 transition-all duration-300 anim-bar">
             <div className="mx-auto w-full md:px-10 flex items-center justify-center gap-4">
               <div className="flex items-center gap-4 flex-1 max-w-md justify-end">
-                {renderSearchBar(desktopSearchRef, true)}
+                {renderSearchBar(desktopSearchRef, true, "anim-item delay-1")}
               </div>
 
-              <div className="flex items-center gap-2">
-                {/* Operación */}
-                <CustomDropdown
-                  label={currentFilters.operationType ? (currentFilters.operationType === "SALE" ? "Venta" : currentFilters.operationType === "RENT" ? "Alquiler" : "Temporal") : "Operación"}
-                  value={currentFilters.operationType || ""}
-                  options={[
-                    { label: "Venta", value: "SALE" },
-                    { label: "Alquiler", value: "RENT" },
-                    { label: "Temporal", value: "TEMP_RENT" },
-                  ]}
-                  onChange={(val) => {
-                    const current = searchParams.get("operationType") || "";
-                    handleNavParamChange("operationType", val === current ? null : val);
-                  }}
-                  variant={currentFilters.operationType ? "black" : "white2"}
-                />
+              <div className="flex items-center gap-2" ref={filterPanelRef}>
+                
+                <div className="anim-item delay-2">
+                  <CustomDropdown
+                    label={currentFilters.operationType ? (currentFilters.operationType === "SALE" ? "Venta" : currentFilters.operationType === "RENT" ? "Alquiler" : "Temporal") : "Operación"}
+                    value={currentFilters.operationType || ""}
+                    options={[
+                      { label: "Venta", value: "SALE" },
+                      { label: "Alquiler", value: "RENT" },
+                      { label: "Temporal", value: "TEMP_RENT" },
+                    ]}
+                    onChange={(val) => {
+                      const current = searchParams.get("operationType") || "";
+                      handleNavParamChange("operationType", val === current ? null : val);
+                    }}
+                    variant={currentFilters.operationType ? "white1" : "white1"}
+                  />
+                </div>
 
-                {/* Tipo */}
-                <CustomDropdown
-                  label={currentFilters.propertyType ? (() => {
-                    const map: Record<string, string> = { HOUSE: "Casa", APARTMENT: "Depto", PH: "PH", LAND: "Terreno", COMMERCIAL_PROPERTY: "Local", OFFICE: "Oficina", GARAGE: "Cochera", FIELD: "Campo", WAREHOUSE: "Galpón" };
-                    return map[currentFilters.propertyType] || "Tipo";
-                  })() : "Tipo"}
-                  value={currentFilters.propertyType || ""}
-                  options={[
-                    { label: "Casa", value: "HOUSE" },
-                    { label: "Departamento", value: "APARTMENT" },
-                    { label: "PH", value: "PH" },
-                    { label: "Terreno", value: "LAND" },
-                    { label: "Local", value: "COMMERCIAL_PROPERTY" },
-                    { label: "Oficina", value: "OFFICE" },
-                    { label: "Cochera", value: "GARAGE" },
-                    { label: "Campo", value: "FIELD" },
-                    { label: "Galpón", value: "WAREHOUSE" },
-                  ]}
-                  onChange={(val) => {
-                    const current = searchParams.get("propertyType") || "";
-                    handleNavParamChange("propertyType", val === current ? null : val);
-                  }}
-                  variant={currentFilters.propertyType ? "black" : "white2"}
-                />
+                <div className="anim-item delay-3">
+                  <CustomDropdown
+                    label={currentFilters.propertyType ? (() => {
+                      const map: Record<string, string> = { HOUSE: "Casa", APARTMENT: "Depto", PH: "PH", LAND: "Terreno", COMMERCIAL_PROPERTY: "Local", OFFICE: "Oficina", GARAGE: "Cochera", FIELD: "Campo", WAREHOUSE: "Galpón" };
+                      return map[currentFilters.propertyType] || "Tipo";
+                    })() : "Tipo"}
+                    value={currentFilters.propertyType || ""}
+                    options={[
+                      { label: "Casa", value: "HOUSE" },
+                      { label: "Departamento", value: "APARTMENT" },
+                      { label: "PH", value: "PH" },
+                      { label: "Terreno", value: "LAND" },
+                      { label: "Local", value: "COMMERCIAL_PROPERTY" },
+                      { label: "Oficina", value: "OFFICE" },
+                      { label: "Cochera", value: "GARAGE" },
+                      { label: "Campo", value: "FIELD" },
+                      { label: "Galpón", value: "WAREHOUSE" },
+                    ]}
+                    onChange={(val) => {
+                      const current = searchParams.get("propertyType") || "";
+                      handleNavParamChange("propertyType", val === current ? null : val);
+                    }}
+                    variant={currentFilters.propertyType ? "white1" : "white1"}
+                  />
+                </div>
 
-                {/* Precio */}
-                <button
-                  type="button"
-                  onClick={() => setActiveFilter((v) => (v === "price" ? null : "price"))}
-                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
-                    currentFilters.minPrice || currentFilters.maxPrice || currentFilters.currency
-                      ? "bg-urbik-black text-white border-urbik-black"
-                      : activeFilter === "price"
-                        ? "bg-white border-urbik-black text-urbik-black shadow-sm"
-                        : "bg-white/70 text-slate-600 border-slate-200 hover:bg-white"
-                  }`}
-                >
-                  {currentFilters.minPrice || currentFilters.maxPrice
-                    ? `${currentFilters.currency || ""}${currentFilters.minPrice ? ` ≥${Number(currentFilters.minPrice).toLocaleString("es-AR")}` : ""}${currentFilters.maxPrice ? ` ≤${Number(currentFilters.maxPrice).toLocaleString("es-AR")}` : ""}`
-                    : "Precio"}
-                  <ChevronDown size={12} className={`transition-transform ${activeFilter === "price" ? "rotate-180" : ""}`} />
-                </button>
+                <div className="relative anim-item delay-4">
+                  <button
+                    type="button"
+                    onClick={() => setActiveFilter((v) => (v === "price" ? null : "price"))}
+                    className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 min-w-10 md:min-w-[120px] font-bold ${
+                      currentFilters.minPrice || currentFilters.maxPrice || currentFilters.currency
+                        ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                        : activeFilter === "price"
+                          ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                          : "bg-white/70 border border-white text-urbik-black/70 hover:bg-gray-50 shadow-sm"
+                    }`}
+                  >
+                    <span className="text-md tracking-wider flex items-center justify-center">
+                      {currentFilters.minPrice || currentFilters.maxPrice
+                        ? `${currentFilters.currency || ""}${currentFilters.minPrice ? ` ≥${Number(currentFilters.minPrice).toLocaleString("es-AR")}` : ""}${currentFilters.maxPrice ? ` ≤${Number(currentFilters.maxPrice).toLocaleString("es-AR")}` : ""}`
+                        : "Precio"}
+                    </span>
+                    <ChevronDown size={16} strokeWidth={3} className={`hidden md:block w-4 h-4 transition-transform duration-200 ${activeFilter === "price" ? "rotate-180" : ""}`} />
+                  </button>
 
-                {/* Ambientes */}
-                <button
-                  type="button"
-                  onClick={() => setActiveFilter((v) => (v === "rooms" ? null : "rooms"))}
-                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
-                    currentFilters.rooms.length > 0 || currentFilters.bedrooms.length > 0 || currentFilters.bathrooms.length > 0
-                      ? "bg-urbik-black text-white border-urbik-black"
-                      : activeFilter === "rooms"
-                        ? "bg-white border-urbik-black text-urbik-black shadow-sm"
-                        : "bg-white/70 text-slate-600 border-slate-200 hover:bg-white"
-                  }`}
-                >
-                  {currentFilters.rooms[0]
-                    ? `${currentFilters.rooms[0]} amb.`
-                    : currentFilters.bedrooms[0]
-                      ? `${currentFilters.bedrooms[0]} hab.`
-                      : "Ambientes"}
-                  <ChevronDown size={12} className={`transition-transform ${activeFilter === "rooms" ? "rotate-180" : ""}`} />
-                </button>
+                  {activeFilter === "price" && (
+                    <div className="absolute top-full left-0 mt-3 z-999 w-80 rounded-2xl border border-gray-200 bg-white text-urbik-black/70 shadow-xl p-5">
+                      <PriceFilterCard
+                        minPrice={localMinPrice}
+                        maxPrice={localMaxPrice}
+                        currency={searchParams.get("currency") || ""}
+                        operationType={searchParams.get("operationType") || ""}
+                        propertyType={searchParams.get("propertyType") || ""}
+                        onChangeMin={(v) => handleNavPriceChange("minPrice", v)}
+                        onChangeMax={(v) => handleNavPriceChange("maxPrice", v)}
+                        onChangeCurrency={(v) => handleNavParamChange("currency", v || null)}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative anim-item delay-5">
+                  <button
+                    type="button"
+                    onClick={() => setActiveFilter((v) => (v === "rooms" ? null : "rooms"))}
+                    className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 min-w-10 md:min-w-[120px] font-bold ${
+                      currentFilters.rooms.length > 0 || currentFilters.bedrooms.length > 0 || currentFilters.bathrooms.length > 0
+                        ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                        : activeFilter === "rooms"
+                          ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                          : "bg-white/70 border border-white text-urbik-black/70 hover:bg-gray-50 shadow-sm"
+                    }`}
+                  >
+                    <span className="text-md tracking-wider flex items-center justify-center">
+                      {currentFilters.rooms[0]
+                        ? `${currentFilters.rooms[0]} amb.`
+                        : currentFilters.bedrooms[0]
+                          ? `${currentFilters.bedrooms[0]} hab.`
+                          : "Ambientes"}
+                    </span>
+                    <ChevronDown size={16} strokeWidth={3} className={`hidden md:block w-4 h-4 transition-transform duration-200 ${activeFilter === "rooms" ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {activeFilter === "rooms" && (
+                    <div className="absolute top-full left-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-urbik-black/70 shadow-xl p-5">
+                      <RoomsFilterCard
+                        rooms={searchParams.getAll("rooms")}
+                        bedrooms={searchParams.getAll("bedrooms")}
+                        bathrooms={searchParams.getAll("bathrooms")}
+                        onChange={handleNavRoomsChange}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <Link
-                href={viewToggleHref}
-                className="flex items-center px-4 py-1.5 font-medium transition-colors duration-300 text-sm shrink-0 text-urbik-black/80 hover:text-urbik-black"
-              >
-                {viewToggleText}
-              </Link>
+              <div className="anim-item delay-6">
+                <Link
+                  href={viewToggleHref}
+                  className="flex items-center px-4 py-1.5 font-medium transition-colors duration-300 text-sm shrink-0 text-urbik-black/80 hover:text-urbik-black"
+                >
+                  {viewToggleText}
+                </Link>
+              </div>
+              
             </div>
           </div>
-
-          {/* Floating filter panel */}
-          {activeFilter && (
-            <div
-              ref={filterPanelRef}
-              className="hidden md:block fixed top-[136px] left-1/2 -translate-x-1/2 z-[999] w-80 rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-xl shadow-[0_15px_50px_rgba(15,23,42,0.12)] p-5"
-            >
-              {activeFilter === "price" && (
-                <PriceFilterCard
-                  minPrice={localMinPrice}
-                  maxPrice={localMaxPrice}
-                  currency={searchParams.get("currency") || ""}
-                  operationType={searchParams.get("operationType") || ""}
-                  propertyType={searchParams.get("propertyType") || ""}
-                  onChangeMin={(v) => handleNavPriceChange("minPrice", v)}
-                  onChangeMax={(v) => handleNavPriceChange("maxPrice", v)}
-                  onChangeCurrency={(v) => handleNavParamChange("currency", v || null)}
-                />
-              )}
-              {activeFilter === "rooms" && (
-                <RoomsFilterCard
-                  rooms={searchParams.getAll("rooms")}
-                  bedrooms={searchParams.getAll("bedrooms")}
-                  bathrooms={searchParams.getAll("bathrooms")}
-                  onChange={handleNavRoomsChange}
-                />
-              )}
-            </div>
-          )}
         </>
       )}
+
+      <style>{`
+        @keyframes slideDownBar {
+          from { transform: translateY(-20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeInItem {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .anim-bar {
+          animation: slideDownBar 0.3s ease-out forwards;
+        }
+        .anim-item {
+          opacity: 0;
+          animation: fadeInItem 0.4s ease-out forwards;
+        }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.4s; }
+        .delay-4 { animation-delay: 0.5s; }
+        .delay-5 { animation-delay: 0.6s; }
+        .delay-6 { animation-delay: 0.7s; }
+      `}</style>
     </>
   );
 }

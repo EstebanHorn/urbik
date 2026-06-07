@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { BarChart, Bar, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { BarChart, Bar, Cell, ResponsiveContainer } from "recharts";
 
 type Bucket = { from: number; to: number; count: number };
 
@@ -60,7 +60,7 @@ export default function PriceFilterCard({
       setBuckets(data.buckets ?? []);
       setAbsMin(data.min ?? 0);
       setAbsMax(data.max ?? 0);
-    } catch { /* ignore */ }
+    } catch {}
   }, [currency, operationType, propertyType]);
 
   useEffect(() => { fetchHistogram(); }, [fetchHistogram]);
@@ -93,8 +93,8 @@ export default function PriceFilterCard({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Precio</span>
-        <div className="flex gap-1 p-0.5 rounded-lg bg-white/40 border border-slate-200/60">
+        <span className="text-xs font-bold text-urbik-black/70 uppercase">Precio</span>
+        <div className="flex gap-1 p-0.5">
           {["ARS", "USD"].map((c) => (
             <button
               key={c}
@@ -102,7 +102,7 @@ export default function PriceFilterCard({
               className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                 currency === c
                   ? "bg-urbik-black text-white shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                  : "text-urbik-black/50"
               }`}
             >
               {c}
@@ -115,20 +115,9 @@ export default function PriceFilterCard({
         <div className="h-16 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={buckets} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} barCategoryGap="10%">
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (!active || !payload?.[0]) return null;
-                  const b = payload[0].payload as Bucket;
-                  return (
-                    <div className="text-[10px] font-bold bg-white/90 border border-slate-200 rounded-lg px-2 py-1 shadow-sm">
-                      {fmt(b.from)} – {fmt(b.to)}: <span className="text-urbik-cyan">{b.count}</span>
-                    </div>
-                  );
-                }}
-              />
               <Bar dataKey="count" radius={[3, 3, 0, 0]} maxBarSize={24}>
                 {buckets.map((b, i) => (
-                  <Cell key={i} fill={b.from >= activeMin && b.to <= activeMax ? "#00deff" : "#e6e6e6"} />
+                  <Cell key={i} fill={b.from >= activeMin && b.to <= activeMax ? "#000000" : "#000000"} />
                 ))}
               </Bar>
             </BarChart>
@@ -138,11 +127,10 @@ export default function PriceFilterCard({
 
       {hasRange ? (
         <div className="px-1">
-          {/* Dual range slider */}
           <div className="relative h-6 flex items-center">
             <div className="absolute w-full h-1.5 bg-slate-200 rounded-full" />
             <div
-              className="absolute h-1.5 bg-urbik-cyan rounded-full pointer-events-none"
+              className="absolute h-1.5 bg-urbik-black/80 rounded-full pointer-events-none"
               style={{ left: `${minPct}%`, right: `${100 - maxPct}%` }}
             />
             <input
@@ -165,16 +153,15 @@ export default function PriceFilterCard({
             />
           </div>
 
-          {/* Value labels */}
           <div className="flex justify-between mt-3">
             <div className="flex flex-col items-start">
-              <span className="text-[10px] font-bold text-slate-400 uppercase">Desde</span>
+              <span className="text-[10px] font-bold text-urbik-black/60 uppercase">Desde</span>
               <span className="text-xs font-black text-urbik-black/80">
                 {currencySymbol} {fmt(activeMin)}
               </span>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[10px] font-bold text-slate-400 uppercase">Hasta</span>
+              <span className="text-[10px] font-bold text-urbik-black/60 uppercase">Hasta</span>
               <span className="text-xs font-black text-urbik-black/80">
                 {currencySymbol} {fmt(activeMax)}
               </span>
