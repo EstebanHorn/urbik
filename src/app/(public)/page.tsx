@@ -131,11 +131,13 @@ export default function HomePage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const [showAuthOverlay, setShowAuthOverlay] = useState(
+    searchParams.get("fromAuth") === "true"
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(
-    null,
-  );
+  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
   const [items, setItems] = useState<SearchProperty[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -177,6 +179,29 @@ export default function HomePage() {
     suggestions: autoSuggestions,
     isLoading: autoLoading,
   } = useSearch();
+
+  useEffect(() => {
+    if (showAuthOverlay) {
+      document.documentElement.style.backgroundColor = "#0a0a0a";
+      document.body.style.backgroundColor = "#0a0a0a";
+
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("fromAuth");
+      window.history.replaceState({}, '', newUrl.toString());
+
+      const timer = setTimeout(() => {
+        setShowAuthOverlay(false);
+        document.documentElement.style.backgroundColor = "";
+        document.body.style.backgroundColor = "";
+      }, 900);
+      
+      return () => {
+        clearTimeout(timer);
+        document.documentElement.style.backgroundColor = "";
+        document.body.style.backgroundColor = "";
+      };
+    }
+  }, [showAuthOverlay]);
 
   useEffect(() => {
     setSearchQuery(filters.q);
@@ -389,7 +414,22 @@ export default function HomePage() {
   }, [items]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
+      
+      {showAuthOverlay && (
+        <div className="fixed inset-0 z-[9999] bg-[#0a0a0a] overflow-hidden pointer-events-none animate-reveal-up">
+          <style>{`
+            @keyframes revealUp {
+              0% { transform: translateY(0); }
+              100% { transform: translateY(-100vh); }
+            }
+            .animate-reveal-up {
+              animation: revealUp 0.8s cubic-bezier(0.7, 0, 0.3, 1) 0.1s both;
+            }
+          `}</style>
+        </div>
+      )}
+
       <div className="mx-auto w-full overflow-x-hidden">
         <div className="relative flex min-h-[800px] flex-col items-start gap-4 lg:flex-row">
           <main className="flex-1 min-w-0 w-full">
@@ -403,7 +443,7 @@ export default function HomePage() {
                   Las mejores oportunidades del mercado seleccionadas para vos.
                 </span>
               </div>
-
+{/*
               <div className="mb-6 ml-0 md:ml-10">
                 <button
                   type="button"
@@ -459,7 +499,7 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
-
+*/}
               {isLoading ? (
                 <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                   {Array.from({ length: 6 }).map((_, idx) => (
@@ -508,7 +548,7 @@ export default function HomePage() {
                 </>
               )}
 
-              <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-5">
+              <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-5 mb-10">
                 <button
                   type="button"
                   disabled={page <= 1}

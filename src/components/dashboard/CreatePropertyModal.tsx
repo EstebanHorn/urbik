@@ -129,12 +129,12 @@ export default function CreatePropertyModal({
     }
   };
 
-  const handleParcelConfirm = (parcel: SelectedParcel) => {
-    rhf.setValue("parcelCCA", parcel.cca);
+const handleParcelConfirm = (parcel: SelectedParcel) => {
+    rhf.setValue("parcelCCA", parcel.cca ?? "");
     rhf.setValue("parcelPDA", parcel.pda ?? "");
     rhf.setValue(
       "parcelGeom",
-      parcel.geometry as unknown as Record<string, unknown>
+      parcel.geometry ? (parcel.geometry as unknown as Record<string, unknown>) : null
     );
     rhf.setValue("latitude", parcel.lat);
     rhf.setValue("longitude", parcel.lon);
