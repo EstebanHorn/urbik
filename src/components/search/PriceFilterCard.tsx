@@ -85,7 +85,6 @@ export default function PriceFilterCard({
     onChangeMax(val >= absMax ? "" : String(val));
   };
 
-  // When min thumb is near the max end, bring it to front so it can be dragged back
   const minZ = minPct > 95 ? "z-20" : "z-10";
   const maxZ = minPct > 95 ? "z-10" : "z-20";
 

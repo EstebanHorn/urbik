@@ -7,7 +7,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import loginBg from "@/assets/login_bg.png";
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -28,22 +27,23 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const isPending = searchParams.get("pending") === "1";
   const isRegistered = searchParams.get("registered") === "1";
 
   useEffect(() => {
+    router.prefetch("/");
     const savedEmail = localStorage.getItem("urbik_remember_email");
 
     if (savedEmail) {
       setEmail(savedEmail);
       setRememberMe(true);
     }
-  }, []);
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setErrorMessage(null);
     setIsLoading(true);
 
@@ -55,6 +55,7 @@ export default function LoginPage() {
 
       if (error) {
         setErrorMessage("Credenciales incorrectas.");
+        setIsLoading(false);
         return;
       }
 
@@ -64,16 +65,10 @@ export default function LoginPage() {
         .eq("id", data.user.id)
         .single();
 
-      if (
-        profile?.role === "REALESTATE" &&
-        profile?.status === "PENDING"
-      ) {
+      if (profile?.role === "REALESTATE" && profile?.status === "PENDING") {
         await supabase.auth.signOut();
-
-        setErrorMessage(
-          "Tu cuenta está en revisión. Te avisaremos cuando sea habilitada."
-        );
-
+        setErrorMessage("Tu cuenta está en revisión. Te avisaremos cuando sea habilitada.");
+        setIsLoading(false);
         return;
       }
 
@@ -83,18 +78,24 @@ export default function LoginPage() {
         localStorage.removeItem("urbik_remember_email");
       }
 
-      router.push("/");
+      document.documentElement.style.backgroundColor = "#0a0a0a";
+      document.body.style.backgroundColor = "#0a0a0a";
+
+      setIsSuccess(true);
       router.refresh();
+      
+      setTimeout(() => {
+        router.push("/?fromAuth=true");
+      }, 450);
+
     } catch {
       setErrorMessage("Ocurrió un error inesperado.");
-    } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -103,181 +104,111 @@ export default function LoginPage() {
     });
   };
 
+  const animClass = isSuccess ? "animate-slide-down" : "animate-slide-up";
+  const getAnimStyle = (delay: string) => isSuccess ? { animationDelay: '0s' } : { animationDelay: delay };
+
   return (
-    <div className="flex h-screen bg-white">
-      <div className="hidden lg:block flex-1 relative overflow-hidden">
-        <Image
-          src={loginBg}
-          alt="Background Left"
-          fill
-          priority
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+    <div className="flex min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+      <style>{`
+        @keyframes slideUpFade {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+          opacity: 0;
+          animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
-        <div className="absolute inset-0 bg-black/5" />
-      </div>
+        /* Le sacamos el 'from { opacity: 1 }' para que no rompa el opacity-50 de Tailwind */
+        @keyframes slideDownFade {
+          to { opacity: 0; transform: translateY(100px); }
+        }
+        .animate-slide-down {
+          pointer-events: none;
+          animation: slideDownFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}</style>
 
-      <div className="w-full lg:w-1/3 flex flex-col items-center justify-center p-12 relative z-10 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-        <div className="w-full max-w-md mx-auto px-4 lg:px-0">
-          <div className="flex flex-col items-center text-center mb-12">
-            <Link
-              href="/"
-              className="relative w-48 h-20 lg:w-64 lg:h-28 -mb-3"
-            >
-              <Image
-                src="/Urbik_Logo_Negro.svg"
-                alt="Logo Urbik"
-                fill
-                priority
-                className="object-contain"
-              />
+      {/* BLOBS */}
+      <div className={`absolute top-[-10%] left-[-10%] w-200 h-200 bg-urbik-black/20 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0s')}></div>
+      <div className={`absolute -bottom-10 right-[-10%] w-200 h-200 bg-white/10 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0.1s')}></div>
+
+      {/* TUS DIVS EXACTOS (Ahora se animan bien) */}
+      <div className={`absolute opacity-50 -bottom-10 -left-10 w-240 h-160 bg-linear-to-tr from-white/5 to-transparent backdrop-blur-md border border-white/10 rounded-3xl pointer-events-none z-0 hidden md:block ${animClass}`} style={getAnimStyle('0.2s')}></div>
+      <div className={`absolute opacity-50 -bottom-10 right-60 w-280 h-180 bg-white/3 backdrop-blur-xl border border-white/10 rounded-3xl pointer-events-none z-0 hidden md:block ${animClass}`} style={getAnimStyle('0.3s')}></div>
+      <div className={`absolute opacity-50 -bottom-10 right-[10%] w-160 h-120 bg-white/1 backdrop-blur-xl border border-white/10 rounded-3xl pointer-events-none z-0 shadow-2xl hidden lg:block ${animClass}`} style={getAnimStyle('0.4s')}></div>
+      <div className={`absolute opacity-50 -bottom-10 -left-60 w-220 h-120 bg-white/3 backdrop-blur-xl border border-white/20 rounded-3xl pointer-events-none z-0 shadow-2xl hidden lg:block ${animClass}`} style={getAnimStyle('0.5s')}></div>
+
+      {/* CONTENEDOR DEL FORM (Este tiene la clase de salida, lo de adentro NO) */}
+      <div className="w-full flex flex-col items-center justify-center p-6 lg:p-12 relative z-10">
+        <div className={`w-full max-w-xl mx-auto p-8 lg:p-10 bg-white/3 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.6)] ${animClass}`} style={getAnimStyle('0.15s')}>
+          
+          <div className={`flex flex-col items-center text-center mb-10 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.25s')}>
+            <Link href="/" className="relative w-48 h-16 lg:w-56 lg:h-20 mb-4 transition-transform hover:scale-105">
+              <Image src="/Urbik_Logo_Negro.svg" alt="Logo Urbik" fill priority className="object-contain invert opacity-50" />
             </Link>
-
-            <h2 className="text-3xl font-display font-bold mb-2">
-              Iniciar sesión
-            </h2>
-
-            <p className="text-urbik-muted text-sm">
-              Ingresá tus credenciales para continuar
-            </p>
+            <h2 className="text-2xl font-display font-semibold text-white mb-2 tracking-wide">Iniciar sesión</h2>
+            <p className="text-white/80 text-sm font-light">Ingresá tus credenciales para continuar</p>
           </div>
 
-          {isPending && (
-            <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-100 text-center">
-              <p className="text-sm text-amber-700 font-medium">
-                Tu cuenta está pendiente de aprobación. Te avisaremos por email cuando esté habilitada.
-              </p>
-            </div>
-          )}
+          <div className={`${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.35s')}>
+            {isPending && (
+              <div className="mb-6 p-4 rounded-full bg-amber-500/10 border border-amber-500/20 text-center">
+                <p className="text-sm text-amber-200 font-medium">Tu cuenta está pendiente de aprobación. Te avisaremos por email cuando esté habilitada.</p>
+              </div>
+            )}
+            {isRegistered && (
+              <div className="mb-6 p-4 rounded-full bg-green-500/10 border border-green-500/20 text-center">
+                <p className="text-sm text-green-200 font-medium">¡Cuenta creada con éxito! Ya podés iniciar sesión.</p>
+              </div>
+            )}
+            {errorMessage && (
+              <div className="mb-6 p-4 rounded-full bg-red-500/10 border border-red-500/20 text-center">
+                <p className="text-sm text-red-300 font-medium">{errorMessage}</p>
+              </div>
+            )}
+          </div>
 
-          {isRegistered && (
-            <div className="mb-6 p-4 rounded-2xl bg-green-50 border border-green-100 text-center">
-              <p className="text-sm text-green-700 font-medium">
-                ¡Cuenta creada con éxito! Ya podés iniciar sesión.
-              </p>
-            </div>
-          )}
-
-          {errorMessage && (
-            <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 text-center">
-              <p className="text-sm text-red-600 font-medium">
-                {errorMessage}
-              </p>
-            </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className={`space-y-5 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.45s')}>
             <div>
-              <label className="block text-md font-medium mb-2 ml-5 text-urbik-muted">
-                Correo electrónico
-              </label>
-
-              <input
-                type="email"
-                placeholder="example@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-                className="w-full rounded-full px-5 py-3 text-sm outline-none bg-linear-to-r from-gray-100 via-gray-100 to-white focus:ring-2 focus:ring-black/20"
-                required
-              />
+              <label className="block text-sm font-medium mb-2 ml-2 text-white/80">Correo electrónico</label>
+              <input type="email" placeholder="ejemplo@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading || isSuccess} className="w-full rounded-full px-5 py-3.5 text-sm outline-none bg-white/10 border border-white/30 text-white placeholder-white/30 focus:bg-white/10 focus:border-urbik-black/50 focus:ring-1 focus:ring-urbik-black/50 shadow-sm transition-all" required />
             </div>
 
             <div>
-              <label className="block text-md font-medium mb-2 ml-5 text-urbik-muted">
-                Contraseña
-              </label>
-
-              <input
-                type="password"
-                placeholder="********"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-                className="w-full rounded-full px-5 py-3 text-sm outline-none bg-linear-to-r from-gray-100 via-gray-100 to-white focus:ring-2 focus:ring-black/20"
-                required
-              />
+              <label className="block text-sm font-medium mb-2 ml-2 text-white/80">Contraseña</label>
+              <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading || isSuccess} className="w-full rounded-full px-5 py-3.5 text-sm outline-none bg-white/10 border border-white/30 text-white placeholder-white/30 focus:bg-white/10 focus:border-urbik-black/50 focus:ring-1 focus:ring-urbik-black/50 shadow-sm transition-all" required />
             </div>
 
-            <div className="flex items-center justify-between px-2 pt-2">
-              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  disabled={isLoading}
-                  className="w-4 h-4 rounded-full border-gray-300 text-black focus:ring-black"
-                />
-
-                Recordarme
-              </label>
-
-              <Link
-                href="/forgot-password"
-                className="text-sm text-urbik-cyan font-medium hover:underline"
-              >
-                ¿Olvidaste tu contraseña?
-              </Link>
+            <div className="flex items-center justify-between px-1 pt-1">
+              <Link href="/forgot-password" className="text-sm text-urbik-white/90 font-medium hover:text-urbik-black hover:underline transition-colors">¿Olvidaste tu contraseña?</Link>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full cursor-pointer bg-urbik-cyan text-white font-bold py-3 rounded-full text-lg shadow-sm hover:opacity-90 transition-opacity mt-6 disabled:opacity-60"
-            >
-              {isLoading ? "Ingresando..." : "INGRESAR"}
+            <button type="submit" disabled={isLoading || isSuccess} className="w-full cursor-pointer bg-urbik-white2 text-[#0a0a0a] font-bold py-3.5 rounded-full text-md shadow-[0_0_15px_rgba(var(--urbik-black-rgb),0.3)] hover:shadow-[0_0_25px_rgba(var(--urbik-black-rgb),0.5)] transition-all mt-6 disabled:opacity-60 disabled:cursor-not-allowed">
+              {isLoading && !isSuccess ? "Ingresando..." : (isSuccess ? "Ingresando..." : "INGRESAR")}
             </button>
           </form>
 
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-400">
-                o continuá con
-              </span>
-            </div>
+          <div className={`flex items-center my-8 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.55s')}>
+            <div className="flex-1 border-t border-white/10" />
+            <span className="px-4 text-xs tracking-wider text-white/40 uppercase font-medium">o continuá con</span>
+            <div className="flex-1 border-t border-white/10" />
           </div>
 
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            disabled={isLoading}
-            className="w-full cursor-pointer bg-linear-to-r from-[#3E3E3E] via-black to-[#2E2E2E] text-white font-medium py-3 rounded-full text-md shadow-sm hover:opacity-95 transition-opacity flex items-center justify-center gap-3"
-          >
+          <button type="button" onClick={handleGoogleSignIn} disabled={isLoading || isSuccess} className={`w-full cursor-pointer bg-white/5 border border-white/10 text-white font-medium py-3 rounded-full text-sm hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.65s')}>
             <GoogleIcon />
-
             <span>Google</span>
           </button>
 
-          <div className="text-center mt-10 text-sm text-gray-500">
+          <div className={`text-center mt-8 text-sm text-white/50 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.75s')}>
             ¿No tenés una cuenta?{" "}
-            <Link
-              href="/auth/register"
-              className="text-urbik-cyan font-semibold hover:underline"
-            >
-              Registrate
-            </Link>
+            <Link href="/auth/register" className="text-urbik-white/90 font-medium hover:text-urbik-black hover:underline transition-colors">Registrate</Link>
           </div>
         </div>
 
-        <div className="absolute bottom-8 text-gray-400 text-xs font-medium">
+        <div className={`absolute bottom-6 text-white/30 text-xs font-light ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.85s')}>
           © 2026 Urbik. Todos los derechos reservados.
         </div>
-      </div>
-
-      <div className="hidden lg:block flex-1 relative overflow-hidden">
-        <Image
-          src={loginBg}
-          alt="Background Right"
-          fill
-          priority
-          className="absolute inset-0 w-full h-full object-cover -scale-x-100"
-        />
-
-        <div className="absolute inset-0 bg-black/5" />
       </div>
     </div>
   );
