@@ -234,13 +234,6 @@ export default function MapPage() {
     [],
   );
 
-  const handleMapRoomsChange = useCallback(
-    (field: "rooms" | "bedrooms" | "bathrooms", value: string | null) => {
-      setFilters((prev) => ({ ...prev, [field]: value ? [value] : [] }));
-    },
-    [],
-  );
-
   const layerOptions = useMemo(() => Object.values(mapBaseLayers), []);
 
   return (
