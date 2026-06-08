@@ -192,7 +192,6 @@ export default function Navbar() {
 
   const profileOptions = session
     ? [
-        { label: "Configuración", value: "/settings" },
         { label: "Cerrar Sesión", value: "logout" },
       ]
     : [

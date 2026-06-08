@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { 
-  SearchProperty, 
-} from "../../app/(public)/page";
+import { useRouter } from "next/navigation";
+import { SearchProperty } from "../../app/(public)/page";
+import { useSearch, type SearchSuggestion } from "@/hooks/useSearch";
 
 import bg1 from "../../assets/banner/bg1.png";
 import bg2 from "../../assets/banner/bg2.png";
@@ -21,7 +21,7 @@ const animationStyles = `
 `;
 
 interface BannerProps {
-  items: SearchProperty[]; 
+  items: SearchProperty[];
 }
 
 const OPERATIONS = ["ambas", "alquilar", "comprar"] as const;
@@ -29,12 +29,30 @@ type OperationType = (typeof OPERATIONS)[number];
 
 const backgroundImages = [bg1, bg2];
 
+function getLabel(s: SearchSuggestion): string {
+  if (s.type === "PROPERTY_SEARCH") return s.display_name || "Buscar propiedades";
+  const display = s.display_name;
+  if (display) {
+    const parts = display.split(",");
+    return parts.length > 3 ? parts.slice(0, 3).join(",") : display;
+  }
+  return s.name || "Resultado sin nombre";
+}
+
+function getBadge(s: SearchSuggestion) {
+  if (s.type === "PROPERTY_SEARCH") return { label: "Propiedades", className: "bg-violet-100 text-violet-700" };
+  if (s.type === "ADDRESS") return { label: "Dirección", className: "bg-blue-50 text-blue-600" };
+  return { label: "Inmobiliaria", className: "bg-emerald-50 text-emerald-700" };
+}
+
 export default function Banner({ items }: BannerProps) {
+  const router = useRouter();
+  const { query, setQuery, suggestions, isLoading, onSelectSuggestion, clearAutocomplete } = useSearch();
+
   const [isMounted, setIsMounted] = useState(false);
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
-  
   const [operation, setOperation] = useState<OperationType>("ambas");
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const activeBtnRef = useRef<HTMLButtonElement>(null);
   const [pillProps, setPillProps] = useState({ left: 0, width: 0 });
@@ -48,22 +66,46 @@ export default function Banner({ items }: BannerProps) {
         });
       }
     };
-
     updatePill();
     window.addEventListener("resize", updatePill);
-
     return () => window.removeEventListener("resize", updatePill);
   }, [operation]);
 
   useEffect(() => {
     setIsMounted(true);
-
     const bgInterval = setInterval(() => {
       setCurrentBgIndex((prev) => (prev + 1) % backgroundImages.length);
     }, 7000);
-
     return () => clearInterval(bgInterval);
   }, []);
+
+  const operationParam = operation === "alquilar" ? "RENT" : operation === "comprar" ? "SALE" : null;
+
+  const handleSelect = (suggestion: SearchSuggestion) => {
+    if (suggestion.type === "PROPERTY_SEARCH" && suggestion.parsedFilters && operationParam && !suggestion.parsedFilters.operationType) {
+      onSelectSuggestion({ ...suggestion, parsedFilters: { ...suggestion.parsedFilters, operationType: operationParam } });
+    } else {
+      onSelectSuggestion(suggestion);
+    }
+  };
+
+  const handleBuscar = () => {
+    if (suggestions.length > 0) {
+      handleSelect(suggestions[0]);
+      return;
+    }
+    clearAutocomplete();
+    const params = new URLSearchParams();
+    if (operationParam) params.set("operationType", operationParam);
+    router.push(`/map?${params.toString()}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleBuscar();
+    }
+  };
 
   return (
     <>
@@ -94,8 +136,8 @@ export default function Banner({ items }: BannerProps) {
         <div className="absolute inset-0 z-10 bg-linear-to-r from-black/80 via-black/50 to-black/70 backdrop-blur-[2px]" />
 
         <div className="absolute inset-0 z-20 flex flex-col md:flex-row items-center justify-center px-4 sm:px-6 md:px-16 lg:px-54 py-8 md:py-10">
-          
-          <div 
+
+          <div
             className={`w-full md:w-1/2 text-center md:text-left mb-8 md:mb-0 transition-all duration-1000 delay-300 flex flex-col justify-center ${
               isMounted ? "translate-x-0 opacity-100" : "-translate-x-8 opacity-0"
             }`}
@@ -108,32 +150,26 @@ export default function Banner({ items }: BannerProps) {
             </p>
           </div>
 
-          <div 
+          <div
             className={`w-full md:w-1/2 max-w-xl flex flex-col items-center md:items-end transition-all duration-1000 delay-500 ${
               isMounted ? "translate-x-0 opacity-100" : "translate-x-8 opacity-0"
             }`}
           >
-            <div 
+            <div
               ref={containerRef}
               className="relative mb-4 hidden md:flex p-1 rounded-full bg-white/20 mr-10 border border-white/20 backdrop-blur-md shadow-lg isolate"
             >
-              <div 
+              <div
                 className="absolute top-1 bottom-1 -z-10 rounded-full bg-urbik-white1 transition-all duration-300 ease-out shadow-md"
-                style={{ 
-                  left: `${pillProps.left}px`, 
-                  width: `${pillProps.width}px` 
-                }}
+                style={{ left: `${pillProps.left}px`, width: `${pillProps.width}px` }}
               />
-
               {OPERATIONS.map((op) => (
                 <button
                   key={op}
                   ref={operation === op ? activeBtnRef : null}
                   onClick={() => setOperation(op)}
                   className={`px-5 cursor-pointer py-2 md:px-6 md:py-2.5 rounded-full text-sm md:text-base font-semibold capitalize transition-all duration-300 ${
-                    operation === op 
-                      ? "text-urbik-black"
-                      : "text-white/80 hover:text-white"
+                    operation === op ? "text-urbik-black" : "text-white/80 hover:text-white"
                   }`}
                 >
                   {op}
@@ -141,28 +177,59 @@ export default function Banner({ items }: BannerProps) {
               ))}
             </div>
 
-            <div className="w-full relative overflow-hidden rounded-full border border-white/20 bg-white/30 p-1.5 md:p-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-md flex items-center">
-              
-              <div className="pl-3 md:pl-4 pr-1 md:pr-2 text-white/70">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                </svg>
+            <div className="w-full relative">
+              <div className="relative overflow-hidden rounded-full border border-white/20 bg-white/30 p-1.5 md:p-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-md flex items-center">
+                <div className="pl-3 md:pl-4 pr-1 md:pr-2 text-white/70">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Busca por ciudad, barrio o calle..."
+                  className="flex-grow bg-transparent px-2 py-1 text-sm md:text-lg text-white placeholder:text-white/60 outline-none w-full"
+                />
+                {isLoading && (
+                  <div className="mr-3 h-4 w-4 animate-spin rounded-full border-2 border-white/60 border-t-transparent" />
+                )}
+                <button
+                  onClick={handleBuscar}
+                  className="cursor-pointer rounded-full bg-urbik-accent px-4 py-2.5 md:px-8 md:py-3 text-sm md:text-lg font-bold text-white transition-all hover:bg-urbik-accent/80 hover:scale-105 active:scale-95"
+                >
+                  Buscar
+                </button>
               </div>
 
-              <input 
-                type="text"
-                placeholder="Busca por ciudad, barrio o calle..." 
-                className="flex-grow bg-transparent px-2 py-1 text-sm md:text-lg text-white placeholder:text-white/60 outline-none w-full"
-              />
-
-              <button className="cursor-pointer rounded-full bg-urbik-accent px-4 py-2.5 md:px-8 md:py-3 text-sm md:text-lg font-bold text-white transition-all hover:bg-urbik-accent/80 hover:scale-105 active:scale-95">
-                Buscar
-              </button>
+              {suggestions.length > 0 && (
+                <ul className="absolute z-50 w-full mt-2 bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden">
+                  {suggestions.map((suggestion, index) => {
+                    const badge = getBadge(suggestion);
+                    const agencyCity = suggestion.type === "REALESTATE_USER" && typeof suggestion.city === "string" && suggestion.city ? suggestion.city : null;
+                    return (
+                      <li
+                        key={`${suggestion.type}-${index}`}
+                        className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex justify-between items-center text-sm border-b last:border-none border-gray-50"
+                        onClick={() => handleSelect(suggestion)}
+                      >
+                        <div className="flex flex-col overflow-hidden mr-2">
+                          <span className="truncate text-gray-800 font-medium">{getLabel(suggestion)}</span>
+                          {agencyCity && <span className="text-[11px] text-gray-400 truncate">{agencyCity}</span>}
+                        </div>
+                        <span className={`shrink-0 ml-2 text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full ${badge.className}`}>
+                          {badge.label}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </div>
           </div>
 
         </div>
-        
       </div>
     </>
   );

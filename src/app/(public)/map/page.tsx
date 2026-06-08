@@ -18,8 +18,7 @@ import type {
   MapProperty,
   BaseLayerId,
 } from "@/components/map/types";
-import { mapBaseLayers } from "@/components/map/types";
-import { useMapSettings } from "@/components/map/MapSettingsProvider";
+import { mapBaseLayers, defaultBaseLayerId } from "@/components/map/types";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import GoogleMapProvider from "@/components/google-map/GoogleMapProvider";
 
@@ -79,7 +78,7 @@ interface RawProperty {
 }
 
 export default function MapPage() {
-  const { propertiesLimit, baseLayer, setBaseLayer } = useMapSettings();
+  const [baseLayer, setBaseLayer] = useState<BaseLayerId>(defaultBaseLayerId);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -312,7 +311,7 @@ export default function MapPage() {
           <div className="flex-1 overflow-y-auto">
             <PropertiesSidebar
               properties={properties}
-              visualLimit={propertiesLimit}
+              visualLimit={6}
               isLoading={isLoading}
               selectedPropertyId={selectedProperty?.id}
               onSelectProperty={setSelectedProperty}

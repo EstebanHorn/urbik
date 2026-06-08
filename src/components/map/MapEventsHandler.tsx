@@ -3,7 +3,6 @@
 import { useMapEvents } from "react-leaflet";
 import { useEffect, useCallback, useRef } from "react";
 import type { MapBounds } from "./types";
-import { useMapSettings } from "@/components/map/MapSettingsProvider";
 
 export interface ZoneData {
   lat: number;
@@ -22,7 +21,6 @@ export function MapEventsHandler({
   onBoundsChange,
   onCenterChange,
 }: MapEventsHandlerProps) {
-  const { isZoneAnalysisEnabled } = useMapSettings();
   const isMountedRef = useRef(true);
 
   useEffect(() => {
@@ -34,7 +32,7 @@ export function MapEventsHandler({
 
   const fetchAddress = useCallback(
     async (lat: number, lng: number, zoom: number) => {
-      if (!isZoneAnalysisEnabled || !isMountedRef.current || zoom < 14) {
+      if (!isMountedRef.current || zoom < 14) {
         onCenterChange({ lat, lng, address: "", zone: "", zoom });
         return;
       }
@@ -76,7 +74,7 @@ export function MapEventsHandler({
         }
       }
     },
-    [onCenterChange, isZoneAnalysisEnabled],
+    [onCenterChange],
   );
 
   const map = useMapEvents({
