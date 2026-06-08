@@ -1,224 +1,315 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, WMSTileLayer, GeoJSON, useMap, useMapEvents, Marker } from "react-leaflet";
+import React, { useCallback, useEffect, useRef } from "react";
+import { Map, AdvancedMarker, useMap, useMapsLibrary, type MapMouseEvent } from "@vis.gl/react-google-maps";
 import type { FeatureCollection, Geometry } from "geojson";
-import L from "leaflet";
 
-const manualPinIcon = L.divIcon({
-  className: "custom-manual-pin",
-  html: `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill: #10b981; drop-shadow: 0 4px 6px rgba(0,0,0,0.3);"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="#ffffff"/></svg>`,
-  iconSize: [36, 36],
-  iconAnchor: [18, 36],
-});
-
-const PROVINCE_CENTERS: Record<string, [number, number]> = {
-  "Buenos Aires": [-36.7, -60.3],
-  "CABA": [-34.6, -58.4],
-  "Ciudad Autónoma de Buenos Aires": [-34.6, -58.4],
-  "Córdoba": [-31.4, -64.2],
-  "Santa Fe": [-30.7, -60.7],
-  "Mendoza": [-32.9, -68.8],
-  "Tucumán": [-26.8, -65.2],
-  "Entre Ríos": [-31.8, -58.9],
-  "Salta": [-24.8, -65.4],
-  "Río Negro": [-40.7, -63.6],
-  "Neuquén": [-38.9, -68.1],
-  "Chubut": [-44.0, -68.5],
-  "Jujuy": [-23.2, -65.3],
-  "Corrientes": [-27.9, -57.1],
-  "Misiones": [-27.4, -55.9],
-  "La Pampa": [-37.1, -65.5],
-  "Chaco": [-27.4, -61.0],
-  "Formosa": [-23.0, -59.2],
-  "Santiago del Estero": [-27.8, -64.3],
-  "San Juan": [-31.0, -68.5],
-  "San Luis": [-33.3, -66.3],
-  "Catamarca": [-28.5, -65.8],
-  "La Rioja": [-29.4, -66.9],
-  "Santa Cruz": [-51.6, -69.2],
-  "Tierra del Fuego": [-54.8, -68.3],
+const PROVINCE_CENTERS: Record<string, { lat: number; lng: number }> = {
+  "Buenos Aires": { lat: -36.7, lng: -60.3 },
+  "CABA": { lat: -34.6, lng: -58.4 },
+  "Ciudad Autónoma de Buenos Aires": { lat: -34.6, lng: -58.4 },
+  "Córdoba": { lat: -31.4, lng: -64.2 },
+  "Santa Fe": { lat: -30.7, lng: -60.7 },
+  "Mendoza": { lat: -32.9, lng: -68.8 },
+  "Tucumán": { lat: -26.8, lng: -65.2 },
+  "Entre Ríos": { lat: -31.8, lng: -58.9 },
+  "Salta": { lat: -24.8, lng: -65.4 },
+  "Río Negro": { lat: -40.7, lng: -63.6 },
+  "Neuquén": { lat: -38.9, lng: -68.1 },
+  "Chubut": { lat: -44.0, lng: -68.5 },
+  "Jujuy": { lat: -23.2, lng: -65.3 },
+  "Corrientes": { lat: -27.9, lng: -57.1 },
+  "Misiones": { lat: -27.4, lng: -55.9 },
+  "La Pampa": { lat: -37.1, lng: -65.5 },
+  "Chaco": { lat: -27.4, lng: -61.0 },
+  "Formosa": { lat: -23.0, lng: -59.2 },
+  "Santiago del Estero": { lat: -27.8, lng: -64.3 },
+  "San Juan": { lat: -31.0, lng: -68.5 },
+  "San Luis": { lat: -33.3, lng: -66.3 },
+  "Catamarca": { lat: -28.5, lng: -65.8 },
+  "La Rioja": { lat: -29.4, lng: -66.9 },
+  "Santa Cruz": { lat: -51.6, lng: -69.2 },
+  "Tierra del Fuego": { lat: -54.8, lng: -68.3 },
 };
 
-function getProvinceCenter(province: string): [number, number] {
+function getProvinceCenter(province: string): { lat: number; lng: number } {
   const normalized = province.trim();
-  const exact = PROVINCE_CENTERS[normalized];
-  if (exact) return exact;
+  if (PROVINCE_CENTERS[normalized]) return PROVINCE_CENTERS[normalized];
   for (const [key, coords] of Object.entries(PROVINCE_CENTERS)) {
-    if (normalized.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(normalized.toLowerCase())) {
+    if (
+      normalized.toLowerCase().includes(key.toLowerCase()) ||
+      key.toLowerCase().includes(normalized.toLowerCase())
+    ) {
       return coords;
     }
   }
-  return [-34.6, -58.4];
+  return { lat: -34.6, lng: -58.4 };
 }
 
 function isRioNegro(province: string) {
   return /r[íi]o\s*negro/i.test(province);
 }
 
-function RioNegroClickLayer({ onParcelClick }: { onParcelClick: (lat: number, lng: number) => void }) {
+const DATA_STYLE_SELECTED = {
+  strokeColor: "#10b981",
+  strokeWeight: 3,
+  fillColor: "#10b981",
+  fillOpacity: 0.35,
+  zIndex: 10,
+};
+const DATA_STYLE_RIO_NEGRO = {
+  strokeColor: "#00c96e",
+  strokeWeight: 2,
+  fillColor: "#00c96e",
+  fillOpacity: 0.08,
+};
+
+function applyDataStyle(map: google.maps.Map) {
+  map.data.setStyle((feature) => {
+    if (feature.getProperty("isSelectedParcel")) return DATA_STYLE_SELECTED;
+    if (feature.getProperty("rioNegro")) return DATA_STYLE_RIO_NEGRO;
+    return {};
+  });
+}
+
+// ── Auto-center using Google Geocoding API ───────────────────────────────────
+
+function MapAutoCenter({ city, province }: { city?: string; province: string }) {
   const map = useMap();
-  const [data, setData] = useState<FeatureCollection | null>(null);
+  const geocodingLib = useMapsLibrary("geocoding");
+  const doneRef = useRef(false);
+
+  useEffect(() => {
+    if (!map || !geocodingLib || doneRef.current) return;
+    doneRef.current = true;
+    const geocoder = new geocodingLib.Geocoder();
+    const address = [city, province, "Argentina"].filter(Boolean).join(", ");
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === "OK" && results?.[0]) {
+        map.panTo(results[0].geometry.location);
+        map.setZoom(16);
+      }
+    });
+  }, [map, geocodingLib, city, province]);
+
+  return null;
+}
+
+// ── ARBA WMS overlay for Buenos Aires cadastral parcels ──────────────────────
+
+function ARBAWMSLayer() {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+
+    const overlay = new google.maps.ImageMapType({
+      name: "ARBA Parcelas",
+      tileSize: new google.maps.Size(256, 256),
+      minZoom: 15,
+      maxZoom: 19,
+      opacity: 1,
+      getTileUrl(coord, zoom) {
+        if (zoom < 15) return "";
+        const n = Math.pow(2, zoom);
+        const west = (coord.x / n) * 360 - 180;
+        const east = ((coord.x + 1) / n) * 360 - 180;
+        const north =
+          Math.atan(Math.sinh(Math.PI * (1 - (2 * coord.y) / n))) *
+          (180 / Math.PI);
+        const south =
+          Math.atan(Math.sinh(Math.PI * (1 - (2 * (coord.y + 1)) / n))) *
+          (180 / Math.PI);
+        const sld = encodeURIComponent(
+          `<?xml version="1.0"?><StyledLayerDescriptor version="1.0.0">` +
+          `<NamedLayer><Name>idera:Parcela</Name><UserStyle><FeatureTypeStyle><Rule>` +
+          `<PolygonSymbolizer>` +
+          `<Stroke><CssParameter name="stroke">#1a7a4a</CssParameter>` +
+          `<CssParameter name="stroke-width">2</CssParameter></Stroke>` +
+          `<Fill><CssParameter name="fill">#00c96e</CssParameter>` +
+          `<CssParameter name="fill-opacity">0.08</CssParameter></Fill>` +
+          `</PolygonSymbolizer>` +
+          `</Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>`
+        );
+        return (
+          `https://geo.arba.gov.ar/geoserver/idera/ows?SERVICE=WMS&VERSION=1.1.1` +
+          `&REQUEST=GetMap&LAYERS=Parcela&FORMAT=image%2Fpng` +
+          `&TRANSPARENT=TRUE&WIDTH=256&HEIGHT=256&SRS=EPSG%3A4326` +
+          `&BBOX=${west},${south},${east},${north}&SLD_BODY=${sld}`
+        );
+      },
+    });
+
+    map.overlayMapTypes.push(overlay);
+    return () => {
+      const arr = map.overlayMapTypes.getArray();
+      const idx = arr.indexOf(overlay);
+      if (idx !== -1) map.overlayMapTypes.removeAt(idx);
+    };
+  }, [map]);
+
+  return null;
+}
+
+// ── Rio Negro GeoJSON layer (via Data layer) ─────────────────────────────────
+
+function RioNegroLayer({
+  onParcelClick,
+}: {
+  onParcelClick: (lat: number, lng: number) => void;
+}) {
+  const map = useMap();
   const abortRef = useRef<AbortController | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cacheRef = useRef<Map<string, FeatureCollection>>(new Map());
   const lastKeyRef = useRef("");
 
-  const fetchParcels = () => {
+  const fetchParcels = useCallback(() => {
+    if (!map) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
-      const zoom = map.getZoom();
-      if (zoom < 13) { setData(null); return; }
-      const bounds = map.getBounds().pad(0.1);
-      const key = `${bounds.getSouth().toFixed(3)},${bounds.getNorth().toFixed(3)},${bounds.getWest().toFixed(3)},${bounds.getEast().toFixed(3)}`;
+      const zoom = map.getZoom() ?? 0;
+      if (zoom < 13) {
+        map.data.forEach((f) => {
+          if (f.getProperty("rioNegro")) map.data.remove(f);
+        });
+        return;
+      }
+
+      const bounds = map.getBounds();
+      if (!bounds) return;
+      const sw = bounds.getSouthWest();
+      const ne = bounds.getNorthEast();
+      const key = `${sw.lat().toFixed(3)},${ne.lat().toFixed(3)},${sw.lng().toFixed(3)},${ne.lng().toFixed(3)}`;
       if (key === lastKeyRef.current) return;
       lastKeyRef.current = key;
+
       const cached = cacheRef.current.get(key);
-      if (cached) { setData(cached); return; }
+      if (cached) {
+        map.data.forEach((f) => {
+          if (f.getProperty("rioNegro")) map.data.remove(f);
+        });
+        cached.features.forEach((f) => {
+          map.data.addGeoJson({
+            type: "Feature",
+            geometry: f.geometry,
+            properties: { ...f.properties, rioNegro: true },
+          });
+        });
+        applyDataStyle(map);
+        return;
+      }
+
       abortRef.current?.abort();
       const ctrl = new AbortController();
       abortRef.current = ctrl;
+
       try {
-        const url = `/api/parcels/rio-negro?minLat=${bounds.getSouth()}&maxLat=${bounds.getNorth()}&minLon=${bounds.getWest()}&maxLon=${bounds.getEast()}&limit=3000`;
+        const url =
+          `/api/parcels/rio-negro?minLat=${sw.lat()}&maxLat=${ne.lat()}` +
+          `&minLon=${sw.lng()}&maxLon=${ne.lng()}&limit=3000`;
         const res = await fetch(url, { signal: ctrl.signal });
         if (!res.ok) return;
-        const json = await res.json() as FeatureCollection;
+        const json = (await res.json()) as FeatureCollection;
+
         if (cacheRef.current.size > 20) {
           const firstKey = cacheRef.current.keys().next().value;
           if (firstKey) cacheRef.current.delete(firstKey);
         }
         cacheRef.current.set(key, json);
-        setData(json);
-      } catch { }
+
+        map.data.forEach((f) => {
+          if (f.getProperty("rioNegro")) map.data.remove(f);
+        });
+        json.features.forEach((f) => {
+          map.data.addGeoJson({
+            type: "Feature",
+            geometry: f.geometry,
+            properties: { ...f.properties, rioNegro: true },
+          });
+        });
+        applyDataStyle(map);
+      } catch {
+        // aborted or network error — ignore
+      }
     }, 250);
-  };
+  }, [map]);
 
   useEffect(() => {
+    if (!map) return;
+
+    applyDataStyle(map);
+
+    const dataClick = map.data.addListener(
+      "click",
+      (e: google.maps.Data.MouseEvent) => {
+        e.stop(); // evita que también se dispare el map click
+        if (e.latLng) onParcelClick(e.latLng.lat(), e.latLng.lng());
+      }
+    );
+
+    // Captura clicks en áreas sin GeoJSON (vacíos entre parcelas)
+    const mapClick = map.addListener(
+      "click",
+      (e: google.maps.MapMouseEvent) => {
+        if (e.latLng) onParcelClick(e.latLng.lat(), e.latLng.lng());
+      }
+    );
+
     fetchParcels();
+    const idleListener = map.addListener("idle", fetchParcels);
+
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       abortRef.current?.abort();
+      google.maps.event.removeListener(dataClick);
+      google.maps.event.removeListener(mapClick);
+      google.maps.event.removeListener(idleListener);
+      map.data.forEach((f) => {
+        if (f.getProperty("rioNegro")) map.data.remove(f);
+      });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map]);
-
-  useMapEvents({ 
-    moveend: fetchParcels, 
-    zoomend: fetchParcels,
-    click: (e) => {
-      onParcelClick(e.latlng.lat, e.latlng.lng);
-    }
-  });
-
-  useEffect(() => {
-    const prev = map.getContainer().style.cursor;
-    map.getContainer().style.cursor = "crosshair";
-    return () => { map.getContainer().style.cursor = prev; };
-  }, [map]);
-
-  if (!data || !data.features?.length) return null;
-
-  return (
-    <GeoJSON
-      key={lastKeyRef.current}
-      data={data}
-      style={{ color: "#00ff8e", weight: 0.7, fillColor: "transparent", fillOpacity: 0 }}
-      eventHandlers={{
-        click: (e) => {
-          const { lat, lng } = e.latlng;
-          onParcelClick(lat, lng);
-        },
-      }}
-    />
-  );
-}
-
-function BuenosAiresClickLayer({ onParcelClick }: { onParcelClick: (lat: number, lng: number) => void }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const prev = map.getContainer().style.cursor;
-    map.getContainer().style.cursor = "crosshair";
-    return () => { map.getContainer().style.cursor = prev; };
-  }, [map]);
-
-  useMapEvents({
-    click: (e) => {
-      onParcelClick(e.latlng.lat, e.latlng.lng);
-    },
-  });
-
-  return (
-    <WMSTileLayer
-      url="https://geo.arba.gov.ar/geoserver/idera/ows?"
-      layers="Parcela"
-      format="image/png"
-      transparent={true}
-      version="1.1.1"
-      tileSize={256}
-      maxZoom={19}
-      minZoom={15}
-      className="brightness-200 saturate-200"
-    />
-  );
-}
-
-function SelectedParcelLayer({ geometry }: { geometry: Geometry | null }) {
-  if (!geometry) return null;
-
-  const feature = {
-    type: "Feature" as const,
-    geometry,
-    properties: {},
-  };
-
-  return (
-    <GeoJSON
-      key={JSON.stringify(geometry).slice(0, 50)}
-      data={feature}
-      style={{ color: "#10b981", weight: 3, fillColor: "#10b981", fillOpacity: 0.35 }}
-    />
-  );
-}
-
-function MapAutoCenter({ city, province }: { city?: string; province: string }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const q = [city, province, "Argentina"].filter(Boolean).join(", ");
-    if (!q.trim()) return;
-
-    fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&countrycodes=ar&limit=1`,
-    )
-      .then((r) => r.json())
-      .then((data: Array<{ lat: string; lon: string }>) => {
-        if (data[0]) {
-          map.setView([parseFloat(data[0].lat), parseFloat(data[0].lon)], 16);
-        }
-      })
-      .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [map, fetchParcels, onParcelClick]);
 
   return null;
 }
 
-function ZoomHint() {
+// ── Selected parcel geometry overlay ────────────────────────────────────────
+
+function SelectedParcelLayer({ geometry }: { geometry: Geometry | null }) {
   const map = useMap();
-  const [zoom, setZoom] = useState(map.getZoom());
-  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
 
-  if (zoom >= 15) return null;
+  useEffect(() => {
+    if (!map) return;
 
-  return (
-    <div className="absolute top-4 right-4 z-[1000] bg-white/90 rounded-xl px-4 py-2.5 shadow border border-gray-100 pointer-events-none">
-      <p className="text-xs font-bold text-gray-600">Acercate para ver las parcelas</p>
-    </div>
-  );
+    map.data.forEach((f) => {
+      if (f.getProperty("isSelectedParcel")) map.data.remove(f);
+    });
+
+    if (geometry) {
+      map.data.addGeoJson({
+        type: "Feature",
+        geometry,
+        properties: { isSelectedParcel: true },
+      });
+    }
+
+    applyDataStyle(map);
+
+    return () => {
+      if (!map) return;
+      map.data.forEach((f) => {
+        if (f.getProperty("isSelectedParcel")) map.data.remove(f);
+      });
+    };
+  }, [map, geometry]);
+
+  return null;
 }
 
-interface ParcelPickerMapProps {
+// ── Main component ───────────────────────────────────────────────────────────
+
+export interface ParcelPickerMapProps {
   province: string;
   city?: string;
   onParcelClick: (lat: number, lng: number) => void;
@@ -235,56 +326,59 @@ export default function ParcelPickerMap({
 }: ParcelPickerMapProps) {
   const center = getProvinceCenter(province);
   const rioNegro = isRioNegro(province);
+  const initialZoom = rioNegro ? 13 : 15;
+
+  const handleMapClick = useCallback(
+    (e: MapMouseEvent) => {
+      if (e.detail.latLng) onParcelClick(e.detail.latLng.lat, e.detail.latLng.lng);
+    },
+    [onParcelClick]
+  );
 
   return (
-    <MapContainer
-      center={center}
-      zoom={rioNegro ? 13 : 16}
-      style={{ height: "100%", width: "100%" }}
-      zoomControl={false}
-      attributionControl={false}
+    <Map
+      mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID as string}
+      defaultCenter={center}
+      defaultZoom={initialZoom}
+      mapTypeId="hybrid"
+      disableDefaultUI
+      gestureHandling="greedy"
+      onClick={rioNegro ? undefined : handleMapClick}
+      options={{ draggableCursor: "pointer", draggingCursor: "move" }}
+      style={{ width: "100%", height: "100%" }}
     >
-      <ZoomControls />
-      <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
       <MapAutoCenter city={city} province={province} />
 
       {rioNegro ? (
-        <RioNegroClickLayer onParcelClick={onParcelClick} />
+        <RioNegroLayer onParcelClick={onParcelClick} />
       ) : (
-        <>
-          <BuenosAiresClickLayer onParcelClick={onParcelClick} />
-          <ZoomHint />
-        </>
+        <ARBAWMSLayer />
       )}
 
       <SelectedParcelLayer geometry={selectedGeometry} />
 
       {manualPin && (
-        <Marker position={[manualPin.lat, manualPin.lng]} icon={manualPinIcon} />
+        <AdvancedMarker position={manualPin}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              transform: "translate(-50%, -100%)",
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="#10b981"
+              stroke="#047857"
+              strokeWidth={1.5}
+            >
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" fill="#ffffff" stroke="none" />
+            </svg>
+          </div>
+        </AdvancedMarker>
       )}
-      
-    </MapContainer>
-  );
-}
-
-function ZoomControls() {
-  const map = useMap();
-  return (
-    <div className="absolute bottom-5 left-4 z-[1000] flex flex-col gap-1.5">
-      <button
-        type="button"
-        onClick={() => map.zoomIn()}
-        className="w-9 h-9 bg-white rounded-xl shadow-md border border-gray-200 flex items-center justify-center text-xl font-bold text-gray-700 hover:bg-gray-50 cursor-pointer"
-      >
-        +
-      </button>
-      <button
-        type="button"
-        onClick={() => map.zoomOut()}
-        className="w-9 h-9 bg-white rounded-xl shadow-md border border-gray-200 flex items-center justify-center text-xl font-bold text-gray-700 hover:bg-gray-50 cursor-pointer"
-      >
-        −
-      </button>
-    </div>
+    </Map>
   );
 }
