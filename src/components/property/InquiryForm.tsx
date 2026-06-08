@@ -130,7 +130,7 @@ export default function InquiryForm({ propertyId }: InquiryFormProps) {
 
           {serverError && <p className="text-xs text-red-500 font-bold bg-red-50 px-4 py-3 rounded-xl border border-red-100">{serverError}</p>}
 
-          <button type="submit" disabled={isSubmitting} className="px-10 bg-urbik-black hover:bg-urbik-dark2 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-4 rounded-full transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group">
+          <button type="submit" disabled={isSubmitting} className="px-14 bg-urbik-black hover:bg-urbik-dark2 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-5 rounded-full transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group">
             <span>{isSubmitting ? "Enviando..." : "Enviar consulta"}</span>
           </button>
         </form>

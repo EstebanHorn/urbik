@@ -36,16 +36,25 @@ export async function POST(req: Request) {
   let threadError = null;
 
   if (propertyId) {
-    const res = await admin
+    const { data: existing } = await admin
       .from("chat_threads")
-      .upsert(
-        { user_id: user.id, real_estate_id: realEstateId, property_id: propertyId },
-        { onConflict: "user_id,real_estate_id,property_id", ignoreDuplicates: false }
-      )
       .select("id")
-      .single();
-    thread = res.data;
-    threadError = res.error;
+      .eq("user_id", user.id)
+      .eq("real_estate_id", realEstateId)
+      .eq("property_id", propertyId)
+      .maybeSingle();
+
+    if (existing) {
+      thread = existing;
+    } else {
+      const res = await admin
+        .from("chat_threads")
+        .insert({ user_id: user.id, real_estate_id: realEstateId, property_id: propertyId })
+        .select("id")
+        .single();
+      thread = res.data;
+      threadError = res.error;
+    }
   } else {
     const { data: existing } = await admin
       .from("chat_threads")
