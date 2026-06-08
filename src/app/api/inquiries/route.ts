@@ -29,8 +29,6 @@ interface SupabaseInquiry {
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
-
     const body: InquiryRequestBody = await req.json();
 
     const {
@@ -54,7 +52,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data: property } = await supabase
+    const admin = createAdminClient();
+
+    const { data: property } = await admin
       .from("properties")
       .select("id, real_estate_id")
       .eq("id", propertyId)
@@ -67,30 +67,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
-
-    let userId: number | null = null;
-
-    if (authUser) {
-      userId = authUser.id as unknown as number;
-    }
-
-    const insertData: Record<string, unknown> = {
-      property_id: property.id,
-      message: message.trim(),
-      sender_name: senderName.trim(),
-      sender_email: senderEmail.trim(),
-      sender_phone: senderPhone.trim(),
-      status: "UNREAD",
-    };
-
-    void userId;
-
-    const { data: inquiry, error } = await supabase
+    const { data: inquiry, error } = await admin
       .from("inquiries")
-      .insert(insertData)
+      .insert({
+        property_id: property.id,
+        message: message.trim(),
+        sender_name: senderName.trim(),
+        sender_email: senderEmail.trim(),
+        sender_phone: senderPhone.trim(),
+        status: "UNREAD",
+      })
       .select("id")
       .single();
 

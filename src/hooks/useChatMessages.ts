@@ -54,6 +54,21 @@ export function useChatMessages(threadId: string | null) {
           });
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "chat_messages",
+          filter: `thread_id=eq.${threadId}`,
+        },
+        (payload) => {
+          const updated = payload.new as ChatMessage;
+          setMessages((prev) =>
+            prev.map((m) => (m.id === updated.id ? { ...m, read_at: updated.read_at } : m))
+          );
+        }
+      )
       .subscribe();
 
     channelRef.current = channel;
