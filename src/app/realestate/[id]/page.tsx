@@ -173,7 +173,7 @@ export default async function RealEstatePage({
                 style={{
                   backgroundImage: realEstate.logo_url
                     ? `url(${realEstate.logo_url})`
-                    : `url(${bgImage.src})`,
+                    : 'none',
                 }}
               >
                 {!realEstate.logo_url && (

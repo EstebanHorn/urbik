@@ -42,7 +42,6 @@ export default function Footer() {
           <h3 className="font-bold mb-4 uppercase text-sm tracking-widest text-gray-400">Cuenta</h3>
           <ul className="space-y-2">
             <li><Link href="/dashboard" className="hover:underline">Mi Perfil</Link></li>
-            <li><Link href="/settings" className="hover:underline">Configuración</Link></li>
           </ul>
         </div>
 

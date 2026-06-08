@@ -150,11 +150,10 @@ export function useSearch() {
       if (f.bathrooms) params.set("bathrooms", String(f.bathrooms));
       if (f.minPrice) params.set("minPrice", String(f.minPrice));
       if (f.maxPrice) params.set("maxPrice", String(f.maxPrice));
-      if (suggestion.display_name) params.set("q", suggestion.display_name);
       Object.entries(f.amenities || {}).forEach(([key, value]) => {
         if (value) params.set(key, "true");
       });
-      router.push(`/properties?${params.toString()}`);
+      router.push(`/map?${params.toString()}`);
     }
   }, [clearAutocomplete, router]);
 
