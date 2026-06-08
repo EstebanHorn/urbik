@@ -296,7 +296,7 @@ export default function Navbar() {
     );
   };
 
-  const renderNavLinks = () => {
+const renderNavLinks = () => {
     const linkClass = "text-sm md:text-base text-urbik-white hover:text-white/70 font-semibold transition-colors";
 
     if (!session) {
@@ -307,6 +307,12 @@ export default function Navbar() {
           <Link href="/dashboard?nueva=1" className={linkClass}>Publicar</Link>
           <Link href="/for-agencies" className={linkClass}>Para Inmobiliarias</Link>
         </>
+      );
+    }
+
+    if (role === "ADMIN" || role === "admin") {
+      return (
+        <Link href="/administrate" className={linkClass}>Administrate</Link>
       );
     }
 

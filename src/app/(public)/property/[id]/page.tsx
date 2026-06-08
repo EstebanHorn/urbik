@@ -512,7 +512,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             <h1 className="text-3xl md:text-4xl lg:text-4xl font-display font-black text-urbik-black italic tracking-tighter leading-tight">
               {property.title}
             </h1>
-            <div className="flex justify-end items-center gap-2 text-urbik-muted font-medium italic">
+            <div className="flex justify-start items-center gap-2 text-urbik-muted font-medium italic">
               <MapPin size={16} className="text-urbik-black/60 shrink-0 sm:w-5 sm:h-5" />
               <span className="text-urbik-black/60 sm:text-lg">
                 {property.address}{property.neighborhood ? `, ${property.neighborhood}` : ""}, {property.city}

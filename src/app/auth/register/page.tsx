@@ -2,12 +2,13 @@
 
 export const dynamic = "force-dynamic";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getJurisdictionsByProvince } from "@/lib/jurisdictions";
+import LocationSelectors from "@/components/ui/LocationSelectors";
 
 const PROVINCES = [
   "Buenos Aires",
@@ -47,6 +48,81 @@ const GoogleIcon = () => (
     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
   </svg>
 );
+
+// Componente para imitar la estética de LocationSelectors en los dropdowns de Matrícula
+const CustomSelect = ({
+  value,
+  options,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  options: string[];
+  onChange: (val: string) => void;
+  placeholder: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative w-full" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 bg-white/30 border border-white font-bold text-white transition-all shadow-md"
+      >
+        <span>{value || placeholder}</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+
+      <div
+        className={`absolute z-50 left-0 mt-2 min-w-[280px] w-full max-h-60 overflow-y-auto rounded-2xl bg-[#0a0a0a] border border-white/10 shadow-2xl transition-all duration-200 outline-none ${
+          isOpen
+            ? "opacity-100 translate-y-0"
+            : "pointer-events-none opacity-0 -translate-y-2"
+        }`}
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        {options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => {
+              onChange(opt);
+              setIsOpen(false);
+            }}
+            className="w-full text-left cursor-pointer px-5 py-3 text-md font-bold text-white hover:bg-white/10 transition"
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 type Role = "USER" | "REALESTATE";
 
@@ -194,6 +270,12 @@ export default function RegisterPage() {
   const handleRealEstateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Validación manual de la provincia (ya que no usamos el atributo required en el div)
+    if (!realEstateForm.licenseProvince) {
+      setError("Seleccioná la provincia de la matrícula.");
+      return;
+    }
 
     if (realEstateForm.password !== realEstateForm.confirmPassword) {
       setError("Las contraseñas no coinciden.");
@@ -489,34 +571,15 @@ export default function RegisterPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2 ml-2 text-white/80">Provincia</label>
-                    <select
-                      value={realEstateForm.province}
-                      onChange={(e) => setRealEstateForm((f) => ({ ...f, province: e.target.value }))}
-                      required
-                      className={`${INPUT_CLASS} appearance-none`}
-                    >
-                      <option value="" className="bg-[#0a0a0a] text-white">Seleccionar</option>
-                      {PROVINCES.map((p) => (
-                        <option key={p} value={p} className="bg-[#0a0a0a] text-white">
-                          {p}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2 ml-2 text-white/80">Ciudad</label>
-                    <input
-                      type="text"
-                      placeholder="Buenos Aires"
-                      value={realEstateForm.city}
-                      onChange={(e) => setRealEstateForm((f) => ({ ...f, city: e.target.value }))}
-                      required
-                      className={INPUT_CLASS}
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 ml-2 text-white/80">Ubicación (Provincia y Ciudad)</label>
+                  <LocationSelectors
+                    provinceValue={realEstateForm.province}
+                    cityValue={realEstateForm.city}
+                    onChange={(name, value) => setRealEstateForm((f) => ({ ...f, [name]: value }))}
+                    provinceLabel="Seleccionar provincia"
+                    cityLabel="Seleccionar ciudad"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -588,32 +651,23 @@ export default function RegisterPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2 ml-2 text-white/80">Provincia de la matrícula</label>
-                  <select
+                  <CustomSelect
                     value={realEstateForm.licenseProvince}
-                    onChange={(e) => setRealEstateForm((f) => ({ ...f, licenseProvince: e.target.value, licenseJurisdiction: "" }))}
-                    required
-                    className={`${INPUT_CLASS} appearance-none`}
-                  >
-                    <option value="" className="bg-[#0a0a0a] text-white">Seleccionar</option>
-                    {PROVINCES.map((p) => (
-                      <option key={p} value={p} className="bg-[#0a0a0a] text-white">{p}</option>
-                    ))}
-                  </select>
+                    options={PROVINCES}
+                    onChange={(val) => setRealEstateForm((f) => ({ ...f, licenseProvince: val, licenseJurisdiction: "" }))}
+                    placeholder="Seleccionar provincia"
+                  />
                 </div>
 
                 {getJurisdictionsByProvince(realEstateForm.licenseProvince).length > 0 && (
                   <div>
                     <label className="block text-sm font-medium mb-2 ml-2 text-white/80">Circunscripción</label>
-                    <select
+                    <CustomSelect
                       value={realEstateForm.licenseJurisdiction}
-                      onChange={(e) => setRealEstateForm((f) => ({ ...f, licenseJurisdiction: e.target.value }))}
-                      className={`${INPUT_CLASS} appearance-none`}
-                    >
-                      <option value="" className="bg-[#0a0a0a] text-white">Seleccionar (opcional)</option>
-                      {getJurisdictionsByProvince(realEstateForm.licenseProvince).map((j) => (
-                        <option key={j} value={j} className="bg-[#0a0a0a] text-white">{j}</option>
-                      ))}
-                    </select>
+                      options={getJurisdictionsByProvince(realEstateForm.licenseProvince)}
+                      onChange={(val) => setRealEstateForm((f) => ({ ...f, licenseJurisdiction: val }))}
+                      placeholder="Seleccionar (opcional)"
+                    />
                   </div>
                 )}
 
