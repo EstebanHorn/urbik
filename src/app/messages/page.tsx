@@ -20,7 +20,7 @@ export default function MessagesPage() {
   );
   const [showConversation, setShowConversation] = useState(!!searchParams.get("thread"));
 
-  const { threads, loading, totalUnread } = useChatThreads();
+  const { threads, loading, totalUnread, refetch } = useChatThreads();
 
   useEffect(() => {
     createClient()
@@ -30,6 +30,10 @@ export default function MessagesPage() {
         setAuthLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    if (activeThreadId) refetch();
+  }, [activeThreadId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelect = (id: string) => {
     setActiveThreadId(id);
@@ -127,25 +131,23 @@ export default function MessagesPage() {
                   >
                     <ArrowLeft size={15} />
                   </button>
-                  <div
-                    className="w-8 h-8 rounded-full bg-urbik-black text-white flex items-center justify-center font-black text-xs shrink-0"
-                  >
+                  <div className="w-9 h-9 rounded-full bg-urbik-black text-white flex items-center justify-center font-black text-sm shrink-0">
                     {(activeThread?.otherParty ?? "?").charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-black text-sm text-urbik-black truncate">
+                    <p className="font-black text-sm text-urbik-black truncate leading-tight">
                       {activeThread?.otherParty ?? "Conversación"}
                     </p>
                     {activeThread?.property ? (
                       <Link
                         href={`/property/${activeThread.property.id}`}
-                        className="text-[11px] text-urbik-cyan hover:underline flex items-center gap-1"
+                        className="text-[11px] text-urbik-cyan hover:underline inline-flex items-center gap-1 mt-0.5"
                       >
-                        <Home size={10} />
-                        {activeThread.property.title}
+                        <Home size={9} />
+                        <span className="truncate max-w-[180px]">{activeThread.property.title}</span>
                       </Link>
                     ) : (
-                      <p className="text-[11px] text-gray-400">Consulta general</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Consulta general</p>
                     )}
                   </div>
                 </div>

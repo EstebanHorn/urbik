@@ -62,7 +62,7 @@ export async function POST(req: Request) {
       .eq("user_id", user.id)
       .eq("real_estate_id", realEstateId)
       .is("property_id", null)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       thread = existing;
@@ -100,32 +100,26 @@ export async function GET() {
 
   const admin = createAdminClient();
 
-  const { data: profile } = await admin
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  const role = profile?.role ?? "USER";
-  const isAgency = role === "REALESTATE" || role === "ADMIN";
-
   const { data: rawThreads } = await admin
     .from("chat_threads")
     .select("id, created_at, last_message_at, property_id, user_id, real_estate_id")
-    .eq(isAgency ? "real_estate_id" : "user_id", user.id)
+    .or(`user_id.eq.${user.id},real_estate_id.eq.${user.id}`)
     .order("last_message_at", { ascending: false });
 
   if (!rawThreads?.length) return NextResponse.json([]);
 
   const enriched = await Promise.all(
     rawThreads.map(async (t) => {
-      const otherId = isAgency ? t.user_id : t.real_estate_id;
+      const iAmAgency = t.real_estate_id === user.id;
+      const otherId = iAmAgency ? t.user_id : t.real_estate_id;
 
-      const [{ data: prop }, otherPartyResult, unreadResult] = await Promise.all([
-        admin.from("properties").select("id, title, images").eq("id", t.property_id).single(),
-        isAgency
-          ? admin.from("user_profiles").select("first_name, last_name").eq("profile_id", otherId).single()
-          : admin.from("real_estates").select("agency_name").eq("profile_id", otherId).single(),
+      const [propResult, otherPartyResult, unreadResult] = await Promise.all([
+        t.property_id
+          ? admin.from("properties").select("id, title, images").eq("id", t.property_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        iAmAgency
+          ? admin.from("user_profiles").select("first_name, last_name").eq("profile_id", otherId).maybeSingle()
+          : admin.from("real_estates").select("agency_name").eq("profile_id", otherId).maybeSingle(),
         admin
           .from("chat_messages")
           .select("id", { count: "exact", head: true })
@@ -134,7 +128,9 @@ export async function GET() {
           .neq("sender_id", user.id),
       ]);
 
-      const otherParty = isAgency
+      const prop = propResult.data as { id: string; title: string; images?: string[] } | null;
+
+      const otherParty = iAmAgency
         ? (() => {
             const up = (otherPartyResult.data as { first_name?: string; last_name?: string } | null);
             return up ? `${up.first_name ?? ""} ${up.last_name ?? ""}`.trim() || "Usuario" : "Usuario";

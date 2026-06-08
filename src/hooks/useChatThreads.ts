@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 export type ChatThread = {
   id: string;
@@ -11,48 +10,34 @@ export type ChatThread = {
   unreadCount: number;
 };
 
+const POLL_INTERVAL = 8000;
+
 export function useChatThreads() {
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabaseRef = useRef(createClient());
-  const channelRef = useRef<ReturnType<typeof supabaseRef.current.channel> | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchThreads = useCallback(async () => {
-    const res = await fetch("/api/chat/threads");
-    if (res.ok) {
-      const data = await res.json();
-      setThreads(Array.isArray(data) ? data : []);
+    try {
+      const res = await fetch("/api/chat/threads");
+      if (res.ok) {
+        const data = await res.json();
+        setThreads(Array.isArray(data) ? data : []);
+      } else {
+        console.error("[useChatThreads] GET /api/chat/threads →", res.status);
+      }
+    } catch (err) {
+      console.error("[useChatThreads] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
     fetchThreads();
-  }, [fetchThreads]);
-
-  useEffect(() => {
-    const supabase = supabaseRef.current;
-
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
-
-    const channel = supabase
-      .channel(`chat:threads:mine:${Date.now()}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "chat_threads" }, () => {
-        fetchThreads();
-      })
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "chat_messages" }, () => {
-        fetchThreads();
-      })
-      .subscribe();
-
-    channelRef.current = channel;
-
+    intervalRef.current = setInterval(fetchThreads, POLL_INTERVAL);
     return () => {
-      supabase.removeChannel(channel);
-      channelRef.current = null;
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [fetchThreads]);
 

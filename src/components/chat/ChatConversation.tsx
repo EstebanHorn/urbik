@@ -32,11 +32,21 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
   const { messages, loading, addOptimistic, replaceOptimistic } = useChatMessages(threadId);
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const prevCountRef = useRef(0);
+
+  // Instant scroll on thread switch, smooth on new message
+  useEffect(() => {
+    prevCountRef.current = 0;
+  }, [threadId]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = scrollRef.current;
+    if (!el || messages.length === 0) return;
+    const isNewMsg = prevCountRef.current > 0 && messages.length > prevCountRef.current;
+    el.scrollTo({ top: el.scrollHeight, behavior: isNewMsg ? "smooth" : "instant" });
+    prevCountRef.current = messages.length;
   }, [messages]);
 
   const handleSend = async () => {
@@ -54,7 +64,9 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
     });
     setBody("");
     setSending(true);
-    if (textareaRef.current) textareaRef.current.style.height = "auto";
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
 
     try {
       const res = await fetch(`/api/chat/threads/${threadId}/messages`, {
@@ -93,18 +105,15 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="w-2 h-2 bg-urbik-black/20 rounded-full animate-bounce"
-                style={{ animationDelay: `${i * 0.12}s` }}
-              />
-            ))}
-          </div>
-          <p className="text-xs font-bold text-gray-400">Cargando mensajes</p>
+      <div className="flex-1 flex items-center justify-center h-full">
+        <div className="flex gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-2 h-2 bg-urbik-black/20 rounded-full animate-bounce"
+              style={{ animationDelay: `${i * 0.12}s` }}
+            />
+          ))}
         </div>
       </div>
     );
@@ -113,11 +122,11 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
   let lastDateLabel = "";
 
   return (
-    <div className="flex flex-col h-full bg-gray-50/40">
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-0.5">
+    <div className="flex flex-col h-full">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-0.5 bg-gray-50/50">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-xs font-bold text-gray-300 tracking-widest uppercase">
+            <p className="text-[11px] font-bold text-gray-300 tracking-widest uppercase">
               Empezá la conversación
             </p>
           </div>
@@ -131,48 +140,39 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
 
           const prevMsg = messages[i - 1];
           const nextMsg = messages[i + 1];
-          const sameSenderAsPrev = prevMsg && prevMsg.sender_id === msg.sender_id;
-          const sameSenderAsNext = nextMsg && nextMsg.sender_id === msg.sender_id;
-
-          const bubbleRounding = isOwn
-            ? `rounded-2xl ${sameSenderAsNext ? "rounded-br-lg" : "rounded-br-sm"}`
-            : `rounded-2xl ${sameSenderAsNext ? "rounded-bl-lg" : "rounded-bl-sm"}`;
+          const sameSenderAsPrev = !showDate && prevMsg?.sender_id === msg.sender_id;
+          const sameSenderAsNext = nextMsg?.sender_id === msg.sender_id;
 
           return (
             <React.Fragment key={msg.id}>
               {showDate && (
-                <div className="flex items-center gap-3 py-4">
-                  <div className="flex-1 h-px bg-gray-200/70" />
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <div className="flex items-center gap-3 py-3 my-1">
+                  <div className="flex-1 h-px bg-gray-200/80" />
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
                     {dateLabel}
                   </span>
-                  <div className="flex-1 h-px bg-gray-200/70" />
+                  <div className="flex-1 h-px bg-gray-200/80" />
                 </div>
               )}
 
               <div
                 className={`flex ${isOwn ? "justify-end" : "justify-start"} ${
-                  sameSenderAsPrev ? "mt-0.5" : "mt-3"
+                  sameSenderAsPrev ? "mt-0.5" : "mt-2.5"
                 }`}
               >
                 <div
-                  className={`max-w-[72%] px-3.5 py-2.5 text-sm font-medium leading-relaxed ${bubbleRounding} ${
-                    isOwn
-                      ? "bg-urbik-black text-white"
-                      : "bg-white border border-gray-100 text-urbik-black shadow-sm"
-                  } ${msg.id.startsWith("temp-") ? "opacity-60" : ""}`}
+                  className={`
+                    max-w-[70%] px-3.5 py-2 text-sm font-medium leading-relaxed
+                    ${isOwn
+                      ? `bg-urbik-black text-white rounded-2xl ${sameSenderAsNext ? "rounded-br-md" : "rounded-br-sm"}`
+                      : `bg-white border border-gray-100 text-urbik-black shadow-sm rounded-2xl ${sameSenderAsNext ? "rounded-bl-md" : "rounded-bl-sm"}`
+                    }
+                    ${msg.id.startsWith("temp-") ? "opacity-50" : ""}
+                  `}
                 >
                   <p className="whitespace-pre-wrap break-words">{msg.body}</p>
-                  <div
-                    className={`flex items-center gap-1 mt-1 ${
-                      isOwn ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <span
-                      className={`text-[10px] leading-none ${
-                        isOwn ? "text-white/40" : "text-gray-400"
-                      }`}
-                    >
+                  <div className={`flex items-center gap-1 mt-1 ${isOwn ? "justify-end" : "justify-start"}`}>
+                    <span className={`text-[10px] leading-none tabular-nums ${isOwn ? "text-white/35" : "text-gray-400"}`}>
                       {formatTime(msg.created_at)}
                     </span>
                     {isOwn && <MessageStatus msg={msg} />}
@@ -182,10 +182,9 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
             </React.Fragment>
           );
         })}
-        <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-gray-100 bg-white px-4 py-3 flex gap-2.5 items-end shrink-0">
+      <div className="border-t border-gray-100 bg-white px-4 py-3 flex gap-2 items-end shrink-0">
         <textarea
           ref={textareaRef}
           rows={1}
@@ -193,14 +192,14 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
           value={body}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          className="flex-1 resize-none bg-gray-50 border border-gray-100 rounded-2xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:bg-white focus:border-gray-200 transition-colors placeholder:text-gray-400 overflow-hidden"
-          style={{ lineHeight: "1.55", minHeight: "40px" }}
+          className="flex-1 resize-none bg-gray-50 border border-transparent rounded-2xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:bg-white focus:border-gray-200 transition-all placeholder:text-gray-400 overflow-hidden"
+          style={{ lineHeight: "1.55", minHeight: "42px" }}
         />
         <button
           type="button"
           onClick={handleSend}
           disabled={!body.trim() || sending}
-          className="bg-urbik-black text-white w-10 h-10 rounded-full flex items-center justify-center disabled:opacity-25 hover:bg-urbik-dark2 transition-colors shrink-0 cursor-pointer"
+          className="bg-urbik-black text-white w-9 h-9 rounded-full flex items-center justify-center disabled:opacity-20 hover:scale-105 active:scale-95 transition-transform shrink-0 cursor-pointer"
         >
           <Send size={14} />
         </button>

@@ -48,7 +48,7 @@ export async function PATCH(
       );
     }
 
-    const { data: inquiry } = await supabase
+    const { data: inquiry } = await admin
       .from("inquiries")
       .select(`
         id,
@@ -80,7 +80,7 @@ export async function PATCH(
       );
     }
 
-    const { data: updated, error } = await supabase
+    const { data: updated, error } = await admin
       .from("inquiries")
       .update({ status: "READ" })
       .eq("id", inquiryId)

@@ -39,7 +39,16 @@
       "Bash(xargs ls *)",
       "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
       "WebFetch(domain:docs.google.com)",
-      "WebFetch(domain:doc-0c-84-docstext.googleusercontent.com)"
+      "WebFetch(domain:doc-0c-84-docstext.googleusercontent.com)",
+      "Bash(xargs wc *)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\app\\\\settings\\\\page.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\components\\\\map\\\\MapSettingsProvider.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\components\\\\map\\\\InteractiveMapClient.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\components\\\\map\\\\DbParcelsLayer.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\esteb\\\\OneDrive\\\\Documentos\\\\Code\\\\urbik\\\\src\\\\components\\\\map\\\\ParcelsLayerOptimized.tsx\" -Force)",
+      "PowerShell(git add *)",
+      "PowerShell(git push *)",
+      "PowerShell(git *)"
     ]
   }
 }
