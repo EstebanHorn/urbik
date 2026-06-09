@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef } from "react";
-import { Map, AdvancedMarker, useMap, useMapsLibrary, type MapMouseEvent } from "@vis.gl/react-google-maps";
+import { Map as GoogleMap, AdvancedMarker, useMap, useMapsLibrary, type MapMouseEvent } from "@vis.gl/react-google-maps";
 import type { FeatureCollection, Geometry } from "geojson";
 
 const PROVINCE_CENTERS: Record<string, { lat: number; lng: number }> = {
@@ -336,7 +336,7 @@ export default function ParcelPickerMap({
   );
 
   return (
-    <Map
+    <GoogleMap
       mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID as string}
       defaultCenter={center}
       defaultZoom={initialZoom}
@@ -344,7 +344,8 @@ export default function ParcelPickerMap({
       disableDefaultUI
       gestureHandling="greedy"
       onClick={rioNegro ? undefined : handleMapClick}
-      options={{ draggableCursor: "pointer", draggingCursor: "move" }}
+      draggableCursor="pointer"
+      draggingCursor="move"
       style={{ width: "100%", height: "100%" }}
     >
       <MapAutoCenter city={city} province={province} />
@@ -379,6 +380,6 @@ export default function ParcelPickerMap({
           </div>
         </AdvancedMarker>
       )}
-    </Map>
+    </GoogleMap>
   );
 }
