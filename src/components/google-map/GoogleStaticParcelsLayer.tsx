@@ -1,10 +1,9 @@
 /// <reference types="@types/google.maps" />
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMap } from "@vis.gl/react-google-maps";
 import { detectRegion, type Region } from "@/components/map/utils";
-import type { FeatureCollection } from "geojson";
 
 export function GoogleStaticParcelsLayer() {
   const map = useMap();
@@ -57,51 +56,48 @@ export function GoogleStaticParcelsLayer() {
     }
   }, [map, region]);
 
+  const arcgisLayerRef = useRef<google.maps.ImageMapType | null>(null);
+
   useEffect(() => {
     if (!map || region !== "rio-negro") {
-      map?.data.forEach((feature: google.maps.Data.Feature) => {
-        if (feature.getProperty("isRioNegro")) map.data.remove(feature);
-      });
+      if (arcgisLayerRef.current) {
+        map?.overlayMapTypes.removeAt(
+          (map.overlayMapTypes.getArray() as google.maps.ImageMapType[]).indexOf(
+            arcgisLayerRef.current,
+          ),
+        );
+        arcgisLayerRef.current = null;
+      }
       return;
     }
 
-    const fetchRioNegro = async () => {
-      const zoom = map.getZoom() || 0;
-      if (zoom < 14) return;
+    if (!arcgisLayerRef.current) {
+      const arcgisMapType = new google.maps.ImageMapType({
+        getTileUrl: function (coord: google.maps.Point, zoom: number) {
+          if (zoom < 14) return null;
+          const r = 6378137;
+          const mapSize = 256 * Math.pow(2, zoom);
+          const res = (2 * Math.PI * r) / mapSize;
+          const xmin = coord.x * 256 * res - Math.PI * r;
+          const ymax = Math.PI * r - coord.y * 256 * res;
+          const xmax = (coord.x + 1) * 256 * res - Math.PI * r;
+          const ymin = Math.PI * r - (coord.y + 1) * 256 * res;
+          const bbox = `${xmin},${ymin},${xmax},${ymax}`;
 
-      const bounds = map.getBounds();
-      if (!bounds) return;
+          return (
+            `https://mapasagencia.rionegro.gov.ar/server/rest/services/Hosted/PARCELARIO/MapServer/export` +
+            `?bbox=${bbox}&bboxSR=3857&layers=show:0&size=256,256` +
+            `&imageSR=3857&format=png32&transparent=true&f=image`
+          );
+        },
+        tileSize: new google.maps.Size(256, 256),
+        maxZoom: 19,
+        opacity: 1,
+      });
 
-      const minLat = bounds.getSouthWest().lat();
-      const minLon = bounds.getSouthWest().lng();
-      const maxLat = bounds.getNorthEast().lat();
-      const maxLon = bounds.getNorthEast().lng();
-
-      try {
-        const res = await fetch(`/api/parcels/rio-negro?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`);
-        if (res.ok) {
-          const json = (await res.json()) as FeatureCollection;
-          json.features.forEach(f => {
-            if (!f.properties) f.properties = {};
-            f.properties.isRioNegro = true;
-          });
-          map.data.addGeoJson(json);
-          
-          map.data.setStyle((feature: google.maps.Data.Feature) => {
-            if (feature.getProperty("isRioNegro")) {
-              return { fillColor: "transparent", strokeColor: "#00ff8e", strokeWeight: 1 };
-            }
-            return {};
-          });
-        }
-      } catch {
-      }
-    };
-
-    const listener = map.addListener("idle", fetchRioNegro);
-    fetchRioNegro();
-
-    return () => { google.maps.event.removeListener(listener); };
+      map.overlayMapTypes.push(arcgisMapType);
+      arcgisLayerRef.current = arcgisMapType;
+    }
   }, [map, region]);
 
   return null;

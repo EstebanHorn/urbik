@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { loadIndex } from "@/lib/rioNegroIndex";
+
+const WFS_URL =
+  "http://mapasagencia.rionegro.gov.ar/server/services/Hosted/PARCELARIO/MapServer/WFSServer";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -16,18 +18,39 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "bbox inválido" }, { status: 400 });
   }
 
+  const bbox = `${minLon},${minLat},${maxLon},${maxLat},EPSG:4326`;
+  const url =
+    `${WFS_URL}?service=wfs&version=2.0.0&request=getfeature` +
+    `&typenames=PARCELARIO:PARCELARIO` +
+    `&bbox=${bbox}` +
+    `&outputFormat=geojson` +
+    `&count=${limit}`;
+
   try {
-    const { features, spatial } = await loadIndex();
-    const ids = spatial.search(minLon, minLat, maxLon, maxLat);
-    const slice = ids.length > limit ? ids.slice(0, limit) : ids;
-    const matches = slice.map((i) => ({
-      type: "Feature",
-      properties: { fid: features[i].fid, cca: features[i].cca },
-      geometry: features[i].geometry,
-    }));
+    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) {
+      return NextResponse.json(
+        { type: "FeatureCollection", features: [] },
+        { status: 502 },
+      );
+    }
+
+    const data = await res.json();
+
+    // Normalizar propiedades para mantener compatibilidad con el resto del sistema
+    const features = (data.features ?? []).map(
+      (f: { properties: Record<string, unknown>; geometry: unknown }) => ({
+        type: "Feature",
+        properties: {
+          fid: f.properties.OBJECTID,
+          cca: f.properties.CCA,
+        },
+        geometry: f.geometry,
+      }),
+    );
 
     return NextResponse.json(
-      { type: "FeatureCollection", features: matches, total: ids.length },
+      { type: "FeatureCollection", features, total: features.length },
       {
         headers: {
           "Cache-Control": "public, max-age=600, s-maxage=3600",
@@ -35,7 +58,7 @@ export async function GET(request: Request) {
       },
     );
   } catch (error) {
-    console.error("Error loading rio-negro parcels:", error);
+    console.error("Error fetching Rio Negro WFS:", error);
     return NextResponse.json(
       { type: "FeatureCollection", features: [] },
       { status: 500 },

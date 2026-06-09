@@ -1,27 +1,7 @@
 import { NextResponse } from "next/server";
-import { loadIndex, type LonLatGeometry } from "@/lib/rioNegroIndex";
 
-function pointInRing(px: number, py: number, ring: number[][]): boolean {
-  let inside = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const [xi, yi] = ring[i];
-    const [xj, yj] = ring[j];
-    if (((yi > py) !== (yj > py)) && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) {
-      inside = !inside;
-    }
-  }
-  return inside;
-}
-
-function pointInGeometry(lng: number, lat: number, geometry: LonLatGeometry): boolean {
-  if (geometry.type === "Polygon") {
-    return pointInRing(lng, lat, (geometry.coordinates as number[][][])[0]);
-  }
-  for (const poly of geometry.coordinates as number[][][][]) {
-    if (pointInRing(lng, lat, poly[0])) return true;
-  }
-  return false;
-}
+const WFS_URL =
+  "http://mapasagencia.rionegro.gov.ar/server/services/Hosted/PARCELARIO/MapServer/WFSServer";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -36,24 +16,43 @@ export async function GET(request: Request) {
   const isRioNegro = /r[íi]o\s*negro/i.test(province);
 
   if (isRioNegro) {
-    const DELTA = 0.002;
-    try {
-      const { features, spatial } = await loadIndex();
-      const ids = spatial.search(lng - DELTA, lat - DELTA, lng + DELTA, lat + DELTA);
+    // Usar BBOX pequeño alrededor del punto — el WFS filtra features que intersectan
+    const DELTA = 0.0001;
+    const bbox = `${lng - DELTA},${lat - DELTA},${lng + DELTA},${lat + DELTA},EPSG:4326`;
+    const url =
+      `${WFS_URL}?service=wfs&version=2.0.0&request=getfeature` +
+      `&typenames=PARCELARIO:PARCELARIO` +
+      `&bbox=${bbox}` +
+      `&outputFormat=geojson` +
+      `&count=1`;
 
-      for (const i of ids) {
-        const f = features[i];
-        if (pointInGeometry(lng, lat, f.geometry)) {
-          return NextResponse.json({ cca: f.cca, geometry: f.geometry });
-        }
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) {
+        return NextResponse.json({ error: "WFS no disponible" }, { status: 502 });
       }
-      return NextResponse.json({ error: "No se encontró parcela en ese punto" }, { status: 404 });
+
+      const data = await res.json();
+      const feature = data.features?.[0];
+
+      if (!feature) {
+        return NextResponse.json(
+          { error: "No se encontró parcela en ese punto" },
+          { status: 404 },
+        );
+      }
+
+      return NextResponse.json({
+        cca: feature.properties?.CCA ?? "",
+        geometry: feature.geometry ?? null,
+      });
     } catch (err) {
-      console.error("Error querying Rio Negro parcels:", err);
+      console.error("Error querying Rio Negro WFS:", err);
       return NextResponse.json({ error: "Error interno" }, { status: 500 });
     }
   }
 
+  // Buenos Aires — ARBA WMS GetFeatureInfo
   try {
     const DELTA = 0.001;
     const west = lng - DELTA;
@@ -88,7 +87,10 @@ export async function GET(request: Request) {
     const feature = data.features?.[0];
 
     if (!feature) {
-      return NextResponse.json({ error: "No se encontró parcela en ese punto" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No se encontró parcela en ese punto" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json({
