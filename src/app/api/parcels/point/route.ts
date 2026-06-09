@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-const WFS_URL =
-  "http://mapasagencia.rionegro.gov.ar/server/services/Hosted/PARCELARIO/MapServer/WFSServer";
+const RIO_NEGRO_FEATURE_SERVER =
+  "https://mapasagencia.rionegro.gov.ar/server/rest/services/Hosted/PARCELARIO/FeatureServer/0/query";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -16,20 +16,24 @@ export async function GET(request: Request) {
   const isRioNegro = /r[íi]o\s*negro/i.test(province);
 
   if (isRioNegro) {
-    // Usar BBOX pequeño alrededor del punto — el WFS filtra features que intersectan
-    const DELTA = 0.0001;
-    const bbox = `${lng - DELTA},${lat - DELTA},${lng + DELTA},${lat + DELTA},EPSG:4326`;
-    const url =
-      `${WFS_URL}?service=wfs&version=2.0.0&request=getfeature` +
-      `&typenames=PARCELARIO:PARCELARIO` +
-      `&bbox=${bbox}` +
-      `&outputFormat=geojson` +
-      `&count=1`;
+    const params = new URLSearchParams({
+      geometry: JSON.stringify({ x: lng, y: lat, spatialReference: { wkid: 4326 } }),
+      geometryType: "esriGeometryPoint",
+      inSR: "4326",
+      spatialRel: "esriSpatialRelIntersects",
+      outFields: "CCA,OBJECTID",
+      returnGeometry: "true",
+      resultRecordCount: "1",
+      f: "geojson",
+    });
 
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      const res = await fetch(`${RIO_NEGRO_FEATURE_SERVER}?${params}`, {
+        signal: AbortSignal.timeout(8000),
+      });
+
       if (!res.ok) {
-        return NextResponse.json({ error: "WFS no disponible" }, { status: 502 });
+        return NextResponse.json({ error: "Servicio no disponible" }, { status: 502 });
       }
 
       const data = await res.json();
@@ -47,7 +51,7 @@ export async function GET(request: Request) {
         geometry: feature.geometry ?? null,
       });
     } catch (err) {
-      console.error("Error querying Rio Negro WFS:", err);
+      console.error("Error querying Rio Negro FeatureServer:", err);
       return NextResponse.json({ error: "Error interno" }, { status: 500 });
     }
   }
