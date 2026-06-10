@@ -74,6 +74,8 @@ interface RawProperty {
   saleCurrency?: string;
   rentCurrency?: string;
   price?: number;
+  lat: number;
+  lon: number;
   [key: string]: unknown;
 }
 

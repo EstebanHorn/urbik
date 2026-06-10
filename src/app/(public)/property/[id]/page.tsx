@@ -15,6 +15,7 @@ import ImageGallery from "@/components/property/ImageGallery";
 import InquiryForm from "@/components/property/InquiryForm";
 import StartChatButton from "@/components/chat/StartChatButton";
 import TrackPropertyView from "@/components/analytics/TrackPropertyView";
+import ReportButton from "@/components/reports/ReportButton";
 
 export const dynamic = "force-dynamic";
 
@@ -145,6 +146,8 @@ interface Property {
   constructionYear: number | null;
   latitude: number | null;
   longitude: number | null;
+  parcelCCA: string | null;
+  parcelPDA: string | null;
   parcelGeom: Record<string, unknown> | null;
   realEstateId: string | null;
   images: string[];
@@ -258,6 +261,8 @@ async function getPropertyData(id: string) {
       constructionYear: propRaw.construction_year,
       latitude: propRaw.latitude,
       longitude: propRaw.longitude,
+      parcelCCA: propRaw.parcel_cca ?? null,
+      parcelPDA: propRaw.parcel_pda ?? null,
       parcelGeom: propRaw.parcel_geom,
       realEstateId: propRaw.real_estate_id,
       images: propRaw.images || [],
@@ -483,7 +488,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   return (
     <main className="min-h-screen bg-white pb-32 lg:pb-20">
       <TrackPropertyView propertyId={String(property.id)} />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-25 mb-6 sm:mb-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-25 mb-6 sm:mb-2 flex items-center justify-between gap-3">
         <Link
           href="/dashboard"
           className="group text-urbik-black/50 inline-flex items-center gap-2 text-sm font-bold hover:text-urbik-black transition-colors"
@@ -493,6 +498,24 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           </div>
           Volver al listado
         </Link>
+        <div className="flex items-center gap-3">
+          <ReportButton
+            targetType="PROPERTY"
+            targetId={String(property.id)}
+            ownerId={property.realEstateId ?? null}
+            contextLabel={property.title}
+            label="Reportar propiedad"
+          />
+          {property.parcelCCA && (
+            <ReportButton
+              targetType="PARCEL"
+              targetId={String(property.id)}
+              ownerId={property.realEstateId ?? null}
+              contextLabel={`Parcela CCA ${property.parcelCCA}`}
+              label="Reportar parcela"
+            />
+          )}
+        </div>
         {isAdmin && <AdminActions id={property.id} currentStatus={property.status} type="property" />}
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 -mb-15">

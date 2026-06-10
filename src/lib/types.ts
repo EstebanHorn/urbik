@@ -199,3 +199,62 @@ export interface FormProps<T> {
   loading: boolean;
   setForm?: React.Dispatch<React.SetStateAction<T>>;
 }
+
+
+export type ReportTargetType = "AGENCY" | "PROPERTY" | "REVIEW" | "PARCEL";
+export type ReportReason =
+  | "SPAM"
+  | "FRAUD"
+  | "OFFENSIVE"
+  | "INCORRECT_INFO"
+  | "DUPLICATE"
+  | "OTHER";
+export type ReportStatus = "PENDING" | "RESOLVED" | "DISMISSED";
+export type ReportAction = "DELETE" | "UNLINK" | "DISMISS";
+export type ReportAdminActionTaken = "DELETED" | "UNLINKED" | "DISMISSED";
+
+export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
+  SPAM: "Spam",
+  FRAUD: "Estafa o fraude",
+  OFFENSIVE: "Contenido ofensivo",
+  INCORRECT_INFO: "Información incorrecta",
+  DUPLICATE: "Duplicado",
+  OTHER: "Otro",
+};
+
+export interface Report {
+  id: string;
+  targetType: ReportTargetType;
+  targetId: string;
+  reason: ReportReason;
+  comment: string | null;
+  status: ReportStatus;
+  adminAction: ReportAdminActionTaken | null;
+  resolvedAt: string | null;
+  createdAt: string;
+  reporter?: {
+    id: string | null;
+    name: string | null;
+    email: string | null;
+  };
+  target?: {
+    label: string;
+    href?: string;
+    ownerId?: string | null;
+    extra?: Record<string, string | null>;
+  };
+}
+
+export type NotificationType = "REPORT_ACTION";
+export type NotificationStatus = "UNREAD" | "READ";
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  relatedType: ReportTargetType | null;
+  relatedId: string | null;
+  status: NotificationStatus;
+  createdAt: string;
+}

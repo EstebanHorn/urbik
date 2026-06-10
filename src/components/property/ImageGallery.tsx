@@ -93,7 +93,7 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
           )}
         </div>
 
-        {parcelGeom && latitude && longitude && (
+        {!!parcelGeom && latitude != null && longitude != null && (
           <div className="absolute top-6 right-6 z-20 w-32 h-32 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-2xl border-4 border-white hidden sm:block opacity-80 hover:opacity-100 transition-opacity">
             <PropertyParcelMap lat={latitude} lon={longitude} selectedGeom={parcelGeom as GeoJsonObject} allProperties={[]} />
             <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 text-[10px] font-bold rounded shadow flex items-center gap-1 z-40 text-urbik-black">

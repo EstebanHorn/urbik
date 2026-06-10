@@ -134,7 +134,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
     rhf.setValue("parcelPDA", parcel.pda ?? "");
     rhf.setValue(
       "parcelGeom",
-      parcel.geometry ? (parcel.geometry as unknown as Record<string, unknown>) : null
+      parcel.geometry ? (parcel.geometry as unknown as Record<string, unknown>) : undefined
     );
     rhf.setValue("latitude", parcel.lat);
     rhf.setValue("longitude", parcel.lon);

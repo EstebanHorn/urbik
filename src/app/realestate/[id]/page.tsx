@@ -7,22 +7,34 @@ import { createClient } from "@/lib/supabase/server";
 import StartChatButton from "@/components/chat/StartChatButton";
 import RealEstateReviews from "@/components/realestate/RealEstateReviews";
 import TrackAgencyView from "@/components/analytics/TrackAgencyView";
-import AgencyPropertiesFilter, { Property } from "@/components/realestate/AgencyPropertiesFilter";
+import AgencyPropertiesFilter, {
+  Property,
+} from "@/components/realestate/AgencyPropertiesFilter";
+import ReportButton from "@/components/reports/ReportButton";
 
-function HeaderFractionalStars({ average, total }: { average: number; total: number }) {
+function HeaderFractionalStars({
+  average,
+  total,
+}: {
+  average: number;
+  total: number;
+}) {
   return (
     <div className="flex items-center gap-2 mb-3 mt-1">
       <div className="flex gap-0.5">
         {[1, 2, 3, 4, 5].map((star) => {
-          const fillPercentage = Math.max(0, Math.min(100, (average - star + 1) * 100));
+          const fillPercentage = Math.max(
+            0,
+            Math.min(100, (average - star + 1) * 100),
+          );
           const gradientId = `star-grad-${star}-${fillPercentage.toFixed(0)}`;
 
           return (
-            <svg 
-              key={star} 
-              viewBox="0 0 24 24" 
-              className="w-5 h-5 stroke-1 text-red-500" 
-              fill="none" 
+            <svg
+              key={star}
+              viewBox="0 0 24 24"
+              className="w-5 h-5 stroke-1 text-red-500"
+              fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <defs>
@@ -39,7 +51,9 @@ function HeaderFractionalStars({ average, total }: { average: number; total: num
           );
         })}
       </div>
-      <span className="text-xs text-urbik-muted font-medium">({total} {total === 1 ? 'reseña' : 'reseñas'})</span>
+      <span className="text-xs text-urbik-muted font-medium">
+        ({total} {total === 1 ? "reseña" : "reseñas"})
+      </span>
     </div>
   );
 }
@@ -60,7 +74,7 @@ export default async function RealEstatePage({
       *,
       profiles (role),
       properties (*)
-    `
+    `,
     )
     .eq("profile_id", id)
     .single();
@@ -72,7 +86,7 @@ export default async function RealEstatePage({
   const { data: reviewsData } = await supabase
     .from("real_estate_reviews")
     .select("rating")
-    .eq("real_estate_id", id); 
+    .eq("real_estate_id", id);
 
   let averageRating = 0;
   let totalReviews = 0;
@@ -100,9 +114,8 @@ export default async function RealEstatePage({
   }
 
   const activeProperties: Property[] =
-    realEstate.properties?.filter(
-      (p: Property) => p.status === "AVAILABLE"
-    ) || [];
+    realEstate.properties?.filter((p: Property) => p.status === "AVAILABLE") ||
+    [];
 
   return (
     <div className="min-h-screen">
@@ -110,10 +123,7 @@ export default async function RealEstatePage({
       <div className="max-w-7xl mx-auto px-4 py-8 mt-20">
         {isAdmin && (
           <div className="mb-6">
-            <AdminActions
-              id={realEstate.profile_id}
-              type="user"
-            />
+            <AdminActions id={realEstate.profile_id} type="user" />
           </div>
         )}
 
@@ -125,14 +135,11 @@ export default async function RealEstatePage({
                 style={{
                   backgroundImage: realEstate.logo_url
                     ? `url(${realEstate.logo_url})`
-                    : 'none',
+                    : "none",
                 }}
               >
                 {!realEstate.logo_url && (
-                  <Building2
-                    size={40}
-                    className="text-urbik-g400"
-                  />
+                  <Building2 size={40} className="text-urbik-g400" />
                 )}
               </div>
 
@@ -143,8 +150,8 @@ export default async function RealEstatePage({
 
                 <p className="flex items-center gap-2 text-urbik-black/60 font-medium mb-3">
                   <MapPin size={16} />
-                  {realEstate.city}, {realEstate.province}.{" "}
-                  {realEstate.street} {realEstate.address}
+                  {realEstate.city}, {realEstate.province}. {realEstate.street}{" "}
+                  {realEstate.address}
                 </p>
 
                 {realEstate.bio && (
@@ -153,7 +160,10 @@ export default async function RealEstatePage({
                   </p>
                 )}
                 {totalReviews > 0 ? (
-                  <HeaderFractionalStars average={averageRating} total={totalReviews} />
+                  <HeaderFractionalStars
+                    average={averageRating}
+                    total={totalReviews}
+                  />
                 ) : (
                   <div className="mb-3 mt-1">
                     <span className="text-sm font-medium text-urbik-muted bg-urbik-g100 px-2.5 py-1 rounded-md">
@@ -172,17 +182,21 @@ export default async function RealEstatePage({
                 Contactar Agencia
               </a>
               {user && id !== user.id && (
-                <StartChatButton
-                  realEstateId={id}
-                  label="Consultar por chat"
-                />
+                <StartChatButton realEstateId={id} label="Consultar por chat" />
               )}
+              <ReportButton
+                targetType="AGENCY"
+                targetId={realEstate.profile_id}
+                ownerId={realEstate.profile_id}
+                contextLabel={realEstate.agency_name}
+                label="Reportar inmobiliaria"
+              />
             </div>
           </div>
         </div>
 
         <AgencyPropertiesFilter properties={activeProperties} />
-        
+
         <RealEstateReviews
           realEstateId={id}
           currentUserId={user?.id ?? null}

@@ -162,7 +162,7 @@ function RioNegroLayer({
   const map = useMap();
   const abortRef = useRef<AbortController | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cacheRef = useRef<Map<string, FeatureCollection>>(new Map());
+  const cacheRef = useRef<globalThis.Map<string, FeatureCollection>>(new globalThis.Map());
   const lastKeyRef = useRef("");
 
   const fetchParcels = useCallback(() => {
@@ -383,7 +383,6 @@ export default function ParcelPickerMap({
       disableDefaultUI
       gestureHandling="greedy"
       onClick={rioNegro ? undefined : handleMapClick}
-      options={{ draggableCursor: "pointer", draggingCursor: "move" }}
       style={{ width: "100%", height: "100%" }}
     >
       <MapAutoCenter city={city} province={province} />

@@ -6,6 +6,7 @@ import { Pencil, Trash2, MessageSquare } from "lucide-react";
 
 import StarRating from "@/components/ui/StarRating";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import ReportButton from "@/components/reports/ReportButton";
 import {
   reviewService,
   type Review,
@@ -171,21 +172,16 @@ export default function RealEstateReviews({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 items-start">
         <SummaryCard summary={summary} />
-        <div className="md:col-span-2">
+        <div className="md:col-span-3 flex flex-col gap-4 min-w-0">
           {error && (
-            <div className="mb-4 rounded-xl border border-urbik-rose/30 bg-urbik-rose/10 px-4 py-3 text-sm font-medium text-urbik-rose">
+            <div className="rounded-xl border border-urbik-rose/30 bg-urbik-rose/10 px-4 py-3 text-sm font-medium text-urbik-rose">
               {error}
             </div>
           )}
 
-          {isOwner ? (
-            <div className=" p-6 text-sm text-urbik-muted font-medium">
-              Esta es la página pública de tu inmobiliaria. Las reseñas que
-              dejen los usuarios aparecerán acá.
-            </div>
-          ) : !currentUserId ? (
+          {isOwner ? null : !currentUserId ? (
             <div className=" p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <p className="font-bold text-urbik-black">
@@ -275,14 +271,14 @@ export default function RealEstateReviews({
               </div>
             </form>
           ) : null}
+
+          <ReviewsList
+            currentUserReview={myReview}
+            currentUserId={currentUserId}
+            otherReviews={otherReviews}
+          />
         </div>
       </div>
-
-      <ReviewsList
-        currentUserReview={myReview}
-        currentUserId={currentUserId}
-        otherReviews={otherReviews}
-      />
     </section>
   );
 }
@@ -412,15 +408,28 @@ function ReviewsList({
   }
 
   return (
-    <div className="space-y-4">
-      {otherReviews.map((r) => (
-        <ReviewCard key={r.id} review={r} />
-      ))}
+    <div className="w-full overflow-x-auto">
+      <div className="flex gap-4 snap-x snap-mandatory pb-2">
+        {otherReviews.map((r) => (
+          <div
+            key={r.id}
+            className="snap-start shrink-0 w-[85%] sm:w-[320px] bg-white rounded-2xl border border-urbik-black/10 shadow-sm"
+          >
+            <ReviewCard review={r} currentUserId={currentUserId} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-function ReviewCard({ review }: { review: Review }) {
+function ReviewCard({
+  review,
+  currentUserId,
+}: {
+  review: Review;
+  currentUserId: string | null;
+}) {
   return (
     <article className=" p-5">
       <header className="flex items-start gap-3 mb-3">
@@ -439,6 +448,15 @@ function ReviewCard({ review }: { review: Review }) {
             </span>
           </div>
         </div>
+        {currentUserId && currentUserId !== review.user.id && (
+          <ReportButton
+            targetType="REVIEW"
+            targetId={review.id}
+            ownerId={review.user.id}
+            variant="icon"
+            contextLabel={`Reseña de ${review.user.name}`}
+          />
+        )}
       </header>
       <p className="text-sm text-urbik-black font-medium whitespace-pre-wrap">
         {review.comment}
