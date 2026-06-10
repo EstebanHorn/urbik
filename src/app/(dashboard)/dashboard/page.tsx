@@ -56,10 +56,16 @@ export type ProfileData = {
   city?: string | null;
   province?: string | null;
   address?: string | null;
-  agencyData?: { 
-    name?: string | null; 
-    slug?: string | null; 
-    logoUrl?: string | null; 
+  street?: string | null;
+  agencyData?: {
+    name?: string | null;
+    slug?: string | null;
+    logoUrl?: string | null;
+    phone?: string | null;
+    city?: string | null;
+    province?: string | null;
+    street?: string | null;
+    address?: string | null;
     properties?: PropertySummary[] | null;
     reviews?: any[] | null;
     reviewCount?: number;

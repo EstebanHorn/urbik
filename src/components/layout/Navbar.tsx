@@ -429,7 +429,7 @@ const renderNavLinks = () => {
                       const current = searchParams.get("operationType") || "";
                       handleNavParamChange("operationType", val === current ? null : val);
                     }}
-                    variant={currentFilters.operationType ? "white1" : "white1"}
+                    variant="white"
                   />
                 </div>
 
@@ -455,7 +455,7 @@ const renderNavLinks = () => {
                       const current = searchParams.get("propertyType") || "";
                       handleNavParamChange("propertyType", val === current ? null : val);
                     }}
-                    variant={currentFilters.propertyType ? "white1" : "white1"}
+                    variant="white"
                   />
                 </div>
 

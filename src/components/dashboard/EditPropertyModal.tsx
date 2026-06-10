@@ -144,7 +144,7 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
       : 0;
 
   const handleParcelConfirm = (parcel: SelectedParcel) => {
-    rhf.setValue("parcelCCA", parcel.cca);
+    rhf.setValue("parcelCCA", parcel.cca ?? undefined);
     rhf.setValue("parcelPDA", parcel.pda ?? "");
     rhf.setValue("parcelGeom", parcel.geometry as unknown as Record<string, unknown>);
     rhf.setValue("latitude", parcel.lat);
