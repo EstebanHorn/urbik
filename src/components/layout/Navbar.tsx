@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import type { Session } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -30,6 +30,14 @@ function getSuggestionLabel(s: SearchSuggestion): string {
 }
 
 export default function Navbar() {
+  return (
+    <Suspense fallback={null}>
+      <NavbarInner />
+    </Suspense>
+  );
+}
+
+function NavbarInner() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -215,7 +223,6 @@ export default function Navbar() {
     </span>
   );
 
-  // Modificado para aceptar una clase extra para animaciones
   const renderSearchBar = (ref: React.RefObject<HTMLDivElement | null>, isDesktop: boolean, extraClass: string = "") => {
     const containerClass = isDesktop 
       ? "bg-white/50 border border-white/70 shadow-md"

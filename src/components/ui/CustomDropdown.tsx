@@ -13,7 +13,7 @@ interface CustomDropdownProps {
   options: Option[];
   onChange: (value: string) => void;
   className?: string;
-  variant?: "white" | "white2" | "map-layer" | "black" | "mobile-black"; 
+  variant?: "white" | "white1" | "white2" | "white3" | "map-layer" | "black" | "mobile-black";
   direction?: "up" | "down" | "responsive";
 }
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { User, Bookmark, MapPin, Phone, Mail } from "lucide-react";
+import { User, Bookmark, MapPin, Phone, Mail, Settings, ChevronDown } from "lucide-react";
 import { ProfileData } from "@/app/(dashboard)/dashboard/page";
 import { SecuritySection, PauseAccountZone, DangerZone } from "@/components/dashboard/AccountActions";
 import FavoriteButton from "@/components/ui/FavoriteButton";
@@ -43,6 +43,8 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
   const [activeTab, setActiveTab] = useState<UserTab>("profile");
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const [showSettings, setShowSettings] = useState(false);
 
   const [favorites, setFavorites] = useState<FavoriteProperty[]>([]);
   const [loadingFavorites, setLoadingFavorites] = useState(false);
@@ -120,8 +122,8 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
       </div>
 
       <div className="w-full">
-        <div className={activeTab === "profile" ? "block w-full max-w-4xl mx-auto" : "hidden"}>
-          <div className={`${glassCard} p-8 mb-10`}>
+        <div className={activeTab === "profile" ? "block w-full mx-auto" : "hidden"}>
+          <div className="mb-20">
             <h2 className="text-xl font-black text-urbik-black/90 mb-6 uppercase tracking-tight border-b border-black/10 pb-4">
               Información Básica
             </h2>
@@ -173,14 +175,25 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
           </div>
 
           {profile?.id && (
-            <div className="space-y-6">
-              <SecuritySection />
-              <PauseAccountZone
-                isPaused={profile.isActive === false}
-                userId={profile.id}
-                onToggleSuccess={onRefresh}
-              />
-              <DangerZone itemName="tu cuenta" userId={profile.id} />
+            <div className="mt-6 flex flex-col items-center w-full">
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/40 border border-black/10 backdrop-blur-md shadow-sm text-sm font-bold text-urbik-black/80 hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer"
+              >
+                <Settings size={16} className={`transition-transform duration-500 ${showSettings ? "rotate-90 text-urbik-rose" : ""}`} />
+                {showSettings ? "Ocultar Ajustes Avanzados" : "Configuración Avanzada de Cuenta"}
+                <ChevronDown size={16} className={`transition-transform duration-300 ${showSettings ? "rotate-180" : ""}`} />
+              </button>
+
+              <div className={`w-full transition-all duration-500 overflow-hidden ${showSettings ? "max-h-[1000px] opacity-100 mt-8 space-y-6" : "max-h-0 opacity-0 pointer-events-none"}`}>
+                <SecuritySection />
+                <PauseAccountZone
+                  isPaused={profile.isActive === false}
+                  userId={profile.id}
+                  onToggleSuccess={onRefresh}
+                />
+                <DangerZone itemName="tu cuenta" userId={profile.id} />
+              </div>
             </div>
           )}
         </div>
@@ -265,18 +278,16 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
         </div>
       </div>
 
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 p-1 rounded-full backdrop-blur-xl bg-white/70 border border-white/60 shadow-[0_10px_40px_rgba(0,0,0,0.1)] w-max">
+      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 p-0.5 rounded-full backdrop-blur-xl bg-white/50 border border-white/60 shadow-[0_10px_40px_rgba(0,0,0,0.1)] w-max">
         <div className="relative flex items-center">
           <div 
-            className="absolute top-0 bottom-0 left-0 w-1/2 bg-white rounded-full shadow-sm transition-transform duration-300 ease-out border border-black/5"
+            className="absolute top-0 bottom-0 left-0 w-1/2 bg-white/50 rounded-full shadow-sm transition-transform duration-300 ease-out "
             style={{ transform: `translateX(${activeTab === "profile" ? "0%" : "100%"})` }}
           />
-          <button onClick={() => setActiveTab("profile")} className={`relative z-10 flex items-center justify-center py-2.5 px-8 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "profile" ? "text-urbik-black font-bold" : "text-urbik-black/50 font-medium hover:text-urbik-black"}`}>
-            <User size={18} className="mr-2" />
+          <button onClick={() => setActiveTab("profile")} className={`relative z-10 flex items-center justify-center py-3 px-8 rounded-full transition-colors duration-300 cursor-pointer font-bold ${activeTab === "profile" ? "text-urbik-black" : "text-urbik-black/50 hover:text-urbik-black"}`}>
             <span className="text-sm">Mi Perfil</span>
           </button>
-          <button onClick={() => setActiveTab("saved")} className={`relative z-10 flex items-center justify-center py-2.5 px-8 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "saved" ? "text-urbik-black font-bold" : "text-urbik-black/50 font-medium hover:text-urbik-black"}`}>
-            <Bookmark size={18} className="mr-2" />
+          <button onClick={() => setActiveTab("saved")} className={`relative z-10 flex items-center justify-center py-3 px-8 rounded-full transition-colors duration-300 cursor-pointer font-bold ${activeTab === "saved" ? "text-urbik-black" : "text-urbik-black/50 hover:text-urbik-black"}`}>
             <span className="text-sm">Guardados</span>
           </button>
         </div>

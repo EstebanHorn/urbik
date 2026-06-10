@@ -78,15 +78,15 @@ export default function LoginPage() {
         localStorage.removeItem("urbik_remember_email");
       }
 
-      document.documentElement.style.backgroundColor = "#0a0a0a";
-      document.body.style.backgroundColor = "#0a0a0a";
+      document.documentElement.style.backgroundColor = "#ffffff";
+      document.body.style.backgroundColor = "#ffffff";
 
       setIsSuccess(true);
       router.refresh();
       
       setTimeout(() => {
         router.push("/?fromAuth=true");
-      }, 450);
+      }, 500);
 
     } catch {
       setErrorMessage("Ocurrió un error inesperado.");
@@ -108,7 +108,7 @@ export default function LoginPage() {
   const getAnimStyle = (delay: string) => isSuccess ? { animationDelay: '0s' } : { animationDelay: delay };
 
   return (
-    <div className="flex min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+    <div className={`flex min-h-screen relative overflow-hidden transition-colors duration-500 ease-in-out ${isSuccess ? 'bg-white' : 'bg-[#0a0a0a]'}`}>
       <style>{`
         @keyframes slideUpFade {
           from { opacity: 0; transform: translateY(30px); }

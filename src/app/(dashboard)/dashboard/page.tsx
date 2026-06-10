@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -14,6 +14,7 @@ export type PropertySummary = {
   title: string;
   description?: string;
   price?: number;
+  currency?: string;
   sale_price?: number;
   rent_price?: number;
   sale_currency?: string;
@@ -53,18 +54,20 @@ export type ProfileData = {
   firstName?: string | null;
   lastName?: string | null;
   phone?: string | null;
+  bio?: string | null;
+  street?: string | null;
   city?: string | null;
   province?: string | null;
   address?: string | null;
-  street?: string | null;
   agencyData?: {
     name?: string | null;
     slug?: string | null;
     logoUrl?: string | null;
+    bio?: string | null;
     phone?: string | null;
+    street?: string | null;
     city?: string | null;
     province?: string | null;
-    street?: string | null;
     address?: string | null;
     properties?: PropertySummary[] | null;
     reviews?: any[] | null;
@@ -76,6 +79,20 @@ export type ProfileData = {
 };
 
 export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-white">
+          <div className="animate-pulse text-gray-400 font-medium">Cargando perfil...</div>
+        </div>
+      }
+    >
+      <DashboardPageInner />
+    </Suspense>
+  );
+}
+
+function DashboardPageInner() {
   const router = useRouter();
   const supabase = createClient();
   const searchParams = useSearchParams();

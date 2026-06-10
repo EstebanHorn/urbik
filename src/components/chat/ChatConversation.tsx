@@ -170,7 +170,7 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
                     ${msg.id.startsWith("temp-") ? "opacity-50" : ""}
                   `}
                 >
-                  <p className="whitespace-pre-wrap break-words">{msg.body}</p>
+                  <p className="whitespace-pre-wrap wrap-break-word">{msg.body}</p>
                   <div className={`flex items-center gap-1 mt-1 ${isOwn ? "justify-end" : "justify-start"}`}>
                     <span className={`text-[10px] leading-none tabular-nums ${isOwn ? "text-white/35" : "text-gray-400"}`}>
                       {formatTime(msg.created_at)}
@@ -199,9 +199,9 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
           type="button"
           onClick={handleSend}
           disabled={!body.trim() || sending}
-          className="bg-urbik-black text-white w-9 h-9 rounded-full flex items-center justify-center disabled:opacity-20 hover:scale-105 active:scale-95 transition-transform shrink-0 cursor-pointer"
+          className="text-urbik-black w-9 h-9 rounded-full flex items-center justify-center disabled:opacity-20 hover:scale-105 active:scale-95 transition-transform shrink-0 cursor-pointer"
         >
-          <Send size={14} />
+          <Send size={22} />
         </button>
       </div>
     </div>
