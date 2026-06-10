@@ -47,9 +47,8 @@ export default function StartChatButton({ propertyId, realEstateId, label }: Pro
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className="w-full flex items-center justify-center gap-2 bg-urbik-black text-white font-black py-5 rounded-full hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer text-sm tracking-wide"
+      className="px-10 flex items-center justify-center gap-2 bg-white border-black/10 shadow-sm text-urbik-black/70 font-bold py-5 rounded-full hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer text-sm tracking-wide"
     >
-      <MessageCircle size={18} />
       {loading ? "Abriendo chat..." : defaultLabel}
     </button>
   );

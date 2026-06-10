@@ -520,7 +520,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
 
         <InquiryForm propertyId={property.id} />
         {property.realEstateId && property.realEstateId !== userId && (
-          <div className="mt-4">
+                <div className="mt-4 w-full items-end flex justify-end">
             <StartChatButton propertyId={property.id} realEstateId={property.realEstateId as string} />
           </div>
         )}

@@ -1,61 +1,13 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
 import { MapPin, Building2 } from "lucide-react";
 
-import bgImage from "@/assets/login_bg.png";
 import AdminActions from "@/components/administrate/AdminActions";
 import { createClient } from "@/lib/supabase/server";
 import StartChatButton from "@/components/chat/StartChatButton";
 import RealEstateReviews from "@/components/realestate/RealEstateReviews";
 import TrackAgencyView from "@/components/analytics/TrackAgencyView";
-
-const PROPERTY_LABELS: Record<string, string> = {
-  HOUSE: "Casa",
-  APARTMENT: "Departamento",
-  PH: "PH",
-  COUNTRY: "Country",
-  LAND: "Terreno",
-  FIELD: "Campo",
-  COMMERCIAL_PROPERTY: "Local Comercial",
-  OFFICE: "Oficina",
-};
-
-const OPERATION_LABELS: Record<string, string> = {
-  SALE: "Venta",
-  RENT: "Alquiler",
-  TEMP_RENT: "Temporal",
-  SALE_RENT: "Venta / Alquiler",
-};
-
-const glassCard = "md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
-
-type Property = {
-  id: string;
-  title: string;
-  status: string;
-  type: string;
-  operation_type: string;
-  address: string;
-  city: string;
-  images?: string[];
-  sale_price?: number | null;
-  rent_price?: number | null;
-  sale_currency?: string | null;
-  rent_currency?: string | null;
-};
-
-function formatPrice(
-  price: number | null,
-  currency: string | null
-): string {
-  if (!price) return "Consultar";
-
-  const symbol = currency === "ARS" ? "$" : "USD";
-
-  return `${symbol} ${price.toLocaleString("es-AR")}`;
-}
+import AgencyPropertiesFilter, { Property } from "@/components/realestate/AgencyPropertiesFilter";
 
 function HeaderFractionalStars({ average, total }: { average: number; total: number }) {
   return (
@@ -194,6 +146,12 @@ export default async function RealEstatePage({
                   {realEstate.city}, {realEstate.province}.{" "}
                   {realEstate.street} {realEstate.address}
                 </p>
+
+                {realEstate.bio && (
+                  <p className="text-sm font-medium text-urbik-black/70 mb-3 max-w-2xl leading-relaxed">
+                    {realEstate.bio}
+                  </p>
+                )}
                 {totalReviews > 0 ? (
                   <HeaderFractionalStars average={averageRating} total={totalReviews} />
                 ) : (
@@ -223,95 +181,7 @@ export default async function RealEstatePage({
           </div>
         </div>
 
-        <section className="pb-20">
-          <div className="mb-5 flex items-baseline justify-between px-10">
-            <h2 className="text-2xl font-black text-urbik-black/90 uppercase tracking-tight">
-              Cartera de Propiedades
-            </h2>
-
-            <span className="text-sm font-bold text-urbik-muted">
-              {activeProperties.length}{" "}
-              {activeProperties.length === 1
-                ? "propiedad"
-                : "propiedades"}
-            </span>
-          </div>
-
-          {activeProperties.length === 0 ? (
-            <div className="py-20 text-center border-2 border-dashed border-urbik-g200 rounded-2xl">
-              <p className="text-urbik-muted font-bold text-lg">
-                Esta inmobiliaria aún no tiene propiedades publicadas.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activeProperties.map((property: Property, index: number) => (
-                <Link
-                  key={property.id}
-                  href={`/property/${property.id}`}
-                  className={`group flex flex-col gap-4 p-4 cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] animate-fade-in-up relative ${glassCard}`}
-                  style={{
-                    animationDelay: `${index * 100}ms`,
-                    animationFillMode: "both"
-                  }}
-                >
-                  <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-urbik-g200">
-                    {property.images?.[0] ? (
-                      <Image
-                        src={property.images[0]}
-                        alt={property.title}
-                        fill
-                        className="object-cover transition duration-700 group-hover:scale-105 [mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_52%,transparent_95%)]"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-white text-xs font-bold text-black/70">
-                        <Building2
-                          size={36}
-                          className="text-urbik-g400"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
-                    <div>
-                      <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
-                          {PROPERTY_LABELS[property.type] ?? property.type}
-                        </span>
-                        <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
-                          {OPERATION_LABELS[property.operation_type] ?? property.operation_type}
-                        </span>
-                      </div>
-
-                      <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
-                        {property.title}
-                      </h3>
-
-                      <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-urbik-black/80">
-                        <MapPin
-                          size={12}
-                          className="shrink-0 text-urbik-cyan"
-                        />
-                        {property.address}, {property.city}
-                      </p>
-                    </div>
-
-                    <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-white/60 pt-4">
-                      <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
-                        {formatPrice(
-                          property.sale_price || property.rent_price || null,
-                          property.sale_currency || property.rent_currency || null
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
+        <AgencyPropertiesFilter properties={activeProperties} />
         
         <RealEstateReviews
           realEstateId={id}

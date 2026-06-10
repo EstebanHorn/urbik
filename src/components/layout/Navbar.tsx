@@ -215,7 +215,6 @@ export default function Navbar() {
     </span>
   );
 
-  // Modificado para aceptar una clase extra para animaciones
   const renderSearchBar = (ref: React.RefObject<HTMLDivElement | null>, isDesktop: boolean, extraClass: string = "") => {
     const containerClass = isDesktop 
       ? "bg-white/50 border border-white/70 shadow-md"

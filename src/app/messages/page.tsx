@@ -98,7 +98,6 @@ export default function MessagesPage() {
         </div>
 
         <div className="border border-gray-100 rounded-3xl overflow-hidden flex h-[75vh] shadow-md">
-          {/* Sidebar */}
           <div
             className={`w-full md:w-72 shrink-0 border-r border-gray-100 flex flex-col bg-white ${
               showConversation ? "hidden md:flex" : "flex"
@@ -119,7 +118,6 @@ export default function MessagesPage() {
             </div>
           </div>
 
-          {/* Conversation panel */}
           <div className={`flex-1 flex flex-col ${showConversation ? "flex" : "hidden md:flex"}`}>
             {activeThreadId && currentUserId ? (
               <>

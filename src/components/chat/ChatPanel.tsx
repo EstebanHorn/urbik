@@ -6,17 +6,28 @@ import { useChatThreads } from "@/hooks/useChatThreads";
 import ChatThreadList from "./ChatThreadList";
 import ChatConversation from "./ChatConversation";
 
-export default function ChatPanel() {
+interface Props {
+  defaultThreadId?: string | null;
+}
+
+export default function ChatPanel({ defaultThreadId }: Props = {}) {
   const { threads, loading } = useChatThreads();
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(defaultThreadId || null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [showConversation, setShowConversation] = useState(false);
+  const [showConversation, setShowConversation] = useState(!!defaultThreadId);
 
   useEffect(() => {
     createClient()
       .auth.getUser()
       .then(({ data }) => setCurrentUserId(data.user?.id ?? null));
   }, []);
+
+  useEffect(() => {
+    if (defaultThreadId) {
+      setActiveThreadId(defaultThreadId);
+      setShowConversation(true);
+    }
+  }, [defaultThreadId]);
 
   const handleSelect = (id: string) => {
     setActiveThreadId(id);

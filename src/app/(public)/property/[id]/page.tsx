@@ -679,10 +679,10 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
-
+            
               <InquiryForm propertyId={property.id} />
               {property.realEstateId && property.realEstateId !== user?.id && (
-                <div className="mt-4">
+                <div className="mt-4 w-full items-end flex justify-end">
                   <StartChatButton propertyId={property.id} realEstateId={property.realEstateId as string} />
                 </div>
               )}

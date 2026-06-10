@@ -57,7 +57,7 @@ export default function ChatThreadList({ threads, loading, activeThreadId, onSel
   }
 
   return (
-    <div className="overflow-y-auto h-full p-2 space-y-0.5">
+    <div className="overflow-y-auto h-full space-y-0.5">
       {threads.map((t) => {
         const isActive = t.id === activeThreadId;
         const hasUnread = t.unreadCount > 0;
@@ -69,13 +69,13 @@ export default function ChatThreadList({ threads, loading, activeThreadId, onSel
             key={t.id}
             type="button"
             onClick={() => onSelect(t.id)}
-            className={`w-full text-left rounded-xl px-3 py-2.5 flex items-start gap-3 transition-colors cursor-pointer ${
+            className={`w-full text-left px-3 py-2.5 flex items-start gap-3 transition-colors cursor-pointer ${
               isActive
-                ? "bg-urbik-black"
+                ? "bg-urbik-black/80"
                 : "hover:bg-gray-100/80"
             }`}
           >
-            <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-sm shrink-0 text-white ${isActive ? "bg-white/15" : bg}`}>
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-sm shrink-0  ${isActive ? "bg-white text-black/80" : bg + " text-white"}`}>
               {initial}
             </div>
 
@@ -94,7 +94,7 @@ export default function ChatThreadList({ threads, loading, activeThreadId, onSel
               </p>
 
               {hasUnread && !isActive && (
-                <span className="inline-flex items-center mt-1 bg-urbik-cyan text-urbik-black text-[10px] font-black px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center mt-1 bg-urbik-black/40 text-urbik-white text-[10px] font-black px-2 py-0.5 rounded-full">
                   {t.unreadCount} nuevo{t.unreadCount > 1 ? "s" : ""}
                 </span>
               )}
