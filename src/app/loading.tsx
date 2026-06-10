@@ -6,7 +6,7 @@ export default function Loading() {
       <div className="relative animate-pulse duration-1000">
         <Image
           src="/Urbik_Logo_Negro.svg"
-          alt="Urbik Logo"
+          alt="Urbik"
           width={180}
           height={60}
           priority
