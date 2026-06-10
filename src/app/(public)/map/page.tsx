@@ -69,6 +69,8 @@ const InteractiveMap = dynamicImport(
 );
 
 interface RawProperty {
+  lat: number;
+  lon: number;
   salePrice?: number;
   rentPrice?: number;
   saleCurrency?: string;
