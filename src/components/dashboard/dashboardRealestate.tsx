@@ -274,9 +274,8 @@ function InquiriesPanel({ onRead }: { onRead?: () => void }) {
           const isExpanded = expandedId === inq.id;
           const isUnread = inq.status === "UNREAD";
           return (
-            <div key={inq.id} className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-urbik-cyan/40 bg-urbik-cyan/5" : "border-gray-100 bg-white"} hover:shadow-sm`} onClick={() => { setExpandedId(isExpanded ? null : inq.id); if (!isExpanded && isUnread) markAsRead(inq.id); }}>
+            <div key={inq.id} className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-urbik-black/30 border-2 bg-white" : "border-white bg-white"} shadow-sm hover:scale-101`} onClick={() => { setExpandedId(isExpanded ? null : inq.id); if (!isExpanded && isUnread) markAsRead(inq.id); }}>
               <div className="p-4 flex items-start gap-4">
-                <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-black text-sm ${isUnread ? "bg-urbik-black text-urbik-cyan" : "bg-gray-100 text-gray-500"}`}>{inq.senderName.charAt(0).toUpperCase()}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-2">

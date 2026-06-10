@@ -74,7 +74,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (path.startsWith("/dashboard")) {
-      const rolesAutorizados = ["AGENT", "REALESTATE"];
+      const rolesAutorizados = ["AGENT", "REALESTATE", "USER"];
       if (!userRole || !rolesAutorizados.includes(userRole)) {
         return NextResponse.redirect(new URL("/unauthorized", request.url));
       }

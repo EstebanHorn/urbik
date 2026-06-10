@@ -5,6 +5,7 @@ import { Map, AdvancedMarker, useMap, useMapsLibrary, type MapMouseEvent } from 
 import type { FeatureCollection, Geometry } from "geojson";
 
 const PROVINCE_CENTERS: Record<string, { lat: number; lng: number }> = {
+  // ... (Tus PROVINCE_CENTERS iguales)
   "Buenos Aires": { lat: -36.7, lng: -60.3 },
   "CABA": { lat: -34.6, lng: -58.4 },
   "Ciudad Autónoma de Buenos Aires": { lat: -34.6, lng: -58.4 },
@@ -154,9 +155,9 @@ function ARBAWMSLayer() {
 // ── Rio Negro GeoJSON layer (via Data layer) ─────────────────────────────────
 
 function RioNegroLayer({
-  onParcelClick,
+  onMapClick,
 }: {
-  onParcelClick: (lat: number, lng: number) => void;
+  onMapClick: (lat: number, lng: number) => void;
 }) {
   const map = useMap();
   const abortRef = useRef<AbortController | null>(null);
@@ -243,16 +244,15 @@ function RioNegroLayer({
     const dataClick = map.data.addListener(
       "click",
       (e: google.maps.Data.MouseEvent) => {
-        e.stop(); // evita que también se dispare el map click
-        if (e.latLng) onParcelClick(e.latLng.lat(), e.latLng.lng());
+        e.stop(); // evita doble trigger en map click
+        if (e.latLng) onMapClick(e.latLng.lat(), e.latLng.lng());
       }
     );
 
-    // Captura clicks en áreas sin GeoJSON (vacíos entre parcelas)
     const mapClick = map.addListener(
       "click",
       (e: google.maps.MapMouseEvent) => {
-        if (e.latLng) onParcelClick(e.latLng.lat(), e.latLng.lng());
+        if (e.latLng) onMapClick(e.latLng.lat(), e.latLng.lng());
       }
     );
 
@@ -269,7 +269,7 @@ function RioNegroLayer({
         if (f.getProperty("rioNegro")) map.data.remove(f);
       });
     };
-  }, [map, fetchParcels, onParcelClick]);
+  }, [map, fetchParcels, onMapClick]);
 
   return null;
 }
@@ -307,22 +307,61 @@ function SelectedParcelLayer({ geometry }: { geometry: Geometry | null }) {
   return null;
 }
 
+// ── Custom Drawing Polygon Layer ────────────────────────────────────────────
+function DrawnPolygonLayer({ path }: { path: { lat: number; lng: number }[] }) {
+  const map = useMap();
+  const polyRef = useRef<google.maps.Polygon | null>(null);
+
+  useEffect(() => {
+    if (!map || !window.google) return;
+    
+    // Instanciamos el polígono solo una vez
+    if (!polyRef.current) {
+      polyRef.current = new google.maps.Polygon({
+        map,
+        strokeColor: "#10b981", // Mantenemos la paleta "emerald"
+        strokeWeight: 3,
+        fillColor: "#10b981",
+        fillOpacity: 0.35,
+        zIndex: 20, // Por encima de los WMS
+      });
+    }
+    
+    // Actualizamos los vértices en vivo cada vez que llega un punto nuevo
+    polyRef.current.setPath(path);
+  }, [map, path]);
+
+  // Cleanup al desmontar
+  useEffect(() => {
+    return () => {
+      if (polyRef.current) {
+        polyRef.current.setMap(null);
+        polyRef.current = null;
+      }
+    };
+  }, []);
+
+  return null;
+}
+
 // ── Main component ───────────────────────────────────────────────────────────
 
 export interface ParcelPickerMapProps {
   province: string;
   city?: string;
-  onParcelClick: (lat: number, lng: number) => void;
+  onMapClick: (lat: number, lng: number) => void;
   selectedGeometry: Geometry | null;
   manualPin?: { lat: number; lng: number } | null;
+  drawnPath?: { lat: number; lng: number }[];
 }
 
 export default function ParcelPickerMap({
   province,
   city,
-  onParcelClick,
+  onMapClick,
   selectedGeometry,
   manualPin,
+  drawnPath,
 }: ParcelPickerMapProps) {
   const center = getProvinceCenter(province);
   const rioNegro = isRioNegro(province);
@@ -330,9 +369,9 @@ export default function ParcelPickerMap({
 
   const handleMapClick = useCallback(
     (e: MapMouseEvent) => {
-      if (e.detail.latLng) onParcelClick(e.detail.latLng.lat, e.detail.latLng.lng);
+      if (e.detail.latLng) onMapClick(e.detail.latLng.lat, e.detail.latLng.lng);
     },
-    [onParcelClick]
+    [onMapClick]
   );
 
   return (
@@ -350,12 +389,24 @@ export default function ParcelPickerMap({
       <MapAutoCenter city={city} province={province} />
 
       {rioNegro ? (
-        <RioNegroLayer onParcelClick={onParcelClick} />
+        <RioNegroLayer onMapClick={onMapClick} />
       ) : (
         <ARBAWMSLayer />
       )}
 
       <SelectedParcelLayer geometry={selectedGeometry} />
+
+      {/* Renders del modo de dibujo manual */}
+      {drawnPath && drawnPath.length > 0 && <DrawnPolygonLayer path={drawnPath} />}
+      
+      {drawnPath?.map((pt, i) => (
+        <AdvancedMarker key={`draw-${i}`} position={pt}>
+          <div 
+            className="w-3.5 h-3.5 bg-white border-2 border-emerald-500 rounded-full shadow-md" 
+            style={{ transform: "translate(-50%, -50%)" }} 
+          />
+        </AdvancedMarker>
+      ))}
 
       {manualPin && (
         <AdvancedMarker position={manualPin}>
