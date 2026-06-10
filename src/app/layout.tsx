@@ -28,7 +28,9 @@ export default function RootLayout({
       <body className="overflow-x-hidden">
         <GoogleMapProvider>
           <Providers>
-            <Navbar />
+            <Suspense fallback={null}>
+              <Navbar />
+            </Suspense>
             <Suspense fallback={null}>
               <SidebarFilters />
             </Suspense>
