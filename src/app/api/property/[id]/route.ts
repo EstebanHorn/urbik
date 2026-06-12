@@ -82,6 +82,10 @@ export async function PUT(
       floor: body.floor ?? undefined,
       unit_number: body.unitNumber ?? undefined,
       address: body.address ?? undefined,
+      display_address:
+        body.displayAddress !== undefined
+          ? body.displayAddress || null
+          : undefined,
       area: toNumberOrUndefined(body.area ?? body.areaM2),
       rooms: toNumberOrUndefined(body.rooms),
       bedrooms: toNumberOrUndefined(body.bedrooms),

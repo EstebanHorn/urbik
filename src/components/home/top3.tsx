@@ -57,12 +57,12 @@ export default function Top3({ items, setHoveredPropertyId }: Top3Props) {
                   {property.title}
                 </h3>
                 <p className="mt-2 truncate text-xs font-semibold text-urbik-black/80">
-                  {property.address}, {property.city}, {property.province}
+                  {property.displayAddress || property.address}, {property.city}, {property.province}
                 </p>
               </div>
               <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/60 pt-4">
                 <span className="text-xs font-bold text-urbik-black/50 z-1">
-                  {property.rooms || 0} amb · {property.area || 0} m²
+                  {property.bedrooms || 0} hab · {property.area || 0} m²
                 </span>
                 <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
                   {currency} {Number(price).toLocaleString("es-AR")}

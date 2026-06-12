@@ -13,6 +13,7 @@ import {
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import ImageGallery from "@/components/property/ImageGallery";
 import InquiryForm from "@/components/property/InquiryForm";
+import OwnerPropertyPanel from "@/components/property/OwnerPropertyPanel";
 import StartChatButton from "@/components/chat/StartChatButton";
 import TrackPropertyView from "@/components/analytics/TrackPropertyView";
 import ReportButton from "@/components/reports/ReportButton";
@@ -115,6 +116,7 @@ interface Property {
   title: string;
   description: string | null;
   address: string;
+  displayAddress: string | null;
   city: string;
   province: string;
   neighborhood: string | null;
@@ -230,6 +232,7 @@ async function getPropertyData(id: string) {
       title: propRaw.title,
       description: propRaw.description,
       address: propRaw.address,
+      displayAddress: propRaw.display_address ?? null,
       city: propRaw.city,
       province: propRaw.province,
       neighborhood: propRaw.neighborhood || null,
@@ -703,11 +706,17 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
             
-              <InquiryForm propertyId={property.id} />
-              {property.realEstateId && property.realEstateId !== user?.id && (
-                <div className="mt-4 w-full items-end flex justify-end">
-                  <StartChatButton propertyId={property.id} realEstateId={property.realEstateId as string} />
-                </div>
+              {property.realEstateId === user?.id ? (
+                <OwnerPropertyPanel propertyId={property.id} />
+              ) : (
+                <>
+                  <InquiryForm propertyId={property.id} />
+                  {property.realEstateId && (
+                    <div className="mt-4 w-full items-end flex justify-end">
+                      <StartChatButton propertyId={property.id} realEstateId={property.realEstateId as string} />
+                    </div>
+                  )}
+                </>
               )}
         <div className="mt-12 sm:mt-24 pt-8 sm:pt-12 border-t border-urbik-g100">
           <h3 className="text-2xl sm:text-3xl font-display text-urbik-black tracking-tighter mb-6 sm:mb-8">

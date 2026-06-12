@@ -5,6 +5,46 @@ import { createAdminClient } from "@/lib/supabase/admin";
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const BOT_RE = /bot|crawl|spider|preview|facebookexternalhit|slurp|bingpreview/i;
 
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const propertyId = searchParams.get("id");
+
+    if (typeof propertyId !== "string" || !UUID_RE.test(propertyId)) {
+      return NextResponse.json({ error: "id inválido" }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+
+    const admin = createAdminClient();
+    const { data: property, error } = await admin
+      .from("properties")
+      .select("real_estate_id, views_count, favorites_count, inquiries_count, chats_count")
+      .eq("id", propertyId)
+      .single();
+
+    if (error || !property) {
+      return NextResponse.json({ error: "Propiedad inexistente" }, { status: 404 });
+    }
+
+    if (property.real_estate_id !== user.id) {
+      return NextResponse.json({ error: "Acceso denegado" }, { status: 403 });
+    }
+
+    return NextResponse.json({
+      viewsCount: property.views_count ?? 0,
+      favoritesCount: property.favorites_count ?? 0,
+      inquiriesCount: property.inquiries_count ?? 0,
+      chatsCount: property.chats_count ?? 0,
+    });
+  } catch (error) {
+    console.error("Error en GET property-view:", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);

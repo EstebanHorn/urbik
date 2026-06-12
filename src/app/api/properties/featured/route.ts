@@ -8,9 +8,12 @@ interface FeaturedProperty {
   rent_price?: number | null;
   operation_type: string;
   address: string;
+  display_address?: string | null;
   city: string;
+  province?: string;
   images: string[];
   rooms: number;
+  bedrooms: number | null;
   bathrooms: number;
   area: number;
   type: string;
@@ -26,9 +29,12 @@ const mapProperty = (
   rentPrice: property.rent_price,
   operationType: property.operation_type,
   address: property.address,
+  displayAddress: property.display_address ?? null,
   city: property.city,
+  province: property.province,
   images: property.images,
   rooms: property.rooms,
+  bedrooms: property.bedrooms,
   bathrooms: property.bathrooms,
   area: property.area,
   type: property.type,
@@ -52,9 +58,12 @@ export async function GET() {
         rent_price,
         operation_type,
         address,
+        display_address,
         city,
+        province,
         images,
         rooms,
+        bedrooms,
         bathrooms,
         area,
         type

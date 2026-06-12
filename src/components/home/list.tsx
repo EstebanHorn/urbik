@@ -47,7 +47,7 @@ function PropertyFeatures({ property }: { property: SearchProperty }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {propertyType !== "TERRENO" && propertyType !== "LOTE" && propertyType !== "COCHERA" && propertyType !== "LOCAL" && propertyType !== "OFICINA" && (
-        <FeaturePill icon={RoomIcon} value={property.rooms || 0} unit="amb" />
+        <FeaturePill icon={RoomIcon} value={property.bedrooms || 0} unit="hab" />
       )}
 
       {propertyType !== "TERRENO" && propertyType !== "LOTE" && propertyType !== "COCHERA" && (
@@ -203,7 +203,7 @@ export default function List({ items, viewMode, premiumProperty, setHoveredPrope
                     {property.title}
                   </h3>
                   <p className="mt-1 md:mt-2 truncate text-xs sm:text-sm font-medium text-urbik-black/50">
-                    {property.address}, {property.city}, {property.province}
+                    {property.displayAddress || property.address}, {property.city}, {property.province}
                   </p>
                 </div>
 

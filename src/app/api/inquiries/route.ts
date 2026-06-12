@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -91,7 +91,12 @@ export async function GET() {
       return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
     }
 
-    const { data: inquiries, error } = await admin
+    const { searchParams } = new URL(req.url);
+    const propertyId = searchParams.get("propertyId");
+    const limitParam = searchParams.get("limit");
+    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 0, 1), 100) : null;
+
+    let query = admin
       .from("inquiries")
       .select(`
         id,
@@ -102,7 +107,7 @@ export async function GET() {
         status,
         created_at,
         profile_id,
-        properties!inner ( 
+        properties!inner (
           id,
           title,
           real_estate_id
@@ -110,6 +115,11 @@ export async function GET() {
       `)
       .eq("properties.real_estate_id", authUser.id)
       .order("created_at", { ascending: false });
+
+    if (propertyId) query = query.eq("property_id", propertyId);
+    if (limit) query = query.limit(limit);
+
+    const { data: inquiries, error } = await query;
 
     if (error) throw error;
 

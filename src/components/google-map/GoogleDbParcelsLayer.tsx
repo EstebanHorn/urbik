@@ -134,17 +134,21 @@ export function GoogleDbParcelsLayer({ properties, onPropertySelect }: { propert
         if (!position) return null;
 
         return (
-          <AdvancedMarker 
-            key={`marker-${prop.id}`} 
-            position={position} 
+          <AdvancedMarker
+            key={`marker-${prop.id}`}
+            position={position}
             zIndex={100}
+            onClick={() => {
+              if (onPropertySelect) onPropertySelect(prop);
+              else router.push(`/property/${prop.id}`);
+            }}
             onMouseEnter={() => {
               setHoveredProp(prop);
               setHoverPos(position);
             }}
             onMouseLeave={() => setHoveredProp(null)}
           >
-            <div className="price-tag-container">
+            <div className="price-tag-container cursor-pointer">
               <div className={`price-tag-badge ${prop.operationType === "SALE" ? "is-sale" : "is-rent"}`}>
                 {formatPriceShort(getDisplayPrice(prop))}
               </div>

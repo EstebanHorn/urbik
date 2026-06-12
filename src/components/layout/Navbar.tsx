@@ -328,7 +328,7 @@ const renderNavLinks = () => {
         <>
           <Link href="/dashboard?nueva=1" className={linkClass}>Publicar</Link>
           <Link href="/dashboard" className={linkClass}>Mi Perfil</Link>
-          <Link href="/?operationType=SALE" className={linkClass}>Comprar</Link>
+          <Link href="/" className={linkClass}>Buscar</Link>
         </>
       );
     }

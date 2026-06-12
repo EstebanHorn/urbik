@@ -110,7 +110,7 @@ export async function GET() {
 
   const { data: userProfile } = await admin
     .from("user_profiles")
-    .select("first_name, last_name")
+    .select("first_name, last_name, city, province, phone")
     .eq("profile_id", authUser.id)
     .single();
 
@@ -118,10 +118,12 @@ export async function GET() {
     id: authUser.id,
     role: profile.role,
     email: profile.email,
-    phone: null,
+    phone: userProfile?.phone ?? null,
     isActive: Boolean(profile.is_active),
     firstName: userProfile?.first_name ?? null,
     lastName: userProfile?.last_name ?? null,
+    city: userProfile?.city ?? null,
+    province: userProfile?.province ?? null,
     properties: [],
   });
 }
@@ -169,7 +171,7 @@ export async function PUT(req: NextRequest) {
 
       if (error) throw error;
     } else {
-      const { firstName, lastName } = body;
+      const { firstName, lastName, city, province, phone } = body;
 
       const { data: existing } = await admin
         .from("user_profiles")
@@ -183,13 +185,23 @@ export async function PUT(req: NextRequest) {
           .update({
             ...(firstName !== undefined && { first_name: firstName }),
             ...(lastName !== undefined && { last_name: lastName }),
+            ...(city !== undefined && { city }),
+            ...(province !== undefined && { province }),
+            ...(phone !== undefined && { phone }),
           })
           .eq("profile_id", authUser.id);
         if (error) throw error;
       } else {
         const { error } = await admin
           .from("user_profiles")
-          .insert({ profile_id: authUser.id, first_name: firstName ?? "", last_name: lastName ?? "" });
+          .insert({
+            profile_id: authUser.id,
+            first_name: firstName ?? "",
+            last_name: lastName ?? "",
+            city: city ?? null,
+            province: province ?? null,
+            phone: phone ?? null,
+          });
         if (error) throw error;
       }
     }
