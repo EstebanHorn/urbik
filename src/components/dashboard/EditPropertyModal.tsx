@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { getVisibleModules, type PropertyUploadFormData } from "./create-modal/schema";
@@ -105,10 +105,15 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
       setActiveModuleId(1);
       setError(null);
     }
-  }, [open, property]); // eslint-disable-line react-hooks/exhaustive-deps
+    // Solo resetea cuando el modal se (re)abre o cambia a otra propiedad.
+    // No depender de `property` por referencia: el padre puede construir un
+    // objeto nuevo con cada render y eso reseteaba el step al paso 1.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, property.id]);
 
   const formData = rhf.watch();
-  const visibleModules = getVisibleModules(formData.type);
+  const propertyType = formData.type;
+  const visibleModules = useMemo(() => getVisibleModules(propertyType), [propertyType]);
 
   const currentIndex = visibleModules.findIndex((m) => m.id === activeModuleId);
   const safeCurrentIndex = currentIndex !== -1 ? currentIndex : 0;

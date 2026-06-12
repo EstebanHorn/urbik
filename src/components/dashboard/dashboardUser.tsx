@@ -71,6 +71,9 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
+          phone: formData.phone,
+          city: formData.city,
+          province: formData.province,
         }),
       });
       if (!res.ok) {

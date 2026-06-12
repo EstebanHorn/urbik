@@ -85,6 +85,7 @@ export interface Property {
   title: string;
   description: string;
   address: string;
+  displayAddress?: string | null;
   city: string;
   province: string;
   country: string;
@@ -100,6 +101,7 @@ export interface Property {
 
   area?: number | null;
   rooms?: number | null;
+  bedrooms?: number | null;
   bathrooms?: number | null;
 
   hasWater: boolean;

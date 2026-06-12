@@ -25,6 +25,7 @@ import {
 
 import Banner from "@/components/home/banner";
 import Top3 from "@/components/home/top3";
+import NearbyProperties from "@/components/home/NearbyProperties";
 import MiniBanner from "@/components/home/minibanner";
 import List from "@/components/home/list";
 import PriceFilterCard from "@/components/search/PriceFilterCard";
@@ -48,8 +49,10 @@ export type SearchProperty = {
   images: string[];
   address: string;
   rooms: number | null;
+  bedrooms: number | null;
   bathrooms: number | null;
   area: number | null;
+  displayAddress?: string | null;
   hasWater: boolean;
   hasElectricity: boolean;
   hasGas: boolean;
@@ -461,6 +464,7 @@ export default function HomePage() {
                 </div>
               ) : (
                 <>
+                  <NearbyProperties />
                   <Top3
                     items={items}
                     setHoveredPropertyId={setHoveredPropertyId}

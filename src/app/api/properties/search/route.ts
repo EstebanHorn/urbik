@@ -39,7 +39,9 @@ const PROPERTY_SELECT = `
   type,
   images,
   address,
+  display_address,
   rooms,
+  bedrooms,
   bathrooms,
   area,
   has_water,
@@ -71,7 +73,9 @@ interface SearchPropertyRow {
   type: string;
   images: string[];
   address: string;
+  display_address?: string | null;
   rooms: number;
+  bedrooms: number | null;
   bathrooms: number;
   area: number;
   has_water: boolean;
@@ -103,7 +107,9 @@ const mapProperty = (property: SearchPropertyRow) => ({
   type: property.type,
   images: property.images,
   address: property.address,
+  displayAddress: property.display_address ?? null,
   rooms: property.rooms,
+  bedrooms: property.bedrooms,
   bathrooms: property.bathrooms,
   area: property.area,
   hasWater: property.has_water,

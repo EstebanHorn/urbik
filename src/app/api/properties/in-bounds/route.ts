@@ -43,7 +43,9 @@ const PROPERTY_SELECT = `
   parcel_geom,
   images,
   address,
+  display_address,
   rooms,
+  bedrooms,
   bathrooms,
   area,
   has_water,
@@ -76,7 +78,9 @@ interface MapPropertyRow {
   parcel_geom?: unknown;
   images: string[];
   address: string;
+  display_address?: string | null;
   rooms: number;
+  bedrooms: number | null;
   bathrooms: number;
   area: number;
   has_water: boolean;
@@ -109,7 +113,9 @@ const mapProperty = (property: MapPropertyRow) => ({
   parcelGeom: property.parcel_geom,
   images: property.images,
   address: property.address,
+  displayAddress: property.display_address ?? null,
   rooms: property.rooms,
+  bedrooms: property.bedrooms,
   bathrooms: property.bathrooms,
   area: property.area,
   hasWater: property.has_water,

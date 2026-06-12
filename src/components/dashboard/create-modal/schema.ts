@@ -2,7 +2,7 @@ export interface PropertyUploadFormData {
   type?: string; unitType?: string; propertySubtype?: string; operationType?: string; status?: string;
   salePrice?: number | string; saleCurrency?: "USD" | "ARS"; rentPrice?: number | string; rentCurrency?: "USD" | "ARS";
   isPriceHidden?: boolean; expenses?: number | string; country?: string; province?: string; city?: string;
-  district?: string; locality?: string; neighborhood?: string; street?: string; number?: string; floor?: string;
+  district?: string; locality?: string; neighborhood?: string; street?: string; number?: string; displayAddress?: string; floor?: string;
   unitNumber?: string; title?: string; description?: string; areaM2?: number | string; coveredArea?: number | string;
   semiCoveredArea?: number | string; uncoveredArea?: number | string; frontLength?: number | string; backLength?: number | string;
   rooms?: number | string; bedrooms?: number | string; bathrooms?: number | string; toilets?: number | string; garages?: number | string;

@@ -30,6 +30,7 @@ export interface PropertyInitialData {
   neighborhood?: string;
   streetName?: string;
   streetNumber?: string;
+  displayAddress?: string;
   floor?: string;
   unitNumber?: string;
   city?: string;
@@ -89,6 +90,7 @@ export interface PropertyFormValues {
   neighborhood: string;
   street: string;
   number: string;
+  displayAddress: string;
   floor: string;
   unitNumber: string;
   title: string;
@@ -168,6 +170,7 @@ function buildDefaultValues(
       neighborhood: "",
       street: "",
       number: "",
+      displayAddress: "",
       floor: "",
       unitNumber: "",
       title: "",
@@ -213,6 +216,7 @@ function buildDefaultValues(
     neighborhood: initialData.neighborhood ?? "",
     street: initialData.streetName ?? "",
     number: initialData.streetNumber ?? "",
+    displayAddress: initialData.displayAddress ?? "",
     floor: initialData.floor ?? "",
     unitNumber: initialData.unitNumber ?? "",
     title: initialData.title ?? "",
@@ -289,6 +293,7 @@ export function usePropertyUploadForm(
       title: form.title,
       description: form.description,
       address: fullAddress,
+      displayAddress: form.displayAddress || null,
       city: form.city,
       province: form.province,
       country: form.country || "Argentina",
@@ -572,6 +577,7 @@ export function useEditProperty(
       neighborhood: (form.neighborhood as string) || null,
       streetName: (form.street as string) || null,
       streetNumber: (form.number as string) || null,
+      displayAddress: (form.displayAddress as string) || null,
       floor: (form.floor as string) || null,
       unitNumber: (form.unitNumber as string) || null,
       toilets: form.toilets ? Number(form.toilets) : null,

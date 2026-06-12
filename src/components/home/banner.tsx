@@ -143,7 +143,7 @@ export default function Banner({ items }: BannerProps) {
             }`}
           >
             <h1 className="mb-3 text-2xl font-black tracking-tighter text-white sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-2xl">
-              Tu próximo hogar<br className="hidden md:block" /> empieza aquí<br className="hidden md:block" />
+              Tu próximo hogar<br className="hidden md:block" /> empieza acá<br className="hidden md:block" />
             </h1>
             <p className="max-w-lg text-sm sm:text-base font-medium text-slate-200 drop-shadow md:text-xl mx-auto md:mx-0 px-2 md:px-0">
               Explorá miles de propiedades en las mejores ubicaciones con la estética que buscás.

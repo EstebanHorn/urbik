@@ -6,6 +6,7 @@ interface PropertyRequestBody {
   title: string;
   description?: string;
   address: string;
+  displayAddress?: string | null;
   city: string;
   province?: string;
   country?: string;
@@ -16,6 +17,7 @@ interface PropertyRequestBody {
   rentCurrency?: string;
   areaM2?: number | string;
   rooms?: number | string;
+  bedrooms?: number | string;
   bathrooms?: number | string;
   operationType: string;
   images?: string[];
@@ -61,6 +63,7 @@ export async function POST(req: NextRequest) {
       title,
       description,
       address,
+      displayAddress,
       city,
       province,
       country,
@@ -71,6 +74,7 @@ export async function POST(req: NextRequest) {
       rentCurrency,
       areaM2,
       rooms,
+      bedrooms,
       bathrooms,
       operationType,
       images,
@@ -94,6 +98,7 @@ export async function POST(req: NextRequest) {
         title,
         description: description || "",
         address,
+        display_address: displayAddress || null,
         city,
         province: province ?? "",
         country: country ?? "Argentina",
@@ -115,6 +120,9 @@ export async function POST(req: NextRequest) {
           : null,
         rooms: rooms
           ? parseInt(rooms.toString())
+          : null,
+        bedrooms: bedrooms
+          ? parseInt(bedrooms.toString())
           : null,
         bathrooms: bathrooms
           ? parseInt(bathrooms.toString())

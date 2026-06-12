@@ -47,6 +47,7 @@ const AnimatedInput = ({
       value={value as string | number}
       placeholder={placeholder}
       onChange={(e) => setValue(fieldName, e.target.value as any)}
+      onWheel={type === "number" ? (e) => (e.currentTarget as HTMLInputElement).blur() : undefined}
       className={`${inputClassName} ${textAlignClass} text-urbik-black placeholder:text-urbik-black/50 caret-urbik-black [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]`}
     />
   );
@@ -287,21 +288,25 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 </label>
                 {(() => {
                   const opts = [
-                    { value: "bueno", label: "Bueno" },
-                    { value: "mediano", label: "Mediano" },
+                    { value: "excelente", label: "Excelente" },
+                    { value: "muy_bueno", label: "Muy bueno" },
+                    { value: "regular", label: "Regular" },
                     { value: "malo", label: "Malo" },
+                    { value: "a_reciclar", label: "A reciclar" },
                   ];
-                  const cur = watch("buildingCondition") ?? "bueno";
+                  const cur = watch("buildingCondition") ?? "";
                   const idx = opts.findIndex((o) => o.value === cur);
                   return (
                     <div className="relative p-0.5 bg-white/30 shadow-md rounded-full border border-white w-full overflow-hidden">
-                      <div className="relative grid grid-cols-3 w-full h-full items-center">
-                        <div
-                          className="absolute top-0 bottom-0 left-0 w-1/3 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
-                          style={{
-                            transform: `translateX(${idx !== -1 ? idx * 100 : 0}%)`,
-                          }}
-                        />
+                      <div className="relative grid grid-cols-5 w-full h-full items-center">
+                        {idx !== -1 && (
+                          <div
+                            className="absolute top-0 bottom-0 left-0 w-1/5 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
+                            style={{
+                              transform: `translateX(${idx * 100}%)`,
+                            }}
+                          />
+                        )}
                         {opts.map((opt) => (
                           <button
                             key={opt.value}
@@ -309,7 +314,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                             onClick={() =>
                               setValue("buildingCondition", opt.value as any)
                             }
-                            className={`relative z-10 py-2.5 text-center text-xs sm:text-sm font-bold transition-colors duration-300 rounded-full cursor-pointer ${cur === opt.value ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+                            className={`relative z-10 py-2.5 text-center text-[10px] sm:text-xs font-bold transition-colors duration-300 rounded-full cursor-pointer px-1 ${cur === opt.value ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
                           >
                             {opt.label}
                           </button>
@@ -592,6 +597,20 @@ export function Module02Location({
           placeholder="Calle / Dirección *"
         />
         <AnimatedInput rhf={rhf} fieldName="number" placeholder="Altura *" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-bold text-urbik-black/50 mb-2 md:pl-2">
+          Dirección a mostrar (opcional)
+        </label>
+        <AnimatedInput
+          rhf={rhf}
+          fieldName="displayAddress"
+          placeholder="ej: Calle 11 entre 40 y 41"
+        />
+        <p className="mt-1 md:pl-2 text-[10px] text-urbik-black/40">
+          Si la dejás vacía, se muestra la dirección estándar en las tarjetas.
+        </p>
       </div>
 
       {onOpenMap && (
