@@ -64,6 +64,7 @@ export type SearchProperty = {
   hasGarden: boolean;
   hasLaundry: boolean;
   hasAirConditioning: boolean;
+  agencyLogo?: string | null;
 };
 
 type ParsedSearchFilters = {
@@ -470,12 +471,12 @@ export default function HomePage() {
                     setHoveredPropertyId={setHoveredPropertyId}
                   />
                   <div className="mt-10 md:mt-30 ml-0 md:ml-10 text-center md:text-left">
-                    <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">
-                      Somos Urbik®
-                    </h1>
-                    <span className="text-urbik-black/50 text-sm md:text-base">
-                      Una nueva forma de comprar y vender propiedades
+                    <span className="text-urbik-black/50 text-sm md:text-base ml-10">
+                      ¡Bienvenido!
                     </span>
+                    <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">
+                      ¿Qué tipo de usuario sos?
+                    </h1>
                   </div>
                   <MiniBanner />
                   <div className="w-full h-10" />

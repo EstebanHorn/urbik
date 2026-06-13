@@ -119,7 +119,7 @@ interface Property {
   constructionYear: number | null; latitude: number | null; longitude: number | null;
   parcelGeom: Record<string, unknown> | null; realEstateId: string | null; images: string[];
   isFavorite: boolean; legacyAmenities: Record<string, boolean>; featureGroups: Record<string, Record<string, boolean>>;
-  RealEstate: { agencyName: string; phone: string } | null;
+  RealEstate: { agencyName: string; phone: string; logoUrl?: string | null } | null;
 }
 
 interface FormattedOtherProperty {
@@ -244,7 +244,8 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
         isAdmin = profile?.role === "ADMIN";
       }
 
-      const { data: propRaw, error } = await supabase.from("properties").select(`*, real_estates (agency_name, phone)`).eq("id", propertyId).single();
+      // 1. Agregamos logo_url a la consulta
+      const { data: propRaw, error } = await supabase.from("properties").select(`*, real_estates (agency_name, phone, logo_url)`).eq("id", propertyId).single();
       
       if (error || !propRaw) {
         setLoading(false);
@@ -283,7 +284,8 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
         bedrooms: propRaw.bedrooms, bathrooms: propRaw.bathrooms, toilets: propRaw.toilets, garages: propRaw.garages, plants: propRaw.plants, floor: propRaw.floor, unitNumber: propRaw.unit_number, condition: propRaw.condition,
         constructionYear: propRaw.construction_year, latitude: propRaw.latitude, longitude: propRaw.longitude, parcelGeom: propRaw.parcel_geom, realEstateId: propRaw.real_estate_id, images: propRaw.images || [], isFavorite,
         legacyAmenities: { hasElectricity: Boolean(propRaw.has_electricity), hasGas: Boolean(propRaw.has_gas), hasInternet: Boolean(propRaw.has_internet), hasParking: Boolean(propRaw.has_parking), hasPool: Boolean(propRaw.has_pool), hasWater: Boolean(propRaw.has_water) }, featureGroups,
-        RealEstate: propRaw.real_estates ? { agencyName: propRaw.real_estates.agency_name, phone: propRaw.real_estates.phone } : null,
+        // 2. Extraemos el logo_url y lo guardamos
+        RealEstate: propRaw.real_estates ? { agencyName: propRaw.real_estates.agency_name, phone: propRaw.real_estates.phone, logoUrl: propRaw.real_estates.logo_url } : null,
       };
 
       setData({ property, otherProperties, isAdmin, userId });
@@ -487,6 +489,17 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-8">
                     <div className="flex flex-col w-full justify-center items-center mt-5">
+                      
+                      {property.RealEstate?.logoUrl && (
+                        <div className="h-16 w-16 mb-2 shrink-0 overflow-hidden">
+                          <img
+                            src={property.RealEstate.logoUrl}
+                            alt="Logo Inmobiliaria"
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      )}
+
                       <p className="text-xs font-bold uppercase tracking-widest text-urbik-muted mb-1">Comercializa</p>
                       <Link href={`/realestate/${property.realEstateId}`} className="hover:text-urbik-black/50 transition-colors">
                         <h4 className="text-xl font-black leading-tight">{property.RealEstate?.agencyName || "Inmobiliaria"}</h4>

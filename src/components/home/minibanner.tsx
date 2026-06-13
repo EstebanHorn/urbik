@@ -1,77 +1,101 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
 import Image from "next/image";
-import minibanner1 from "../../assets/minibanner/minibanner1.png";
-import minibanner2 from "../../assets/minibanner/minibanner2.png";
 
-const bannersData = [
-  {
-    id: 1,
-    image: minibanner1,
-    text: "Esta es tu oportunidad",
-    subtext: "Publicá y vendé en un instante",
-  },
-  {
-    id: 2,
-    image: minibanner2,
-    text: "Descubrí tu próximo hogar",
-    subtext: "Encontra tu propiedad ideal en Urbik",
-  }
-];
-
-export default function MiniBanner() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex === 0 ? 1 : 0));
-    }, 5000); 
-
-    return () => clearInterval(timer);
-  }, []);
-
+export default function Banners() {
   return (
-    <div className="w-full h-40 md:h-[200px] bg-urbik-black mt-5 rounded-2xl relative overflow-hidden flex justify-start items-center text-white text-left shadow-lg px-6 md:px-12">
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mt-5">
       
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={bannersData[currentIndex].id}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="absolute inset-0 w-full h-full"
-        >
-          <Image
-            src={bannersData[currentIndex].image}
-            alt={`Banner ${currentIndex + 1}`}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/20" />
-        </motion.div>
-      </AnimatePresence>
+      <div className="relative flex flex-col bg-urbik-black rounded-4xl overflow-hidden shadow-lg border border-gray-100 transition-transform hover:-translate-y-1">
+        
+        <Image 
+          src="/crearcuentagratis.png" 
+          alt="Crear cuenta gratis" 
+          fill 
+          className="object-cover opacity-5"
+          priority
+        />
 
-      <div className="relative z-10 w-full max-w-sm md:max-w-md lg:max-w-lg">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-wide drop-shadow-md">
-              {bannersData[currentIndex].text}
-            </h1>
-            {bannersData[currentIndex].subtext && (
-              <p className="text-sm md:text-base lg:text-lg drop-shadow-md text-gray-100">
-                {bannersData[currentIndex].subtext}
-              </p>
-            )}
-          </motion.div>
-        </AnimatePresence>
+        <div className="relative z-10 p-6 md:p-8 flex flex-col flex-grow text-white">
+          <span className="text-white/80 font-bold uppercase text-sm tracking-wider">
+            Para vos
+          </span>
+          <h2 className="text-4xl font-bold mt-2 leading-tight">
+            Encontrá tu próxima propiedad sin perderte nada
+          </h2>
+          <p className="text-white/90 mt-3">
+            Guardá las propiedades que te interesan y recibí alertas cuando aparezcan nuevas opciones que se ajusten a tu búsqueda.
+          </p>
+          
+          <ul className="mt-5 space-y-3 flex-grow">
+            <li className="flex items-start gap-2">
+              <span className="text-white font-bold">✓</span>
+              <span>Guardá propiedades favoritas</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-white font-bold">✓</span>
+              <span>Recibí alertas de nuevas publicaciones</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-white font-bold">✓</span>
+              <span>Consultá a los profesionales</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-white font-bold">✓</span>
+              <span>Mirá más de lo que te interesa</span>
+            </li>
+          </ul>
+          
+          <button className="relative cursor-pointer hover:scale-101 hover:bg-white/50 z-20 mt-8 w-full bg-white/30 backdrop-blur-2xl border border-white/30 text-white font-semibold py-3 px-4 rounded-full transition-colors shadow-sm">
+            Crear cuenta gratis
+          </button>
+        </div>
       </div>
-      
+
+      <div className="relative flex flex-col bg-white border border-white rounded-4xl overflow-hidden shadow-lg transition-transform hover:-translate-y-1">
+        
+        <Image 
+          src="/registrarmiinmobiliaria.png" 
+          alt="Registrar mi inmobiliaria" 
+          fill 
+          className="object-cover opacity-5"
+        />
+
+        <div className="relative z-10 p-6 md:p-8 flex flex-col flex-grow text-urbik-black">
+          <span className="text-urbik-black/60 font-bold uppercase text-sm tracking-wider">
+            Para inmobiliarias
+          </span>
+          <h2 className="text-4xl font-bold mt-2 leading-tight">
+            Publicá y empezá a recibir consultas hoy mismo
+          </h2>
+          <p className="text-urbik-black/70 mt-3">
+            Sumá tu inmobiliaria a Urbik sin costo. Accedé a compradores reales que buscan activamente en el portal.
+          </p>
+          
+          <ul className="mt-5 space-y-3 text-urbik-black/60 flex-grow">
+            <li className="flex items-start gap-2">
+              <span className="text-urbik-black font-bold">✓</span>
+              <span>Registrá tu inmobiliaria y verificala gratis</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-urbik-black font-bold">✓</span>
+              <span>Publicá ilimitadamente</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-urbik-black font-bold">✓</span>
+              <span>Recibí consultas y nuevas propiedades</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-urbik-black font-bold">✓</span>
+              <span>Obtené tu sitio web</span>
+            </li>
+          </ul>
+          
+          <button className="relative z-20 mt-8 w-full hover:scale-101 hover:bg-white/50 cursor-pointer bg-white backdrop-blur-2xl text-black font-semibold py-3 px-4 rounded-full transition-colors shadow-sm">
+            Registrar mi inmobiliaria
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }

@@ -162,15 +162,27 @@ export function PropertiesSidebar({
                 )}
               </div>
 
-              <div className="flex flex-1 flex-col justify-between p-4 z-10">
+              <div className="flex flex-1 flex-col justify-between p-4 pt-2 z-10">
                 <div>
-                  <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-2.5 py-1 text-[10px] font-bold text-white uppercase shadow-sm z-1">
-                      {getPropertyLabel(prop.type)}
-                    </span>
-                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-2.5 py-1 text-[10px] font-bold text-white uppercase shadow-sm z-1">
-                      {getOperationLabel(prop.operationType)}
-                    </span>
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-white/20 bg-urbik-black/80 px-2.5 py-1 text-[10px] font-bold text-white uppercase shadow-sm z-1">
+                        {getPropertyLabel(prop.type)}
+                      </span>
+                      <span className="rounded-full border border-white/20 bg-urbik-black/80 px-2.5 py-1 text-[10px] font-bold text-white uppercase shadow-sm z-1">
+                        {getOperationLabel(prop.operationType)}
+                      </span>
+                    </div>
+
+                    {(prop as any).agencyLogo && (
+                      <div className="h-10 w-10 shrink-0 overflow-hidden z-1">
+                        <img
+                          src={(prop as any).agencyLogo}
+                          alt="Logo Inmobiliaria"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <h3 className="line-clamp-2 text-sm font-black tracking-tight text-urbik-black">
@@ -183,7 +195,7 @@ export function PropertiesSidebar({
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-3 border-t border-white/60 mt-3">
+                <div className="flex flex-col gap-3 border-t border-white/60">
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-black tracking-tight text-urbik-black/90 z-1">
                       $ {prop.price?.toLocaleString("es-AR")}

@@ -1,137 +1,102 @@
 "use client";
 import { motion } from "framer-motion";
-import { Eye, Zap, ShieldCheck } from "lucide-react";
-import Image from "next/image";
-
-const glassCard = "relative md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
+import { Eye, TrendingUp, Heart } from "lucide-react";
 
 export default function AboutUs() {
   const values = [
     {
-      icon: <Eye className="text-urbik-white" size={24} />,
+      icon: <Eye size={24} strokeWidth={1.5} className="text-neutral-800" />,
       title: "Transparencia",
-      desc: "Visualizamos datos catastrales reales para que sepas exactamente qué estás comprando.",
-      longDesc: "En un mercado históricamente opaco, Urbik rompe las barreras de información. No solo listamos propiedades; integramos capas de datos públicos y privados para que el comprador entienda el entorno, la distribución de los metros cuadrados y el valor real proyectado.",
+      desc: "Creemos que la confianza se construye con información clara, haciendo cada operación más accesible y segura.",
     },
     {
-      icon: <Zap className="text-urbik-white" size={24} />,
-      title: "Innovación",
-      desc: "Cambiamos la forma de buscar hogar mediante mapas avanzados y datos catastrales en tiempo real.",
-      longDesc: "Más allá de la búsqueda por filtros, integramos cartografía catastral, visualización de parcelas y herramientas pensadas para que cada inmobiliaria pueda publicar, gestionar y hacer crecer su cartera desde un solo lugar.",
+      icon: <TrendingUp size={24} strokeWidth={1.5} className="text-neutral-800" />,
+      title: "Evolución",
+      desc: "Ayudamos a las inmobiliarias a potenciar su trabajo con soluciones modernas y análisis de datos precisos.",
     },
     {
-      icon: <ShieldCheck className="text-urbik-white" size={24} />,
-      title: "Seguridad",
-      desc: "Validamos cada agente inmobiliario para garantizar una experiencia confiable y segura.",
-      longDesc: "Tu tranquilidad es nuestro activo más valioso. Implementamos un proceso de verificación individual estricto para cada inmobiliaria que opera en nuestra red, asegurando que cada operación sea respaldada por profesionales certificados.",
+      icon: <Heart size={24} strokeWidth={1.5} className="text-neutral-800" />,
+      title: "Propósito",
+      desc: "La innovación debe resolver problemas concretos. La tecnología importa cuando mejora la vida de las personas.",
     },
   ];
 
   return (
-    <div className="relative bg-[#f8fafc] min-h-screen pt-16 font-sans overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-gray-200/30 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-gray-200/30 blur-[120px] pointer-events-none" />
+    <div className="bg-white min-h-screen text-neutral-900 font-sans selection:bg-neutral-200">
+      
+      <section className="max-w-5xl mx-auto px-6 pt-32 pb-20 md:pt-40 md:pb-32">
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-5xl md:text-7xl font-light tracking-tight leading-tight mb-16"
+        >
+          Transformando la <br className="hidden md:block" />
+          <span className="font-semibold">experiencia inmobiliaria.</span>
+        </motion.h1>
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="grid md:grid-cols-2 gap-10 md:gap-16 text-lg text-neutral-600 leading-relaxed font-light"
+        >
+          <div>
+            <p className="mb-6">
+              En un mundo donde la tecnología transforma industrias a una velocidad cada vez mayor, el sector inmobiliario enfrenta el desafío de adaptarse a nuevas formas de trabajar, comunicar y tomar decisiones. <strong>Urbik nace para acompañar esa evolución.</strong>
+            </p>
+            <p>
+              Creemos que comprar, vender o alquilar una propiedad debería ser una experiencia más transparente, eficiente y basada en información confiable. 
+            </p>
+          </div>
+          <div>
+            <p className="mb-6">
+              Desarrollamos una plataforma que combina tecnología y datos para acercar a inmobiliarias, propietarios e interesados de una manera más simple y efectiva.
+            </p>
+            <p>
+              Aspiramos a construir mucho más que un portal. Queremos desarrollar un ecosistema que integre información de mercado, herramientas profesionales y servicios que aporten valor real a cada etapa del proceso.
+            </p>
+          </div>
+        </motion.div>
+      </section>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center mt-10">
-        <div>
-          <motion.h1
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-5xl font-display font-bold text-urbik-black leading-[0.8] tracking-tighter mb-8"
-          >
-            <span className="ml-5">Redefiniendo el</span>
-            <br />
-            <div className="flex flex-wrap items-baseline gap-x-3">
-              <span className="font-black text-9xl text-urbik-black">futuro</span>
-              <span className="ml-5">inmobiliario.</span>
-            </div>
-          </motion.h1>
-
-          <p className="text-urbik-dark2 mb-10 max-w-lg font-medium text-lg">
-            Urbik nació de una frustración común: la falta de claridad en el mercado. 
-            Creamos la primera herramienta que no solo te muestra fotos, sino la 
-            realidad del suelo y el potencial de cada inversión.
-          </p>
-        </div>
-
-        <div className="relative">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="rounded-[30px] overflow-hidden aspect-square relative z-10 shadow-2xl shadow-black/10"
-          >
-            <Image
-              src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80" 
-              alt="Oficina Urbik" 
-              fill
-              className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
-            />
-          </motion.div>
-        </div>
+      <div className="max-w-5xl mx-auto px-6">
+        <div className="h-px w-full bg-neutral-100" />
       </div>
 
-      <div className="relative z-10 py-24 mt-10">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-            <div>
-              <h2 className="text-2xl font-display font-bold text-urbik-muted ml-2">Nuestros Pilares</h2>
-              <p className="text-urbik-black opacity-50 text-md font-medium mt-2">Lo que nos hace diferentes al resto.</p>
-            </div>
-            <div className="hidden md:block h-px bg-urbik-g300/50 flex-1 mx-10 mb-4" />
-          </div>
+      <section className="max-w-5xl mx-auto px-6 py-20 md:py-32">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          className="mb-16"
+        >
+          <h2 className="text-2xl font-semibold tracking-tight">Ese es el camino que elegimos recorrer.</h2>
+        </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {values.map((value, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ y: -10 }}
-                className={`p-10 transition-all duration-500 h-full cursor-default group hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] ${glassCard}`}
-              >
-                <div className="relative z-10">
-                  <div className="bg-urbik-black w-14 h-14 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    {value.icon}
-                  </div>
-                  <h3 className="text-xl font-display font-bold mb-4 text-urbik-black">{value.title}</h3>
-                  <p className="text-urbik-muted font-medium leading-relaxed">
-                    {value.desc}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="mt-32 space-y-12 mb-20">
-            {values.map((value, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className={`grid grid-cols-1 md:grid-cols-12 gap-8 items-center p-10 md:p-14 ${glassCard}`}
-              >
-                <div className="relative z-10 md:col-span-2 flex items-center justify-center md:justify-start">
-                  <span className="text-7xl font-black italic text-urbik-black opacity-10 drop-shadow-sm">
-                    0{index + 1}
-                  </span>
-                </div>
-
-                <div className="relative z-10 md:col-span-3">
-                  <h3 className="text-3xl font-display font-bold text-urbik-black tracking-tighter">
-                    {value.title}
-                  </h3>
-                </div>
-
-                <div className="relative z-10 md:col-span-7">
-                  <p className="text-lg text-urbik-muted font-medium leading-relaxed">
-                    {value.longDesc}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+          {values.map((value, index) => (
+            <motion.div 
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="flex flex-col group"
+            >
+              <div className="mb-6 p-4 bg-white border border-white shadow-sm rounded-2xl w-fit group-hover:bg-neutral-100 group-hover:scale-105 transition-all duration-300">
+                {value.icon}
+              </div>
+              <h3 className="text-xl font-medium mb-3">{value.title}</h3>
+              <p className="text-neutral-500 font-light leading-relaxed">
+                {value.desc}
+              </p>
+            </motion.div>
+          ))}
         </div>
-      </div>
+      </section>
+
     </div>
   );
 }

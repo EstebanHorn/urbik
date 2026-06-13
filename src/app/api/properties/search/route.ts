@@ -55,7 +55,10 @@ const PROPERTY_SELECT = `
   has_garden,
   has_laundry,
   has_air_conditioning,
-  created_at
+  created_at,
+  real_estates (
+    logo_url
+  )
 `;
 
 interface SearchPropertyRow {
@@ -90,6 +93,9 @@ interface SearchPropertyRow {
   has_laundry: boolean;
   has_air_conditioning: boolean;
   created_at: string;
+  real_estates?: {
+    logo_url: string | null;
+  } | null;
 }
 
 const mapProperty = (property: SearchPropertyRow) => ({
@@ -124,6 +130,7 @@ const mapProperty = (property: SearchPropertyRow) => ({
   hasLaundry: property.has_laundry,
   hasAirConditioning: property.has_air_conditioning,
   createdAt: property.created_at,
+  agencyLogo: property.real_estates?.logo_url ?? null,
 });
 
 export async function GET(request: Request) {

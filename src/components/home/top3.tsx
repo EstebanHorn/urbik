@@ -43,16 +43,30 @@ export default function Top3({ items, setHoveredPropertyId }: Top3Props) {
                 </div>
               )}
             </div>
+            
             <div className="flex flex-1 flex-col justify-between min-w-0 z-100">
               <div>
-                <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
-                    {getTypeLabel(property.type)}
-                  </span>
-                  <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
-                    {getOperationLabel(property.operationType)}
-                  </span>
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                      {getTypeLabel(property.type)}
+                    </span>
+                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                      {getOperationLabel(property.operationType)}
+                    </span>
+                  </div>
+                  
+                  {property.agencyLogo && (
+                    <div className="h-12 w-12 shrink-0 overflow-hidden z-1">
+                      <img
+                        src={property.agencyLogo}
+                        alt="Logo Inmobiliaria"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
+
                 <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
                   {property.title}
                 </h3>
@@ -60,6 +74,7 @@ export default function Top3({ items, setHoveredPropertyId }: Top3Props) {
                   {property.displayAddress || property.address}, {property.city}, {property.province}
                 </p>
               </div>
+              
               <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/60 pt-4">
                 <span className="text-xs font-bold text-urbik-black/50 z-1">
                   {property.bedrooms || 0} hab · {property.area || 0} m²

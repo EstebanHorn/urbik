@@ -112,9 +112,20 @@ function PromotedPropertyCard({
             </span>
           </div>
 
-          <h3 className="line-clamp-2 text-xl md:text-2xl lg:text-3xl font-black tracking-tight text-urbik-black/90 z-1">
-            {property.title}
-          </h3>
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="line-clamp-2 text-xl md:text-2xl lg:text-3xl font-black tracking-tight text-urbik-black/90 z-1">
+              {property.title}
+            </h3>
+            {property.agencyLogo && (
+              <div className="h-14 w-14 md:h-20 md:w-20 shrink-0 overflow-hidden z-1">
+                <img
+                  src={property.agencyLogo}
+                  alt="Logo Inmobiliaria"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            )}
+          </div>
 
           <p className="mt-2 truncate text-sm font-medium text-urbik-black/50 z-1">
             {property.address}, {property.city}, {property.province}
@@ -199,9 +210,22 @@ export default function List({ items, viewMode, premiumProperty, setHoveredPrope
                       {getTypeLabel(property.type)} en {getOperationLabel(property.operationType)}
                     </span>
                   </div>
-                  <h3 className="line-clamp-2 text-lg sm:text-xl md:text-2xl font-black tracking-tight text-urbik-black">
-                    {property.title}
-                  </h3>
+                  
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="line-clamp-2 text-lg sm:text-xl md:text-2xl font-black tracking-tight text-urbik-black">
+                      {property.title}
+                    </h3>
+                    {property.agencyLogo && (
+                      <div className="h-12 w-12 md:h-18 md:w-18 shrink-0 overflow-hidden z-1">
+                        <img
+                          src={property.agencyLogo}
+                          alt="Logo Inmobiliaria"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   <p className="mt-1 md:mt-2 truncate text-xs sm:text-sm font-medium text-urbik-black/50">
                     {property.displayAddress || property.address}, {property.city}, {property.province}
                   </p>
