@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Building2, ChevronDown } from "lucide-react";
+import { MapPin, Building2, ChevronDown, X } from "lucide-react";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import PriceFilterCard from "@/components/search/PriceFilterCard";
 import RoomsFilterCard from "@/components/search/RoomsFilterCard";
@@ -41,7 +41,7 @@ const OPERATION_LABELS: Record<string, string> = {
   SALE: "Venta",
   RENT: "Alquiler",
   TEMP_RENT: "Temporal",
-  SALE_RENT: "Venta / Alquiler",
+  SALE_RENT: "Venta y alquiler",
 };
 
 const glassCard = "md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
@@ -135,10 +135,11 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
             label={filterOperation ? (OPERATION_LABELS[filterOperation] || filterOperation) : "Operación"}
             value={filterOperation}
             options={[
-              { label: "Todas", value: "" },
+              { label: "Todo", value: "" },
               { label: "Venta", value: "SALE" },
               { label: "Alquiler", value: "RENT" },
               { label: "Temporal", value: "TEMP_RENT" },
+              { label: "Venta y alquiler", value: "SALE_RENT" },
             ]}
             onChange={(val) => setFilterOperation(val)}
             variant="white1"
@@ -148,11 +149,12 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
             label={filterType ? (PROPERTY_LABELS[filterType] || filterType) : "Tipo"}
             value={filterType}
             options={[
-              { label: "Todos", value: "" },
+              { label: "Todo", value: "" },
               { label: "Casa", value: "HOUSE" },
               { label: "Departamento", value: "APARTMENT" },
               { label: "PH", value: "PH" },
               { label: "Terreno", value: "LAND" },
+              { label: "Campo", value: "FIELD" },
               { label: "Local", value: "COMMERCIAL_PROPERTY" },
               { label: "Oficina", value: "OFFICE" },
             ]}
@@ -229,6 +231,27 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
               </div>
             )}
           </div>
+
+          {(filterOperation || filterType || minPrice || maxPrice || filterCurrency || filterRooms.length > 0 || filterBedrooms.length > 0 || filterBathrooms.length > 0) && (
+            <button
+              type="button"
+              onClick={() => {
+                setFilterOperation("");
+                setFilterType("");
+                setMinPrice("");
+                setMaxPrice("");
+                setFilterCurrency("");
+                setFilterRooms([]);
+                setFilterBedrooms([]);
+                setFilterBathrooms([]);
+                setActiveFilter(null);
+              }}
+              className="h-10 cursor-pointer px-3 md:px-4 py-2 rounded-full flex items-center gap-2 bg-urbik-black/80 text-white text-sm font-bold hover:bg-urbik-black transition-colors shadow-sm"
+            >
+              <X size={14} strokeWidth={3} />
+              <span className="hidden md:inline">Limpiar filtros</span>
+            </button>
+          )}
         </div>
       </div>
 

@@ -58,7 +58,9 @@ const PROPERTY_SELECT = `
   has_grill,
   has_garden,
   has_laundry,
-  has_air_conditioning
+  has_air_conditioning,
+  real_estate_id,
+  real_estates ( agency_name, logo_url )
 `;
 
 interface MapPropertyRow {
@@ -94,6 +96,8 @@ interface MapPropertyRow {
   has_garden: boolean;
   has_laundry: boolean;
   has_air_conditioning: boolean;
+  real_estate_id?: string | null;
+  real_estates?: { agency_name?: string | null; logo_url?: string | null } | null;
 }
 
 const mapProperty = (property: MapPropertyRow) => ({
@@ -129,6 +133,9 @@ const mapProperty = (property: MapPropertyRow) => ({
   hasGarden: property.has_garden,
   hasLaundry: property.has_laundry,
   hasAirConditioning: property.has_air_conditioning,
+  realEstateId: property.real_estate_id ?? null,
+  agencyName: property.real_estates?.agency_name ?? null,
+  agencyLogoUrl: property.real_estates?.logo_url ?? null,
 });
 
 export async function GET(request: Request) {

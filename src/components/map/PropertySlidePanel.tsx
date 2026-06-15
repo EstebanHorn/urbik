@@ -22,7 +22,7 @@ const getOperationLabel = (type: string) => {
     case "SALE": return "Venta";
     case "RENT": return "Alquiler";
     case "TEMP_RENT": return "Temporal";
-    case "SALE_RENT": return "Venta y Alquiler";
+    case "SALE_RENT": return "Venta y alquiler";
     default: return type;
   }
 };
@@ -119,7 +119,7 @@ interface Property {
   constructionYear: number | null; latitude: number | null; longitude: number | null;
   parcelGeom: Record<string, unknown> | null; realEstateId: string | null; images: string[];
   isFavorite: boolean; legacyAmenities: Record<string, boolean>; featureGroups: Record<string, Record<string, boolean>>;
-  RealEstate: { agencyName: string; phone: string } | null;
+  RealEstate: { agencyName: string; phone: string; logoUrl: string | null } | null;
 }
 
 interface FormattedOtherProperty {
@@ -244,7 +244,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
         isAdmin = profile?.role === "ADMIN";
       }
 
-      const { data: propRaw, error } = await supabase.from("properties").select(`*, real_estates (agency_name, phone)`).eq("id", propertyId).single();
+      const { data: propRaw, error } = await supabase.from("properties").select(`*, real_estates (agency_name, phone, logo_url)`).eq("id", propertyId).single();
       
       if (error || !propRaw) {
         setLoading(false);
@@ -283,7 +283,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
         bedrooms: propRaw.bedrooms, bathrooms: propRaw.bathrooms, toilets: propRaw.toilets, garages: propRaw.garages, plants: propRaw.plants, floor: propRaw.floor, unitNumber: propRaw.unit_number, condition: propRaw.condition,
         constructionYear: propRaw.construction_year, latitude: propRaw.latitude, longitude: propRaw.longitude, parcelGeom: propRaw.parcel_geom, realEstateId: propRaw.real_estate_id, images: propRaw.images || [], isFavorite,
         legacyAmenities: { hasElectricity: Boolean(propRaw.has_electricity), hasGas: Boolean(propRaw.has_gas), hasInternet: Boolean(propRaw.has_internet), hasParking: Boolean(propRaw.has_parking), hasPool: Boolean(propRaw.has_pool), hasWater: Boolean(propRaw.has_water) }, featureGroups,
-        RealEstate: propRaw.real_estates ? { agencyName: propRaw.real_estates.agency_name, phone: propRaw.real_estates.phone } : null,
+        RealEstate: propRaw.real_estates ? { agencyName: propRaw.real_estates.agency_name, phone: propRaw.real_estates.phone, logoUrl: propRaw.real_estates.logo_url ?? null } : null,
       };
 
       setData({ property, otherProperties, isAdmin, userId });
@@ -349,7 +349,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
         </button>
       </div>
 
-      <div className="max-w-7xl mx-auto  -mb-15">
+      <div className="max-w-7xl mx-auto">
         <ImageGallery
           images={property.images}
           title={property.title}
@@ -360,7 +360,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-2 sm:gap-3 px-5 mb-10 sm:mb-20">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-2 sm:gap-3 px-5 mt-8 mb-10 sm:mb-20">
           <div className="space-y-2 w-full lg:w-auto">
             <h1 className="text-3xl md:text-4xl lg:text-4xl font-display font-black text-urbik-black italic tracking-tighter leading-tight">
               {property.title}
@@ -487,9 +487,27 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-8">
                     <div className="flex flex-col w-full justify-center items-center mt-5">
-                      <p className="text-xs font-bold uppercase tracking-widest text-urbik-muted mb-1">Comercializa</p>
-                      <Link href={`/realestate/${property.realEstateId}`} className="hover:text-urbik-black/50 transition-colors">
-                        <h4 className="text-xl font-black leading-tight">{property.RealEstate?.agencyName || "Inmobiliaria"}</h4>
+                      <p className="text-xs font-bold uppercase tracking-widest text-urbik-muted mb-3">Comercializa</p>
+                      <Link
+                        href={`/realestate/${property.realEstateId}`}
+                        className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
+                      >
+                        {property.RealEstate?.logoUrl ? (
+                          <Image
+                            src={property.RealEstate.logoUrl}
+                            alt={property.RealEstate.agencyName || "Inmobiliaria"}
+                            width={80}
+                            height={80}
+                            className="w-20 h-20 rounded-full object-cover border border-urbik-g100 shadow-sm"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 rounded-full bg-urbik-g100 flex items-center justify-center text-urbik-black/50 font-black text-2xl">
+                            {(property.RealEstate?.agencyName || "I").charAt(0)}
+                          </div>
+                        )}
+                        <h4 className="text-xl font-black leading-tight text-center">
+                          {property.RealEstate?.agencyName || "Inmobiliaria"}
+                        </h4>
                       </Link>
                     </div>
                   </div>

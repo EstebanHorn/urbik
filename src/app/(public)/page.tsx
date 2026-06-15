@@ -89,7 +89,7 @@ export function getOperationLabel(type: string) {
     case "TEMP_RENT":
       return "Temporal";
     case "SALE_RENT":
-      return "Venta y Alquiler";
+      return "Venta y alquiler";
     default:
       return type;
   }

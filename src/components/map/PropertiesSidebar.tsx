@@ -197,6 +197,27 @@ export function PropertiesSidebar({
                   </div>
                 </div>
               </div>
+
+              {(prop.agencyLogoUrl || prop.agencyName) && (
+                <div
+                  className="absolute bottom-2 right-2 z-30"
+                  title={prop.agencyName ?? undefined}
+                >
+                  {prop.agencyLogoUrl ? (
+                    <Image
+                      src={prop.agencyLogoUrl}
+                      alt={prop.agencyName || "Inmobiliaria"}
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 rounded-full object-cover ring-2 ring-white shadow-md bg-white"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-urbik-g100 ring-2 ring-white shadow-md flex items-center justify-center text-[10px] font-black text-urbik-black/70">
+                      {(prop.agencyName || "I").charAt(0)}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

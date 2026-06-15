@@ -12,7 +12,7 @@ function getOperationLabel(type: string) {
   if (type === "SALE") return "Venta";
   if (type === "RENT") return "Alquiler";
   if (type === "TEMP_RENT") return "Temporal";
-  if (type === "SALE_RENT") return "Venta y Alquiler";
+  if (type === "SALE_RENT") return "Venta y alquiler";
   return type;
 }
 

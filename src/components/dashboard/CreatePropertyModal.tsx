@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { X } from "lucide-react";
 import {
@@ -23,9 +23,14 @@ interface CreatePropertyModalProps {
   open: boolean;
   onClose: () => void;
   onCreated: () => void;
+  defaultContactInfo?: {
+    contactName?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+  };
 }
 
-const DEFAULT_VALUES: PropertyUploadFormData = {
+const BASE_DEFAULT_VALUES: PropertyUploadFormData = {
   type: "HOUSE",
   operationType: "SALE",
   status: "AVAILABLE",
@@ -85,7 +90,15 @@ export default function CreatePropertyModal({
   open,
   onClose,
   onCreated,
+  defaultContactInfo,
 }: CreatePropertyModalProps) {
+  const DEFAULT_VALUES: PropertyUploadFormData = {
+    ...BASE_DEFAULT_VALUES,
+    contactName: defaultContactInfo?.contactName,
+    contactPhone: defaultContactInfo?.contactPhone,
+    contactEmail: defaultContactInfo?.contactEmail,
+    showAgencyContact: true,
+  };
   const rhf = useForm<PropertyUploadFormData>({
     defaultValues: DEFAULT_VALUES,
   });
@@ -93,6 +106,11 @@ export default function CreatePropertyModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [parcelPickerOpen, setParcelPickerOpen] = useState(false);
+  const formScrollRef = useRef<HTMLFormElement | null>(null);
+
+  useEffect(() => {
+    formScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeModuleId]);
 
   const propertyType = rhf.watch("type");
   const parcelPDA = rhf.watch("parcelPDA");
@@ -282,6 +300,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
           <div className="flex flex-1 overflow-hidden">
             <form
               id="create-property-form"
+              ref={formScrollRef}
               onSubmit={handleSubmit}
               onKeyDown={(e) => {
                 if (

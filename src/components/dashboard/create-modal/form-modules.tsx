@@ -5,7 +5,37 @@ import { UseFormReturn, Path } from "react-hook-form";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import LocationSelectors from "@/components/ui/LocationSelectors";
 import ImageUpload from "@/components/ui/ImageUpload";
-import { AmenitiesGrid } from "./shared-ui";
+import { AmenitiesGrid, MultiChipSelect } from "./shared-ui";
+
+const FLOOR_TYPE_OPTIONS = [
+  { value: "porcelanato", label: "Porcelanato" },
+  { value: "ceramico", label: "Cerámico" },
+  { value: "madera_parquet", label: "Madera / Parquet / Entablonado" },
+  { value: "flotante_laminado", label: "Flotante / Laminado" },
+  { value: "vinilico_spc", label: "Vinílico / SPC" },
+  { value: "cemento_microcemento", label: "Cemento Alisado / Microcemento" },
+  { value: "mosaico_granitico", label: "Mosaico / Granítico" },
+  { value: "calcareo", label: "Calcáreo" },
+  { value: "marmol_granito", label: "Mármol / Granito Natural" },
+  { value: "alfombra", label: "Alfombra" },
+  { value: "laja_piedra", label: "Laja / Piedra / Adoquín" },
+  { value: "deck_wpc", label: "Deck de Madera / WPC" },
+];
+
+const LEGACY_FLOOR_MAP: Record<string, string> = {
+  madera: "madera_parquet",
+  ceramica: "ceramico",
+  porcelana: "porcelanato",
+  marmol: "marmol_granito",
+  cemento: "cemento_microcemento",
+};
+
+function normalizeFloorType(raw: unknown): string[] {
+  if (Array.isArray(raw)) return raw.filter((v): v is string => typeof v === "string");
+  if (typeof raw !== "string" || !raw) return [];
+  const mapped = LEGACY_FLOOR_MAP[raw];
+  return mapped ? [mapped] : [raw];
+}
 import type { PropertyUploadFormData } from "./schema";
 
 interface ModuleProps {
@@ -115,7 +145,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
     { id: "SALE", label: "Venta" },
     { id: "RENT", label: "Alquiler" },
     { id: "TEMP_RENT", label: "Temporal" },
-    { id: "SALE_RENT", label: "Ambos" },
+    { id: "SALE_RENT", label: "Venta y alquiler" },
   ];
 
   const statusOptions = [
@@ -389,13 +419,6 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
 
           {propertyType === "FIELD" && (
             <div className="space-y-4">
-              <AnimatedInput
-                type="number"
-                rhf={rhf}
-                fieldName="hectares"
-                placeholder="Hectáreas"
-                inputClassName={SURFACE_INPUT_CLASS}
-              />
               <CustomDropdown
                 label="Tipo de explotación"
                 options={[
@@ -613,24 +636,39 @@ export function Module02Location({
         </p>
       </div>
 
-      {onOpenMap && (
-        <button
-          type="button"
-          disabled={isSearchingCity}
-          onClick={onOpenMap}
-          className={`w-full py-4 px-6 rounded-full border-2 border-dashed transition-all flex items-center justify-center gap-3 font-medium text-xs ${
-            selectedParcelPDA
-              ? "border-emerald-500 text-emerald-700 bg-emerald-50"
-              : "border-white text-white hover:border-urbik-black hover:text-urbik-black"
-          } disabled:opacity-50 disabled:cursor-not-allowed`}
-        >
-          {isSearchingCity
-            ? "Buscando zona..."
-            : selectedParcelPDA
-              ? `Parcela vinculada (PDA: ${selectedParcelPDA})`
-              : "Seleccionar parcela catastral en el mapa"}
-        </button>
-      )}
+      {onOpenMap && (() => {
+        const hasParcelLink = Boolean(selectedParcelPDA);
+        const hasDrawnParcel = !hasParcelLink && Boolean(watch("parcelGeom"));
+        const hasManualPin =
+          !hasParcelLink &&
+          !hasDrawnParcel &&
+          watch("latitude") != null &&
+          watch("longitude") != null;
+        const isActive = hasParcelLink || hasDrawnParcel || hasManualPin;
+
+        return (
+          <button
+            type="button"
+            disabled={isSearchingCity}
+            onClick={onOpenMap}
+            className={`w-full py-4 px-6 rounded-full border-2 border-dashed transition-all flex items-center justify-center gap-3 font-medium text-xs ${
+              isActive
+                ? "border-emerald-500 text-emerald-700 bg-emerald-50"
+                : "border-white text-white hover:border-urbik-black hover:text-urbik-black"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            {isSearchingCity
+              ? "Buscando zona..."
+              : hasParcelLink
+                ? `Parcela vinculada (PDA: ${selectedParcelPDA}) — Modificar`
+                : hasDrawnParcel
+                  ? "Parcela esbozada — Modificar"
+                  : hasManualPin
+                    ? "Pin manual fijado — Modificar"
+                    : "Seleccionar parcela catastral en el mapa"}
+          </button>
+        );
+      })()}
     </div>
   );
 }
@@ -716,12 +754,29 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
 
   const roomFields = getRoomFields();
 
+  const isField = propertyType === "FIELD";
+  const showSemiAndUncovered = !isField;
+
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 gap-4">
+        {isField && (
+          <div>
+            <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
+              Hectáreas totales *
+            </label>
+            <AnimatedInput
+              type="number"
+              rhf={rhf}
+              fieldName="hectares"
+              placeholder="0"
+              inputClassName={SURFACE_INPUT_CLASS}
+            />
+          </div>
+        )}
         <div>
           <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
-            M2 cubiertos (m²) *
+            {isField ? "m² cubiertos" : "M2 cubiertos (m²) *"}
           </label>
           <AnimatedInput
             type="number"
@@ -731,30 +786,34 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
             inputClassName={SURFACE_INPUT_CLASS}
           />
         </div>
-        <div>
-          <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
-            Sup. semicubierta (m²)
-          </label>
-          <AnimatedInput
-            type="number"
-            rhf={rhf}
-            fieldName="semiCoveredArea"
-            placeholder="0"
-            inputClassName={SURFACE_INPUT_CLASS}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
-            Sup. descubierta (m²)
-          </label>
-          <AnimatedInput
-            type="number"
-            rhf={rhf}
-            fieldName="uncoveredArea"
-            placeholder="0"
-            inputClassName={SURFACE_INPUT_CLASS}
-          />
-        </div>
+        {showSemiAndUncovered && (
+          <>
+            <div>
+              <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
+                Sup. semicubierta (m²)
+              </label>
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="semiCoveredArea"
+                placeholder="0"
+                inputClassName={SURFACE_INPUT_CLASS}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
+                Sup. descubierta (m²)
+              </label>
+              <AnimatedInput
+                type="number"
+                rhf={rhf}
+                fieldName="uncoveredArea"
+                placeholder="0"
+                inputClassName={SURFACE_INPUT_CLASS}
+              />
+            </div>
+          </>
+        )}
 
         {showFrontBack && (
           <>
@@ -861,6 +920,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
   ];
 
   const viewOptions = [
+    { value: "", label: "Ninguna" },
     { value: "rio", label: "Río" },
     { value: "mar", label: "Mar" },
     { value: "lago", label: "Lago" },
@@ -959,19 +1019,11 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
               onChange={(v) => setValue("balconyType", v as any)}
               variant="white2"
             />
-            <CustomDropdown
+            <MultiChipSelect
               label="Tipo de piso"
-              options={[
-                { value: "madera", label: "Madera" },
-                { value: "ceramica", label: "Cerámica" },
-                { value: "porcelana", label: "Porcelana" },
-                { value: "marmol", label: "Mármol" },
-                { value: "cemento", label: "Cemento" },
-                { value: "otro", label: "Otro" },
-              ]}
-              value={watch("floorType") ?? ""}
-              onChange={(v) => setValue("floorType", v as any)}
-              variant="white2"
+              options={FLOOR_TYPE_OPTIONS.filter((o) => o.value !== "laja_piedra")}
+              value={normalizeFloorType(watch("floorType"))}
+              onChange={(next) => setValue("floorType", next as any)}
             />
             <CustomDropdown
               label="Vista"
@@ -1004,6 +1056,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
             <CustomDropdown
               label="Costa"
               options={[
+                { value: "", label: "Ninguna" },
                 { value: "rio", label: "Río" },
                 { value: "lago", label: "Lago" },
                 { value: "mar", label: "Mar" },
@@ -1025,19 +1078,11 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
             <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">
               Edificación
             </p>
-            <CustomDropdown
+            <MultiChipSelect
               label="Tipo de piso"
-              options={[
-                { value: "madera", label: "Madera" },
-                { value: "ceramica", label: "Cerámica" },
-                { value: "porcelana", label: "Porcelana" },
-                { value: "marmol", label: "Mármol" },
-                { value: "cemento", label: "Cemento alisado" },
-                { value: "otro", label: "Otro" },
-              ]}
-              value={watch("floorType") ?? ""}
-              onChange={(v) => setValue("floorType", v as any)}
-              variant="white2"
+              options={FLOOR_TYPE_OPTIONS}
+              value={normalizeFloorType(watch("floorType"))}
+              onChange={(next) => setValue("floorType", next as any)}
             />
             <CustomDropdown
               label="Tipo de techo"

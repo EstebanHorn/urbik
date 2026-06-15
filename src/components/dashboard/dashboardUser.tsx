@@ -23,7 +23,7 @@ const getOperationLabel = (type: string) => {
   switch (type) {
     case "SALE": return "Venta";
     case "RENT": return "Alquiler";
-    case "SALE_RENT": return "Venta y Alquiler";
+    case "SALE_RENT": return "Venta y alquiler";
     default: return type;
   }
 };

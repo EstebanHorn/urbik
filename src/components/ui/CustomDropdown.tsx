@@ -107,9 +107,7 @@ export function CustomDropdown({
             transition={{ duration: 0.2 }}
             className={`absolute w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden ${positionClasses}`}
           >
-            {options
-              .filter((opt) => opt.value !== "")
-              .map((opt) => (
+            {options.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
