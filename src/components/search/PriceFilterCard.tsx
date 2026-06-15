@@ -153,16 +153,16 @@ export default function PriceFilterCard({
             />
           </div>
 
-          <div className="flex justify-between mt-3">
-            <div className="flex flex-col items-start">
+          <div className="flex justify-between mt-3 gap-2">
+            <div className="flex flex-col items-start min-w-[8rem]">
               <span className="text-[10px] font-bold text-urbik-black/60 uppercase">Desde</span>
-              <span className="text-xs font-black text-urbik-black/80">
+              <span className="text-xs font-black text-urbik-black/80 tabular-nums whitespace-nowrap">
                 {currencySymbol} {fmt(activeMin)}
               </span>
             </div>
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-end min-w-[8rem]">
               <span className="text-[10px] font-bold text-urbik-black/60 uppercase">Hasta</span>
-              <span className="text-xs font-black text-urbik-black/80">
+              <span className="text-xs font-black text-urbik-black/80 tabular-nums whitespace-nowrap">
                 {currencySymbol} {fmt(activeMax)}
               </span>
             </div>

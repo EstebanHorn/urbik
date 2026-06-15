@@ -64,7 +64,7 @@ const OPERATION_LABELS: Record<string, string> = {
   SALE: "Venta",
   RENT: "Alquiler",
   TEMP_RENT: "Temporal",
-  SALE_RENT: "Venta / Alquiler",
+  SALE_RENT: "Venta y alquiler",
 };
 
 const getOperationLabel = (type: string) => {
@@ -74,7 +74,7 @@ const getOperationLabel = (type: string) => {
     case "RENT":
       return "Alquiler";
     case "SALE_RENT":
-      return "Venta y Alquiler";
+      return "Venta y alquiler";
     default:
       return type;
   }
@@ -1269,7 +1269,7 @@ export default function DashboardRealestate({
               }
               value={filterOperation}
               options={[
-                { label: "Todas", value: "" },
+                { label: "Todo", value: "" },
                 { label: "Venta", value: "SALE" },
                 { label: "Alquiler", value: "RENT" },
                 { label: "Temporal", value: "TEMP_RENT" },
@@ -1284,7 +1284,7 @@ export default function DashboardRealestate({
               }
               value={filterType}
               options={[
-                { label: "Todos", value: "" },
+                { label: "Todo", value: "" },
                 { label: "Casa", value: "HOUSE" },
                 { label: "Departamento", value: "APARTMENT" },
                 { label: "PH", value: "PH" },
@@ -1643,6 +1643,13 @@ export default function DashboardRealestate({
         open={isCreateOpen}
         onClose={() => setCreateOpen(false)}
         onCreated={onRefresh}
+        defaultContactInfo={{
+          contactName:
+            profile?.agencyData?.name || profile?.name || undefined,
+          contactPhone:
+            profile?.agencyData?.phone || profile?.phone || undefined,
+          contactEmail: profile?.email || undefined,
+        }}
       />
 
       {editingProperty && (
@@ -1656,6 +1663,13 @@ export default function DashboardRealestate({
             featureGroups: editingProperty.featureGroups || undefined,
             youtubeUrl: editingProperty.youtubeUrl || undefined,
             tour360Url: editingProperty.tour360Url || undefined,
+          }}
+          defaultContactInfo={{
+            contactName:
+              profile?.agencyData?.name || profile?.name || undefined,
+            contactPhone:
+              profile?.agencyData?.phone || profile?.phone || undefined,
+            contactEmail: profile?.email || undefined,
           }}
           onClose={() => setEditingProperty(null)}
           onUpdated={onRefresh}

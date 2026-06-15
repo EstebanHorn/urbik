@@ -151,39 +151,84 @@ type AmenityCategory = {
 
 const TAG_CATEGORIES: AmenityCategory[] = [
   {
-    key: "ambientes",
+    key: "ambientesCasaPh",
     label: "Ambientes / Espacios",
-    visibleFor: ["HOUSE", "APARTMENT", "PH", "OFFICE"],
+    visibleFor: ["HOUSE", "PH", "COUNTRY"],
     tags: [
-      { key: "hasLiving", label: "Living" },
-      { key: "hasLivingDining", label: "Living-comedor" },
-      { key: "hasDining", label: "Comedor" },
+      { key: "hasBath", label: "Baño" },
+      { key: "hasStorage", label: "Bodega / Depósito" },
+      { key: "hasLocker", label: "Baulera" },
+      { key: "hasStudy", label: "Estudio / Escritorio" },
+      { key: "hasLibrary", label: "Biblioteca" },
+      { key: "hasBedroom", label: "Dormitorio" },
+      { key: "hasMezzanine", label: "Entrepiso" },
       { key: "hasKitchen", label: "Cocina" },
       { key: "hasKitchenDining", label: "Cocina-comedor" },
-      { key: "hasIntegratedKitchen", label: "Cocina integrada" },
+      { key: "hasLiving", label: "Living" },
+      { key: "hasLivingDining", label: "Living-comedor" },
+      { key: "hasGarageRoom", label: "Garaje" },
+      { key: "hasLocal", label: "Local" },
+      { key: "hasOffice", label: "Oficina" },
+      { key: "hasBasement", label: "Sótano / Subsuelo" },
+      { key: "hasTerrace", label: "Terraza" },
+      { key: "hasWalkInCloset", label: "Vestidor" },
+      { key: "hasAttic", label: "Altillo" },
       { key: "hasPantry", label: "Despensa" },
-      { key: "hasSuite", label: "Suite" },
+    ],
+  },
+
+  {
+    key: "ambientesDepto",
+    label: "Ambientes / Espacios",
+    visibleFor: ["APARTMENT"],
+    tags: [
+      { key: "hasBath", label: "Baño" },
+      { key: "hasStorage", label: "Bodega / Depósito" },
+      { key: "hasLocker", label: "Baulera" },
+      { key: "hasBalcony", label: "Balcón", isLegacy: true },
+      { key: "hasStudy", label: "Estudio / Escritorio" },
+      { key: "hasShed", label: "Galpón" },
+      { key: "hasLibrary", label: "Biblioteca" },
+      { key: "hasBedroom", label: "Dormitorio" },
+      { key: "hasMezzanine", label: "Entrepiso" },
+      { key: "hasGallery", label: "Galería" },
+      { key: "hasGarageRoom", label: "Cochera" },
+      { key: "hasOffice", label: "Oficina" },
+      { key: "hasTerrace", label: "Terraza" },
+      { key: "hasWalkInCloset", label: "Vestidor" },
+      { key: "hasKitchen", label: "Cocina" },
+      { key: "hasKitchenDining", label: "Cocina-comedor" },
+      { key: "hasLiving", label: "Living" },
+      { key: "hasLivingDining", label: "Living-comedor" },
+    ],
+  },
+
+  {
+    key: "ambientesOffice",
+    label: "Ambientes / Espacios",
+    visibleFor: ["OFFICE"],
+    tags: [
+      { key: "hasLiving", label: "Living" },
+      { key: "hasKitchen", label: "Cocina" },
+      { key: "hasPantry", label: "Despensa" },
       { key: "hasWalkInCloset", label: "Vestidor" },
       { key: "hasStudy", label: "Escritorio" },
-      { key: "hasPlayroom", label: "Playroom" },
       { key: "hasServiceRoom", label: "Cuarto de servicio" },
       { key: "hasStorage", label: "Depósito" },
-      { key: "hasAttic", label: "Altillo" },
-      { key: "hasBasement", label: "Subsuelo" },
     ],
   },
 
   {
     key: "exterior",
     label: "Exterior",
-    visibleFor: ["HOUSE", "APARTMENT", "PH"],
+    visibleFor: ["HOUSE", "PH", "COUNTRY"],
     tags: [
-      { key: "hasPatio", label: "Patio" },
-      { key: "hasTerrace", label: "Terraza" },
-      { key: "hasBalcony", label: "Balcón", isLegacy: true },
-      { key: "hasGarden", label: "Jardín", isLegacy: true },
+      { key: "hasShed", label: "Galpón" },
       { key: "hasGallery", label: "Galería" },
+      { key: "hasFrontYard", label: "Patio delantero" },
+      { key: "hasBackYard", label: "Patio trasero" },
       { key: "hasGrill", label: "Parrilla", isLegacy: true },
+      { key: "hasBalcony", label: "Balcón", isLegacy: true },
       { key: "hasSolarium", label: "Solárium" },
     ],
   },
@@ -199,7 +244,7 @@ const TAG_CATEGORIES: AmenityCategory[] = [
       { key: "hasElectricity", label: "Luz eléctrica", isLegacy: true },
       { key: "hasSewage", label: "Cloacas" },
       { key: "hasInternet", label: "Internet", isLegacy: true },
-      { key: "hasCable", label: "Televisión por cable" },
+      { key: "hasCable", label: "TV por cable" },
       { key: "hasPhone", label: "Teléfono" },
     ],
   },
@@ -211,7 +256,6 @@ const TAG_CATEGORIES: AmenityCategory[] = [
     tags: [
       { key: "hasAirConditioning", label: "Aire acondicionado", isLegacy: true },
       { key: "hasCentralAC", label: "AC central" },
-      { key: "hasHeating", label: "Calefacción" },
       { key: "hasCentralHeating", label: "Calefacción central" },
       { key: "hasRadiators", label: "Radiadores" },
       { key: "hasFloorHeating", label: "Losa radiante" },
@@ -227,7 +271,7 @@ const TAG_CATEGORIES: AmenityCategory[] = [
     visibleFor: ["HOUSE", "APARTMENT", "PH", "COMMERCIAL_PROPERTY", "COUNTRY"],
     tags: [
       { key: "hasEquippedKitchen", label: "Cocina equipada" },
-      { key: "hasKitchenFurniture", label: "Muebles de cocina" },
+      { key: "hasKitchenFurniture", label: "Cocina amoblada" },
       { key: "isFurnished", label: "Amoblado" },
       { key: "hasJacuzzi", label: "Hidromasaje" },
       { key: "hasPool", label: "Piscina / Pileta", isLegacy: true },
@@ -343,14 +387,19 @@ export function AmenitiesGrid({
                 <button
                   key={tag.key}
                   type="button"
+                  title={tag.label}
                   onClick={() => handleToggle(tag.key, !active)}
-                  className={`rounded-full border px-3 py-2 text-xs font-bold transition-all text-left flex items-center justify-between gap-1 ${
+                  className={`group rounded-full border px-3 py-2 text-xs font-bold transition-all text-left flex items-center justify-between gap-1 overflow-hidden relative ${
                     active
                       ? "bg-urbik-white text-urbik-black/80 border-none"
                       : "border-white text-urbik-black/60 bg-white/30 hover:bg-gray-50"
                   }`}
                 >
-                  <span className="truncate">{tag.label}</span>
+                  <span className="block w-full overflow-hidden">
+                    <span className="block whitespace-nowrap truncate group-hover:[animation:pill-marquee_6s_linear_infinite]">
+                      {tag.label}
+                    </span>
+                  </span>
 
                 </button>
               );
@@ -358,6 +407,56 @@ export function AmenitiesGrid({
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+interface MultiChipSelectProps {
+  label: string;
+  options: { value: string; label: string }[];
+  value: string[];
+  onChange: (next: string[]) => void;
+}
+
+export function MultiChipSelect({
+  label,
+  options,
+  value,
+  onChange,
+}: MultiChipSelectProps) {
+  const selected = new Set(value ?? []);
+
+  const handleToggle = (val: string) => {
+    const next = new Set(selected);
+    if (next.has(val)) next.delete(val);
+    else next.add(val);
+    onChange(Array.from(next));
+  };
+
+  return (
+    <div className="w-full">
+      <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
+        {label}
+      </label>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => {
+          const active = selected.has(opt.value);
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => handleToggle(opt.value)}
+              className={`rounded-full border px-3 py-2 text-xs font-bold transition-all ${
+                active
+                  ? "bg-urbik-white text-urbik-black/80 border-none shadow-sm"
+                  : "border-white text-urbik-black/60 bg-white/30 hover:bg-gray-50"
+              }`}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

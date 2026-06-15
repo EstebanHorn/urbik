@@ -154,16 +154,6 @@ export default function ParcelPickerModal({
               Parcela Catastral
             </button>
             <button
-              onClick={() => toggleMode("manual")}
-              className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
-                mode === "manual"
-                  ? "border-urbik-cyan text-urbik-black"
-                  : "border-transparent text-gray-400 hover:text-gray-600"
-              }`}
-            >
-              Pin Manual
-            </button>
-            <button
               onClick={() => toggleMode("draw")}
               className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
                 mode === "draw"
@@ -173,7 +163,20 @@ export default function ParcelPickerModal({
             >
               Dibujar Parcela
             </button>
+            <button
+              onClick={() => toggleMode("manual")}
+              className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+                mode === "manual"
+                  ? "border-urbik-cyan text-urbik-black"
+                  : "border-transparent text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              Pin Manual
+            </button>
           </div>
+          <p className="px-8 pt-2 pb-3 text-xs font-medium text-urbik-black/50 italic">
+            Seleccioná una sola opción.
+          </p>
         </div>
 
         <div className="flex-1 min-h-0 relative mx-4 my-3 rounded-2xl overflow-hidden">

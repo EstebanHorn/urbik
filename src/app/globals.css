@@ -288,3 +288,9 @@ a {
   animation: fade-in-up 0.6s ease-out forwards;
 }
 
+@keyframes pill-marquee {
+  0%, 15% { transform: translateX(0); }
+  50%, 65% { transform: translateX(calc(-100% + 6ch)); }
+  100% { transform: translateX(0); }
+}
+

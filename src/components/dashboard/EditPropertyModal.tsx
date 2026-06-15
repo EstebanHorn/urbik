@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { getVisibleModules, type PropertyUploadFormData } from "./create-modal/schema";
@@ -39,6 +39,7 @@ type EditableProperty = Omit<PropertySummary, "type" | "description" | "property
   landUse?: string;
   buildingCondition?: string | null;
   buildingFloors?: number | null;
+  extraData?: Record<string, unknown>;
 };
 
 interface EditPropertyModalProps {
@@ -46,28 +47,72 @@ interface EditPropertyModalProps {
   property: EditableProperty;
   onClose: () => void;
   onUpdated: () => void;
+  defaultContactInfo?: {
+    contactName?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+  };
 }
 
-function toDefaultValues(p: EditableProperty): PropertyUploadFormData {
-  const parts = (p.address || "").split(" ");
-  const number = parts.at(-1) ?? "";
-  const street = parts.slice(0, -1).join(" ") || p.address || "";
+function toDefaultValues(
+  p: EditableProperty,
+  fallbackContact?: {
+    contactName?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+  },
+): PropertyUploadFormData {
   const op = p.operationType as string | undefined;
+
+  // Prefer structured fields from the API when present; fall back to splitting `address` for legacy rows.
+  const fallbackParts = (p.address || "").split(" ");
+  const fallbackNumber = fallbackParts.at(-1) ?? "";
+  const fallbackStreet =
+    fallbackParts.slice(0, -1).join(" ") || p.address || "";
+  const street = p.streetName ?? fallbackStreet;
+  const number = p.streetNumber ?? fallbackNumber;
+
+  const extra = (p.extraData ?? {}) as Record<string, unknown>;
+  const str = (v: unknown): string | undefined =>
+    typeof v === "string" && v !== "" ? v : undefined;
+  const num = (v: unknown): number | undefined =>
+    typeof v === "number" && !Number.isNaN(v) ? v : undefined;
+  const bool = (v: unknown): boolean | undefined =>
+    typeof v === "boolean" ? v : undefined;
 
   return {
     id: p.id,
     title: p.title,
     description: p.description,
     type: p.type ?? undefined,
+    unitType: p.unitType ?? str(extra.unitType),
     operationType: op,
     status: p.status,
-    city: p.city,
+    country: p.country ?? "Argentina",
     province: p.province,
+    city: p.city,
+    district: p.district,
+    locality: p.locality,
+    neighborhood: p.neighborhood,
     street,
     number,
+    displayAddress: p.displayAddress,
+    floor: p.floor,
+    unitNumber: p.unitNumber,
     areaM2: p.area,
+    coveredArea: p.coveredArea,
+    semiCoveredArea: p.semiCoveredArea,
+    uncoveredArea: p.uncoveredArea,
+    frontLength: p.frontLength,
+    backLength: p.backLength,
     rooms: p.rooms,
+    bedrooms: p.bedrooms,
     bathrooms: p.bathrooms,
+    toilets: p.toilets,
+    garages: p.garages,
+    plants: p.plants,
+    hectares: p.hectares ?? num(extra.hectares),
+    expenses: p.expenses,
     images: p.images ?? [],
     propertySubtype: p.propertySubtype ?? undefined,
     youtubeUrl: p.youtubeUrl ?? undefined,
@@ -75,10 +120,15 @@ function toDefaultValues(p: EditableProperty): PropertyUploadFormData {
     isPriceHidden: p.isPriceHidden,
     featureGroups: p.featureGroups ?? {},
     amenities: (p.featureGroups?.amenities as Record<string, boolean>) ?? {},
-    saleCurrency: "USD",
-    rentCurrency: "ARS",
-    salePrice: (op === "SALE" || op === "SALE_RENT") ? p.price : undefined,
-    rentPrice: (op === "RENT" || op === "TEMP_RENT" || op === "SALE_RENT") ? p.price : undefined,
+    saleCurrency: (p.saleCurrency as "USD" | "ARS") || "USD",
+    rentCurrency: (p.rentCurrency as "USD" | "ARS") || "ARS",
+    salePrice:
+      p.salePrice ?? ((op === "SALE" || op === "SALE_RENT") ? p.price : undefined),
+    rentPrice:
+      p.rentPrice ??
+      ((op === "RENT" || op === "TEMP_RENT" || op === "SALE_RENT")
+        ? p.price
+        : undefined),
     parcelCCA: p.parcelCCA ?? undefined,
     parcelPDA: p.parcelPDA ?? undefined,
     parcelGeom: p.parcelGeom as Record<string, unknown> | undefined,
@@ -87,21 +137,54 @@ function toDefaultValues(p: EditableProperty): PropertyUploadFormData {
     buildingCondition: p.buildingCondition ?? undefined,
     buildingFloors: p.buildingFloors ?? undefined,
     commercialActivity: p.commercialActivity ?? undefined,
-    hectares: p.hectares ?? undefined,
-    landUse: p.landUse ?? undefined,
+    landUse: p.landUse ?? str(extra.landUse),
+    // Characteristics & extraData (subtipos)
+    condition: str(extra.condition),
+    orientation: str(extra.orientation),
+    disposition: str(extra.disposition),
+    constructionYear: num(extra.constructionYear),
+    renovationYear: num(extra.renovationYear),
+    garageType: str(extra.garageType),
+    balconyType: str(extra.balconyType),
+    viewType: str(extra.viewType),
+    floorType: Array.isArray(extra.floorType)
+      ? (extra.floorType as string[])
+      : str(extra.floorType),
+    roofType: str(extra.roofType),
+    slope: str(extra.slope),
+    coastType: str(extra.coastType),
+    soilType: str(extra.soilType),
+    buildabilityIndex: num(extra.buildabilityIndex),
+    occupancyIndex: num(extra.occupancyIndex),
+    hasConstruction: bool(extra.hasConstruction),
+    hasIrrigation: bool(extra.hasIrrigation),
+    hasFencing: bool(extra.hasFencing),
+    hasWater: bool(extra.hasWater),
+    hasElectricity: bool(extra.hasElectricity),
+    contactName: str(extra.contactName) ?? fallbackContact?.contactName,
+    contactPhone: str(extra.contactPhone) ?? fallbackContact?.contactPhone,
+    contactEmail: str(extra.contactEmail) ?? fallbackContact?.contactEmail,
+    contactWhatsapp: str(extra.contactWhatsapp),
+    showAgencyContact: bool(extra.showAgencyContact) ?? true,
+    extraData: extra,
   };
 }
 
-export default function EditPropertyModal({ open, property, onClose, onUpdated }: EditPropertyModalProps) {
-  const rhf = useForm<PropertyUploadFormData>({ defaultValues: toDefaultValues(property) });
+export default function EditPropertyModal({ open, property, onClose, onUpdated, defaultContactInfo }: EditPropertyModalProps) {
+  const rhf = useForm<PropertyUploadFormData>({ defaultValues: toDefaultValues(property, defaultContactInfo) });
   const [activeModuleId, setActiveModuleId] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [parcelPickerOpen, setParcelPickerOpen] = useState(false);
+  const formScrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    formScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeModuleId]);
 
   useEffect(() => {
     if (open) {
-      rhf.reset(toDefaultValues(property));
+      rhf.reset(toDefaultValues(property, defaultContactInfo));
       setActiveModuleId(1);
       setError(null);
     }
@@ -164,6 +247,41 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
 
     setIsSubmitting(true);
     try {
+      const mergedExtraData: Record<string, unknown> = {
+        ...(data.extraData ?? {}),
+        unitType: data.unitType ?? undefined,
+        condition: data.condition ?? undefined,
+        orientation: data.orientation ?? undefined,
+        disposition: data.disposition ?? undefined,
+        constructionYear: data.constructionYear ?? undefined,
+        renovationYear: data.renovationYear ?? undefined,
+        garageType: data.garageType ?? undefined,
+        balconyType: data.balconyType ?? undefined,
+        viewType: data.viewType ?? undefined,
+        floorType: data.floorType ?? undefined,
+        roofType: data.roofType ?? undefined,
+        slope: data.slope ?? undefined,
+        coastType: data.coastType ?? undefined,
+        soilType: data.soilType ?? undefined,
+        landUse: data.landUse ?? undefined,
+        buildabilityIndex: data.buildabilityIndex ?? undefined,
+        occupancyIndex: data.occupancyIndex ?? undefined,
+        hasConstruction: data.hasConstruction,
+        hasIrrigation: data.hasIrrigation,
+        hasFencing: data.hasFencing,
+        hasWater: data.hasWater,
+        hasElectricity: data.hasElectricity,
+        contactName: data.contactName ?? undefined,
+        contactPhone: data.contactPhone ?? undefined,
+        contactEmail: data.contactEmail ?? undefined,
+        contactWhatsapp: data.contactWhatsapp ?? undefined,
+        showAgencyContact: data.showAgencyContact,
+        hectares: data.hectares ?? undefined,
+      };
+      Object.keys(mergedExtraData).forEach((k) => {
+        if (mergedExtraData[k] === undefined) delete mergedExtraData[k];
+      });
+
       const res = await fetch(`/api/property/${property.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -171,10 +289,18 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
           title: data.title,
           description: data.description || "",
           street: data.street || "",
+          streetName: data.street || "",
           number: data.number || "",
-          city: data.city || "",
+          streetNumber: data.number || "",
+          country: data.country || "Argentina",
           province: data.province || "",
-          country: "Argentina",
+          city: data.city || "",
+          district: data.district ?? null,
+          locality: data.locality ?? null,
+          neighborhood: data.neighborhood ?? null,
+          displayAddress: data.displayAddress ?? null,
+          floor: data.floor ?? null,
+          unitNumber: data.unitNumber ?? null,
           type: data.type,
           unitType: data.unitType,
           operationType: data.operationType,
@@ -183,8 +309,10 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
           saleCurrency: data.saleCurrency || "USD",
           rentPrice: data.rentPrice ?? null,
           rentCurrency: data.rentCurrency || "ARS",
+          expenses: data.expenses ?? null,
           areaM2: data.areaM2 ?? null,
           rooms: data.rooms ?? null,
+          bedrooms: data.bedrooms ?? null,
           bathrooms: data.bathrooms ?? null,
           toilets: data.toilets ?? null,
           garages: data.garages ?? null,
@@ -199,7 +327,11 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
           youtubeUrl: data.youtubeUrl || null,
           tour360Url: data.tour360Url || null,
           isPriceHidden: data.isPriceHidden || false,
-          featureGroups: { amenities: data.amenities || {} },
+          featureGroups: {
+            ...(data.featureGroups ?? {}),
+            amenities: data.amenities || {},
+          },
+          amenities: data.amenities || {},
           condition: data.condition,
           orientation: data.orientation,
           constructionYear: data.constructionYear,
@@ -214,6 +346,7 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
           commercialActivity: data.commercialActivity || null,
           hectares: data.hectares || null,
           landUse: data.landUse || null,
+          extraData: mergedExtraData,
         }),
       });
 
@@ -292,7 +425,7 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated }
           </div>
 
           <div className="flex flex-1 overflow-hidden">
-            <div className="flex-1 overflow-y-auto px-8 py-6">
+            <div ref={formScrollRef} className="flex-1 overflow-y-auto px-8 py-6">
               {activeModule && (
                 <div key={activeModule.id} className="step-transition">
                   <h3 className="text-xl font-bold text-center text-urbik-black/80 mb-6">
