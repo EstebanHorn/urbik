@@ -349,7 +349,7 @@ const renderNavLinks = () => {
     if (role === "REALESTATE") {
       return (
         <>
-          <Link href="/dashboard?nueva=1" className={linkClass}>Publicar</Link>
+          <Link href={`${pathname}?nueva=1`} className={linkClass}>Publicar</Link>
           <Link href="/dashboard" className={linkClass}>Mi Perfil</Link>
           <Link href="/" className={linkClass}>Buscar</Link>
         </>
@@ -503,7 +503,7 @@ const renderNavLinks = () => {
                   >
                     <span className="text-md tracking-wider flex items-center justify-center truncate">
                       {currentFilters.minPrice || currentFilters.maxPrice
-                        ? `${currentFilters.currency || ""}${currentFilters.minPrice ? ` ≥${formatPriceShort(currentFilters.minPrice)}` : ""}${currentFilters.maxPrice ? ` ≤${formatPriceShort(currentFilters.maxPrice)}` : ""}`
+                        ? "Precio"
                         : "Precio"}
                     </span>
                     <ChevronDown size={16} strokeWidth={3} className={`hidden md:block w-4 h-4 shrink-0 transition-transform duration-200 ${activeFilter === "price" ? "rotate-180" : ""}`} />

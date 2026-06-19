@@ -211,12 +211,22 @@ export default function MapPage() {
     [],
   );
 
-  const handleBoundsChange = useCallback(
+const handleBoundsChange = useCallback(
     (bounds: MapBounds) => {
       boundsRef.current = bounds;
       fetchFilteredProperties(bounds, filters);
+
+      // Agregamos esto: inyectar los límites en la URL sin recargar la página
+      // para que el PriceFilterCard del Navbar pueda leerlos.
+      const currentParams = new URLSearchParams(searchParams.toString());
+      currentParams.set("minLat", bounds.minLat.toString());
+      currentParams.set("maxLat", bounds.maxLat.toString());
+      currentParams.set("minLon", bounds.minLon.toString());
+      currentParams.set("maxLon", bounds.maxLon.toString());
+      
+      router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
     },
-    [fetchFilteredProperties, filters],
+    [fetchFilteredProperties, filters, pathname, router, searchParams],
   );
 
   useEffect(() => {

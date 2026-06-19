@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { BarChart, Bar, Cell, ResponsiveContainer } from "recharts";
+import { useSearchParams } from "next/navigation";
 
 type Bucket = { from: number; to: number; count: number };
 
@@ -49,19 +50,33 @@ export default function PriceFilterCard({
   const [absMin, setAbsMin] = useState(0);
   const [absMax, setAbsMax] = useState(0);
 
+  const searchParams = useSearchParams();
+
   const fetchHistogram = useCallback(async () => {
     try {
-      const params = new URLSearchParams({ currency });
+      const params = new URLSearchParams(searchParams?.toString() || "");
+
+      params.delete("minPrice");
+      params.delete("maxPrice");
+      params.delete("page");
+
+      if (currency) params.set("currency", currency);
+      else params.delete("currency");
+
       if (operationType) params.set("operationType", operationType);
+      else params.delete("operationType");
+
       if (propertyType) params.set("propertyType", propertyType);
-      const res = await fetch(`/api/properties/price-histogram?${params}`);
+      else params.delete("propertyType");
+
+      const res = await fetch(`/api/properties/price-histogram?${params.toString()}`);
       if (!res.ok) return;
       const data = await res.json();
       setBuckets(data.buckets ?? []);
       setAbsMin(data.min ?? 0);
       setAbsMax(data.max ?? 0);
     } catch {}
-  }, [currency, operationType, propertyType]);
+  }, [currency, operationType, propertyType, searchParams]);
 
   useEffect(() => { fetchHistogram(); }, [fetchHistogram]);
 
@@ -125,7 +140,7 @@ export default function PriceFilterCard({
         </div>
       )}
 
-      {hasRange ? (
+{hasRange ? (
         <div className="px-1">
           <div className="relative h-6 flex items-center">
             <div className="absolute w-full h-1.5 bg-slate-200 rounded-full" />
@@ -167,6 +182,13 @@ export default function PriceFilterCard({
               </span>
             </div>
           </div>
+        </div>
+      ) : absMin > 0 ? (
+        <div className="flex flex-col items-center justify-center mt-2">
+          <span className="text-[10px] font-bold text-urbik-black/60 uppercase">Precio único en la zona</span>
+          <span className="text-sm font-black text-urbik-black/80 tabular-nums whitespace-nowrap">
+            {currencySymbol} {fmt(absMin)}
+          </span>
         </div>
       ) : (
         absMin === 0 && absMax === 0 && (

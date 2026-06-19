@@ -131,7 +131,7 @@ export default async function RealEstatePage({
           <div className="relative z-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="flex items-center gap-8 min-w-0 w-full">
               <div
-                className="w-28 h-28 shrink-0 rounded-full flex items-center justify-center bg-cover bg-center overflow-hidden bg-urbik-g200"
+                className="w-28 h-28 shrink-0 flex items-center justify-center bg-cover bg-center overflow-hidden"
                 style={{
                   backgroundImage: realEstate.logo_url
                     ? `url(${realEstate.logo_url})`

@@ -498,7 +498,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
                             alt={property.RealEstate.agencyName || "Inmobiliaria"}
                             width={80}
                             height={80}
-                            className="w-20 h-20 rounded-full object-cover border border-urbik-g100 shadow-sm"
+                            className="w-20 h-20 object-cover"
                           />
                         ) : (
                           <div className="w-20 h-20 rounded-full bg-urbik-g100 flex items-center justify-center text-urbik-black/50 font-black text-2xl">
