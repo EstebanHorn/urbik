@@ -29,6 +29,13 @@ function getSuggestionLabel(s: SearchSuggestion): string {
   return parts.length > 3 ? parts.slice(0, 3).join(",").trim() : display.trim();
 }
 
+function formatPriceShort(val: string) {
+  if (!val) return "";
+  const n = Number(val);
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".0", "")}M`;
+  return n.toLocaleString("es-AR");
+}
+
 export default function Navbar() {
   return (
     <Suspense fallback={null}>
@@ -110,6 +117,23 @@ function NavbarInner() {
     }, 500);
   }, [pathname, router, searchParams, localMinPrice, localMaxPrice]);
 
+  const handleCurrencySwitch = useCallback((newCurrency: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (newCurrency) params.set("currency", newCurrency);
+    else params.delete("currency");
+    
+    params.delete("minPrice");
+    params.delete("maxPrice");
+    params.set("page", "1");
+    
+    setLocalMinPrice("");
+    setLocalMaxPrice("");
+    
+    if (priceTimerRef.current) clearTimeout(priceTimerRef.current);
+    
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [pathname, router, searchParams]);
+
   const handleNavRoomsChange = useCallback((field: "rooms" | "bedrooms" | "bathrooms", value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete(field);
@@ -181,7 +205,6 @@ function NavbarInner() {
     });
 
     return () => subscription.unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isExcluded) return null;
@@ -436,7 +459,7 @@ const renderNavLinks = () => {
                       const current = searchParams.get("operationType") || "";
                       handleNavParamChange("operationType", val === current ? null : val);
                     }}
-                    variant="white"
+                    variant="white1"
                   />
                 </div>
 
@@ -462,7 +485,7 @@ const renderNavLinks = () => {
                       const current = searchParams.get("propertyType") || "";
                       handleNavParamChange("propertyType", val === current ? null : val);
                     }}
-                    variant="white"
+                    variant="white1"
                   />
                 </div>
 
@@ -470,7 +493,7 @@ const renderNavLinks = () => {
                   <button
                     type="button"
                     onClick={() => setActiveFilter((v) => (v === "price" ? null : "price"))}
-                    className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 min-w-10 md:min-w-[120px] font-bold ${
+                    className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 w-[180px] font-bold ${
                       currentFilters.minPrice || currentFilters.maxPrice || currentFilters.currency
                         ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
                         : activeFilter === "price"
@@ -478,12 +501,12 @@ const renderNavLinks = () => {
                           : "bg-white/70 border border-white text-urbik-black/70 hover:bg-gray-50 shadow-sm"
                     }`}
                   >
-                    <span className="text-md tracking-wider flex items-center justify-center">
+                    <span className="text-md tracking-wider flex items-center justify-center truncate">
                       {currentFilters.minPrice || currentFilters.maxPrice
-                        ? `${currentFilters.currency || ""}${currentFilters.minPrice ? ` ≥${Number(currentFilters.minPrice).toLocaleString("es-AR")}` : ""}${currentFilters.maxPrice ? ` ≤${Number(currentFilters.maxPrice).toLocaleString("es-AR")}` : ""}`
+                        ? `${currentFilters.currency || ""}${currentFilters.minPrice ? ` ≥${formatPriceShort(currentFilters.minPrice)}` : ""}${currentFilters.maxPrice ? ` ≤${formatPriceShort(currentFilters.maxPrice)}` : ""}`
                         : "Precio"}
                     </span>
-                    <ChevronDown size={16} strokeWidth={3} className={`hidden md:block w-4 h-4 transition-transform duration-200 ${activeFilter === "price" ? "rotate-180" : ""}`} />
+                    <ChevronDown size={16} strokeWidth={3} className={`hidden md:block w-4 h-4 shrink-0 transition-transform duration-200 ${activeFilter === "price" ? "rotate-180" : ""}`} />
                   </button>
 
                   {activeFilter === "price" && (
@@ -496,7 +519,7 @@ const renderNavLinks = () => {
                         propertyType={searchParams.get("propertyType") || ""}
                         onChangeMin={(v) => handleNavPriceChange("minPrice", v)}
                         onChangeMax={(v) => handleNavPriceChange("maxPrice", v)}
-                        onChangeCurrency={(v) => handleNavParamChange("currency", v || null)}
+                        onChangeCurrency={handleCurrencySwitch}
                       />
                     </div>
                   )}
@@ -506,7 +529,7 @@ const renderNavLinks = () => {
                   <button
                     type="button"
                     onClick={() => setActiveFilter((v) => (v === "rooms" ? null : "rooms"))}
-                    className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 min-w-10 md:min-w-[120px] font-bold ${
+                    className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 w-[130px] md:w-[170px] font-bold ${
                       currentFilters.rooms.length > 0 || currentFilters.bedrooms.length > 0 || currentFilters.bathrooms.length > 0
                         ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
                         : activeFilter === "rooms"
@@ -521,7 +544,7 @@ const renderNavLinks = () => {
                           ? `${currentFilters.bedrooms[0]} hab.`
                           : "Ambientes"}
                     </span>
-                    <ChevronDown size={16} strokeWidth={3} className={`hidden md:block w-4 h-4 transition-transform duration-200 ${activeFilter === "rooms" ? "rotate-180" : ""}`} />
+                    <ChevronDown size={16} strokeWidth={3} className={`hidden md:block w-4 h-4 shrink-0 transition-transform duration-200 ${activeFilter === "rooms" ? "rotate-180" : ""}`} />
                   </button>
 
                   {activeFilter === "rooms" && (

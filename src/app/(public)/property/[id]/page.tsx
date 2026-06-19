@@ -654,7 +654,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
               <div>
                 <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Descripción</h3>
                 <div className="bg-white p-8 rounded-2xl border border-urbik-g100 shadow-sm">
-                  <div className="text-urbik-black/80 leading-relaxed whitespace-pre-wrap font-serif text-lg">
+                  <div className="text-urbik-black/80 leading-relaxed whitespace-pre-wrap text-lg">
                     {property.description}
                   </div>
                 </div>
