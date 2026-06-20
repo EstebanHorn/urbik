@@ -13,6 +13,8 @@ export type PropertySummary = {
   id: string;
   title: string;
   description?: string;
+  createdAt?: string;
+  updatedAt?: string;
   price?: number;
   currency?: string;
   salePrice?: number;

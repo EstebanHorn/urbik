@@ -23,6 +23,8 @@ import {
   Info,
   Settings,
   ChevronDown,
+  ArrowDownWideNarrow,
+  ArrowUpWideNarrow,
 } from "lucide-react";
 
 import CreatePropertyModal from "@/components/dashboard/CreatePropertyModal";
@@ -837,6 +839,17 @@ export default function DashboardRealestate({
   const [filterBedrooms, setFilterBedrooms] = useState<string[]>([]);
   const [filterBathrooms, setFilterBathrooms] = useState<string[]>([]);
 
+  type SortBy = "updatedAt" | "createdAt" | "price" | "area";
+  const [sortBy, setSortBy] = useState<SortBy>("updatedAt");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  const SORT_LABELS: Record<SortBy, string> = {
+    updatedAt: "Últimas modificaciones",
+    createdAt: "Fecha de publicación",
+    price: "Precio",
+    area: "Superficie",
+  };
+
   useEffect(() => {
     if (!activeFilter) return;
     const handleOutside = (e: MouseEvent) => {
@@ -898,6 +911,27 @@ export default function DashboardRealestate({
     }
 
     return matches;
+  });
+
+  const getSortPrice = (prop: PropertySummary) =>
+    prop.price ?? prop.sale_price ?? prop.rent_price ?? 0;
+
+  const sortedProperties = [...filteredProperties].sort((a, b) => {
+    let cmp = 0;
+    if (sortBy === "price") {
+      cmp = getSortPrice(a) - getSortPrice(b);
+    } else if (sortBy === "area") {
+      cmp = (a.area || 0) - (b.area || 0);
+    } else {
+      const dateA = new Date(
+        (sortBy === "updatedAt" ? a.updatedAt : a.createdAt) ?? a.createdAt ?? 0,
+      ).getTime();
+      const dateB = new Date(
+        (sortBy === "updatedAt" ? b.updatedAt : b.createdAt) ?? b.createdAt ?? 0,
+      ).getTime();
+      cmp = dateA - dateB;
+    }
+    return sortDir === "asc" ? cmp : -cmp;
   });
 
   const fetchFavorites = useCallback(async () => {
@@ -1379,6 +1413,43 @@ export default function DashboardRealestate({
                 </div>
               )}
             </div>
+
+            <div className="flex items-center gap-2 md:ml-auto">
+              <CustomDropdown
+                label={`Ordenar: ${SORT_LABELS[sortBy]}`}
+                value={sortBy}
+                options={[
+                  { label: "Últimas modificaciones", value: "updatedAt" },
+                  { label: "Fecha de publicación", value: "createdAt" },
+                  { label: "Precio", value: "price" },
+                  { label: "Superficie", value: "area" },
+                ]}
+                onChange={(val) => setSortBy(val as SortBy)}
+                variant="white1"
+              />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+                }
+                title={
+                  sortDir === "asc"
+                    ? "Orden ascendente"
+                    : "Orden descendente"
+                }
+                className="h-10 shrink-0 cursor-pointer px-3 py-2 rounded-full bg-white/70 border border-white text-urbik-black/70 shadow-sm hover:bg-gray-50 transition-colors duration-200 flex items-center gap-1.5 font-bold"
+              >
+                {sortDir === "asc" ? (
+                  <ArrowUpWideNarrow size={16} strokeWidth={2.5} />
+                ) : (
+                  <ArrowDownWideNarrow size={16} strokeWidth={2.5} />
+                )}
+                <span className="text-sm hidden md:inline">
+                  {sortDir === "asc" ? "Asc." : "Desc."}
+                </span>
+              </button>
+            </div>
           </div>
           {filteredProperties.length === 0 ? (
             <div className="text-center py-20 border-2 border-dashed border-urbik-g200 rounded-2xl mx-2 md:mx-6">
@@ -1388,7 +1459,7 @@ export default function DashboardRealestate({
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProperties.map((prop, index) => {
+              {sortedProperties.map((prop, index) => {
                 return (
                   <div
                     key={prop.id}

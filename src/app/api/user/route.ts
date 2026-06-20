@@ -13,6 +13,8 @@ function mapProperty(p: any) {
     id: p.id,
     title: p.title,
     description: p.description,
+    createdAt: p.created_at ?? undefined,
+    updatedAt: p.updated_at ?? p.created_at ?? undefined,
     price: price ?? undefined,
     salePrice: p.sale_price ?? undefined,
     rentPrice: p.rent_price ?? undefined,

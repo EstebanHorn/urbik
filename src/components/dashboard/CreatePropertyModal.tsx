@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import type { Geometry } from "geojson";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { X } from "lucide-react";
 import {
   getVisibleModules,
+  getStepError,
   type PropertyUploadFormData,
 } from "./create-modal/schema";
 import {
@@ -115,8 +117,30 @@ export default function CreatePropertyModal({
   const propertyType = rhf.watch("type");
   const parcelPDA = rhf.watch("parcelPDA");
   const parcelCCA = rhf.watch("parcelCCA");
+  const parcelGeom = rhf.watch("parcelGeom");
+  const latitude = rhf.watch("latitude");
+  const longitude = rhf.watch("longitude");
   const province = rhf.watch("province");
   const city = rhf.watch("city");
+
+  const initialParcel: SelectedParcel | null = useMemo(() => {
+    const geom = parcelGeom as Geometry | undefined;
+    const lat = typeof latitude === "number" ? latitude : undefined;
+    const lon = typeof longitude === "number" ? longitude : undefined;
+    if (geom) {
+      return {
+        cca: parcelCCA ?? null,
+        pda: parcelPDA ?? null,
+        geometry: geom,
+        lat: lat ?? 0,
+        lon: lon ?? 0,
+      };
+    }
+    if (lat != null && lon != null) {
+      return { cca: null, pda: null, geometry: null, lat, lon, isManual: true };
+    }
+    return null;
+  }, [parcelGeom, parcelCCA, parcelPDA, latitude, longitude]);
 
   const visibleModules = getVisibleModules(propertyType);
 
@@ -134,14 +158,20 @@ export default function CreatePropertyModal({
   }, [currentIndex, visibleModules]);
 
   const handleNext = () => {
-    if (!isLastStep) {
-      const nextId = visibleModules[safeCurrentIndex + 1].id;
-      setActiveModuleId(nextId);
+    if (isLastStep || !activeModule) return;
+    const stepError = getStepError(activeModule.id, rhf.getValues());
+    if (stepError) {
+      setError(stepError);
+      return;
     }
+    setError(null);
+    const nextId = visibleModules[safeCurrentIndex + 1].id;
+    setActiveModuleId(nextId);
   };
 
   const handleBack = () => {
     if (!isFirstStep) {
+      setError(null);
       const prevId = visibleModules[safeCurrentIndex - 1].id;
       setActiveModuleId(prevId);
     }
@@ -295,6 +325,13 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
               visibleModules={visibleModules}
               currentIndex={safeCurrentIndex}
             />
+
+            {error && (
+              <div className="mx-8 mb-3 p-3 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2">
+                <span className="text-red-500 font-bold leading-none">!</span>
+                <p className="text-sm text-red-600 font-medium">{error}</p>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-1 overflow-hidden">
@@ -321,12 +358,6 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
                     {activeModule.label}
                   </h3>
                   {moduleContent[activeModule.id]}
-                </div>
-              )}
-
-              {error && (
-                <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-100">
-                  <p className="text-sm text-red-600 font-medium">{error}</p>
                 </div>
               )}
             </form>
@@ -371,6 +402,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
         open={parcelPickerOpen}
         province={province ?? ""}
         city={city}
+        initialParcel={initialParcel}
         onClose={() => setParcelPickerOpen(false)}
         onConfirm={handleParcelConfirm}
       />

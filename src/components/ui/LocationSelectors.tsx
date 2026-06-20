@@ -25,6 +25,76 @@ interface LocationSelectorsProps {
   showLocality?: boolean;
 }
 
+// Definido a nivel de módulo (identidad estable entre renders) para que el
+// menú no se desmonte/remonte en cada render del padre. Antes estaba declarado
+// dentro del componente: cualquier re-render recreaba el componente, React
+// remontaba el DOM y el scroll del listado volvía solo hacia arriba.
+function DropdownMenu({
+  items,
+  onSelect,
+  isOpen,
+  menuRef,
+  scrollRefs,
+}: {
+  items: GeorefItem[];
+  onSelect: (item: GeorefItem) => void;
+  isOpen: boolean;
+  menuRef: React.RefObject<HTMLDivElement | null>;
+  scrollRefs: React.RefObject<Record<string, HTMLButtonElement | null>>;
+}) {
+  const handleSearchByKey = (e: React.KeyboardEvent) => {
+    const char = e.key.toLowerCase();
+    if (char.length === 1 && /[a-zñ]/.test(char)) {
+      const target = items.find((item) =>
+        item.nombre
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .startsWith(char),
+      );
+
+      if (target && menuRef.current) {
+        const el = scrollRefs.current[target.id];
+        if (el) {
+          menuRef.current.scrollTo({
+            top: el.offsetTop,
+            behavior: "smooth",
+          });
+        }
+      }
+    }
+  };
+
+  return (
+    <div
+      ref={menuRef}
+      tabIndex={0}
+      onKeyDown={handleSearchByKey}
+      className={`absolute z-50 left-0 mt-2 min-w-[280px] max-h-72 overflow-y-auto rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl transition-all duration-200 outline-none
+      ${
+        isOpen
+          ? "opacity-100 translate-y-0"
+          : "pointer-events-none opacity-0 -translate-y-2"
+      }`}
+      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+    >
+      {items.map((item) => (
+        <button
+          key={item.id}
+          ref={(el) => {
+            scrollRefs.current[item.id] = el;
+          }}
+          type="button"
+          onClick={() => onSelect(item)}
+          className="w-full text-left cursor-pointer px-5 py-3 text-md font-bold text-urbik-white hover:bg-white/10 transition"
+        >
+          {item.nombre}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function LocationSelectors({
   provinceValue,
   cityValue,
@@ -80,9 +150,21 @@ export default function LocationSelectors({
       setHasLocalidades(true);
       return;
     }
+
+    // El endpoint de georef filtra `departamento` por nombre, y muchos
+    // departamentos/partidos comparten nombre en distintas provincias
+    // (ej: "Adolfo Alsina" en Río Negro y Buenos Aires). Eso mezclaba las
+    // localidades. Resolvemos el id único del departamento dentro de la
+    // provincia seleccionada y filtramos por id.
+    const depts = provinceValue
+      ? ((geoData.departamentos as Record<string, GeorefItem[]>)[provinceValue] ?? [])
+      : [];
+    const cityItem = depts.find((c) => c.nombre === cityValue);
+    const deptParam = cityItem?.id ?? cityValue;
+
     setLoadingLocalidades(true);
     fetch(
-      `https://apis.datos.gob.ar/georef/api/localidades?departamento=${encodeURIComponent(cityValue)}&max=1000&campos=id,nombre`,
+      `https://apis.datos.gob.ar/georef/api/localidades?departamento=${encodeURIComponent(deptParam)}&max=1000&campos=id,nombre`,
     )
       .then((res) => res.json())
       .then((data) => {
@@ -100,7 +182,7 @@ export default function LocationSelectors({
         setHasLocalidades(false);
         setLoadingLocalidades(false);
       });
-  }, [cityValue, showLocality]);
+  }, [cityValue, showLocality, provinceValue]);
 
   useEffect(() => {
     if (openDropdown === "province" && provMenuRef.current) {
@@ -111,72 +193,6 @@ export default function LocationSelectors({
       localityMenuRef.current.focus();
     }
   }, [openDropdown]);
-
-  const handleSearchByKey = (
-    e: React.KeyboardEvent,
-    items: GeorefItem[],
-    containerRef: React.RefObject<HTMLDivElement | null>,
-  ) => {
-    const char = e.key.toLowerCase();
-    if (char.length === 1 && /[a-zñ]/.test(char)) {
-      const target = items.find((item) =>
-        item.nombre
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[̀-ͯ]/g, "")
-          .startsWith(char),
-      );
-
-      if (target && containerRef.current) {
-        const el = scrollRefs.current[target.id];
-        if (el) {
-          containerRef.current.scrollTo({
-            top: el.offsetTop,
-            behavior: "smooth",
-          });
-        }
-      }
-    }
-  };
-
-  const DropdownMenu = ({
-    items,
-    onSelect,
-    isOpen,
-    menuRef,
-  }: {
-    items: GeorefItem[];
-    onSelect: (item: GeorefItem) => void;
-    isOpen: boolean;
-    menuRef: React.RefObject<HTMLDivElement | null>;
-  }) => (
-    <div
-      ref={menuRef}
-      tabIndex={0}
-      onKeyDown={(e) => handleSearchByKey(e, items, menuRef)}
-      className={`absolute z-50 left-0 mt-2 min-w-[280px] max-h-72 overflow-y-auto rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl transition-all duration-200 outline-none
-      ${
-        isOpen
-          ? "opacity-100 translate-y-0"
-          : "pointer-events-none opacity-0 -translate-y-2"
-      }`}
-      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-    >
-      {items.map((item) => (
-        <button
-          key={item.id}
-          ref={(el) => {
-            scrollRefs.current[item.id] = el;
-          }}
-          type="button"
-          onClick={() => onSelect(item)}
-          className="w-full text-left cursor-pointer px-5 py-3 text-md font-bold text-urbik-white hover:bg-white/10 transition"
-        >
-          {item.nombre}
-        </button>
-      ))}
-    </div>
-  );
 
   return (
     <div className={`flex flex-col gap-2 w-full ${showLocality ? "flex-wrap" : ""}`}>
@@ -196,6 +212,7 @@ export default function LocationSelectors({
           items={provincias}
           isOpen={openDropdown === "province"}
           menuRef={provMenuRef}
+          scrollRefs={scrollRefs}
           onSelect={(item) => {
             onChange("province", item.nombre);
             onChange("city", "");
@@ -224,6 +241,7 @@ export default function LocationSelectors({
             items={ciudades}
             isOpen={openDropdown === "city"}
             menuRef={cityMenuRef}
+            scrollRefs={scrollRefs}
             onSelect={(item) => {
               onChange("city", item.nombre);
               if (showLocality) onChange("locality", "");
@@ -253,6 +271,7 @@ export default function LocationSelectors({
               items={localidades}
               isOpen={openDropdown === "locality"}
               menuRef={localityMenuRef}
+              scrollRefs={scrollRefs}
               onSelect={(item) => {
                 onChange("locality", item.nombre);
                 setOpenDropdown(null);

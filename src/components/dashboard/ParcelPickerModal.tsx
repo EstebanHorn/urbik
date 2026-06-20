@@ -1,9 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, MapPin, MousePointerClick, PenTool } from "lucide-react";
-import type { Geometry } from "geojson";
+import type { Geometry, Polygon } from "geojson";
 
 const ParcelPickerMap = dynamic(() => import("./ParcelPickerMap"), {
   ssr: false,
@@ -25,12 +25,40 @@ export interface SelectedParcel {
   isManual?: boolean;
 }
 
+// Centro inicial del mapa al editar: usa lat/lon guardadas o, si faltan,
+// el centroide del polígono de la parcela.
+function getInitialCenter(
+  parcel?: SelectedParcel | null,
+): { lat: number; lng: number } | null {
+  if (!parcel) return null;
+  if (
+    Number.isFinite(parcel.lat) &&
+    Number.isFinite(parcel.lon) &&
+    (parcel.lat !== 0 || parcel.lon !== 0)
+  ) {
+    return { lat: parcel.lat, lng: parcel.lon };
+  }
+  if (parcel.geometry && parcel.geometry.type === "Polygon") {
+    const ring = (parcel.geometry as Polygon).coordinates[0] ?? [];
+    if (ring.length > 0) {
+      const sum = ring.reduce(
+        (acc, c) => ({ lng: acc.lng + c[0], lat: acc.lat + c[1] }),
+        { lng: 0, lat: 0 },
+      );
+      return { lat: sum.lat / ring.length, lng: sum.lng / ring.length };
+    }
+  }
+  return null;
+}
+
 interface ParcelPickerModalProps {
   open: boolean;
   province: string;
   city?: string;
   onClose: () => void;
   onConfirm: (parcel: SelectedParcel) => void;
+  // Parcela ya vinculada/dibujada al editar: se precarga para que se vea en el mapa.
+  initialParcel?: SelectedParcel | null;
 }
 
 export default function ParcelPickerModal({
@@ -39,17 +67,57 @@ export default function ParcelPickerModal({
   city,
   onClose,
   onConfirm,
+  initialParcel,
 }: ParcelPickerModalProps) {
   const [selected, setSelected] = useState<SelectedParcel | null>(null);
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [fetchError, setFetchError] = useState(false);
-  
+
   // Agregamos el modo "draw" y el estado para los vértices dibujados
   const [mode, setMode] = useState<"parcel" | "manual" | "draw">("parcel");
   const [drawnPath, setDrawnPath] = useState<{ lat: number; lng: number }[]>([]);
 
+  // Al abrir, precargamos lo que se había seleccionado/dibujado antes para que
+  // se renderice en el mapa (antes el mapa aparecía vacío al editar).
+  useEffect(() => {
+    if (!open) return;
+    setNotFound(false);
+    setFetchError(false);
+
+    if (initialParcel?.geometry) {
+      if (initialParcel.cca || initialParcel.pda) {
+        // Parcela catastral vinculada.
+        setMode("parcel");
+        setSelected(initialParcel);
+        setDrawnPath([]);
+      } else {
+        // Parcela esbozada manualmente: reconstruimos los vértices.
+        const geom = initialParcel.geometry as Polygon;
+        const ring = geom.type === "Polygon" ? geom.coordinates[0] ?? [] : [];
+        // El polígono guardado cierra repitiendo el primer punto; lo quitamos.
+        const path = ring
+          .slice(0, ring.length > 1 ? -1 : ring.length)
+          .map((c) => ({ lat: c[1], lng: c[0] }));
+        setMode("draw");
+        setDrawnPath(path);
+        setSelected(null);
+      }
+    } else if (initialParcel && Number.isFinite(initialParcel.lat) && Number.isFinite(initialParcel.lon)) {
+      // Pin manual.
+      setMode("manual");
+      setSelected(initialParcel);
+      setDrawnPath([]);
+    } else {
+      setMode("parcel");
+      setSelected(null);
+      setDrawnPath([]);
+    }
+  }, [open, initialParcel]);
+
   if (!open) return null;
+
+  const initialCenter = getInitialCenter(initialParcel);
 
   const handleMapClick = async (lat: number, lng: number) => {
     if (mode === "manual") {
@@ -187,6 +255,7 @@ export default function ParcelPickerModal({
             selectedGeometry={selected?.geometry ?? null}
             manualPin={mode === "manual" && selected ? { lat: selected.lat, lng: selected.lon } : null}
             drawnPath={mode === "draw" ? drawnPath : undefined}
+            initialCenter={initialCenter}
           />
 
           {loading && (

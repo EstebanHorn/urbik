@@ -353,6 +353,8 @@ export interface ParcelPickerMapProps {
   selectedGeometry: Geometry | null;
   manualPin?: { lat: number; lng: number } | null;
   drawnPath?: { lat: number; lng: number }[];
+  // Centro inicial cuando ya hay una parcela seleccionada/dibujada (al editar).
+  initialCenter?: { lat: number; lng: number } | null;
 }
 
 export default function ParcelPickerMap({
@@ -362,10 +364,11 @@ export default function ParcelPickerMap({
   selectedGeometry,
   manualPin,
   drawnPath,
+  initialCenter,
 }: ParcelPickerMapProps) {
-  const center = getProvinceCenter(province);
   const rioNegro = isRioNegro(province);
-  const initialZoom = rioNegro ? 13 : 15;
+  const center = initialCenter ?? getProvinceCenter(province);
+  const initialZoom = initialCenter ? 17 : rioNegro ? 13 : 15;
 
   const handleMapClick = useCallback(
     (e: MapMouseEvent) => {
@@ -387,7 +390,7 @@ export default function ParcelPickerMap({
       draggingCursor="move"
       style={{ width: "100%", height: "100%" }}
     >
-      <MapAutoCenter city={city} province={province} />
+      {!initialCenter && <MapAutoCenter city={city} province={province} />}
 
       {rioNegro ? (
         <RioNegroLayer onMapClick={onMapClick} />

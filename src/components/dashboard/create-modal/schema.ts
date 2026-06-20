@@ -98,6 +98,48 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
   },
 ];
 
+// Validación bloqueante por paso: devuelve un mensaje si falta algún campo
+// obligatorio (los marcados con asterisco en el formulario), o null si el paso
+// está completo. Se usa para impedir avanzar de pantalla con datos faltantes.
+export function getStepError(
+  moduleId: number,
+  form: PropertyUploadFormData,
+): string | null {
+  switch (moduleId) {
+    case 1: {
+      if (!hasValue(form.type)) return "Seleccioná el tipo de propiedad.";
+      const priceOk =
+        Boolean(form.isPriceHidden) ||
+        hasValue(form.salePrice) ||
+        hasValue(form.rentPrice);
+      if (!priceOk)
+        return "Ingresá un precio o marcá la opción “Sin precio”.";
+      return null;
+    }
+    case 2: {
+      if (!hasValue(form.province)) return "Seleccioná la provincia.";
+      if (!hasValue(form.city)) return "Seleccioná el partido / departamento.";
+      if (!hasValue(form.street)) return "Ingresá la calle / dirección.";
+      if (!hasValue(form.number)) return "Ingresá la altura.";
+      return null;
+    }
+    case 3: {
+      if (!hasValue(form.title)) return "Ingresá un título para la propiedad.";
+      return null;
+    }
+    case 4: {
+      if (form.type === "FIELD") {
+        if (!hasValue(form.hectares)) return "Ingresá las hectáreas totales.";
+      } else if (!hasValue(form.areaM2)) {
+        return "Ingresá los m² cubiertos.";
+      }
+      return null;
+    }
+    default:
+      return null;
+  }
+}
+
 export function getVisibleModules(propertyType: string | undefined): ModuleDefinition[] {
   if (!propertyType) return MODULE_DEFINITIONS.filter((m) => m.visibleFor.length === 0);
   return MODULE_DEFINITIONS.filter((m) => m.visibleFor.length === 0 || m.visibleFor.includes(propertyType));

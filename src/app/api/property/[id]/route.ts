@@ -176,6 +176,9 @@ export async function PUT(
       }
     });
 
+    // Marca de última modificación, para poder ordenar por "últimas modificaciones".
+    updateData.updated_at = new Date().toISOString();
+
     const { data: updated, error } = await admin
       .from("properties")
       .update(updateData)
