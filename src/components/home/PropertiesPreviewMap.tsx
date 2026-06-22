@@ -36,7 +36,7 @@ function createPinIcon(isActive: boolean) {
     : "0 2px 8px rgba(15, 23, 42, 0.35)";
 
   return L.divIcon({
-    className: "urbik-mini-pin",
+    className: "geora-mini-pin",
     html: `
       <div style="
         position: relative;

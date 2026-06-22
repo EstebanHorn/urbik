@@ -127,8 +127,8 @@ function ConfirmationModal({
     <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden transform transition-all">
         <div className="p-6">
-          <div className="flex items-center justify-center w-12 h-12 mx-auto bg-urbik-rose/10 rounded-full">
-            <span className="text-urbik-rose text-xl font-bold">!</span>
+          <div className="flex items-center justify-center w-12 h-12 mx-auto bg-geora-rose/10 rounded-full">
+            <span className="text-geora-rose text-xl font-bold">!</span>
           </div>
           <div className="mt-4 text-center">
             <h3 className="text-lg font-bold text-gray-900">{title}</h3>
@@ -139,14 +139,14 @@ function ConfirmationModal({
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 cursor-pointer px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-urbik-black/70 hover:border-urbik-white rounded-full hover:bg-urbik-black/70 hover:text-urbik-white disabled:opacity-50 transition-all"
+            className="flex-1 cursor-pointer px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-geora-black/70 hover:border-geora-white rounded-full hover:bg-geora-black/70 hover:text-geora-white disabled:opacity-50 transition-all"
           >
             Cancelar
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="flex-1 cursor-pointer px-4 py-2 text-sm font-medium border border-urbik-white text-white bg-urbik-rose rounded-full hover:bg-urbik-white hover:text-urbik-rose hover:border-urbik-rose disabled:opacity-50 flex justify-center items-center transition-all"
+            className="flex-1 cursor-pointer px-4 py-2 text-sm font-medium border border-geora-white text-white bg-geora-rose rounded-full hover:bg-geora-white hover:text-geora-rose hover:border-geora-rose disabled:opacity-50 flex justify-center items-center transition-all"
           >
             {isLoading ? "Eliminando..." : "Eliminar"}
           </button>
@@ -254,12 +254,12 @@ function EditAgencyProfileModal({
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="max-w-lg w-full mt-20 overflow-hidden transform transition-all flex flex-col rounded-3xl bg-white/70 border border-white backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center bg-white/70 p-6">
-          <h3 className="text-xl font-black text-urbik-black/90">
+          <h3 className="text-xl font-black text-geora-black/90">
             Editar Perfil Inmobiliaria
           </h3>
           <button
             onClick={onClose}
-            className="p-2 transition hover:text-urbik-black/70 cursor-pointer"
+            className="p-2 transition hover:text-geora-black/70 cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -267,7 +267,7 @@ function EditAgencyProfileModal({
 
         <div className="p-6 space-y-5 overflow-y-auto max-h-[65vh] custom-scrollbar">
           <div>
-            <label className="block text-xs font-bold text-urbik-black/90 uppercase -mb-3">
+            <label className="block text-xs font-bold text-geora-black/90 uppercase -mb-3">
               Logo de la Inmobiliaria
             </label>
             <ImageUpload
@@ -278,7 +278,7 @@ function EditAgencyProfileModal({
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">
+            <label className="block text-xs font-bold text-geora-black/90 uppercase mb-1 ml-5">
               Nombre de la Inmobiliaria
             </label>
             <input
@@ -290,7 +290,7 @@ function EditAgencyProfileModal({
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">
+            <label className="block text-xs font-bold text-geora-black/90 uppercase mb-1 ml-5">
               Descripción / Biografía
             </label>
             <textarea
@@ -303,7 +303,7 @@ function EditAgencyProfileModal({
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">
+            <label className="block text-xs font-bold text-geora-black/90 uppercase mb-1 ml-5">
               Teléfono
             </label>
             <input
@@ -315,7 +315,7 @@ function EditAgencyProfileModal({
             />
           </div>
           <div className="space-y-1">
-            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">
+            <label className="block text-xs font-bold text-geora-black/90 uppercase mb-1 ml-5">
               Ubicación
             </label>
             <LocationSelectors
@@ -326,7 +326,7 @@ function EditAgencyProfileModal({
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">
+            <label className="block text-xs font-bold text-geora-black/90 uppercase mb-1 ml-5">
               Calle
             </label>
             <input
@@ -338,7 +338,7 @@ function EditAgencyProfileModal({
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-1 ml-5">
+            <label className="block text-xs font-bold text-geora-black/90 uppercase mb-1 ml-5">
               Número / Piso / Depto
             </label>
             <input
@@ -361,14 +361,14 @@ function EditAgencyProfileModal({
             <button
               onClick={onClose}
               disabled={isSaving}
-              className="px-6 py-2.5 cursor-pointer text-sm font-bold text-urbik-black/70 transition hover:text-urbik-black/50"
+              className="px-6 py-2.5 cursor-pointer text-sm font-bold text-geora-black/70 transition hover:text-geora-black/50"
             >
               Cancelar
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold text-urbik-black/70 hover:text-urbik-black/50 bg-white/30 border border-black/10 transition shadow-md"
+              className="px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold text-geora-black/70 hover:text-geora-black/50 bg-white/30 border border-black/10 transition shadow-md"
             >
               {isSaving ? "Guardando..." : "Guardar Cambios"}
             </button>
@@ -506,7 +506,7 @@ function NotificationsPanel({
         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
           <Inbox size={28} className="text-gray-400" />
         </div>
-        <h3 className="text-base font-bold text-urbik-black/60">
+        <h3 className="text-base font-bold text-geora-black/60">
           No tenés notificaciones por el momento.
         </h3>
       </div>
@@ -515,7 +515,7 @@ function NotificationsPanel({
   return (
     <div className="mt-4">
       {unreadCount > 0 && (
-        <p className="text-xs font-bold text-urbik-muted mb-3 ml-1">
+        <p className="text-xs font-bold text-geora-muted mb-3 ml-1">
           {unreadCount} sin leer
         </p>
       )}
@@ -528,24 +528,24 @@ function NotificationsPanel({
             return (
               <div
                 key={`notif-${n.id}`}
-                className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-urbik-rose/40 border-2 bg-white" : "border-white bg-white"} shadow-sm hover:scale-[1.01]`}
+                className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-geora-rose/40 border-2 bg-white" : "border-white bg-white"} shadow-sm hover:scale-[1.01]`}
                 onClick={() => {
                   setExpandedId(isExpanded ? null : n.id);
                   if (!isExpanded && isUnread) markNotificationAsRead(n.id);
                 }}
               >
                 <div className="p-4 flex items-start gap-4">
-                  <div className="bg-urbik-rose/10 p-2 rounded-full shrink-0">
-                    <Bell size={16} className="text-urbik-rose" />
+                  <div className="bg-geora-rose/10 p-2 rounded-full shrink-0">
+                    <Bell size={16} className="text-geora-rose" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-2">
-                        <span className="font-black text-sm text-urbik-black">
+                        <span className="font-black text-sm text-geora-black">
                           {n.title}
                         </span>
                         {isUnread ? (
-                          <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-urbik-rose text-white">
+                          <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-geora-rose text-white">
                             Sistema
                           </span>
                         ) : (
@@ -572,24 +572,24 @@ function NotificationsPanel({
           return (
             <div
               key={`inq-${inq.id}`}
-              className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-urbik-black/30 border-2 bg-white" : "border-white bg-white"} shadow-sm hover:scale-[1.01]`}
+              className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-geora-black/30 border-2 bg-white" : "border-white bg-white"} shadow-sm hover:scale-[1.01]`}
               onClick={() => {
                 setExpandedId(isExpanded ? null : inq.id);
                 if (!isExpanded && isUnread) markInquiryAsRead(inq.id);
               }}
             >
               <div className="p-4 flex items-start gap-4">
-                <div className="bg-urbik-cyan/15 p-2 rounded-full shrink-0">
-                  <Mail size={16} className="text-urbik-cyan" />
+                <div className="bg-geora-cyan/15 p-2 rounded-full shrink-0">
+                  <Mail size={16} className="text-geora-cyan" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-2">
-                      <span className="font-black text-sm text-urbik-black">
+                      <span className="font-black text-sm text-geora-black">
                         {inq.senderName}
                       </span>
                       {isUnread ? (
-                        <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-urbik-cyan text-urbik-dark">
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-geora-cyan text-geora-dark">
                           Consulta
                         </span>
                       ) : (
@@ -602,9 +602,9 @@ function NotificationsPanel({
                   <div className="flex items-center gap-1 mt-0.5">
                     <Building2
                       size={11}
-                      className="text-urbik-emerald shrink-0"
+                      className="text-geora-emerald shrink-0"
                     />
-                    <span className="text-xs text-urbik-muted font-medium truncate">
+                    <span className="text-xs text-geora-muted font-medium truncate">
                       {inq.property.title}
                     </span>
                   </div>
@@ -624,15 +624,15 @@ function NotificationsPanel({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="flex items-center gap-3 p-3">
                       <div className="bg-white p-1.5 rounded-full border border-gray-200">
-                        <Mail size={14} className="text-urbik-dark" />
+                        <Mail size={14} className="text-geora-dark" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-urbik-muted uppercase">
+                        <p className="text-[10px] font-bold text-geora-muted uppercase">
                           Email
                         </p>
                         <a
                           href={`mailto:${inq.senderEmail}`}
-                          className="text-xs font-bold text-urbik-black hover:text-urbik-emerald transition-colors"
+                          className="text-xs font-bold text-geora-black hover:text-geora-emerald transition-colors"
                         >
                           {inq.senderEmail}
                         </a>
@@ -640,15 +640,15 @@ function NotificationsPanel({
                     </div>
                     <div className="flex items-center gap-3 p-3">
                       <div className="bg-white p-1.5 rounded-full border border-gray-200">
-                        <Phone size={14} className="text-urbik-dark" />
+                        <Phone size={14} className="text-geora-dark" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-urbik-muted uppercase">
+                        <p className="text-[10px] font-bold text-geora-muted uppercase">
                           Teléfono
                         </p>
                         <a
                           href={`tel:${inq.senderPhone}`}
-                          className="text-xs font-bold text-urbik-black hover:text-urbik-emerald transition-colors"
+                          className="text-xs font-bold text-geora-black hover:text-geora-emerald transition-colors"
                         >
                           {inq.senderPhone}
                         </a>
@@ -656,10 +656,10 @@ function NotificationsPanel({
                     </div>
                   </div>
                   <div className="p-4">
-                    <p className="text-[10px] font-bold text-urbik-muted uppercase mb-2">
+                    <p className="text-[10px] font-bold text-geora-muted uppercase mb-2">
                       Mensaje original
                     </p>
-                    <p className="text-sm text-urbik-black leading-relaxed whitespace-pre-wrap">
+                    <p className="text-sm text-geora-black leading-relaxed whitespace-pre-wrap">
                       {inq.message}
                     </p>
                   </div>
@@ -672,7 +672,7 @@ function NotificationsPanel({
                             value={replyMsg}
                             onChange={(e) => setReplyMsg(e.target.value)}
                             placeholder="Escribí tu respuesta para enviarla por mensaje..."
-                            className="w-full text-sm border border-gray-200 bg-white rounded-xl p-3 focus:outline-none focus:border-urbik-black resize-none"
+                            className="w-full text-sm border border-gray-200 bg-white rounded-xl p-3 focus:outline-none focus:border-geora-black resize-none"
                             rows={3}
                           />
                           <div className="flex justify-end gap-2">
@@ -688,7 +688,7 @@ function NotificationsPanel({
                             <button
                               onClick={() => handleSendReply(inq)}
                               disabled={isSendingReply || !replyMsg.trim()}
-                              className="px-4 py-2 bg-urbik-black text-white text-xs font-bold rounded-lg cursor-pointer disabled:opacity-50 hover:bg-urbik-black/90 transition-colors"
+                              className="px-4 py-2 bg-geora-black text-white text-xs font-bold rounded-lg cursor-pointer disabled:opacity-50 hover:bg-geora-black/90 transition-colors"
                             >
                               {isSendingReply
                                 ? "Enviando..."
@@ -699,7 +699,7 @@ function NotificationsPanel({
                       ) : (
                         <button
                           onClick={() => setReplyingTo(inq.id)}
-                          className="flex items-center gap-2 text-sm font-bold text-urbik-black hover:opacity-70 transition-opacity cursor-pointer"
+                          className="flex items-center gap-2 text-sm font-bold text-geora-black hover:opacity-70 transition-opacity cursor-pointer"
                         >
                           <MessageSquare size={16} /> Responder por chat
                         </button>
@@ -762,7 +762,7 @@ function HeaderFractionalStars({
           );
         })}
       </div>
-      <span className="text-xs text-urbik-muted font-medium">
+      <span className="text-xs text-geora-muted font-medium">
         ({total} {total === 1 ? "reseña" : "reseñas"})
       </span>
     </div>
@@ -1046,7 +1046,7 @@ export default function DashboardRealestate({
     <div className="pb-28">
       {activeTab !== "properties" && (
         <div className="flex flex-col md:flex-row md:items-center ml-5 md:justify-between gap-4 mb-6 mt-0 sm:mt-5">
-          <h1 className="text-2xl font-black text-urbik-black">
+          <h1 className="text-2xl font-black text-geora-black">
             {activeTab === "statistics" && "Estadísticas"}
             {activeTab === "notifications" && "Notificaciones"}
             {activeTab === "chat" && "Mensajes"}
@@ -1087,18 +1087,18 @@ export default function DashboardRealestate({
           {loadingFavorites ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 animate-pulse">
               {[1, 2, 3].map((i) => (
-                <div key={i} className={`bg-urbik-g200 h-96 ${glassCard}`} />
+                <div key={i} className={`bg-geora-g200 h-96 ${glassCard}`} />
               ))}
             </div>
           ) : favorites.length === 0 ? (
-            <div className="text-center py-20 border-2 border-dashed border-urbik-g200 rounded-2xl mx-2 md:mx-6">
-              <Bookmark size={32} className="mx-auto text-urbik-g400 mb-4" />
-              <p className="text-urbik-muted font-bold text-lg">
+            <div className="text-center py-20 border-2 border-dashed border-geora-g200 rounded-2xl mx-2 md:mx-6">
+              <Bookmark size={32} className="mx-auto text-geora-g400 mb-4" />
+              <p className="text-geora-muted font-bold text-lg">
                 Aún no tenés propiedades guardadas en tus favoritos.
               </p>
               <Link
                 href="/"
-                className="text-urbik-black font-bold underline mt-4 block"
+                className="text-geora-black font-bold underline mt-4 block"
               >
                 Explorar propiedades
               </Link>
@@ -1127,7 +1127,7 @@ export default function DashboardRealestate({
                     />
                   </div>
 
-                  <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-urbik-g200">
+                  <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-geora-g200">
                     <Image
                       src={prop.images[0] || "/placeholder-property.jpg"}
                       alt={prop.title}
@@ -1140,22 +1140,22 @@ export default function DashboardRealestate({
                   <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
                     <div>
                       <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                        <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                           {getPropertyLabel(prop.type)}
                         </span>
-                        <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                        <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                           {getOperationLabel(prop.operationType)}
                         </span>
                       </div>
 
-                      <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black uppercase">
+                      <h3 className="line-clamp-2 text-base font-black tracking-tight text-geora-black uppercase">
                         {prop.title}
                       </h3>
 
-                      <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-urbik-black/80">
+                      <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-geora-black/80">
                         <MapPin
                           size={12}
-                          className="shrink-0 text-urbik-cyan"
+                          className="shrink-0 text-geora-cyan"
                           strokeWidth={3}
                         />
                         {prop.address ? `${prop.address}, ` : ""}
@@ -1164,7 +1164,7 @@ export default function DashboardRealestate({
                     </div>
 
                     <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-white/60 pt-4">
-                      <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
+                      <span className="text-base font-black tracking-tight text-geora-black/70 z-1">
                         {prop.currency === "USD" ? "USD" : "$"}{" "}
                         {prop.price?.toLocaleString("es-AR") ?? "Consultar"}
                       </span>
@@ -1184,13 +1184,13 @@ export default function DashboardRealestate({
                 onClick={() => setProfileEditOpen(true)}
               >
                 <div
-                  className="w-28 h-28 shrink-0 rounded-full flex items-center justify-center bg-cover bg-center overflow-hidden bg-urbik-g200 relative group/logo"
+                  className="w-28 h-28 shrink-0 rounded-full flex items-center justify-center bg-cover bg-center overflow-hidden bg-geora-g200 relative group/logo"
                   style={{
                     backgroundImage: logoUrl ? `url(${logoUrl})` : "none",
                   }}
                 >
                   {!logoUrl && (
-                    <Building2 size={40} className="text-urbik-g400" />
+                    <Building2 size={40} className="text-geora-g400" />
                   )}
 
                   <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover/logo:opacity-100 transition-opacity duration-300">
@@ -1202,11 +1202,11 @@ export default function DashboardRealestate({
                 </div>
 
                 <div className="min-w-0 w-full flex flex-col items-start justify-center relative">
-                  <h1 className="text-3xl md:text-4xl font-black text-urbik-black/90 uppercase tracking-tighter mb-1 flex items-center gap-3">
+                  <h1 className="text-3xl md:text-4xl font-black text-geora-black/90 uppercase tracking-tighter mb-1 flex items-center gap-3">
                     {agencyName}
                   </h1>
 
-                  <p className="flex items-center gap-2 text-urbik-black/60 font-medium mb-3">
+                  <p className="flex items-center gap-2 text-geora-black/60 font-medium mb-3">
                     <MapPin size={16} />
                     {profile?.agencyData?.city ||
                       profile?.city ||
@@ -1224,7 +1224,7 @@ export default function DashboardRealestate({
                   </p>
 
                   {(profile?.agencyData?.bio || profile?.bio) && (
-                    <p className="text-sm font-medium text-urbik-black/70 mb-3 max-w-2xl leading-relaxed">
+                    <p className="text-sm font-medium text-geora-black/70 mb-3 max-w-2xl leading-relaxed">
                       {profile?.agencyData?.bio || profile?.bio}
                     </p>
                   )}
@@ -1237,7 +1237,7 @@ export default function DashboardRealestate({
                       />
                     ) : (
                       <div className="mb-3 mt-1">
-                        <span className="text-sm font-medium text-urbik-muted bg-urbik-g100 px-2.5 py-1 rounded-md">
+                        <span className="text-sm font-medium text-geora-muted bg-geora-g100 px-2.5 py-1 rounded-md">
                           Sin reseñas todavía
                         </span>
                       </div>
@@ -1250,7 +1250,7 @@ export default function DashboardRealestate({
                 <div className="flex items-center w-full justify-between gap-2">
                   <button
                     onClick={() => setProfileEditOpen(true)}
-                    className="text-center flex-1 px-3 py-2 text-md font-bold text-urbik-black/80 cursor-pointer hover:text-urbik-black/50 transform transition duration-200"
+                    className="text-center flex-1 px-3 py-2 text-md font-bold text-geora-black/80 cursor-pointer hover:text-geora-black/50 transform transition duration-200"
                   >
                     Editar Perfil
                   </button>
@@ -1258,10 +1258,10 @@ export default function DashboardRealestate({
                   <button
                     onClick={handleShareProfile}
                     title="Compartir perfil"
-                    className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md cursor-pointer border shadow-sm border-black/10 text-urbik-black/80 hover:scale-105 hover:bg-white transition duration-200"
+                    className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md cursor-pointer border shadow-sm border-black/10 text-geora-black/80 hover:scale-105 hover:bg-white transition duration-200"
                   >
                     {isCopied ? (
-                      <CheckCheck size={18} className="text-urbik-emerald" />
+                      <CheckCheck size={18} className="text-geora-emerald" />
                     ) : (
                       <Share2 size={18} />
                     )}
@@ -1270,7 +1270,7 @@ export default function DashboardRealestate({
 
                 <button
                   onClick={() => setCreateOpen(true)}
-                  className="text-center w-full rounded-full bg-white cursor-pointer border shadow-md border-black/10 px-5 py-2 text-sm font-bold text-urbik-black/80 hover:scale-105 hover:text-urbik-black/50 transform transition duration-200"
+                  className="text-center w-full rounded-full bg-white cursor-pointer border shadow-md border-black/10 px-5 py-2 text-sm font-bold text-geora-black/80 hover:scale-105 hover:text-geora-black/50 transform transition duration-200"
                 >
                   Cargar Propiedad
                 </button>
@@ -1279,14 +1279,14 @@ export default function DashboardRealestate({
           </div>
 
           <div className="mb-5 flex items-baseline justify-between px-2 md:px-10">
-            <h2 className="text-2xl font-black text-urbik-black/90 uppercase tracking-tight">
+            <h2 className="text-2xl font-black text-geora-black/90 uppercase tracking-tight">
               Cartera de Propiedades
             </h2>
-            <span className="text-sm font-bold text-urbik-muted hidden sm:block">
+            <span className="text-sm font-bold text-geora-muted hidden sm:block">
               {filteredProperties.length}{" "}
               {filteredProperties.length === 1 ? "propiedad" : "propiedades"}
             </span>
-            <span className="text-sm font-bold text-urbik-muted hidden sm:block">
+            <span className="text-sm font-bold text-geora-muted hidden sm:block">
               {properties.length}{" "}
               {properties.length === 1 ? "propiedad" : "propiedades"}
             </span>
@@ -1338,10 +1338,10 @@ export default function DashboardRealestate({
                 }
                 className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 min-w-10 md:min-w-[120px] font-bold ${
                   minPrice || maxPrice || filterCurrency
-                    ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                    ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                     : activeFilter === "price"
-                      ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
-                      : "bg-white/70 border border-white text-urbik-black/70 hover:bg-gray-50 shadow-sm"
+                      ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
+                      : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
                 }`}
               >
                 <span className="text-sm md:text-md tracking-wider flex items-center justify-center">
@@ -1357,7 +1357,7 @@ export default function DashboardRealestate({
               </button>
 
               {activeFilter === "price" && (
-                <div className="absolute top-full left-0 md:right-0 md:left-auto mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-urbik-black/70 shadow-xl p-5">
+                <div className="absolute top-full left-0 md:right-0 md:left-auto mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
                   <PriceFilterCard
                     minPrice={minPrice}
                     maxPrice={maxPrice}
@@ -1382,10 +1382,10 @@ export default function DashboardRealestate({
                   filterRooms.length > 0 ||
                   filterBedrooms.length > 0 ||
                   filterBathrooms.length > 0
-                    ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                    ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                     : activeFilter === "rooms"
-                      ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
-                      : "bg-white/70 border border-white text-urbik-black/70 hover:bg-gray-50 shadow-sm"
+                      ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
+                      : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
                 }`}
               >
                 <span className="text-sm md:text-md tracking-wider flex items-center justify-center">
@@ -1403,7 +1403,7 @@ export default function DashboardRealestate({
               </button>
 
               {activeFilter === "rooms" && (
-                <div className="absolute top-full right-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-urbik-black/70 shadow-xl p-5">
+                <div className="absolute top-full right-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
                   <RoomsFilterCard
                     rooms={filterRooms}
                     bedrooms={filterBedrooms}
@@ -1438,7 +1438,7 @@ export default function DashboardRealestate({
                     ? "Orden ascendente"
                     : "Orden descendente"
                 }
-                className="h-10 shrink-0 cursor-pointer px-3 py-2 rounded-full bg-white/70 border border-white text-urbik-black/70 shadow-sm hover:bg-gray-50 transition-colors duration-200 flex items-center gap-1.5 font-bold"
+                className="h-10 shrink-0 cursor-pointer px-3 py-2 rounded-full bg-white/70 border border-white text-geora-black/70 shadow-sm hover:bg-gray-50 transition-colors duration-200 flex items-center gap-1.5 font-bold"
               >
                 {sortDir === "asc" ? (
                   <ArrowUpWideNarrow size={16} strokeWidth={2.5} />
@@ -1452,8 +1452,8 @@ export default function DashboardRealestate({
             </div>
           </div>
           {filteredProperties.length === 0 ? (
-            <div className="text-center py-20 border-2 border-dashed border-urbik-g200 rounded-2xl mx-2 md:mx-6">
-              <p className="text-urbik-muted font-bold text-lg">
+            <div className="text-center py-20 border-2 border-dashed border-geora-g200 rounded-2xl mx-2 md:mx-6">
+              <p className="text-geora-muted font-bold text-lg">
                 Aún no hay propiedades publicadas en tu cartera.
               </p>
             </div>
@@ -1476,7 +1476,7 @@ export default function DashboardRealestate({
                           e.stopPropagation();
                           setEditingProperty(prop);
                         }}
-                        className="w-9 h-9 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md border border-white text-urbik-black shadow-sm transition-all hover:scale-110 hover:bg-white"
+                        className="w-9 h-9 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md border border-white text-geora-black shadow-sm transition-all hover:scale-110 hover:bg-white"
                         title="Editar"
                       >
                         <Edit2 size={14} />
@@ -1487,14 +1487,14 @@ export default function DashboardRealestate({
                           setDeletingId(prop.id);
                           setIsModalOpen(true);
                         }}
-                        className="w-9 h-9 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md border border-white text-urbik-rose shadow-sm transition-all hover:scale-110 hover:bg-white"
+                        className="w-9 h-9 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md border border-white text-geora-rose shadow-sm transition-all hover:scale-110 hover:bg-white"
                         title="Eliminar"
                       >
                         <X size={16} />
                       </button>
                     </div>
 
-                    <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-urbik-g200">
+                    <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-geora-g200">
                       {prop.images && prop.images.length > 0 ? (
                         <img
                           src={prop.images[0]}
@@ -1503,7 +1503,7 @@ export default function DashboardRealestate({
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center bg-white text-xs font-bold text-black/70">
-                          <Building2 size={36} className="text-urbik-g400" />
+                          <Building2 size={36} className="text-geora-g400" />
                         </div>
                       )}
 
@@ -1518,12 +1518,12 @@ export default function DashboardRealestate({
                     <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
                       <div>
                         <div className="mb-3 flex flex-wrap items-center gap-2">
-                          <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                          <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                             {prop.type
                               ? (PROPERTY_LABELS[prop.type] ?? prop.type)
                               : "Inmueble"}
                           </span>
-                          <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                          <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                             {prop.operationType
                               ? (OPERATION_LABELS[prop.operationType] ??
                                 prop.operationType)
@@ -1531,24 +1531,24 @@ export default function DashboardRealestate({
                           </span>
                         </div>
 
-                        <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
+                        <h3 className="line-clamp-2 text-base font-black tracking-tight text-geora-black">
                           {prop.title}
                         </h3>
 
-                        <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-urbik-black/80">
+                        <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-geora-black/80">
                           <MapPin
                             size={12}
-                            className="shrink-0 text-urbik-cyan"
+                            className="shrink-0 text-geora-cyan"
                           />
                           {prop.address || "Sin dirección"}, {prop.city || "—"}
                         </p>
                       </div>
 
                       <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/60 pt-4">
-                        <span className="text-xs font-bold text-urbik-black/50 z-1">
+                        <span className="text-xs font-bold text-geora-black/50 z-1">
                           {prop.rooms || 0} amb · {prop.area || 0} m²
                         </span>
-                        <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
+                        <span className="text-base font-black tracking-tight text-geora-black/70 z-1">
                           {formatPrice(
                             prop.price ||
                               prop.sale_price ||
@@ -1566,7 +1566,7 @@ export default function DashboardRealestate({
           )}
 
           {profile?.id && (
-            <div className="mt-20 border-t border-urbik-black/10 pt-10 px-2 md:px-10">
+            <div className="mt-20 border-t border-geora-black/10 pt-10 px-2 md:px-10">
               <RealEstateReviews
                 realEstateId={profile.id}
                 currentUserId={profile.id}
@@ -1575,14 +1575,14 @@ export default function DashboardRealestate({
             </div>
           )}
 
-          <div className="mt-20 border-t border-urbik-black/10 pt-10 px-2 md:px-10 mb-10 w-full flex flex-col items-center justify-center">
+          <div className="mt-20 border-t border-geora-black/10 pt-10 px-2 md:px-10 mb-10 w-full flex flex-col items-center justify-center">
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/40 border border-black/10 backdrop-blur-md shadow-sm text-sm font-bold text-urbik-black/80 hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/40 border border-black/10 backdrop-blur-md shadow-sm text-sm font-bold text-geora-black/80 hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer"
             >
               <Settings
                 size={16}
-                className={`transition-transform duration-500 ${showSettings ? "rotate-90 text-urbik-rose" : ""}`}
+                className={`transition-transform duration-500 ${showSettings ? "rotate-90 text-geora-rose" : ""}`}
               />
               {showSettings
                 ? "Ocultar Ajustes de Cuenta"
@@ -1625,13 +1625,13 @@ export default function DashboardRealestate({
       <div className="fixed bottom-16 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 p-0.5 rounded-full backdrop-blur-xl bg-white/50 border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] w-[95vw] sm:w-max">
         <div className="relative grid grid-cols-5 w-full h-full items-center">
           <div
-            className="absolute top-0 bottom-0 left-0 w-1/5 bg-urbik-white1/70 backdrop-blur-3xl rounded-full shadow-md transition-transform duration-300 ease-out"
+            className="absolute top-0 bottom-0 left-0 w-1/5 bg-geora-white1/70 backdrop-blur-3xl rounded-full shadow-md transition-transform duration-300 ease-out"
             style={{ transform: `translateX(${getTransformIndex() * 100}%)` }}
           />
 
           <button
             onClick={() => setActiveTab("properties")}
-            className={`relative z-10 flex items-center justify-center py-3 sm:py-3 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "properties" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-3 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "properties" ? "text-geora-black/80" : "text-geora-black/50 hover:text-geora-black"}`}
           >
             <Home size={22} className="sm:hidden" />
             <span className="hidden sm:inline font-bold text-sm">
@@ -1641,7 +1641,7 @@ export default function DashboardRealestate({
 
           <button
             onClick={() => setActiveTab("statistics")}
-            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "statistics" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "statistics" ? "text-geora-black/80" : "text-geora-black/50 hover:text-geora-black"}`}
           >
             <BarChart3 size={22} className="sm:hidden" />
             <span className="hidden sm:inline font-bold text-sm">
@@ -1651,7 +1651,7 @@ export default function DashboardRealestate({
 
           <button
             onClick={() => setActiveTab("notifications")}
-            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "notifications" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "notifications" ? "text-geora-black/80" : "text-geora-black/50 hover:text-geora-black"}`}
           >
             <div className="relative flex items-center justify-center">
               <Bell size={22} className="sm:hidden" />
@@ -1666,7 +1666,7 @@ export default function DashboardRealestate({
 
           <button
             onClick={() => setActiveTab("chat")}
-            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "chat" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "chat" ? "text-geora-black/80" : "text-geora-black/50 hover:text-geora-black"}`}
           >
             <div className="relative flex items-center justify-center">
               <MessageSquare size={22} className="sm:hidden" />
@@ -1674,14 +1674,14 @@ export default function DashboardRealestate({
                 Mensajes
               </span>
               {unreadChatCount > 0 && (
-                <span className="absolute -top-1.5 -right-2.5 sm:-top-1 sm:-right-3 w-3 h-3 bg-urbik-cyan rounded-full border-[2px] border-white shadow-sm" />
+                <span className="absolute -top-1.5 -right-2.5 sm:-top-1 sm:-right-3 w-3 h-3 bg-geora-cyan rounded-full border-[2px] border-white shadow-sm" />
               )}
             </div>
           </button>
 
           <button
             onClick={() => setActiveTab("saved")}
-            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "saved" ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "saved" ? "text-geora-black/80" : "text-geora-black/50 hover:text-geora-black"}`}
           >
             <Bookmark size={22} className="sm:hidden" />
             <span className="hidden sm:inline font-bold text-sm">

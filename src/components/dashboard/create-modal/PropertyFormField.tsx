@@ -380,7 +380,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
     <div className="space-y-8">
       <div className="flex flex-col">
         <div className="flex items-center gap-2 mb-2 ml-5">
-          <label className="block text-md font-bold text-urbik-black/50">
+          <label className="block text-md font-bold text-geora-black/50">
             Título del Aviso
           </label>
           <button
@@ -398,7 +398,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
           value={form.title || ""}
           onChange={handleChange}
           placeholder="Ej: Departamento 3 amb con pileta en La Plata"
-          className="bg-urbik-white text-urbik-black/60 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+          className="bg-geora-white text-geora-black/60 border border-black/50 w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all"
         />
         {showTitleTip && (
           <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3">
@@ -416,7 +416,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
       <div className="flex flex-wrap gap-5 items-end justify-between">
         <div className="flex flex-col w-full md:w-[45%]">
-          <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
+          <label className="block text-md font-bold text-geora-black/50 mb-3 ml-5">
             Tipo de Propiedad
           </label>
           <CustomDropdown
@@ -437,12 +437,12 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         </div>
 
         <div className="flex flex-col">
-          <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
+          <label className="block text-md font-bold text-geora-black/50 mb-3 ml-5">
             Operación
           </label>
-          <div className="relative flex bg-urbik-white rounded-full w-fit overflow-hidden border border-black/50 focus:border-urbik-black outline-none transition-all">
+          <div className="relative flex bg-geora-white rounded-full w-fit overflow-hidden border border-black/50 focus:border-geora-black outline-none transition-all">
             <motion.div
-              className="absolute top-0 bottom-0 bg-urbik-dark rounded-full border border-black/50"
+              className="absolute top-0 bottom-0 bg-geora-dark rounded-full border border-black/50"
               initial={false}
               animate={{ width: opPill.width, x: opPill.x }}
             />
@@ -459,7 +459,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                 className={`relative cursor-pointer z-10 px-7 py-2.5 text-xs font-bold transition-colors rounded-full ${
                   form.operationType === opt.id
                     ? "text-white"
-                    : "text-urbik-black/50 hover:bg-urbik-g400/50"
+                    : "text-geora-black/50 hover:bg-geora-g400/50"
                 }`}
               >
                 {opt.label}
@@ -471,7 +471,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
       {showUnitTypeSelector && (
         <div className="flex flex-col w-full md:w-[45%]">
-          <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
+          <label className="block text-md font-bold text-geora-black/50 mb-3 ml-5">
             Tipo de Unidad
           </label>
           <CustomDropdown
@@ -488,7 +488,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
       <div className="flex flex-wrap gap-5 items-end">
         {unitTypeOptions.length > 0 && (
           <div className="flex flex-col w-full md:w-[45%]">
-            <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
+            <label className="block text-md font-bold text-geora-black/50 mb-3 ml-5">
               Subtipo de Unidad
             </label>
             <CustomDropdown
@@ -505,7 +505,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         )}
 
         <div className="flex flex-col w-full md:w-[45%]">
-          <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
+          <label className="block text-md font-bold text-geora-black/50 mb-3 ml-5">
             Estado
           </label>
           <CustomDropdown
@@ -521,7 +521,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
       {subtypeOptions.length > 0 && (
         <div className="flex flex-col w-full md:w-[45%]">
-          <label className="block text-md font-bold text-urbik-black/50 mb-3 ml-5">
+          <label className="block text-md font-bold text-geora-black/50 mb-3 ml-5">
             Subtipo
           </label>
           <CustomDropdown
@@ -551,7 +551,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         />
         <label
           htmlFor="sinPrecio"
-          className="text-sm font-semibold text-urbik-black/70"
+          className="text-sm font-semibold text-geora-black/70"
         >
           Publicar como &ldquo;Sin precio&rdquo;
         </label>
@@ -561,7 +561,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
         <div className="flex flex-col gap-5">
           {showRentPrice && (
             <div className="flex flex-col w-full">
-              <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
+              <label className="block text-md ml-5 font-bold text-geora-black/50 mb-2">
                 Precio Alquiler
               </label>
               <div className="flex items-center gap-3">
@@ -571,7 +571,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                   value={form.rentPrice || ""}
                   onChange={handleChange}
                   placeholder="0"
-                  className="bg-urbik-white text-urbik-black/50 border border-black/50 flex-1 px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+                  className="bg-geora-white text-geora-black/50 border border-black/50 flex-1 px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all"
                 />
                 <CurrencySelector
                   value={form.rentCurrency || "ARS"}
@@ -585,7 +585,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
           {showSalePrice && (
             <div className="flex flex-col w-full">
-              <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
+              <label className="block text-md ml-5 font-bold text-geora-black/50 mb-2">
                 Precio Venta
               </label>
               <div className="flex items-center gap-3">
@@ -595,7 +595,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                   value={form.salePrice || ""}
                   onChange={handleChange}
                   placeholder="0"
-                  className="bg-urbik-white text-urbik-black/50 border border-black/50 flex-1 px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+                  className="bg-geora-white text-geora-black/50 border border-black/50 flex-1 px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all"
                 />
                 <CurrencySelector
                   value={form.saleCurrency || "USD"}
@@ -609,7 +609,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
           {showExpenses && (
             <div className="flex flex-col w-full md:w-[45%]">
-              <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
+              <label className="block text-md ml-5 font-bold text-geora-black/50 mb-2">
                 Expensas (opcional)
               </label>
               <input
@@ -618,7 +618,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                 value={form.expenses || ""}
                 onChange={handleChange}
                 placeholder="0"
-                className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+                className="bg-geora-white text-geora-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all"
               />
             </div>
           )}
@@ -628,7 +628,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {filteredDynamicFields.map((field) => (
           <div key={field.key}>
-            <label className="block text-md ml-5 font-bold text-urbik-black/50">
+            <label className="block text-md ml-5 font-bold text-geora-black/50">
               {field.label} {field.required ? "*" : ""}
             </label>
             <input
@@ -636,7 +636,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
               name={field.key}
               value={form[field.key] || ""}
               onChange={handleChange}
-              className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-2 rounded-full focus:border-urbik-black outline-none transition-all"
+              className="bg-geora-white text-geora-black/50 border border-black/50 w-full px-5 py-2 rounded-full focus:border-geora-black outline-none transition-all"
             />
           </div>
         ))}
@@ -649,7 +649,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             onClick={() => setShowCharacteristics((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
           >
-            <span className="text-xs font-black uppercase tracking-wider text-urbik-black/70">
+            <span className="text-xs font-black uppercase tracking-wider text-geora-black/70">
               Características
             </span>
             <span className="text-gray-400 font-bold text-sm">
@@ -661,7 +661,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             <div className="p-5 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
+                  <label className="block text-sm font-bold text-geora-black/50 mb-2 ml-1">
                     Estado del inmueble
                   </label>
                   <CustomDropdown
@@ -677,7 +677,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
+                  <label className="block text-sm font-bold text-geora-black/50 mb-2 ml-1">
                     Orientación
                   </label>
                   <CustomDropdown
@@ -694,7 +694,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
                 {showDisposition && (
                   <div>
-                    <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
+                    <label className="block text-sm font-bold text-geora-black/50 mb-2 ml-1">
                       Disposición
                     </label>
                     <CustomDropdown
@@ -714,7 +714,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-2 ml-1">
-                    <label className="block text-sm font-bold text-urbik-black/50">
+                    <label className="block text-sm font-bold text-geora-black/50">
                       Año de construcción
                     </label>
                     <span
@@ -732,12 +732,12 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                     min={1900}
                     max={CURRENT_YEAR}
                     placeholder={`1900–${CURRENT_YEAR}`}
-                    className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all"
+                    className="bg-geora-white text-geora-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-geora-black outline-none transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
+                  <label className="block text-sm font-bold text-geora-black/50 mb-2 ml-1">
                     Año de última renovación
                   </label>
                   <input
@@ -748,7 +748,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                     min={1900}
                     max={CURRENT_YEAR}
                     placeholder={`1900–${CURRENT_YEAR}`}
-                    className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all"
+                    className="bg-geora-white text-geora-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-geora-black outline-none transition-all"
                   />
                 </div>
               </div>
@@ -759,12 +759,12 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
       {showBuildingInfo && (
         <div className="rounded-2xl border border-gray-200 p-5 space-y-5">
-          <p className="text-xs font-black uppercase tracking-wider text-urbik-black/60">
+          <p className="text-xs font-black uppercase tracking-wider text-geora-black/60">
             Más sobre el edificio
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
+              <label className="block text-sm font-bold text-geora-black/50 mb-2 ml-1">
                 Estado del edificio
               </label>
               <CustomDropdown
@@ -780,7 +780,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
+              <label className="block text-sm font-bold text-geora-black/50 mb-2 ml-1">
                 Cantidad de pisos
               </label>
               <input
@@ -789,12 +789,12 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                 value={form.buildingFloors || ""}
                 onChange={handleChange}
                 min={1}
-                className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all"
+                className="bg-geora-white text-geora-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-geora-black outline-none transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
+              <label className="block text-sm font-bold text-geora-black/50 mb-2 ml-1">
                 Departamentos por piso
               </label>
               <input
@@ -803,7 +803,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
                 value={form.unitsPerFloor || ""}
                 onChange={handleChange}
                 min={1}
-                className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all"
+                className="bg-geora-white text-geora-black/50 border border-black/50 w-full px-5 py-2.5 rounded-full focus:border-geora-black outline-none transition-all"
               />
             </div>
           </div>
@@ -812,7 +812,7 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
+          <label className="block text-md ml-5 font-bold text-geora-black/50 mb-2">
             Video de YouTube
           </label>
           <input
@@ -821,11 +821,11 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             value={form.youtubeUrl || ""}
             onChange={handleChange}
             placeholder="https://www.youtube.com/watch?v=..."
-            className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+            className="bg-geora-white text-geora-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all"
           />
         </div>
         <div>
-          <label className="block text-md ml-5 font-bold text-urbik-black/50 mb-2">
+          <label className="block text-md ml-5 font-bold text-geora-black/50 mb-2">
             Tour 360
           </label>
           <input
@@ -834,19 +834,19 @@ export function PropertyFormFields({ form, setForm }: FormFieldsProps) {
             value={form.tour360Url || ""}
             onChange={handleChange}
             placeholder="https://..."
-            className="bg-urbik-white text-urbik-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all"
+            className="bg-geora-white text-geora-black/50 border border-black/50 w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all"
           />
         </div>
       </div>
 
       <div className="flex flex-col items-center justify-center w-full py-4 space-y-1">
         {showSalePrice && (form.salePrice || 0) > 0 && (
-          <span className="text-xl font-black text-urbik-black/70 italic">
+          <span className="text-xl font-black text-geora-black/70 italic">
             VENTA: {form.saleCurrency} {Number(form.salePrice).toLocaleString()}
           </span>
         )}
         {showRentPrice && (form.rentPrice || 0) > 0 && (
-          <span className="text-xl font-black text-urbik-black/70 italic">
+          <span className="text-xl font-black text-geora-black/70 italic">
             ALQ: {form.rentCurrency} {Number(form.rentPrice).toLocaleString()}
           </span>
         )}

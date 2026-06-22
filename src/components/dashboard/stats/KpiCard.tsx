@@ -15,13 +15,13 @@ export default function KpiCard({ label, value, hint, icon }: Props) {
     <div className={`flex flex-col gap-2 p-6 ${glassCardStyles}`}>
       
       <div className="relative z-10 flex items-center justify-between h-10">
-        <span className="text-xs font-bold uppercase tracking-wide text-urbik-black/50">
+        <span className="text-xs font-bold uppercase tracking-wide text-geora-black/50">
           {label}
         </span>
-        {icon && <div className="text-urbik-black/50">{icon}</div>}
+        {icon && <div className="text-geora-black/50">{icon}</div>}
       </div>
 
-      <div className="relative z-10 text-4xl font-black text-urbik-black/70 leading-none">
+      <div className="relative z-10 text-4xl font-black text-geora-black/70 leading-none">
         {value}
       </div>
 

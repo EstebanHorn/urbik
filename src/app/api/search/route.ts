@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
       dbQuery,
       fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ar&addressdetails=1&limit=6`,
-        { headers: { "User-Agent": "Urbik-App-v2" } },
+        { headers: { "User-Agent": "Geora-App-v2" } },
       ),
     ]);
 

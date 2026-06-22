@@ -48,10 +48,10 @@ export default function Top3({ items, setHoveredPropertyId }: Top3Props) {
               <div>
                 <div className="mb-3 flex items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                       {getTypeLabel(property.type)}
                     </span>
-                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                       {getOperationLabel(property.operationType)}
                     </span>
                   </div>
@@ -67,19 +67,19 @@ export default function Top3({ items, setHoveredPropertyId }: Top3Props) {
                   )}
                 </div>
 
-                <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
+                <h3 className="line-clamp-2 text-base font-black tracking-tight text-geora-black">
                   {property.title}
                 </h3>
-                <p className="mt-2 truncate text-xs font-semibold text-urbik-black/80">
+                <p className="mt-2 truncate text-xs font-semibold text-geora-black/80">
                   {property.displayAddress || property.address}, {property.city}, {property.province}
                 </p>
               </div>
               
               <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/60 pt-4">
-                <span className="text-xs font-bold text-urbik-black/50 z-1">
+                <span className="text-xs font-bold text-geora-black/50 z-1">
                   {property.bedrooms || 0} hab · {property.area || 0} m²
                 </span>
-                <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
+                <span className="text-base font-black tracking-tight text-geora-black/70 z-1">
                   {currency} {Number(price).toLocaleString("es-AR")}
                 </span>
               </div>

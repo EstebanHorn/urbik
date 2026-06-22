@@ -103,7 +103,7 @@ export function PropertiesSidebar({
 
   if (properties.length === 0) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center p-8 text-center text-urbik-black/50">
+      <div className="flex h-full w-full flex-col items-center justify-center p-8 text-center text-geora-black/50">
         <MapPin className="mb-2 h-10 w-10" />
         <p className="font-medium">No se encontraron propiedades.</p>
       </div>
@@ -134,7 +134,7 @@ export function PropertiesSidebar({
               key={prop.id}
               className={`group relative flex flex-col cursor-pointer transition-all duration-500 animate-fade-in-up ${glassCard}
                 ${hasSelection && !isSelected ? "opacity-60 scale-[0.98] saturate-50" : "hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)]"}
-                ${isSelected ? "scale-[1.03] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-2 ring-urbik-black z-30" : ""}
+                ${isSelected ? "scale-[1.03] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-2 ring-geora-black z-30" : ""}
               `}
               style={{
                 animationDelay: `${index * 50}ms`,
@@ -146,7 +146,7 @@ export function PropertiesSidebar({
                 className="absolute inset-0 z-20"
               />
 
-              <div className="relative h-40 md:h-48 w-full overflow-hidden rounded-t-2xl bg-urbik-g200">
+              <div className="relative h-40 md:h-48 w-full overflow-hidden rounded-t-2xl bg-geora-g200">
                 {prop.images?.[0] ? (
                   <Image
                     src={prop.images[0]}
@@ -157,7 +157,7 @@ export function PropertiesSidebar({
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center bg-white text-xs font-bold text-black/70">
-                    <Building2 size={36} className="text-urbik-g400" />
+                    <Building2 size={36} className="text-geora-g400" />
                   </div>
                 )}
               </div>
@@ -165,32 +165,32 @@ export function PropertiesSidebar({
               <div className="flex flex-1 flex-col justify-between p-4 pt-2 z-10">
                 <div>
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-2.5 py-1 text-[10px] font-bold text-white uppercase shadow-sm z-1">
+                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-2.5 py-1 text-[10px] font-bold text-white uppercase shadow-sm z-1">
                       {getPropertyLabel(prop.type)}
                     </span>
-                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-2.5 py-1 text-[10px] font-bold text-white uppercase shadow-sm z-1">
+                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-2.5 py-1 text-[10px] font-bold text-white uppercase shadow-sm z-1">
                       {getOperationLabel(prop.operationType)}
                     </span>
                   </div>
 
-                  <h3 className="line-clamp-2 text-sm font-black tracking-tight text-urbik-black">
+                  <h3 className="line-clamp-2 text-sm font-black tracking-tight text-geora-black">
                     {prop.title}
                   </h3>
 
-                  <p className="mt-1 flex items-center gap-1 truncate text-xs font-semibold text-urbik-black/80">
-                    <MapPin size={12} className="shrink-0 text-urbik-black/80" />
+                  <p className="mt-1 flex items-center gap-1 truncate text-xs font-semibold text-geora-black/80">
+                    <MapPin size={12} className="shrink-0 text-geora-black/80" />
                     {prop.address}, {prop.city}
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-3 border-t border-white/60">
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-black tracking-tight text-urbik-black/90 z-1">
+                    <span className="text-2xl font-black tracking-tight text-geora-black/90 z-1">
                       $ {prop.price?.toLocaleString("es-AR")}
                     </span>
 
                     {isInitiallyFavorite && (
-                      <span className="text-[10px] font-bold text-urbik-emerald">
+                      <span className="text-[10px] font-bold text-geora-emerald">
                         Guardada
                       </span>
                     )}
@@ -212,7 +212,7 @@ export function PropertiesSidebar({
                       className="w-8 h-8 object-cover"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-urbik-g100 ring-2 ring-white shadow-md flex items-center justify-center text-[10px] font-black text-urbik-black/70">
+                    <div className="w-8 h-8 rounded-full bg-geora-g100 ring-2 ring-white shadow-md flex items-center justify-center text-[10px] font-black text-geora-black/70">
                       {(prop.agencyName || "I").charAt(0)}
                     </div>
                   )}

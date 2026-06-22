@@ -5,7 +5,7 @@ export function LoadingSpinner() {
     <div className="flex items-center justify-center p-10">
       <div className="animate-pulse">
         <Image
-          src="/Urbik_Logo_Negro.svg"
+          src="/Geora_Logo_Negro.svg"
           alt="Cargando..."
           width={100}
           height={40}

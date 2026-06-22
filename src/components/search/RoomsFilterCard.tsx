@@ -24,7 +24,7 @@ function CountGroup({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm font-bold text-urbik-black/80 uppercase">{label}</span>
+      <span className="text-sm font-bold text-geora-black/80 uppercase">{label}</span>
       <div className="flex flex-wrap gap-1.5">
         {COUNTS.map((val) => {
           const isActive = active === val;
@@ -34,8 +34,8 @@ function CountGroup({
               onClick={() => onChange(field, isActive ? null : val)}
               className={`h-8 min-w-10 px-3 text-xs transition-all duration-200 cursor-pointer ${
                 isActive
-                  ? " text-urbik-black font-black text-sm"
-                  : " text-urbik-black/60 font-bold"
+                  ? " text-geora-black font-black text-sm"
+                  : " text-geora-black/60 font-bold"
               }`}
             >
               {val}
@@ -45,7 +45,7 @@ function CountGroup({
         {active && (
           <button
             onClick={() => onChange(field, null)}
-            className="h-8 px-3 text-xs font-bold text-urbik-black transition-colors cursor-pointer"
+            className="h-8 px-3 text-xs font-bold text-geora-black transition-colors cursor-pointer"
           >
             ✕
           </button>

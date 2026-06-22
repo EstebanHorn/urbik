@@ -24,7 +24,7 @@ export default function TopPropertiesTable({ properties }: { properties: TopProp
     <div className="overflow-x-auto">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="text-md items-center justify-center uppercase text-urbik-black/50 font-bold border-b border-gray-200">
+          <tr className="text-md items-center justify-center uppercase text-geora-black/50 font-bold border-b border-gray-200">
             <th className="px-4 py-3">Propiedad</th>
             <th className="px-3 py-3 text-right"><Eye size={20} className="inline mb-1 mr-1" /> Vistas</th>
             <th className="px-3 py-3 text-right"><Heart size={20} className="inline mb-1 mr-1" /> Favoritos</th>
@@ -41,18 +41,18 @@ export default function TopPropertiesTable({ properties }: { properties: TopProp
                     {p.image ? (
                       <img src={p.image} alt={p.title ?? ""} className="object-cover w-full h-full" />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center text-gray-400 text-[10px] font-bold">URBIK</div>
+                      <div className="h-full w-full flex items-center justify-center text-gray-400 text-[10px] font-bold">GEORA</div>
                     )}
                   </div>
-                  <span className="font-bold text-urbik-black/70 truncate max-w-[260px]">
+                  <span className="font-bold text-geora-black/70 truncate max-w-[260px]">
                     {p.title ?? "Sin título"}
                   </span>
                 </Link>
               </td>
-              <td className="px-3 py-3 text-right font-black text-urbik-black/70">{p.views}</td>
-              <td className="px-3 py-3 text-right font-bold text-urbik-black/60">{p.favorites}</td>
-              <td className="px-3 py-3 text-right font-bold text-urbik-black/60">{p.inquiries}</td>
-              <td className="px-3 py-3 text-right font-bold text-urbik-black/60">{p.chats}</td>
+              <td className="px-3 py-3 text-right font-black text-geora-black/70">{p.views}</td>
+              <td className="px-3 py-3 text-right font-bold text-geora-black/60">{p.favorites}</td>
+              <td className="px-3 py-3 text-right font-bold text-geora-black/60">{p.inquiries}</td>
+              <td className="px-3 py-3 text-right font-bold text-geora-black/60">{p.chats}</td>
             </tr>
           ))}
         </tbody>

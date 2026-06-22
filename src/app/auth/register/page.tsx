@@ -38,7 +38,7 @@ const PROVINCES = [
 ];
 
 const INPUT_CLASS =
-  "w-full rounded-full px-5 py-3.5 text-sm outline-none bg-white/10 border border-white/30 text-white placeholder-white/30 focus:bg-white/10 focus:border-urbik-black/50 focus:ring-1 focus:ring-urbik-black/50 shadow-sm transition-all";
+  "w-full rounded-full px-5 py-3.5 text-sm outline-none bg-white/10 border border-white/30 text-white placeholder-white/30 focus:bg-white/10 focus:border-geora-black/50 focus:ring-1 focus:ring-geora-black/50 shadow-sm transition-all";
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -360,7 +360,7 @@ export default function RegisterPage() {
         }
       `}</style>
 
-      <div className={`absolute top-[-10%] left-[-10%] w-200 h-200 bg-urbik-black/20 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0s')}></div>
+      <div className={`absolute top-[-10%] left-[-10%] w-200 h-200 bg-geora-black/20 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0s')}></div>
       <div className={`absolute -bottom-10 right-[-10%] w-200 h-200 bg-white/10 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0.1s')}></div>
 
       <div className={`absolute opacity-50 -bottom-10 -left-10 w-240 h-160 bg-linear-to-tr from-white/5 to-transparent backdrop-blur-md border border-white/10 rounded-3xl pointer-events-none z-0 hidden md:block ${animClass}`} style={getAnimStyle('0.2s')}></div>
@@ -374,8 +374,8 @@ export default function RegisterPage() {
           <div className={`flex flex-col items-center text-center mb-8 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.25s')}>
             <Link href="/" className="relative w-48 h-16 lg:w-56 lg:h-20 mb-4 transition-transform hover:scale-105">
               <Image
-                src="/Urbik_Logo_Negro.svg"
-                alt="Logo Urbik"
+                src="/Geora_Logo_Negro.svg"
+                alt="Logo Geora"
                 fill
                 priority
                 className="object-contain invert opacity-50"
@@ -537,7 +537,7 @@ export default function RegisterPage() {
                   <button
                     type="submit"
                     disabled={isLoading || isSuccess}
-                    className="flex-1 cursor-pointer bg-urbik-white2 text-[#0a0a0a] font-bold py-3.5 rounded-full text-md shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] transition-all disabled:opacity-60"
+                    className="flex-1 cursor-pointer bg-geora-white2 text-[#0a0a0a] font-bold py-3.5 rounded-full text-md shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] transition-all disabled:opacity-60"
                   >
                     {isLoading ? "Creando..." : "CREAR CUENTA"}
                   </button>
@@ -615,7 +615,7 @@ export default function RegisterPage() {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 cursor-pointer bg-urbik-white2 text-[#0a0a0a] font-bold py-3.5 rounded-full text-md shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] transition-all"
+                    className="flex-1 cursor-pointer bg-geora-white2 text-[#0a0a0a] font-bold py-3.5 rounded-full text-md shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] transition-all"
                   >
                     Continuar
                   </button>
@@ -712,7 +712,7 @@ export default function RegisterPage() {
                   <button
                     type="submit"
                     disabled={isLoading || isSuccess}
-                    className="flex-1 cursor-pointer bg-urbik-white2 text-[#0a0a0a] font-bold py-3.5 rounded-full text-md shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] transition-all disabled:opacity-60"
+                    className="flex-1 cursor-pointer bg-geora-white2 text-[#0a0a0a] font-bold py-3.5 rounded-full text-md shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] transition-all disabled:opacity-60"
                   >
                     {isLoading ? "Enviando..." : "ENVIAR SOLICITUD"}
                   </button>
@@ -723,14 +723,14 @@ export default function RegisterPage() {
 
           <div className={`text-center mt-8 text-sm text-white/50 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.65s')}>
             ¿Ya tenés cuenta?{" "}
-            <Link href="/auth/login" className="text-urbik-white/90 font-medium hover:text-white hover:underline transition-colors">
+            <Link href="/auth/login" className="text-geora-white/90 font-medium hover:text-white hover:underline transition-colors">
               Iniciá sesión
             </Link>
           </div>
         </div>
 
         <div className={`absolute bottom-6 text-white/30 text-xs font-light ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.75s')}>
-          © 2026 Urbik. Todos los derechos reservados.
+          © 2026 Geora. Todos los derechos reservados.
         </div>
       </div>
     </div>

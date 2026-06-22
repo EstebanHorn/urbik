@@ -10,11 +10,11 @@ const POLICIES = [
   {
     id: 1,
     title: "1. Datos recopilados",
-    icon: <Eye size={18} className="text-urbik-black/60" />,
+    icon: <Eye size={18} className="text-geora-black/60" />,
     content: (
       <>
-        <p>Urbik podrá recopilar:</p>
-        <ul className="list-disc pl-5 mt-2 space-y-1 text-urbik-black/80 font-medium">
+        <p>Geora podrá recopilar:</p>
+        <ul className="list-disc pl-5 mt-2 space-y-1 text-geora-black/80 font-medium">
           <li>Nombre y apellido</li>
           <li>Correo electrónico</li>
           <li>Teléfono</li>
@@ -27,11 +27,11 @@ const POLICIES = [
   {
     id: 2,
     title: "2. Finalidad",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
+    icon: <FileText size={18} className="text-geora-black/60" />,
     content: (
       <>
         <p>Los datos serán utilizados para:</p>
-        <ul className="list-disc pl-5 mt-2 space-y-1 text-urbik-black/80 font-medium">
+        <ul className="list-disc pl-5 mt-2 space-y-1 text-geora-black/80 font-medium">
           <li>Operar la Plataforma</li>
           <li>Permitir el contacto entre usuarios e inmobiliarias</li>
           <li>Gestionar servicios y suscripciones</li>
@@ -43,17 +43,17 @@ const POLICIES = [
   {
     id: 3,
     title: "3. Consentimiento",
-    icon: <ShieldCheck size={18} className="text-urbik-black/60" />,
+    icon: <ShieldCheck size={18} className="text-geora-black/60" />,
     content: "El Usuario presta su consentimiento libre, expreso e informado para el tratamiento de sus datos."
   },
   {
     id: 4,
     title: "4. Cesión de datos",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
+    icon: <FileText size={18} className="text-geora-black/60" />,
     content: (
       <>
         <p>Los datos podrán ser compartidos con:</p>
-        <ul className="list-disc pl-5 mt-2 space-y-1 text-urbik-black/80 font-medium">
+        <ul className="list-disc pl-5 mt-2 space-y-1 text-geora-black/80 font-medium">
           <li>Inmobiliarias</li>
           <li>Proveedores de servicios necesarios para el funcionamiento de la Plataforma</li>
         </ul>
@@ -63,51 +63,51 @@ const POLICIES = [
   {
     id: 5,
     title: "5. Derechos del titular",
-    icon: <Scale size={18} className="text-urbik-black/60" />,
+    icon: <Scale size={18} className="text-geora-black/60" />,
     content: (
       <>
         <p>El Usuario podrá:</p>
-        <ul className="list-disc pl-5 mt-2 space-y-1 text-urbik-black/80 font-medium">
+        <ul className="list-disc pl-5 mt-2 space-y-1 text-geora-black/80 font-medium">
           <li>Acceder a sus datos</li>
           <li>Solicitar su rectificación</li>
           <li>Solicitar su eliminación</li>
         </ul>
-        <p className="mt-2 text-urbik-black/90 font-bold">Conforme a la Ley 25.326.</p>
+        <p className="mt-2 text-geora-black/90 font-bold">Conforme a la Ley 25.326.</p>
       </>
     )
   },
   {
     id: 6,
     title: "6. Seguridad",
-    icon: <Lock size={18} className="text-urbik-black/60" />,
-    content: "Urbik adopta medidas de seguridad razonables para proteger la información."
+    icon: <Lock size={18} className="text-geora-black/60" />,
+    content: "Geora adopta medidas de seguridad razonables para proteger la información."
   },
   {
     id: 7,
     title: "7. Autoridad de control",
-    icon: <ShieldCheck size={18} className="text-urbik-black/60" />,
+    icon: <ShieldCheck size={18} className="text-geora-black/60" />,
     content: "La Dirección Nacional de Protección de Datos Personales es el órgano de control de la Ley N° 25.326."
   },
   {
     id: 8,
     title: "8. Modificaciones",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
-    content: "Urbik podrá modificar esta política en cualquier momento."
+    icon: <FileText size={18} className="text-geora-black/60" />,
+    content: "Geora podrá modificar esta política en cualquier momento."
   }
 ];
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen mt-15 bg-urbik-white py-10 px-4 sm:px-6 lg:px-8 pb-28 flex flex-col items-center">
+    <div className="min-h-screen mt-15 bg-geora-white py-10 px-4 sm:px-6 lg:px-8 pb-28 flex flex-col items-center">
       
       <div className="w-full max-w-4xl flex items-center mb-10 mt-5 relative z-10 animate-fade-in-up">
         <Link 
           href="/" 
-          className="w-10 h-10 flex items-center justify-center cursor-pointer border-black/10 text-urbik-black/80 hover:scale-105 transition duration-200 absolute left-0"
+          className="w-10 h-10 flex items-center justify-center cursor-pointer border-black/10 text-geora-black/80 hover:scale-105 transition duration-200 absolute left-0"
         >
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="w-full text-center text-2xl md:text-3xl font-black text-urbik-black/90 uppercase tracking-tighter">
+        <h1 className="w-full text-center text-2xl md:text-3xl font-black text-geora-black/90 uppercase tracking-tighter">
           Política de Privacidad
         </h1>
       </div>
@@ -125,11 +125,11 @@ export default function PrivacyPolicy() {
                 }}
               >
                 <div className="flex items-center gap-3 mb-2 ml-10">
-                  <h3 className="text-lg font-black tracking-tight text-urbik-black uppercase">
+                  <h3 className="text-lg font-black tracking-tight text-geora-black uppercase">
                     {policy.title}
                   </h3>
                 </div>
-                <div className="pl-8 text-sm md:text-base font-medium text-urbik-black/70 leading-relaxed">
+                <div className="pl-8 text-sm md:text-base font-medium text-geora-black/70 leading-relaxed">
                   {policy.content}
                 </div>
               </div>
@@ -138,7 +138,7 @@ export default function PrivacyPolicy() {
         </div>
       </div>
 
-      <p className="text-sm font-semibold text-urbik-muted mt-10">
+      <p className="text-sm font-semibold text-geora-muted mt-10">
         Última actualización: {new Date().toLocaleDateString('es-AR')}
       </p>
     </div>

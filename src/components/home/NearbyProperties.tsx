@@ -79,10 +79,10 @@ export default function NearbyProperties() {
   return (
     <section className="mb-10">
       <div className="mb-5 text-center md:text-left">
-        <h2 className="text-2xl md:text-3xl text-urbik-black/80 font-black">
+        <h2 className="text-2xl md:text-3xl text-geora-black/80 font-black">
           Cerca tuyo en {city}
         </h2>
-        <span className="text-urbik-black/50 text-sm md:text-base">
+        <span className="text-geora-black/50 text-sm md:text-base">
           Propiedades disponibles en tu ciudad.
         </span>
       </div>
@@ -104,22 +104,22 @@ export default function NearbyProperties() {
                     Sin imagen
                   </div>
                 )}
-                <span className="absolute top-3 left-3 rounded-full bg-urbik-black/80 px-3 py-1 text-[10px] font-bold text-white uppercase">
+                <span className="absolute top-3 left-3 rounded-full bg-geora-black/80 px-3 py-1 text-[10px] font-bold text-white uppercase">
                   {getOperationLabel(property.operationType)}
                 </span>
               </div>
               <div className="p-4">
-                <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
+                <h3 className="line-clamp-2 text-base font-black tracking-tight text-geora-black">
                   {property.title}
                 </h3>
-                <p className="mt-1 truncate text-xs font-semibold text-urbik-black/60">
+                <p className="mt-1 truncate text-xs font-semibold text-geora-black/60">
                   {property.displayAddress || property.address}, {property.city}
                 </p>
                 <div className="mt-3 flex items-center justify-between border-t border-black/5 pt-3">
-                  <span className="text-xs font-bold text-urbik-black/50">
+                  <span className="text-xs font-bold text-geora-black/50">
                     {property.bedrooms || 0} hab · {property.area || 0} m²
                   </span>
-                  <span className="text-sm font-black text-urbik-black/80">
+                  <span className="text-sm font-black text-geora-black/80">
                     {currency} {Number(price).toLocaleString("es-AR")}
                   </span>
                 </div>

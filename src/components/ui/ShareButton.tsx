@@ -16,7 +16,7 @@ export default function ShareButton({ slug, className }: { slug: string; classNa
   return (
     <button
       onClick={handleShare}
-      className={className ?? "flex items-center justify-center gap-2 rounded-full px-5 py-2 text-md font-bold border border-urbik-cyan text-urbik-cyan hover:bg-urbik-cyan hover:text-urbik-black cursor-pointer transition-colors"}
+      className={className ?? "flex items-center justify-center gap-2 rounded-full px-5 py-2 text-md font-bold border border-geora-cyan text-geora-cyan hover:bg-geora-cyan hover:text-geora-black cursor-pointer transition-colors"}
     >
       {copied ? <Check size={15} /> : <Share2 size={15} />}
       {copied ? "¡Copiado!" : "Compartir"}

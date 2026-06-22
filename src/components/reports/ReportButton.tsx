@@ -61,7 +61,7 @@ export default function ReportButton({
         title={displayLabel}
         className={
           className ??
-          "cursor-pointer p-1.5 rounded-full text-urbik-black/40 hover:bg-urbik-rose/10 hover:text-urbik-rose transition-colors"
+          "cursor-pointer p-1.5 rounded-full text-geora-black/40 hover:bg-geora-rose/10 hover:text-geora-rose transition-colors"
         }
       >
         <Flag size={14} />
@@ -73,7 +73,7 @@ export default function ReportButton({
         onClick={handleClick}
         className={
           className ??
-          "cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-urbik-black/15 text-urbik-rose text-sm font-bold hover:bg-urbik-rose/5 transition-all active:scale-95"
+          "cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-geora-black/15 text-geora-rose text-sm font-bold hover:bg-geora-rose/5 transition-all active:scale-95"
         }
       >
         <Flag size={14} /> {displayLabel}
@@ -85,7 +85,7 @@ export default function ReportButton({
         onClick={handleClick}
         className={
           className ??
-          "cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold text-urbik-black/50 hover:text-urbik-rose transition-colors"
+          "cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold text-geora-black/50 hover:text-geora-rose transition-colors"
         }
       >
         <Flag size={12} /> {displayLabel}

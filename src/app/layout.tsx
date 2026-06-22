@@ -14,7 +14,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Urbik - Encotrá tu lugar",
+  title: "Geora - Encotrá tu lugar",
   description: "Buscador de propiedades con estética sobria",
 };
 

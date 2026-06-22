@@ -197,7 +197,7 @@ export default function ParcelPickerModal({
         {/* Header */}
         <div className="flex flex-col shrink-0 bg-white/70">
           <div className="flex items-center justify-between px-8 py-5">
-            <h2 className="text-lg font-black text-urbik-black">
+            <h2 className="text-lg font-black text-geora-black">
               Ubicación de la propiedad
             </h2>
             <button
@@ -215,7 +215,7 @@ export default function ParcelPickerModal({
               onClick={() => toggleMode("parcel")}
               className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
                 mode === "parcel"
-                  ? "border-urbik-cyan text-urbik-black"
+                  ? "border-geora-cyan text-geora-black"
                   : "border-transparent text-gray-400 hover:text-gray-600"
               }`}
             >
@@ -225,7 +225,7 @@ export default function ParcelPickerModal({
               onClick={() => toggleMode("draw")}
               className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
                 mode === "draw"
-                  ? "border-urbik-cyan text-urbik-black"
+                  ? "border-geora-cyan text-geora-black"
                   : "border-transparent text-gray-400 hover:text-gray-600"
               }`}
             >
@@ -235,14 +235,14 @@ export default function ParcelPickerModal({
               onClick={() => toggleMode("manual")}
               className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
                 mode === "manual"
-                  ? "border-urbik-cyan text-urbik-black"
+                  ? "border-geora-cyan text-geora-black"
                   : "border-transparent text-gray-400 hover:text-gray-600"
               }`}
             >
               Pin Manual
             </button>
           </div>
-          <p className="px-8 pt-2 pb-3 text-xs font-medium text-urbik-black/50 italic">
+          <p className="px-8 pt-2 pb-3 text-xs font-medium text-geora-black/50 italic">
             Seleccioná una sola opción.
           </p>
         </div>
@@ -261,7 +261,7 @@ export default function ParcelPickerModal({
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="bg-white/90 rounded-xl px-4 py-2.5 shadow-lg border border-gray-100">
-                <p className="text-xs font-bold text-urbik-black">Buscando parcela...</p>
+                <p className="text-xs font-bold text-geora-black">Buscando parcela...</p>
               </div>
             </div>
           )}
@@ -303,7 +303,7 @@ export default function ParcelPickerModal({
           {!selected && drawnPath.length === 0 && !loading && !notFound && !fetchError && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none">
               <div className="bg-white/90 backdrop-blur-sm rounded-full px-5 py-2.5 shadow-lg border border-gray-100">
-                <p className="text-xs font-bold text-urbik-black/60 tracking-widest uppercase">
+                <p className="text-xs font-bold text-geora-black/60 tracking-widest uppercase">
                   {mode === "parcel" && "Hacé click sobre una parcela"}
                   {mode === "manual" && "Hacé click para fijar el pin"}
                   {mode === "draw" && "Hacé click en los vértices"}
@@ -363,7 +363,7 @@ export default function ParcelPickerModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-3 text-urbik-black/80 font-bold hover:text-urbik-black transition-colors cursor-pointer"
+            className="px-6 py-3 text-geora-black/80 font-bold hover:text-geora-black transition-colors cursor-pointer"
           >
             CANCELAR
           </button>
@@ -371,7 +371,7 @@ export default function ParcelPickerModal({
             type="button"
             disabled={isConfirmDisabled}
             onClick={handleConfirm}
-            className="px-6 py-3 text-urbik-black/80 font-bold hover:text-urbik-black transition-colors disabled:opacity-40 cursor-pointer"
+            className="px-6 py-3 text-geora-black/80 font-bold hover:text-geora-black transition-colors disabled:opacity-40 cursor-pointer"
           >
             CONFIRMAR
           </button>

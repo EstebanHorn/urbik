@@ -56,26 +56,26 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
-          <Image src="/Urbik_Logo_Negro.svg" alt="Urbik" width={120} height={40} priority />
+          <Image src="/Geora_Logo_Negro.svg" alt="Geora" width={120} height={40} priority />
         </div>
 
         <div className="rounded-3xl border border-white/60 bg-white/60 backdrop-blur-2xl shadow-[0_10px_60px_rgba(0,0,0,0.08)] p-8 md:p-10">
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-urbik-black/5">
-              <Lock size={20} className="text-urbik-black" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-geora-black/5">
+              <Lock size={20} className="text-geora-black" />
             </div>
             <div>
-              <h1 className="text-xl font-black text-urbik-black uppercase tracking-tight">
+              <h1 className="text-xl font-black text-geora-black uppercase tracking-tight">
                 Nueva contraseña
               </h1>
-              <p className="text-xs text-urbik-black/50">Ingresá tu nueva contraseña para continuar.</p>
+              <p className="text-xs text-geora-black/50">Ingresá tu nueva contraseña para continuar.</p>
             </div>
           </div>
 
           {!ready ? (
             <div className="text-center py-10">
-              <div className="text-sm text-urbik-black/40 animate-pulse">Verificando link de seguridad...</div>
-              <p className="text-xs text-urbik-black/30 mt-3">
+              <div className="text-sm text-geora-black/40 animate-pulse">Verificando link de seguridad...</div>
+              <p className="text-xs text-geora-black/30 mt-3">
                 Si llegaste aquí por error, volvé al{" "}
                 <Link href="/" className="underline">inicio</Link>.
               </p>
@@ -83,7 +83,7 @@ export default function ResetPasswordPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
-                <label className="block text-xs font-bold text-urbik-black/70 uppercase mb-2 ml-1">
+                <label className="block text-xs font-bold text-geora-black/70 uppercase mb-2 ml-1">
                   Nueva contraseña
                 </label>
                 <motion.input
@@ -94,19 +94,19 @@ export default function ResetPasswordPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Mínimo 6 caracteres"
-                  className="w-full px-5 py-3.5 rounded-2xl bg-white/50 border border-white shadow-sm focus:ring-2 focus:ring-urbik-black/20 outline-none text-sm font-medium"
+                  className="w-full px-5 py-3.5 rounded-2xl bg-white/50 border border-white shadow-sm focus:ring-2 focus:ring-geora-black/20 outline-none text-sm font-medium"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-9 text-urbik-black/40 hover:text-urbik-black transition-colors cursor-pointer"
+                  className="absolute right-4 top-9 text-geora-black/40 hover:text-geora-black transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-urbik-black/70 uppercase mb-2 ml-1">
+                <label className="block text-xs font-bold text-geora-black/70 uppercase mb-2 ml-1">
                   Confirmar contraseña
                 </label>
                 <motion.input
@@ -117,7 +117,7 @@ export default function ResetPasswordPage() {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   placeholder="Repetí la contraseña"
-                  className="w-full px-5 py-3.5 rounded-2xl bg-white/50 border border-white shadow-sm focus:ring-2 focus:ring-urbik-black/20 outline-none text-sm font-medium"
+                  className="w-full px-5 py-3.5 rounded-2xl bg-white/50 border border-white shadow-sm focus:ring-2 focus:ring-geora-black/20 outline-none text-sm font-medium"
                 />
               </div>
 
@@ -130,7 +130,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-full bg-urbik-black text-white font-bold text-sm hover:opacity-85 transition-opacity disabled:opacity-50 mt-2 cursor-pointer"
+                className="w-full py-3.5 rounded-full bg-geora-black text-white font-bold text-sm hover:opacity-85 transition-opacity disabled:opacity-50 mt-2 cursor-pointer"
               >
                 {loading ? "Guardando..." : "Guardar nueva contraseña"}
               </button>

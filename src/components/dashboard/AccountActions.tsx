@@ -36,7 +36,7 @@ export function SecuritySection() {
   return (
     <div className="flex items-start justify-between gap-4 mb-10 md:mb-30">
       <div className="flex items-center gap-4">
-        <div className="text-urbik-black"><Lock size={24} /></div>
+        <div className="text-geora-black"><Lock size={24} /></div>
         <div>
           <h3 className="text-xl font-bold text-gray-800">Seguridad de la cuenta</h3>
           {message.text ? (
@@ -79,7 +79,7 @@ export function PauseAccountZone({ isPaused, userId, onToggleSuccess }: { isPaus
     <>
       <div className="flex items-center justify-between mb-10 md:mb-20">
         <div className="flex items-center gap-4">
-          <div className={isPaused ? "text-urbik-emerald" : "text-urbik-black"}><Pause size={24} /></div>
+          <div className={isPaused ? "text-geora-emerald" : "text-geora-black"}><Pause size={24} /></div>
           <div>
             <h3 className="text-xl font-bold text-gray-800">{isPaused ? "Reactivar Cuenta" : "Pausar Cuenta"}</h3>
             <p className="text-sm text-gray-500">
@@ -87,7 +87,7 @@ export function PauseAccountZone({ isPaused, userId, onToggleSuccess }: { isPaus
             </p>
           </div>
         </div>
-        <button onClick={() => setShowModal(true)} className={`px-6 py-3 cursor-pointer font-bold rounded-full transition-all ${isPaused ? "bg-urbik-emerald text-white hover:bg-green-600" : "border-2 border-black text-black hover:bg-black hover:text-white"}`}>
+        <button onClick={() => setShowModal(true)} className={`px-6 py-3 cursor-pointer font-bold rounded-full transition-all ${isPaused ? "bg-geora-emerald text-white hover:bg-green-600" : "border-2 border-black text-black hover:bg-black hover:text-white"}`}>
           {isPaused ? "Reactivar Ahora" : "Pausar Cuenta"}
         </button>
       </div>
@@ -96,16 +96,16 @@ export function PauseAccountZone({ isPaused, userId, onToggleSuccess }: { isPaus
         {showModal && (
           <div className="fixed inset-0 h-full z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white/70 backdrop-blur-2xl border border-white/60 w-full rounded-xl p-8 md:p-12 shadow-2xl relative text-center">
-              <button onClick={() => setShowModal(false)} className="absolute cursor-pointer right-8 top-8 text-urbik-black/70 hover:text-black"><X size={24} /></button>
+              <button onClick={() => setShowModal(false)} className="absolute cursor-pointer right-8 top-8 text-geora-black/70 hover:text-black"><X size={24} /></button>
               
               <div className="flex justify-center mb-6">
-                {isPaused ? <Play className="text-urbik-emerald" size={48} /> : <Pause className="text-urbik-black/80" size={48} />}
+                {isPaused ? <Play className="text-geora-emerald" size={48} /> : <Pause className="text-geora-black/80" size={48} />}
               </div>
               
-              <h3 className="text-2xl font-bold text-urbik-black/80 mb-2">{isPaused ? "¿Reactivar tu presencia?" : "¿Quieres pausar tu cuenta?"}</h3>
+              <h3 className="text-2xl font-bold text-geora-black/80 mb-2">{isPaused ? "¿Reactivar tu presencia?" : "¿Quieres pausar tu cuenta?"}</h3>
               <p className="text-gray-500 mb-8">{isPaused ? "Volverás a ser visible para todos los usuarios." : "Podrás reactivarla en cualquier momento."}</p>
               
-              <button onClick={handleToggle} className={`w-full py-4 cursor-pointer rounded-full font-bold transition-all ${isPaused ? "bg-urbik-emerald text-white hover:bg-green-600" : "bg-black text-white hover:bg-gray-800"}`}>
+              <button onClick={handleToggle} className={`w-full py-4 cursor-pointer rounded-full font-bold transition-all ${isPaused ? "bg-geora-emerald text-white hover:bg-green-600" : "bg-black text-white hover:bg-gray-800"}`}>
                 SÍ, {isPaused ? "REACTIVAR" : "PAUSAR"}
               </button>
             </motion.div>
@@ -149,13 +149,13 @@ export function DangerZone({ userId }: { itemName: string, userId: string }) {
         {showModal && (
           <div className="fixed inset-0 h-full z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white/70 backdrop-blur-2xl border border-white/60 w-full rounded-xl p-8 md:p-12 shadow-2xl relative text-center">
-              <button onClick={() => setShowModal(false)} className="absolute cursor-pointer right-8 top-8 text-urbik-black/70 hover:text-black"><X size={24} /></button>
+              <button onClick={() => setShowModal(false)} className="absolute cursor-pointer right-8 top-8 text-geora-black/70 hover:text-black"><X size={24} /></button>
               
               <div className="flex justify-center mb-6 text-red-500">
                 <AlertTriangle size={48} />
               </div>
 
-              <h3 className="text-2xl font-bold text-urbik-black/80 mb-2">¿Absolutamente seguro?</h3>
+              <h3 className="text-2xl font-bold text-geora-black/80 mb-2">¿Absolutamente seguro?</h3>
               <p className="text-sm text-gray-500 mb-6">Para confirmar, escribe <strong>ELIMINAR MI CUENTA</strong> a continuación:</p>
               
               <div className="relative mb-8">

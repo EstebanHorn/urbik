@@ -47,12 +47,12 @@ export const SearchBar: React.FC = () => {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Buscar ciudad, dirección o propiedad..."
-          className="w-full bg-transparent text-sm text-urbik-black placeholder:text-urbik-muted italic font-light outline-none pl-1"
+          className="w-full bg-transparent text-sm text-geora-black placeholder:text-geora-muted italic font-light outline-none pl-1"
         />
         {isLoading ? (
           <div className="animate-spin h-4 w-4 border-2 border-t-transparent rounded-full shrink-0" />
         ) : (
-          <Search className="h-4 w-4 text-urbik-muted shrink-0" />
+          <Search className="h-4 w-4 text-geora-muted shrink-0" />
         )}
       </div>
 
@@ -60,7 +60,7 @@ export const SearchBar: React.FC = () => {
         <ul className="absolute z-50 w-full mt-2 bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden">
           {isLoading ? (
             <li className="p-4 text-sm text-gray-500 flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-urbik-black border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-geora-black border-t-transparent rounded-full animate-spin" />
               Buscando...
             </li>
           ) : (

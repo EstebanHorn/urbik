@@ -50,7 +50,7 @@ export default function SidebarFilters() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 z-[1002] bg-urbik-black/40 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-[1002] bg-geora-black/40 backdrop-blur-sm md:hidden"
             />
           )}
 
@@ -72,12 +72,12 @@ export default function SidebarFilters() {
                 <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 rounded-full bg-slate-300/80 pointer-events-none" />
               )}
               <div className={`flex items-center justify-between ${!isMobile ? "mt-4" : "mt-2"}`}>
-                <h2 className="text-xl font-black text-urbik-black/80 tracking-tight">Más Filtros</h2>
+                <h2 className="text-xl font-black text-geora-black/80 tracking-tight">Más Filtros</h2>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-2 rounded-full hover:bg-black/5 transition-colors cursor-pointer"
                 >
-                  <X size={20} className="text-urbik-black/60" />
+                  <X size={20} className="text-geora-black/60" />
                 </button>
               </div>
             </div>
@@ -101,7 +101,7 @@ export default function SidebarFilters() {
                         onClick={() => handleFilterChange("operationType", currentOpType === val ? null : val)}
                         className={`py-2.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
                           currentOpType === val
-                            ? "bg-urbik-emerald text-white shadow-md shadow-urbik-emerald/20"
+                            ? "bg-geora-emerald text-white shadow-md shadow-geora-emerald/20"
                             : "bg-white/50 text-slate-600 hover:bg-white hover:shadow-sm"
                         }`}
                       >
@@ -130,7 +130,7 @@ export default function SidebarFilters() {
                         onClick={() => handleFilterChange("propertyType", currentPropType === type.val ? null : type.val)}
                         className={`py-2 px-3 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
                           currentPropType === type.val
-                            ? "bg-urbik-black text-white shadow-md"
+                            ? "bg-geora-black text-white shadow-md"
                             : "bg-white/50 text-slate-600 hover:bg-white hover:shadow-sm"
                         }`}
                       >
@@ -161,7 +161,7 @@ export default function SidebarFilters() {
                           onClick={() => handleFilterChange(amenity.key, isActive ? null : "true")}
                           className={`py-1.5 px-3 rounded-full border text-xs font-bold transition-all duration-200 cursor-pointer ${
                             isActive
-                              ? "border-urbik-emerald bg-urbik-emerald/10 text-urbik-emerald"
+                              ? "border-geora-emerald bg-geora-emerald/10 text-geora-emerald"
                               : "border-slate-200 bg-white/40 text-slate-500 hover:border-slate-300 hover:bg-white"
                           }`}
                         >

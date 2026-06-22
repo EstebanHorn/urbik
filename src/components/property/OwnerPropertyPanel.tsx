@@ -105,22 +105,22 @@ export default function OwnerPropertyPanel({ propertyId }: OwnerPropertyPanelPro
 
   return (
     <div className={`${glassCard} mt-6 overflow-hidden animate-fade-in-up`}>
-      <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-urbik-black via-urbik-black/80 to-urbik-black/60" />
+      <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-geora-black via-geora-black/80 to-geora-black/60" />
 
       <div className="relative z-10 p-6 md:p-7">
         <div className="flex items-start justify-between gap-3 mb-6">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="absolute -inset-1 rounded-full bg-urbik-black/10 blur-md" />
-              <div className="relative w-10 h-10 rounded-full bg-urbik-black flex items-center justify-center">
+              <div className="absolute -inset-1 rounded-full bg-geora-black/10 blur-md" />
+              <div className="relative w-10 h-10 rounded-full bg-geora-black flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
             </div>
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-urbik-black px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-geora-black px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white">
                 Tu propiedad
               </span>
-              <h3 className="mt-1.5 text-xl font-black tracking-tighter text-urbik-black">
+              <h3 className="mt-1.5 text-xl font-black tracking-tighter text-geora-black">
                 Panel de actividad
               </h3>
             </div>
@@ -165,14 +165,14 @@ export default function OwnerPropertyPanel({ propertyId }: OwnerPropertyPanelPro
         <div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5 text-urbik-black/60" />
-              <h4 className="text-xs font-black uppercase tracking-widest text-urbik-black/70">
+              <Clock className="w-3.5 h-3.5 text-geora-black/60" />
+              <h4 className="text-xs font-black uppercase tracking-widest text-geora-black/70">
                 Últimas consultas
               </h4>
             </div>
             <Link
               href="/dashboard?tab=inquiries"
-              className="text-[10px] font-bold text-urbik-black/60 hover:text-urbik-black underline decoration-dashed underline-offset-2"
+              className="text-[10px] font-bold text-geora-black/60 hover:text-geora-black underline decoration-dashed underline-offset-2"
             >
               Ver todas
             </Link>
@@ -188,12 +188,12 @@ export default function OwnerPropertyPanel({ propertyId }: OwnerPropertyPanelPro
               ))}
             </div>
           ) : inquiries.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-urbik-black/15 bg-white/30 p-5 text-center">
-              <Mail className="w-5 h-5 text-urbik-black/30 mx-auto mb-2" />
-              <p className="text-xs font-semibold text-urbik-black/50">
+            <div className="rounded-2xl border border-dashed border-geora-black/15 bg-white/30 p-5 text-center">
+              <Mail className="w-5 h-5 text-geora-black/30 mx-auto mb-2" />
+              <p className="text-xs font-semibold text-geora-black/50">
                 Todavía no recibiste consultas en esta propiedad.
               </p>
-              <p className="text-[10px] text-urbik-black/40 mt-1">
+              <p className="text-[10px] text-geora-black/40 mt-1">
                 Cuando lleguen, las vas a ver acá.
               </p>
             </div>
@@ -206,7 +206,7 @@ export default function OwnerPropertyPanel({ propertyId }: OwnerPropertyPanelPro
                     key={inq.id}
                     className={`relative rounded-2xl border p-3 transition-all duration-200 ${
                       isUnread
-                        ? "border-urbik-black/20 bg-white/70 shadow-[0_2px_12px_rgba(0,0,0,0.05)]"
+                        ? "border-geora-black/20 bg-white/70 shadow-[0_2px_12px_rgba(0,0,0,0.05)]"
                         : "border-white/60 bg-white/40"
                     }`}
                   >
@@ -217,19 +217,19 @@ export default function OwnerPropertyPanel({ propertyId }: OwnerPropertyPanelPro
                       </span>
                     )}
                     <div className="flex items-start gap-3">
-                      <div className="shrink-0 w-9 h-9 rounded-full bg-urbik-black/85 flex items-center justify-center text-[10px] font-black text-white">
+                      <div className="shrink-0 w-9 h-9 rounded-full bg-geora-black/85 flex items-center justify-center text-[10px] font-black text-white">
                         {initials(inq.senderName)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-0.5">
-                          <span className="text-xs font-black text-urbik-black truncate">
+                          <span className="text-xs font-black text-geora-black truncate">
                             {inq.senderName}
                           </span>
-                          <span className="text-[10px] text-urbik-black/50 whitespace-nowrap">
+                          <span className="text-[10px] text-geora-black/50 whitespace-nowrap">
                             {formatRelative(inq.createdAt)}
                           </span>
                         </div>
-                        <p className="text-[11px] text-urbik-black/70 line-clamp-2 leading-snug">
+                        <p className="text-[11px] text-geora-black/70 line-clamp-2 leading-snug">
                           {inq.message}
                         </p>
                       </div>
@@ -243,7 +243,7 @@ export default function OwnerPropertyPanel({ propertyId }: OwnerPropertyPanelPro
 
         <Link
           href="/dashboard?tab=inquiries"
-          className="mt-5 group/cta flex items-center justify-between gap-2 rounded-full bg-urbik-black px-5 py-3 text-white transition-all duration-300 hover:bg-urbik-black/85"
+          className="mt-5 group/cta flex items-center justify-between gap-2 rounded-full bg-geora-black px-5 py-3 text-white transition-all duration-300 hover:bg-geora-black/85"
         >
           <span className="text-xs font-black uppercase tracking-widest">
             Gestionar en el dashboard
@@ -273,18 +273,18 @@ function KpiBox({
   return (
     <div
       className={`${kpiCard} ${
-        highlight ? "ring-1 ring-urbik-black/15 bg-white/75" : ""
+        highlight ? "ring-1 ring-geora-black/15 bg-white/75" : ""
       }`}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-black uppercase tracking-widest text-urbik-black/50">
+        <span className="text-[10px] font-black uppercase tracking-widest text-geora-black/50">
           {label}
         </span>
-        <div className="text-urbik-black/50">{icon}</div>
+        <div className="text-geora-black/50">{icon}</div>
       </div>
-      <div className="text-3xl font-black text-urbik-black tracking-tighter leading-none">
+      <div className="text-3xl font-black text-geora-black tracking-tighter leading-none">
         {loading ? (
-          <span className="inline-block h-7 w-10 rounded bg-urbik-black/10 animate-pulse" />
+          <span className="inline-block h-7 w-10 rounded bg-geora-black/10 animate-pulse" />
         ) : (
           value.toLocaleString("es-AR")
         )}

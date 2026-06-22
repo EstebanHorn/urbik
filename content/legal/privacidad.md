@@ -1,15 +1,15 @@
 ---
 title: "Política de Privacidad"
-description: "Política de privacidad de la plataforma Urbik"
+description: "Política de privacidad de la plataforma Geora"
 ---
 
-# Política de Privacidad de Urbik
+# Política de Privacidad de Geora
 
 Última actualización: 22 de abril de 2026
 
 ## 1. Introducción
 
-Urbik respeta tu privacidad y se compromete a proteger tus datos personales. Esta Política de Privacidad explica cómo recopilamos, usamos y protegemos tu información.
+Geora respeta tu privacidad y se compromete a proteger tus datos personales. Esta Política de Privacidad explica cómo recopilamos, usamos y protegemos tu información.
 
 ## 2. Información que Recopilamos
 
@@ -66,7 +66,7 @@ Implementamos medidas de seguridad técnicas y organizacionales:
 
 ## 6. Cookies
 
-Urbik utiliza cookies para:
+Geora utiliza cookies para:
 
 - Autenticación de sesión
 - Preferencias del usuario
@@ -86,7 +86,7 @@ Tienes derecho a:
 - Portabilidad de datos
 - Presentar quejas ante autoridades
 
-Para ejercer estos derechos, contacta: privacidad@urbik.com.ar
+Para ejercer estos derechos, contacta: privacidad@geora.com.ar
 
 ## 8. Retención de Datos
 
@@ -94,7 +94,7 @@ Mantenemos tus datos mientras tu cuenta esté activa. Después de la eliminació
 
 ## 9. Enlaces Externos
 
-Urbik no es responsable por prácticas de privacidad de sitios externos. Te recomendamos revisar sus políticas de privacidad.
+Geora no es responsable por prácticas de privacidad de sitios externos. Te recomendamos revisar sus políticas de privacidad.
 
 ## 10. Cambios en esta Política
 
@@ -103,7 +103,7 @@ Podemos modificar esta política ocasionalmente. Cambios significativos serán n
 ## 11. Contacto
 
 Para cuestiones de privacidad:
-- Email: privacidad@urbik.com.ar
+- Email: privacidad@geora.com.ar
 - Dirección: Calle 7 #1234, La Plata, Buenos Aires
 
 ---

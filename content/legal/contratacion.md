@@ -9,14 +9,14 @@ description: "Términos y condiciones para operaciones de compra-venta y alquile
 
 ## 1. Objeto
 
-Estos términos regulan las operaciones de compra-venta y alquiler de propiedades intermediadas a través de la plataforma Urbik.
+Estos términos regulan las operaciones de compra-venta y alquiler de propiedades intermediadas a través de la plataforma Geora.
 
 ## 2. Partes Involucradas
 
 - **Vendedor/Propietario**: Propietario de la propiedad
 - **Comprador/Inquilino**: Interesado en la propiedad
 - **Inmobiliaria Registrada**: Intermediaria autorizada
-- **Urbik**: Plataforma de intermediación
+- **Geora**: Plataforma de intermediación
 
 ## 3. Proceso de Transacción
 
@@ -31,7 +31,7 @@ La Inmobiliaria Registrada publica información completa y veraz de la propiedad
 Compradores/Inquilinos pueden realizar consultas directamente a través de la Plataforma. Las Inmobiliarias deben responder dentro de 24 horas hábiles.
 
 ### 3.3 Negociación
-Las partes negocian los términos de la operación. Urbik facilita la comunicación pero no interviene en la negociación.
+Las partes negocian los términos de la operación. Geora facilita la comunicación pero no interviene en la negociación.
 
 ### 3.4 Acuerdo
 Una vez alcanzado el acuerdo, las partes firman contrato privado o ante escribano según corresponda.
@@ -83,11 +83,11 @@ En caso de conflicto, la Inmobiliaria actuará como mediadora neutral. Si no se 
 
 ## 8. Comisiones y Honorarios
 
-Las comisiones se negocian directamente entre partes e Inmobiliaria. Urbik no interfiere en la fijación de honorarios.
+Las comisiones se negocian directamente entre partes e Inmobiliaria. Geora no interfiere en la fijación de honorarios.
 
 ## 9. Limitaciones de Responsabilidad
 
-Urbik:
+Geora:
 - No garantiza la conclusión de operaciones
 - No asume responsabilidad por contenido publicado
 - No valida títulos de propiedad
@@ -97,7 +97,7 @@ Urbik:
 ## 10. Resolución de Conflictos
 
 ### 10.1 Mediación
-Las partes pueden solicitar mediación a través de Urbik sin costo.
+Las partes pueden solicitar mediación a través de Geora sin costo.
 
 ### 10.2 Arbitraje
 Conflictos no resueltos por mediación se someten a arbitraje según reglamento de Cámara Inmobiliaria Argentina.
@@ -124,7 +124,7 @@ En caso de incumplimiento:
 - La parte afectada puede recurrir a mediación
 - Si persiste, escala a arbitraje
 - Pueden iniciar acciones legales
-- Urbik puede remover partes de la plataforma
+- Geora puede remover partes de la plataforma
 
 ## 13. Legislación Aplicable
 
@@ -144,12 +144,12 @@ Se respetan las regulaciones específicas de cada provincia:
 
 ## 15. Actualización de Términos
 
-Urbik puede modificar estos términos. Cambios significativos se comunican con 30 días de anticipación.
+Geora puede modificar estos términos. Cambios significativos se comunican con 30 días de anticipación.
 
 ## 16. Contacto para Consultas
 
 Para cuestiones de contratación:
-- Email: contratos@urbik.com.ar
+- Email: contratos@geora.com.ar
 - Teléfono: +54 221 123-4567
 - Dirección: Calle 7 #1234, La Plata, Buenos Aires
 

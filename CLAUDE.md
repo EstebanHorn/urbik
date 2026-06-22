@@ -15,7 +15,7 @@ No test suite is configured.
 
 ## Architecture
 
-**Urbik** is a Spanish-language real estate listing platform. Stack: Next.js 16 App Router, React 19, TypeScript, Supabase (auth + DB), Tailwind CSS v4.
+**Geora** is a Spanish-language real estate listing platform. Stack: Next.js 16 App Router, React 19, TypeScript, Supabase (auth + DB), Tailwind CSS v4.
 
 ### Routing & Pages (`src/app/`)
 
@@ -145,7 +145,7 @@ The map page uses layered rendering: React Leaflet for the base interactive map,
 
 ### Styling
 
-Tailwind CSS v4. Custom theme colors: `urbik` palette using cyan, emerald, and rose shades — defined in `tailwind.config.js`. Global styles in `src/app/globals.css`.
+Tailwind CSS v4. Custom theme colors: `geora` palette using cyan, emerald, and rose shades — defined in `tailwind.config.js`. Global styles in `src/app/globals.css`.
 
 ### Environment Variables
 

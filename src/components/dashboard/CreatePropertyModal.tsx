@@ -73,7 +73,7 @@ function CreateProgressBar({
   return (
     <div className="px-8 pb-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-bold uppercase text-urbik-black/50">
+        <span className="text-sm font-bold uppercase text-geora-black/50">
           Progreso de carga - Paso {currentIndex + 1} de {visibleModules.length}
         </span>
         <span className="text-sm font-bold">{percentage}%</span>
@@ -308,7 +308,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
         <div className="relative w-full max-w-xl h-[80vh] bg-white/70 border border-white rounded-3xl flex flex-col shadow-2xl overflow-hidden">
           <div className="flex flex-col shrink-0 bg-white/70">
             <div className="flex items-center justify-between px-8 py-5">
-              <h2 className="text-lg font-black text-urbik-black">
+              <h2 className="text-lg font-black text-geora-black">
                 Cargar propiedad
               </h2>
               <button
@@ -354,7 +354,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
                   key={activeModule.id}
                   className="step-transition opacity-0"
                 >
-                  <h3 className="text-xl font-bold text-center text-urbik-black/80 mb-6">
+                  <h3 className="text-xl font-bold text-center text-geora-black/80 mb-6">
                     {activeModule.label}
                   </h3>
                   {moduleContent[activeModule.id]}
@@ -368,7 +368,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
               type="button"
               onClick={handleBack}
               disabled={isFirstStep || isSubmitting}
-              className="px-6 py-3 text-urbik-black/80 font-bold hover:text-urbik-black transition-colors
+              className="px-6 py-3 text-geora-black/80 font-bold hover:text-geora-black transition-colors
               disabled:opacity-40 cursor-pointer w-32"
             >
               VOLVER
@@ -378,7 +378,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="px-6 py-3 text-urbik-black/80 font-bold hover:text-urbik-black transition-colors
+                className="px-6 py-3 text-geora-black/80 font-bold hover:text-geora-black transition-colors
               disabled:opacity-40 cursor-pointer w-32"
               >
                 SIGUIENTE
@@ -388,7 +388,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
                 type="button"
                 onClick={() => handleSubmit()}
                 disabled={isSubmitting}
-                className="px-6 py-3 text-urbik-black/80 font-bold hover:text-urbik-black transition-colors
+                className="px-6 py-3 text-geora-black/80 font-bold hover:text-geora-black transition-colors
               disabled:opacity-40 cursor-pointer w-32"
               >
                 {isSubmitting ? "GUARDANDO..." : "PUBLICAR PROPIEDAD"}

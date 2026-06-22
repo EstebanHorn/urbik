@@ -96,7 +96,7 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-1 overflow-hidden">
           <div className="p-5">
-            <div className="text-3xl font-black text-urbik-black/80">Vistas a tus propiedades</div>
+            <div className="text-3xl font-black text-geora-black/80">Vistas a tus propiedades</div>
             <p className="text-xs text-gray-500 ml-2 mt-1">Últimos 30 días</p>
           </div>
           <div className="p-4">
@@ -106,7 +106,7 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
 
         <div className="lg:col-span-1 overflow-hidden">
           <div className="p-5">
-            <div className="text-3xl font-black text-urbik-black/80">Visitas a tu perfil</div>
+            <div className="text-3xl font-black text-geora-black/80">Visitas a tu perfil</div>
             <p className="text-xs text-gray-500 ml-2 mt-1">Últimos 30 días · {kpis.agencyViews30d} totales</p>
           </div>
           <div className="p-4">
@@ -117,8 +117,8 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
 
         <div className="w-full overflow-hidden">
           <div className="p-5">
-            <div className="text-md font-bold text-urbik-black/60 ml-2">Ranking</div>
-            <div className="text-4xl font-black text-urbik-black/80">Top 5 más vistas</div>
+            <div className="text-md font-bold text-geora-black/60 ml-2">Ranking</div>
+            <div className="text-4xl font-black text-geora-black/80">Top 5 más vistas</div>
           </div>
           <div className="p-2">
             <TopPropertiesTable properties={topProperties} />
@@ -126,9 +126,9 @@ export default function StatsPanel({ properties }: { properties: PropertyLite[] 
         </div>
 
         <div className="p-5">
-          <div className="text-md font-bold text-urbik-black/60 ml-2">Precios</div>
-          <div className="text-2xl font-black text-urbik-black/80">Historial por propiedad</div>
-          <p className="text-xs text-urbik-black/60 mt-1">Hacé clic en una propiedad para ver su evolución de precio</p>
+          <div className="text-md font-bold text-geora-black/60 ml-2">Precios</div>
+          <div className="text-2xl font-black text-geora-black/80">Historial por propiedad</div>
+          <p className="text-xs text-geora-black/60 mt-1">Hacé clic en una propiedad para ver su evolución de precio</p>
         </div>
         <div className="p-4">
           <PricePanel properties={properties} />

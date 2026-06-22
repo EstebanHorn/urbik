@@ -122,10 +122,10 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
     <section className="pb-20">
       <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between px-2 md:px-10 gap-4">
         <div className="flex items-baseline gap-3">
-          <h2 className="text-2xl font-black text-urbik-black/90 uppercase tracking-tight">
+          <h2 className="text-2xl font-black text-geora-black/90 uppercase tracking-tight">
             Cartera de Propiedades
           </h2>
-          <span className="text-sm font-bold text-urbik-muted hidden sm:block">
+          <span className="text-sm font-bold text-geora-muted hidden sm:block">
             {filteredProperties.length} {filteredProperties.length === 1 ? "propiedad" : "propiedades"}
           </span>
         </div>
@@ -168,10 +168,10 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
               onClick={() => setActiveFilter((v) => (v === "price" ? null : "price"))}
               className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 min-w-10 md:min-w-[120px] font-bold ${
                 minPrice || maxPrice || filterCurrency
-                  ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                  ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                   : activeFilter === "price"
-                    ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
-                    : "bg-white/70 border border-white text-urbik-black/70 hover:bg-gray-50 shadow-sm"
+                    ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
+                    : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
               }`}
             >
               <span className="text-sm md:text-md tracking-wider flex items-center justify-center">
@@ -183,7 +183,7 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
             </button>
 
             {activeFilter === "price" && (
-              <div className="absolute top-full left-0 md:right-0 md:left-auto mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-urbik-black/70 shadow-xl p-5">
+              <div className="absolute top-full left-0 md:right-0 md:left-auto mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
                 <PriceFilterCard
                   minPrice={minPrice}
                   maxPrice={maxPrice}
@@ -204,10 +204,10 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
               onClick={() => setActiveFilter((v) => (v === "rooms" ? null : "rooms"))}
               className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 min-w-10 md:min-w-[120px] font-bold ${
                 filterRooms.length > 0 || filterBedrooms.length > 0 || filterBathrooms.length > 0
-                  ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                  ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                   : activeFilter === "rooms"
-                    ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
-                    : "bg-white/70 border border-white text-urbik-black/70 hover:bg-gray-50 shadow-sm"
+                    ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
+                    : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
               }`}
             >
               <span className="text-sm md:text-md tracking-wider flex items-center justify-center">
@@ -221,7 +221,7 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
             </button>
 
             {activeFilter === "rooms" && (
-              <div className="absolute top-full right-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-urbik-black/70 shadow-xl p-5">
+              <div className="absolute top-full right-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
                 <RoomsFilterCard
                   rooms={filterRooms}
                   bedrooms={filterBedrooms}
@@ -246,7 +246,7 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
                 setFilterBathrooms([]);
                 setActiveFilter(null);
               }}
-              className="h-10 cursor-pointer px-3 md:px-4 py-2 rounded-full flex items-center gap-2 bg-urbik-black/80 text-white text-sm font-bold hover:bg-urbik-black transition-colors shadow-sm"
+              className="h-10 cursor-pointer px-3 md:px-4 py-2 rounded-full flex items-center gap-2 bg-geora-black/80 text-white text-sm font-bold hover:bg-geora-black transition-colors shadow-sm"
             >
               <X size={14} strokeWidth={3} />
               <span className="hidden md:inline">Limpiar filtros</span>
@@ -256,8 +256,8 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
       </div>
 
       {filteredProperties.length === 0 ? (
-        <div className="py-20 text-center border-2 border-dashed border-urbik-g200 rounded-2xl">
-          <p className="text-urbik-muted font-bold text-lg">
+        <div className="py-20 text-center border-2 border-dashed border-geora-g200 rounded-2xl">
+          <p className="text-geora-muted font-bold text-lg">
             {properties.length === 0 
                 ? "Esta inmobiliaria aún no tiene propiedades publicadas." 
                 : "No hay propiedades que coincidan con los filtros aplicados."}
@@ -275,7 +275,7 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
                 animationFillMode: "both"
               }}
             >
-              <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-urbik-g200">
+              <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-geora-g200">
                 {property.images?.[0] ? (
                   <Image
                     src={property.images[0]}
@@ -286,7 +286,7 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center bg-white text-xs font-bold text-black/70">
-                    <Building2 size={36} className="text-urbik-g400" />
+                    <Building2 size={36} className="text-geora-g400" />
                   </div>
                 )}
               </div>
@@ -294,28 +294,28 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
               <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
                 <div>
                   <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                       {PROPERTY_LABELS[property.type] ?? property.type}
                     </span>
-                    <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                       {OPERATION_LABELS[property.operation_type] ?? property.operation_type}
                     </span>
                   </div>
 
-                  <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black">
+                  <h3 className="line-clamp-2 text-base font-black tracking-tight text-geora-black">
                     {property.title}
                   </h3>
-                  <p className="mt-1.5 text-sm text-urbik-black/70 line-clamp-2 leading-snug">
+                  <p className="mt-1.5 text-sm text-geora-black/70 line-clamp-2 leading-snug">
                     {property.description}
                   </p>
-                  <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-urbik-black/80">
-                    <MapPin size={12} className="shrink-0 text-urbik-cyan" />
+                  <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-geora-black/80">
+                    <MapPin size={12} className="shrink-0 text-geora-cyan" />
                     {property.address}, {property.city}
                   </p>
                 </div>
 
                 <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-white/60 pt-4">
-                  <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
+                  <span className="text-base font-black tracking-tight text-geora-black/70 z-1">
                     {formatPrice(
                       property.sale_price || property.rent_price || null,
                       property.sale_currency || property.rent_currency || null

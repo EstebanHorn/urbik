@@ -34,9 +34,9 @@ const AreaIcon = ({ className = "w-4 h-4" }) => (
 
 const FeaturePill = ({ icon: Icon, value, unit }: { icon: any, value: number | string, unit: string }) => (
   <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 border border-black/50 transition-colors group-hover:border-black ">
-    <Icon className="w-3 h-3 sm:w-4 sm:h-4 text-urbik-black/50 group-hover:text-urbik-black" />
-    <span className="text-[11px] sm:text-sm text-urbik-black/50 group-hover:text-urbik-black">
-      <strong className="font-bold text-urbik-black/50 group-hover:text-urbik-black">{value}</strong> {unit}
+    <Icon className="w-3 h-3 sm:w-4 sm:h-4 text-geora-black/50 group-hover:text-geora-black" />
+    <span className="text-[11px] sm:text-sm text-geora-black/50 group-hover:text-geora-black">
+      <strong className="font-bold text-geora-black/50 group-hover:text-geora-black">{value}</strong> {unit}
     </span>
   </div>
 );
@@ -97,23 +97,23 @@ function PromotedPropertyCard({
               Sin imagen
             </div>
           )}
-          <div className="absolute top-4 left-4 rounded-full bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-urbik-black/60 shadow-lg">
+          <div className="absolute top-4 left-4 rounded-full bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-geora-black/60 shadow-lg">
             Propiedad Patrocinada
           </div>
         </div>
 
         <div className="flex flex-1 flex-col justify-center p-4 md:p-6 min-w-0 z-10 w-full">
           <div className="mb-4 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-black/10 bg-urbik-black px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+            <span className="rounded-full border border-black/10 bg-geora-black px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
               {getTypeLabel(property.type)} en {getOperationLabel(property.operationType)}
             </span>
-            <span className="rounded-full border border-emerald-200  text-urbik-emerald px-3 py-1 text-xs font-bold uppercase shadow-sm z-1">
+            <span className="rounded-full border border-emerald-200  text-geora-emerald px-3 py-1 text-xs font-bold uppercase shadow-sm z-1">
               OPORTUNIDAD
             </span>
           </div>
 
           <div className="flex items-start justify-between gap-4">
-            <h3 className="line-clamp-2 text-xl md:text-2xl lg:text-3xl font-black tracking-tight text-urbik-black/90 z-1">
+            <h3 className="line-clamp-2 text-xl md:text-2xl lg:text-3xl font-black tracking-tight text-geora-black/90 z-1">
               {property.title}
             </h3>
             {property.agencyLogo && (
@@ -127,7 +127,7 @@ function PromotedPropertyCard({
             )}
           </div>
 
-          <p className="mt-2 truncate text-sm font-medium text-urbik-black/50 z-1">
+          <p className="mt-2 truncate text-sm font-medium text-geora-black/50 z-1">
             {property.address}, {property.city}, {property.province}
           </p>
 
@@ -135,10 +135,10 @@ function PromotedPropertyCard({
             <PropertyFeatures property={property} />
 
             <div className="flex items-center gap-4">
-              <div className="text-2xl font-black tracking-tight md:text-4xl text-urbik-black">
+              <div className="text-2xl font-black tracking-tight md:text-4xl text-geora-black">
                 {currency} {Number(price).toLocaleString("es-AR")}
               </div>
-              <div className="hidden md:flex h-12 w-12 items-center justify-center rounded-full bg-black/5 text-urbik-black transition-colors duration-300 group-hover:bg-urbik-black group-hover:text-white">
+              <div className="hidden md:flex h-12 w-12 items-center justify-center rounded-full bg-black/5 text-geora-black transition-colors duration-300 group-hover:bg-geora-black group-hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
@@ -206,13 +206,13 @@ export default function List({ items, viewMode, premiumProperty, setHoveredPrope
               <div className="flex min-w-0 flex-1 flex-col justify-between px-2 pb-2 md:py-3 md:pr-4 z-100">
                 <div className="min-w-0">
                   <div className="mb-2 md:mb-3 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-urbik-white2 group-hover:bg-urbik-black px-2 py-1 text-[10px] md:text-xs font-bold uppercase tracking-wider text-urbik-black/80">
+                    <span className="rounded-full bg-geora-white2 group-hover:bg-geora-black px-2 py-1 text-[10px] md:text-xs font-bold uppercase tracking-wider text-geora-black/80">
                       {getTypeLabel(property.type)} en {getOperationLabel(property.operationType)}
                     </span>
                   </div>
                   
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="line-clamp-2 text-lg sm:text-xl md:text-2xl font-black tracking-tight text-urbik-black">
+                    <h3 className="line-clamp-2 text-lg sm:text-xl md:text-2xl font-black tracking-tight text-geora-black">
                       {property.title}
                     </h3>
                     {property.agencyLogo && (
@@ -226,7 +226,7 @@ export default function List({ items, viewMode, premiumProperty, setHoveredPrope
                     )}
                   </div>
 
-                  <p className="mt-1 md:mt-2 truncate text-xs sm:text-sm font-medium text-urbik-black/50">
+                  <p className="mt-1 md:mt-2 truncate text-xs sm:text-sm font-medium text-geora-black/50">
                     {property.displayAddress || property.address}, {property.city}, {property.province}
                   </p>
                 </div>
@@ -235,10 +235,10 @@ export default function List({ items, viewMode, premiumProperty, setHoveredPrope
                   <PropertyFeatures property={property} />
 
                   <div className="flex items-center gap-3">
-                    <div className="text-xl font-black tracking-tight md:text-3xl text-urbik-black">
+                    <div className="text-xl font-black tracking-tight md:text-3xl text-geora-black">
                       {currency} {Number(price).toLocaleString("es-AR")}
                     </div>
-                    <div className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-black/5 text-urbik-black transition-colors duration-300 group-hover:bg-urbik-black group-hover:text-white">
+                    <div className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-black/5 text-geora-black transition-colors duration-300 group-hover:bg-geora-black group-hover:text-white">
                       <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                       </svg>

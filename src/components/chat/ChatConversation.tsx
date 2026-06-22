@@ -24,7 +24,7 @@ function formatDateLabel(iso: string) {
 
 function MessageStatus({ msg }: { msg: ChatMessage }) {
   if (msg.id.startsWith("temp-")) return <Clock size={10} className="text-white/40 shrink-0" />;
-  if (msg.read_at) return <CheckCheck size={11} className="text-urbik-cyan shrink-0" />;
+  if (msg.read_at) return <CheckCheck size={11} className="text-geora-cyan shrink-0" />;
   return <Check size={11} className="text-white/50 shrink-0" />;
 }
 
@@ -110,7 +110,7 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="w-2 h-2 bg-urbik-black/20 rounded-full animate-bounce"
+              className="w-2 h-2 bg-geora-black/20 rounded-full animate-bounce"
               style={{ animationDelay: `${i * 0.12}s` }}
             />
           ))}
@@ -164,8 +164,8 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
                   className={`
                     max-w-[70%] px-3.5 py-2 text-sm font-medium leading-relaxed
                     ${isOwn
-                      ? `bg-urbik-black text-white rounded-2xl ${sameSenderAsNext ? "rounded-br-md" : "rounded-br-sm"}`
-                      : `bg-white border border-gray-100 text-urbik-black shadow-sm rounded-2xl ${sameSenderAsNext ? "rounded-bl-md" : "rounded-bl-sm"}`
+                      ? `bg-geora-black text-white rounded-2xl ${sameSenderAsNext ? "rounded-br-md" : "rounded-br-sm"}`
+                      : `bg-white border border-gray-100 text-geora-black shadow-sm rounded-2xl ${sameSenderAsNext ? "rounded-bl-md" : "rounded-bl-sm"}`
                     }
                     ${msg.id.startsWith("temp-") ? "opacity-50" : ""}
                   `}
@@ -199,7 +199,7 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
           type="button"
           onClick={handleSend}
           disabled={!body.trim() || sending}
-          className="text-urbik-black w-9 h-9 rounded-full flex items-center justify-center disabled:opacity-20 hover:scale-105 active:scale-95 transition-transform shrink-0 cursor-pointer"
+          className="text-geora-black w-9 h-9 rounded-full flex items-center justify-center disabled:opacity-20 hover:scale-105 active:scale-95 transition-transform shrink-0 cursor-pointer"
         >
           <Send size={22} />
         </button>

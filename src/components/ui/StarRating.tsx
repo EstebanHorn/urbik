@@ -33,7 +33,7 @@ export default function StarRating({
               className={
                 active
                   ? "fill-amber-400 text-amber-400"
-                  : "fill-urbik-g200 text-urbik-g400"
+                  : "fill-geora-g200 text-geora-g400"
               }
               aria-hidden
             />
@@ -55,7 +55,7 @@ export default function StarRating({
               className={
                 active
                   ? "fill-amber-400 text-amber-400"
-                  : "fill-transparent text-urbik-g400"
+                  : "fill-transparent text-geora-g400"
               }
             />
           </button>

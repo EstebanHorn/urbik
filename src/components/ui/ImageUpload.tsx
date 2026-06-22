@@ -85,7 +85,7 @@ export default function ImageUpload({
   return (
     <div className="space-y-4">
       <div className="flex justify-end items-end px-1">
-        <span className="text-[10px] text-urbik-black/40 font-medium">{value.length} / {maxFiles} IMÁGENES</span>
+        <span className="text-[10px] text-geora-black/40 font-medium">{value.length} / {maxFiles} IMÁGENES</span>
       </div>
 
       {value.length > 0 && (
@@ -93,8 +93,8 @@ export default function ImageUpload({
           <p className="text-[10px] text-gray-400 font-medium px-1">Arrastrá las fotos para reordenarlas. La posición 1 será la foto de portada.</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             {value.map((url, index) => (
-              <div key={`${url}-${index}`} draggable onDragStart={(e) => handleImageDragStart(e, index)} onDragOver={(e) => handleImageDragOver(e, index)} onDrop={(e) => handleImageDrop(e, index)} onDragEnd={handleImageDragEnd} className={`relative aspect-square rounded-xl overflow-hidden border group bg-white/30 shadow-sm animate-in fade-in zoom-in duration-300 cursor-grab active:cursor-grabbing transition-all ${dragOverIndex === index && draggedIndex !== index ? "border-emerald-400 scale-105 shadow-md" : draggedIndex === index ? "border-urbik-black/30 opacity-50" : "border-urbik-black/10"}`}>
-                {index === 0 && <span className="absolute top-2 left-2 z-10 bg-urbik-black text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">Portada</span>}
+              <div key={`${url}-${index}`} draggable onDragStart={(e) => handleImageDragStart(e, index)} onDragOver={(e) => handleImageDragOver(e, index)} onDrop={(e) => handleImageDrop(e, index)} onDragEnd={handleImageDragEnd} className={`relative aspect-square rounded-xl overflow-hidden border group bg-white/30 shadow-sm animate-in fade-in zoom-in duration-300 cursor-grab active:cursor-grabbing transition-all ${dragOverIndex === index && draggedIndex !== index ? "border-emerald-400 scale-105 shadow-md" : draggedIndex === index ? "border-geora-black/30 opacity-50" : "border-geora-black/10"}`}>
+                {index === 0 && <span className="absolute top-2 left-2 z-10 bg-geora-black text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">Portada</span>}
                 
                 <Image 
                   src={url} 
@@ -117,12 +117,12 @@ export default function ImageUpload({
           <input type="file" multiple accept="image/*" className="hidden" ref={fileInputRef} onChange={onInputChange} disabled={isUploading} />
           <div className="flex flex-col items-center gap-2 z-10">
             {isUploading ? (
-              <div className="flex flex-col items-center gap-2"><div className="w-8 h-8 border border-white rounded-full animate-spin" /><span className="text-xs font-bold text-urbik-black animate-pulse">Subiendo...</span></div>
+              <div className="flex flex-col items-center gap-2"><div className="w-8 h-8 border border-white rounded-full animate-spin" /><span className="text-xs font-bold text-geora-black animate-pulse">Subiendo...</span></div>
             ) : (
               <>
                 <div className="text-center">
-                  <span className={`text-sm font-bold transition-colors ${isDragActive ? "text-urbik-black" : "text-urbik-black/60 group-hover:text-urbik-black"}`}>{isDragActive ? "¡Soltá las fotos acá!" : "Hacé click o arrastrá fotos"}</span>
-                  <p className="text-[10px] text-urbik-black/60 mt-1 uppercase ">JPG, PNG, WEBP · Máx 10MB</p>
+                  <span className={`text-sm font-bold transition-colors ${isDragActive ? "text-geora-black" : "text-geora-black/60 group-hover:text-geora-black"}`}>{isDragActive ? "¡Soltá las fotos acá!" : "Hacé click o arrastrá fotos"}</span>
+                  <p className="text-[10px] text-geora-black/60 mt-1 uppercase ">JPG, PNG, WEBP · Máx 10MB</p>
                 </div>
               </>
             )}

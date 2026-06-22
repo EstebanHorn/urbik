@@ -57,13 +57,13 @@ export default function SmartZoneSingle({ property }: SmartViewProps) {
 
   return (
     <div className="mt-24 relative">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-urbik-emerald/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-geora-emerald/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto">
-        <div className="bg-linear-to-br from-gray-900 to-black rounded-3xl p-8 md:p-12 border border-urbik-emerald/30 shadow-[0_0_50px_-12px_rgba(16,185,129,0.2)] relative overflow-hidden">
+        <div className="bg-linear-to-br from-gray-900 to-black rounded-3xl p-8 md:p-12 border border-geora-emerald/30 shadow-[0_0_50px_-12px_rgba(16,185,129,0.2)] relative overflow-hidden">
           <div className="absolute top-8 right-8 w-10 h-10 ">
             <Image
-              src="/Urbik_Logo_Smart_Zone.svg"
+              src="/Geora_Logo_Smart_Zone.svg"
               alt="Smart Zone"
               width={40}
               height={40}
@@ -73,21 +73,21 @@ export default function SmartZoneSingle({ property }: SmartViewProps) {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center  mr-15">
             <div className="lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-left">
-              <span className="bg-urbik-emerald text-black text-sm font-black px-3 py-1 rounded-full uppercase tracking-[0.2em] mb-4">
+              <span className="bg-geora-emerald text-black text-sm font-black px-3 py-1 rounded-full uppercase tracking-[0.2em] mb-4">
                 Análisis de IA
               </span>
               <h2 className="text-3xl md:text-4xl font-black text-white mb-6 leading-none tracking-tighter uppercase">
-                URBIK SMART <br />
-                <span className="text-urbik-emerald italic text-6xl md:text-8xl block mt-1 -ml-5">
+                GEORA SMART <br />
+                <span className="text-geora-emerald italic text-6xl md:text-8xl block mt-1 -ml-5">
                   ZONE
                 </span>
               </h2>
 
               <div className="flex gap-4 mt-2">
-                <div className="h-28 w-28 bg-urbik-emerald/10 border border-urbik-emerald/20 rounded-2xl flex flex-col items-center justify-center backdrop-blur-sm">
-                  <span className="text-urbik-emerald font-black text-4xl">
+                <div className="h-28 w-28 bg-geora-emerald/10 border border-geora-emerald/20 rounded-2xl flex flex-col items-center justify-center backdrop-blur-sm">
+                  <span className="text-geora-emerald font-black text-4xl">
                     {loadingAi ? (
-                      <div className="w-6 h-6 border-2 border-urbik-emerald border-t-transparent rounded-full animate-spin" />
+                      <div className="w-6 h-6 border-2 border-geora-emerald border-t-transparent rounded-full animate-spin" />
                     ) : (
                       analysis?.score || "N/A"
                     )}
@@ -146,13 +146,13 @@ export default function SmartZoneSingle({ property }: SmartViewProps) {
               <div className="mt-4 flex justify-between items-center px-2">
                 <div className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${loadingAi ? "bg-gray-600" : "bg-urbik-emerald animate-pulse shadow-[0_0_8px_rgba(16,185,129,1)]"}`}
+                    className={`w-2 h-2 rounded-full ${loadingAi ? "bg-gray-600" : "bg-geora-emerald animate-pulse shadow-[0_0_8px_rgba(16,185,129,1)]"}`}
                   />
                   <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">
                     {loadingAi ? "Neural Mapping..." : "Análisis Completo"}
                   </span>
                 </div>
-                <div className="text-[10px] text-urbik-emerald/60 font-bold uppercase tracking-widest flex gap-4">
+                <div className="text-[10px] text-geora-emerald/60 font-bold uppercase tracking-widest flex gap-4">
                   <span
                     className={
                       loadingAi

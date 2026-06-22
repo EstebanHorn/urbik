@@ -59,7 +59,7 @@ export default function FavoriteButton({ propertyId, initialIsFavorite, small = 
                 onClick={toggleFavorite}
                 className={`backdrop-blur-sm rounded-full shadow-md transition-colors flex items-center justify-center
                     ${small ? 'p-2' : 'p-3'}
-                    ${isFavorite ? "bg-urbik-rose" : "bg-urbik-black"}`}
+                    ${isFavorite ? "bg-geora-rose" : "bg-geora-black"}`}
             >
                 <Heart
                     size={small ? 16 : 20}

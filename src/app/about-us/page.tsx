@@ -43,7 +43,7 @@ export default function AboutUs() {
         >
           <div>
             <p className="mb-6">
-              En un mundo donde la tecnología transforma industrias a una velocidad cada vez mayor, el sector inmobiliario enfrenta el desafío de adaptarse a nuevas formas de trabajar, comunicar y tomar decisiones. <strong>Urbik nace para acompañar esa evolución.</strong>
+              En un mundo donde la tecnología transforma industrias a una velocidad cada vez mayor, el sector inmobiliario enfrenta el desafío de adaptarse a nuevas formas de trabajar, comunicar y tomar decisiones. <strong>Geora nace para acompañar esa evolución.</strong>
             </p>
             <p>
               Creemos que comprar, vender o alquilar una propiedad debería ser una experiencia más transparente, eficiente y basada en información confiable. 

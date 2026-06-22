@@ -28,13 +28,13 @@ const THUMB =
   "[&::-webkit-slider-runnable-track]:bg-transparent " +
   "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 " +
   "[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white " +
-  "[&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-urbik-black " +
+  "[&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-geora-black " +
   "[&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab " +
   "[&::-webkit-slider-thumb]:active:cursor-grabbing " +
   "[&::-moz-range-track]:bg-transparent " +
   "[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 " +
   "[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white " +
-  "[&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-urbik-black [&::-moz-range-thumb]:shadow-md";
+  "[&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-geora-black [&::-moz-range-thumb]:shadow-md";
 
 export default function PriceFilterCard({
   minPrice,
@@ -108,7 +108,7 @@ export default function PriceFilterCard({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-urbik-black/70 uppercase">Precio</span>
+        <span className="text-xs font-bold text-geora-black/70 uppercase">Precio</span>
         <div className="flex gap-1 p-0.5">
           {["ARS", "USD"].map((c) => (
             <button
@@ -116,8 +116,8 @@ export default function PriceFilterCard({
               onClick={() => onChangeCurrency(currency === c ? "" : c)}
               className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                 currency === c
-                  ? "bg-urbik-black text-white shadow-sm"
-                  : "text-urbik-black/50"
+                  ? "bg-geora-black text-white shadow-sm"
+                  : "text-geora-black/50"
               }`}
             >
               {c}
@@ -145,7 +145,7 @@ export default function PriceFilterCard({
           <div className="relative h-6 flex items-center">
             <div className="absolute w-full h-1.5 bg-slate-200 rounded-full" />
             <div
-              className="absolute h-1.5 bg-urbik-black/80 rounded-full pointer-events-none"
+              className="absolute h-1.5 bg-geora-black/80 rounded-full pointer-events-none"
               style={{ left: `${minPct}%`, right: `${100 - maxPct}%` }}
             />
             <input
@@ -170,14 +170,14 @@ export default function PriceFilterCard({
 
           <div className="flex justify-between mt-3 gap-2">
             <div className="flex flex-col items-start min-w-[8rem]">
-              <span className="text-[10px] font-bold text-urbik-black/60 uppercase">Desde</span>
-              <span className="text-xs font-black text-urbik-black/80 tabular-nums whitespace-nowrap">
+              <span className="text-[10px] font-bold text-geora-black/60 uppercase">Desde</span>
+              <span className="text-xs font-black text-geora-black/80 tabular-nums whitespace-nowrap">
                 {currencySymbol} {fmt(activeMin)}
               </span>
             </div>
             <div className="flex flex-col items-end min-w-[8rem]">
-              <span className="text-[10px] font-bold text-urbik-black/60 uppercase">Hasta</span>
-              <span className="text-xs font-black text-urbik-black/80 tabular-nums whitespace-nowrap">
+              <span className="text-[10px] font-bold text-geora-black/60 uppercase">Hasta</span>
+              <span className="text-xs font-black text-geora-black/80 tabular-nums whitespace-nowrap">
                 {currencySymbol} {fmt(activeMax)}
               </span>
             </div>
@@ -185,8 +185,8 @@ export default function PriceFilterCard({
         </div>
       ) : absMin > 0 ? (
         <div className="flex flex-col items-center justify-center mt-2">
-          <span className="text-[10px] font-bold text-urbik-black/60 uppercase">Precio único en la zona</span>
-          <span className="text-sm font-black text-urbik-black/80 tabular-nums whitespace-nowrap">
+          <span className="text-[10px] font-bold text-geora-black/60 uppercase">Precio único en la zona</span>
+          <span className="text-sm font-black text-geora-black/80 tabular-nums whitespace-nowrap">
             {currencySymbol} {fmt(absMin)}
           </span>
         </div>

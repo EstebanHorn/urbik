@@ -86,51 +86,51 @@ export default function InquiryForm({ propertyId }: InquiryFormProps) {
     return (
       <div className="mt-20 text-center space-y-4">
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-urbik-emerald/10 rounded-full flex items-center justify-center">
-            <CheckCircle2 size={36} className="text-urbik-emerald" />
+          <div className="w-16 h-16 bg-geora-emerald/10 rounded-full flex items-center justify-center">
+            <CheckCircle2 size={36} className="text-geora-emerald" />
           </div>
         </div>
-        <h4 className="text-xl font-black text-urbik-black">Consulta enviada</h4>
-        <p className="text-urbik-muted text-sm font-medium leading-relaxed">La inmobiliaria se pondrá en contacto con vos.</p>
+        <h4 className="text-xl font-black text-geora-black">Consulta enviada</h4>
+        <p className="text-geora-muted text-sm font-medium leading-relaxed">La inmobiliaria se pondrá en contacto con vos.</p>
       </div>
     );
   }
 
   return (
     <div className="mt-20 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-32 h-32 bg-urbik-cyan/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2" />
+      <div className="absolute top-0 left-0 w-32 h-32 bg-geora-cyan/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2" />
       <div className="relative z-10">
-        <h4 className="text-xl font-black text-urbik-black mb-1">Envianos una consulta</h4>
-        <p className="text-xs font-bold text-urbik-muted uppercase tracking-widest mb-6">Te respondemos a la brevedad</p>
+        <h4 className="text-xl font-black text-geora-black mb-1">Envianos una consulta</h4>
+        <p className="text-xs font-bold text-geora-muted uppercase tracking-widest mb-6">Te respondemos a la brevedad</p>
 
         <form onSubmit={handleSubmit} noValidate className="space-y-4 flex flex-col items-end justify-end">
           <div className="w-full">
-            <label htmlFor="senderName" className="block text-xs font-bold text-urbik-muted uppercase tracking-wider mb-1">Nombre</label>
-            <input id="senderName" name="senderName" type="text" value={form.senderName} onChange={handleChange} placeholder="Tu nombre completo" className={`w-full px-4 py-3 rounded-xl text-sm font-medium bg-white text-urbik-black placeholder:text-urbik-muted/50 outline-none transition-colors focus:border-urbik-emerald ${errors.senderName ? "border-red-400" : "border-urbik-g100 hover:border-urbik-g200"}`} />
+            <label htmlFor="senderName" className="block text-xs font-bold text-geora-muted uppercase tracking-wider mb-1">Nombre</label>
+            <input id="senderName" name="senderName" type="text" value={form.senderName} onChange={handleChange} placeholder="Tu nombre completo" className={`w-full px-4 py-3 rounded-xl text-sm font-medium bg-white text-geora-black placeholder:text-geora-muted/50 outline-none transition-colors focus:border-geora-emerald ${errors.senderName ? "border-red-400" : "border-geora-g100 hover:border-geora-g200"}`} />
             {errors.senderName && <p className="mt-1 text-xs text-red-500 font-medium">{errors.senderName}</p>}
           </div>
 
           <div className="w-full">
-            <label htmlFor="senderEmail" className="block text-xs font-bold text-urbik-muted uppercase tracking-wider mb-1">Email</label>
-            <input id="senderEmail" name="senderEmail" type="email" value={form.senderEmail} onChange={handleChange} placeholder="tu@email.com" className={`w-full px-4 py-3 rounded-xl text-sm font-medium bg-white text-urbik-black placeholder:text-urbik-muted/50 outline-none transition-colors focus:border-urbik-emerald ${errors.senderEmail ? "border-red-400" : "border-urbik-g100 hover:border-urbik-g200"}`} />
+            <label htmlFor="senderEmail" className="block text-xs font-bold text-geora-muted uppercase tracking-wider mb-1">Email</label>
+            <input id="senderEmail" name="senderEmail" type="email" value={form.senderEmail} onChange={handleChange} placeholder="tu@email.com" className={`w-full px-4 py-3 rounded-xl text-sm font-medium bg-white text-geora-black placeholder:text-geora-muted/50 outline-none transition-colors focus:border-geora-emerald ${errors.senderEmail ? "border-red-400" : "border-geora-g100 hover:border-geora-g200"}`} />
             {errors.senderEmail && <p className="mt-1 text-xs text-red-500 font-medium">{errors.senderEmail}</p>}
           </div>
 
           <div className="w-full">
-            <label htmlFor="senderPhone" className="block text-xs font-bold text-urbik-muted uppercase tracking-wider mb-1">Teléfono</label>
-            <input id="senderPhone" name="senderPhone" type="tel" value={form.senderPhone} onChange={handleChange} placeholder="+54 9 11 0000-0000" className={`w-full px-4 py-3 rounded-xl text-sm font-medium bg-white text-urbik-black placeholder:text-urbik-muted/50 outline-none transition-colors focus:border-urbik-emerald ${errors.senderPhone ? "border-red-400" : "border-urbik-g100 hover:border-urbik-g200"}`} />
+            <label htmlFor="senderPhone" className="block text-xs font-bold text-geora-muted uppercase tracking-wider mb-1">Teléfono</label>
+            <input id="senderPhone" name="senderPhone" type="tel" value={form.senderPhone} onChange={handleChange} placeholder="+54 9 11 0000-0000" className={`w-full px-4 py-3 rounded-xl text-sm font-medium bg-white text-geora-black placeholder:text-geora-muted/50 outline-none transition-colors focus:border-geora-emerald ${errors.senderPhone ? "border-red-400" : "border-geora-g100 hover:border-geora-g200"}`} />
             {errors.senderPhone && <p className="mt-1 text-xs text-red-500 font-medium">{errors.senderPhone}</p>}
           </div>
 
           <div className="w-full">
-            <label htmlFor="message" className="block text-xs font-bold text-urbik-muted uppercase tracking-wider mb-1">Consulta</label>
-            <textarea id="message" name="message" rows={4} value={form.message} onChange={handleChange} placeholder="Escribí tu consulta sobre esta propiedad..." className={`w-full px-4 py-3 rounded-xl text-sm font-medium bg-white text-urbik-black placeholder:text-urbik-muted/50 outline-none transition-colors focus:border-urbik-emerald resize-none ${errors.message ? "border-red-400" : "border-urbik-g100 hover:border-urbik-g200"}`} />
+            <label htmlFor="message" className="block text-xs font-bold text-geora-muted uppercase tracking-wider mb-1">Consulta</label>
+            <textarea id="message" name="message" rows={4} value={form.message} onChange={handleChange} placeholder="Escribí tu consulta sobre esta propiedad..." className={`w-full px-4 py-3 rounded-xl text-sm font-medium bg-white text-geora-black placeholder:text-geora-muted/50 outline-none transition-colors focus:border-geora-emerald resize-none ${errors.message ? "border-red-400" : "border-geora-g100 hover:border-geora-g200"}`} />
             {errors.message && <p className="mt-1 text-xs text-red-500 font-medium">{errors.message}</p>}
           </div>
 
           {serverError && <p className="text-xs text-red-500 font-bold bg-red-50 px-4 py-3 rounded-xl border border-red-100">{serverError}</p>}
 
-          <button type="submit" disabled={isSubmitting} className="px-14 bg-urbik-black hover:bg-urbik-dark2 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-5 rounded-full transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group">
+          <button type="submit" disabled={isSubmitting} className="px-14 bg-geora-black hover:bg-geora-dark2 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-5 rounded-full transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group">
             <span>{isSubmitting ? "Enviando..." : "Enviar consulta"}</span>
           </button>
         </form>

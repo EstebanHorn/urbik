@@ -21,7 +21,7 @@ interface PropertyParcelMapProps {
 
 const DynamicMap = dynamic(() => import("./PropertyParcelMapInner"), {
   ssr: false,
-  loading: () => <div className="h-full w-full bg-urbik-white2 animate-pulse rounded-md" />,
+  loading: () => <div className="h-full w-full bg-geora-white2 animate-pulse rounded-md" />,
 });
 
 export default function PropertyParcelMap({ 

@@ -77,20 +77,20 @@ export default function AdminActions({ id, currentStatus, type }: AdminActionsPr
         {pendingAction !== null ? (
           <div className="flex w-full items-center justify-center gap-4 transition-opacity duration-300">
             {isLoading ? (
-              <div className="flex items-center gap-3 text-urbik-black font-bold">
+              <div className="flex items-center gap-3 text-geora-black font-bold">
                 <Loader2 className="animate-spin" size={24} />
                 <span>{pendingAction === "delete" ? "Eliminando..." : "Procesando..."}</span>
               </div>
             ) : (
               <div className="flex flex-col sm:flex-row w-full sm:w-auto items-center gap-4">
-                <span className="font-bold text-urbik-black text-center sm:text-left">
+                <span className="font-bold text-geora-black text-center sm:text-left">
                   ¿Confirmar {pendingAction === "delete" ? "eliminación" : "cambio de estado"}?
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPendingAction(null)}
                     disabled={isLoading}
-                    className="cursor-pointer flex justify-center items-center gap-2 px-5 py-2.5 bg-white/50 hover:bg-white/80 border border-white text-urbik-black shadow-sm rounded-full text-sm font-bold transition-all duration-300 active:scale-95"
+                    className="cursor-pointer flex justify-center items-center gap-2 px-5 py-2.5 bg-white/50 hover:bg-white/80 border border-white text-geora-black shadow-sm rounded-full text-sm font-bold transition-all duration-300 active:scale-95"
                   >
                     <X size={16} /> Cancelar
                   </button>
@@ -98,7 +98,7 @@ export default function AdminActions({ id, currentStatus, type }: AdminActionsPr
                     onClick={handleConfirm}
                     disabled={isLoading}
                     className={`cursor-pointer flex justify-center items-center gap-2 px-5 py-2.5 border border-white shadow-sm rounded-full text-sm font-bold transition-all duration-300 active:scale-95 text-white ${
-                      pendingAction === "delete" ? "bg-urbik-rose hover:opacity-80" : "bg-urbik-black hover:opacity-80"
+                      pendingAction === "delete" ? "bg-geora-rose hover:opacity-80" : "bg-geora-black hover:opacity-80"
                     }`}
                   >
                     <Check size={16} /> Confirmar
@@ -111,14 +111,14 @@ export default function AdminActions({ id, currentStatus, type }: AdminActionsPr
           
           <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4 transition-opacity duration-300">
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="p-2 bg-urbik-black text-white rounded-full">
+              <div className="p-2 bg-geora-black text-white rounded-full">
                 <ShieldAlert size={20} />
               </div>
               <div>
-                <p className="text-xs font-black uppercase tracking-wider text-urbik-black/60">
+                <p className="text-xs font-black uppercase tracking-wider text-geora-black/60">
                   Modo Administrador
                 </p>
-                <p className="text-sm font-bold text-urbik-black">
+                <p className="text-sm font-bold text-geora-black">
                   Gestionando {type === "property" ? "propiedad" : "inmobiliaria"}
                 </p>
               </div>
@@ -127,7 +127,7 @@ export default function AdminActions({ id, currentStatus, type }: AdminActionsPr
             <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
               <button
                 onClick={() => setPendingAction("pause")}
-                className="flex-1 sm:flex-none cursor-pointer flex justify-center items-center gap-2 px-5 py-2.5 bg-white/10 border border-white text-urbik-black/60 shadow-sm rounded-full text-sm font-bold transition-all duration-300 active:scale-95"
+                className="flex-1 sm:flex-none cursor-pointer flex justify-center items-center gap-2 px-5 py-2.5 bg-white/10 border border-white text-geora-black/60 shadow-sm rounded-full text-sm font-bold transition-all duration-300 active:scale-95"
               >
                 {currentStatus === "PAUSED" ? <Play size={16} /> : <Pause size={16} />}
                 {currentStatus === "PAUSED" ? "Reanudar" : "Pausar"}
@@ -135,7 +135,7 @@ export default function AdminActions({ id, currentStatus, type }: AdminActionsPr
               
               <button
                 onClick={() => setPendingAction("delete")}
-                className="flex-1 sm:flex-none cursor-pointer flex justify-center items-center gap-2 px-5 py-2.5 bg-white/10 border border-white text-urbik-rose shadow-sm rounded-full text-sm font-bold transition-all duration-300 active:scale-95"
+                className="flex-1 sm:flex-none cursor-pointer flex justify-center items-center gap-2 px-5 py-2.5 bg-white/10 border border-white text-geora-rose shadow-sm rounded-full text-sm font-bold transition-all duration-300 active:scale-95"
               >
                 <Trash2 size={16} />
                 Eliminar

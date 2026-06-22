@@ -161,11 +161,11 @@ export default function RealEstateReviews({
   return (
     <section className="pb-12">
       <div className="mb-6 flex items-baseline justify-between">
-        <h2 className="text-2xl font-black text-urbik-black/90 uppercase tracking-tight">
+        <h2 className="text-2xl font-black text-geora-black/90 uppercase tracking-tight">
           Reseñas
         </h2>
         {summary.total > 0 && (
-          <span className="text-sm font-bold text-urbik-muted">
+          <span className="text-sm font-bold text-geora-muted">
             {summary.total}{" "}
             {summary.total === 1 ? "reseña" : "reseñas"}
           </span>
@@ -176,7 +176,7 @@ export default function RealEstateReviews({
         <SummaryCard summary={summary} />
         <div className="md:col-span-3 flex flex-col gap-4 min-w-0">
           {error && (
-            <div className="rounded-xl border border-urbik-rose/30 bg-urbik-rose/10 px-4 py-3 text-sm font-medium text-urbik-rose">
+            <div className="rounded-xl border border-geora-rose/30 bg-geora-rose/10 px-4 py-3 text-sm font-medium text-geora-rose">
               {error}
             </div>
           )}
@@ -184,16 +184,16 @@ export default function RealEstateReviews({
           {isOwner ? null : !currentUserId ? (
             <div className=" p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <p className="font-bold text-urbik-black">
+                <p className="font-bold text-geora-black">
                   ¿Querés dejar tu opinión?
                 </p>
-                <p className="text-sm text-urbik-muted font-medium">
+                <p className="text-sm text-geora-muted font-medium">
                   Iniciá sesión para calificar a esta inmobiliaria.
                 </p>
               </div>
               <Link
                 href="/auth/login"
-                className="shrink-0 rounded-full bg-urbik-black hover:bg-urbik-dark2 transition-colors px-5 py-2.5 text-sm font-bold text-white text-center"
+                className="shrink-0 rounded-full bg-geora-black hover:bg-geora-dark2 transition-colors px-5 py-2.5 text-sm font-bold text-white text-center"
               >
                 Iniciar sesión
               </Link>
@@ -210,12 +210,12 @@ export default function RealEstateReviews({
               onSubmit={handleSubmit}
               className="rounded-2xl shadow-sm bg-white p-6"
             >
-              <h3 className="font-bold text-urbik-black mb-3">
+              <h3 className="font-bold text-geora-black mb-3">
                 {myReview ? "Editar tu reseña" : "Dejá tu reseña"}
               </h3>
 
               <div className="mb-4">
-                <label className="block text-xs font-bold uppercase tracking-wide text-urbik-muted mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wide text-geora-muted mb-2">
                   Puntuación
                 </label>
                 <StarRating
@@ -228,7 +228,7 @@ export default function RealEstateReviews({
               <div className="mb-4">
                 <label
                   htmlFor="review-comment"
-                  className="block text-xs font-bold uppercase tracking-wide text-urbik-muted mb-2"
+                  className="block text-xs font-bold uppercase tracking-wide text-geora-muted mb-2"
                 >
                   Comentario
                 </label>
@@ -239,9 +239,9 @@ export default function RealEstateReviews({
                   maxLength={COMMENT_MAX}
                   rows={4}
                   placeholder="Contá cómo fue tu experiencia con esta inmobiliaria…"
-                  className="w-full rounded-xl border border-urbik-g200 bg-white px-4 py-3 text-sm font-medium text-urbik-black focus:border-urbik-cyan focus:outline-none resize-none"
+                  className="w-full rounded-xl border border-geora-g200 bg-white px-4 py-3 text-sm font-medium text-geora-black focus:border-geora-cyan focus:outline-none resize-none"
                 />
-                <div className="mt-1 text-right text-xs text-urbik-muted">
+                <div className="mt-1 text-right text-xs text-geora-muted">
                   {formComment.length}/{COMMENT_MAX}
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function RealEstateReviews({
                     type="button"
                     onClick={handleCancelEdit}
                     disabled={submitting}
-                    className="rounded-full px-5 py-2.5 text-sm font-bold text-urbik-black border border-urbik-g200 hover:bg-urbik-g100 transition-colors disabled:opacity-50"
+                    className="rounded-full px-5 py-2.5 text-sm font-bold text-geora-black border border-geora-g200 hover:bg-geora-g100 transition-colors disabled:opacity-50"
                   >
                     Cancelar
                   </button>
@@ -260,7 +260,7 @@ export default function RealEstateReviews({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded-full bg-urbik-black hover:bg-urbik-dark2 transition-colors px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60"
+                  className="rounded-full bg-geora-black hover:bg-geora-dark2 transition-colors px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60"
                 >
                   {submitting
                     ? "Enviando…"
@@ -288,12 +288,12 @@ function SummaryCard({ summary }: { summary: ReviewSummary }) {
   return (
     <div className=" p-6">
       <div className="flex items-center gap-4 mb-4">
-        <div className="text-5xl font-black text-urbik-black leading-none">
+        <div className="text-5xl font-black text-geora-black leading-none">
           {summary.total > 0 ? summary.average.toFixed(1) : "—"}
         </div>
         <div>
           <StarRating value={Math.round(summary.average)} readonly size={18} />
-          <p className="text-xs text-urbik-muted font-medium mt-1">
+          <p className="text-xs text-geora-muted font-medium mt-1">
             {summary.total === 0
               ? "Sin reseñas todavía"
               : `${summary.total} ${
@@ -310,14 +310,14 @@ function SummaryCard({ summary }: { summary: ReviewSummary }) {
           const pct = (n / maxBar) * 100;
           return (
             <div key={star} className="flex items-center gap-2 text-xs">
-              <span className="w-3 font-bold text-urbik-muted">{star}</span>
-              <div className="flex-1 h-2 rounded-full bg-urbik-g100 overflow-hidden">
+              <span className="w-3 font-bold text-geora-muted">{star}</span>
+              <div className="flex-1 h-2 rounded-full bg-geora-g100 overflow-hidden">
                 <div
                   className="h-full bg-amber-400"
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <span className="w-6 text-right text-urbik-muted font-medium">
+              <span className="w-6 text-right text-geora-muted font-medium">
                 {n}
               </span>
             </div>
@@ -343,7 +343,7 @@ function MyReviewCard({
     <div className=" p-6">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wide text-urbik-muted mb-2">
+          <p className="text-xs font-bold uppercase tracking-wide text-geora-muted mb-2">
             Tu reseña
           </p>
           <StarRating value={review.rating} readonly size={18} />
@@ -353,26 +353,26 @@ function MyReviewCard({
             type="button"
             onClick={onEdit}
             disabled={busy}
-            className="rounded-full p-2 border border-urbik-g200 hover:bg-urbik-g100 transition-colors disabled:opacity-50"
+            className="rounded-full p-2 border border-geora-g200 hover:bg-geora-g100 transition-colors disabled:opacity-50"
             aria-label="Editar"
           >
-            <Pencil size={14} className="text-urbik-black" />
+            <Pencil size={14} className="text-geora-black" />
           </button>
           <button
             type="button"
             onClick={onDelete}
             disabled={busy}
-            className="rounded-full p-2 border border-urbik-g200 hover:bg-urbik-rose/10 hover:border-urbik-rose/30 transition-colors disabled:opacity-50"
+            className="rounded-full p-2 border border-geora-g200 hover:bg-geora-rose/10 hover:border-geora-rose/30 transition-colors disabled:opacity-50"
             aria-label="Eliminar"
           >
-            <Trash2 size={14} className="text-urbik-rose" />
+            <Trash2 size={14} className="text-geora-rose" />
           </button>
         </div>
       </div>
-      <p className="text-sm text-urbik-black font-medium whitespace-pre-wrap">
+      <p className="text-sm text-geora-black font-medium whitespace-pre-wrap">
         {review.comment}
       </p>
-      <p className="text-xs text-urbik-muted font-medium mt-3">
+      <p className="text-xs text-geora-muted font-medium mt-3">
         {formatDate(review.createdAt)}
         {review.updatedAt !== review.createdAt && " · editada"}
       </p>
@@ -393,12 +393,12 @@ function ReviewsList({
 
   if (otherReviews.length === 0) {
     return (
-      <div className="py-12 text-center border-2 border-dashed border-urbik-g200 rounded-2xl">
+      <div className="py-12 text-center border-2 border-dashed border-geora-g200 rounded-2xl">
         <MessageSquare
           size={28}
-          className="mx-auto mb-3 text-urbik-g400"
+          className="mx-auto mb-3 text-geora-g400"
         />
-        <p className="text-urbik-muted font-bold text-sm">
+        <p className="text-geora-muted font-bold text-sm">
           {hasMine
             ? "Aún no hay otras reseñas."
             : "Sé el primero en dejar una reseña."}
@@ -413,7 +413,7 @@ function ReviewsList({
         {otherReviews.map((r) => (
           <div
             key={r.id}
-            className="snap-start shrink-0 w-[85%] sm:w-[320px] bg-white rounded-2xl border border-urbik-black/10 shadow-sm"
+            className="snap-start shrink-0 w-[85%] sm:w-[320px] bg-white rounded-2xl border border-geora-black/10 shadow-sm"
           >
             <ReviewCard review={r} currentUserId={currentUserId} />
           </div>
@@ -433,16 +433,16 @@ function ReviewCard({
   return (
     <article className=" p-5">
       <header className="flex items-start gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full bg-urbik-black text-white font-black text-sm flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-full bg-geora-black text-white font-black text-sm flex items-center justify-center shrink-0">
           {getInitials(review.user.name)}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-bold text-urbik-black text-sm truncate">
+          <p className="font-bold text-geora-black text-sm truncate">
             {review.user.name}
           </p>
           <div className="flex items-center gap-2 mt-0.5">
             <StarRating value={review.rating} readonly size={14} />
-            <span className="text-xs text-urbik-muted font-medium">
+            <span className="text-xs text-geora-muted font-medium">
               {formatDate(review.createdAt)}
               {review.updatedAt !== review.createdAt && " · editada"}
             </span>
@@ -458,7 +458,7 @@ function ReviewCard({
           />
         )}
       </header>
-      <p className="text-sm text-urbik-black font-medium whitespace-pre-wrap">
+      <p className="text-sm text-geora-black font-medium whitespace-pre-wrap">
         {review.comment}
       </p>
     </article>

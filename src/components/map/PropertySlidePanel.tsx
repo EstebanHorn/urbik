@@ -129,11 +129,11 @@ interface FormattedOtherProperty {
 
 function StatChip({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
   return (
-    <div className="flex items-center gap-3 bg-white border border-urbik-g100 rounded-2xl px-4 py-3 shadow-sm">
-      <span className="text-urbik-black bg-urbik-g100 p-2 rounded-full shrink-0">{icon}</span>
+    <div className="flex items-center gap-3 bg-white border border-geora-g100 rounded-2xl px-4 py-3 shadow-sm">
+      <span className="text-geora-black bg-geora-g100 p-2 rounded-full shrink-0">{icon}</span>
       <div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-urbik-muted leading-none mb-0.5">{label}</p>
-        <p className="text-base font-black text-urbik-black leading-tight">{value}</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-geora-muted leading-none mb-0.5">{label}</p>
+        <p className="text-base font-black text-geora-black leading-tight">{value}</p>
       </div>
     </div>
   );
@@ -142,9 +142,9 @@ function StatChip({ icon, label, value }: { icon: React.ReactNode; label: string
 function SurfaceRow({ label, value }: { label: string; value: number | null }) {
   if (!value) return null;
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-urbik-g100 last:border-0">
-      <span className="text-sm font-semibold text-urbik-muted">{label}</span>
-      <span className="text-sm font-black text-urbik-black">{value} m²</span>
+    <div className="flex items-center justify-between py-2.5 border-b border-geora-g100 last:border-0">
+      <span className="text-sm font-semibold text-geora-muted">{label}</span>
+      <span className="text-sm font-black text-geora-black">{value} m²</span>
     </div>
   );
 }
@@ -152,9 +152,9 @@ function SurfaceRow({ label, value }: { label: string; value: number | null }) {
 function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
   return (
     <div className="flex items-center gap-3 py-3">
-      <span className="text-urbik-muted shrink-0">{icon}</span>
-      <span className="text-sm font-semibold text-urbik-muted flex-1">{label}</span>
-      <span className="text-sm font-black text-urbik-black">{value}</span>
+      <span className="text-geora-muted shrink-0">{icon}</span>
+      <span className="text-sm font-semibold text-geora-muted flex-1">{label}</span>
+      <span className="text-sm font-black text-geora-black">{value}</span>
     </div>
   );
 }
@@ -173,10 +173,10 @@ function FeaturesSection({ propertyType, legacyAmenities, featureGroups }: { pro
     if (legacyActive.length === 0) return null;
     return (
       <div className="mt-10">
-        <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight ml-2 mb-4">Servicios y Comodidades</h3>
+        <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight ml-2 mb-4">Servicios y Comodidades</h3>
         <div className="flex flex-wrap gap-2">
           {legacyActive.map(([key]) => (
-            <span key={key} className="inline-flex items-center gap-2 px-3 py-2 bg-urbik-black text-white text-xs font-bold rounded-full">
+            <span key={key} className="inline-flex items-center gap-2 px-3 py-2 bg-geora-black text-white text-xs font-bold rounded-full">
               {LEGACY_ICON[key] ?? <CheckCircle2 size={14} />}
               {key.replace("has", "").replace(/([A-Z])/g, " $1").trim()}
             </span>
@@ -190,21 +190,21 @@ function FeaturesSection({ propertyType, legacyAmenities, featureGroups }: { pro
 
   return (
     <div className="mt-10">
-      <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight ml-2 mb-6">Características y Servicios</h3>
+      <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight ml-2 mb-6">Características y Servicios</h3>
       <div className="space-y-5">
         {showCats.map((cat) => {
           const hasSomething = cat.tags.some((t) => flat[t.key] !== undefined);
           if (!hasSomething && cat.key !== "servicios") return null;
           return (
             <div key={cat.key}>
-              <p className="text-[11px] font-black uppercase tracking-widest text-urbik-muted mb-2 ml-1">{cat.label}</p>
+              <p className="text-[11px] font-black uppercase tracking-widest text-geora-muted mb-2 ml-1">{cat.label}</p>
               <div className="flex flex-wrap gap-2">
                 {cat.tags.map((tag) => {
                   const isTrue = flat[tag.key] === true;
                   const isDefined = flat[tag.key] !== undefined;
                   if (!isTrue && !isDefined) { if (cat.key !== "servicios") return null; }
                   return (
-                    <span key={tag.key} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-full border transition-colors ${isTrue ? "bg-urbik-black text-white border-urbik-black" : "bg-white text-urbik-muted border-urbik-g200"}`}>
+                    <span key={tag.key} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-full border transition-colors ${isTrue ? "bg-geora-black text-white border-geora-black" : "bg-white text-geora-muted border-geora-g200"}`}>
                       {isTrue ? <CheckCircle2 size={13} className="shrink-0" /> : <XCircle size={13} className="shrink-0 opacity-40" />}
                       {tag.label}
                     </span>
@@ -221,10 +221,10 @@ function FeaturesSection({ propertyType, legacyAmenities, featureGroups }: { pro
 
 const getStatusBadge = (property: { status?: string; operationType: string }) => {
   const s = property.status || "AVAILABLE";
-  if (s === "SOLD") return { label: "VENDIDA", color: "bg-urbik-white2 text-urbik-dark" };
-  if (s === "RENTED") return { label: "ALQUILADA", color: "bg-urbik-white2 text-urbik-dark" };
-  if (s === "PAUSED") return { label: "PAUSADA", color: "bg-urbik-white2 text-urbik-dark" };
-  return { label: getOperationLabel(property.operationType), color: "bg-urbik-white2 text-urbik-dark" };
+  if (s === "SOLD") return { label: "VENDIDA", color: "bg-geora-white2 text-geora-dark" };
+  if (s === "RENTED") return { label: "ALQUILADA", color: "bg-geora-white2 text-geora-dark" };
+  if (s === "PAUSED") return { label: "PAUSADA", color: "bg-geora-white2 text-geora-dark" };
+  return { label: getOperationLabel(property.operationType), color: "bg-geora-white2 text-geora-dark" };
 };
 
 export default function PropertySlidePanel({ propertyId, onClose }: { propertyId: string; onClose: () => void }) {
@@ -296,7 +296,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
   if (loading || !data) {
     return (
       <div className="flex h-full items-center justify-center bg-white">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-urbik-black"></div>
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-geora-black"></div>
       </div>
     );
   }
@@ -337,13 +337,13 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
           href={`/property/${property.id}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="cursor-pointer flex items-center gap-2 rounded-full bg-urbik-white2 px-4 py-2 text-xs font-bold uppercase  text-urbik-black/80 hover:bg-urbik-g200 transition-colors"
+          className="cursor-pointer flex items-center gap-2 rounded-full bg-geora-white2 px-4 py-2 text-xs font-bold uppercase  text-geora-black/80 hover:bg-geora-g200 transition-colors"
         >
           <ExternalLink size={14} /> Abrir en nueva pestaña
         </Link>
         <button
           onClick={onClose}
-          className="cursor-pointer rounded-full bg-urbik-white2 p-2 text-urbik-black/80 hover:bg-urbik-g200 transition-colors"
+          className="cursor-pointer rounded-full bg-geora-white2 p-2 text-geora-black/80 hover:bg-geora-g200 transition-colors"
         >
           <X size={20} />
         </button>
@@ -362,12 +362,12 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-2 sm:gap-3 px-5 mt-8 mb-10 sm:mb-20">
           <div className="space-y-2 w-full lg:w-auto">
-            <h1 className="text-3xl md:text-4xl lg:text-4xl font-display font-black text-urbik-black italic tracking-tighter leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-4xl font-display font-black text-geora-black italic tracking-tighter leading-tight">
               {property.title}
             </h1>
-            <div className="flex justify-end items-center gap-2 text-urbik-muted font-medium italic">
-              <MapPin size={16} className="text-urbik-black/60 shrink-0 sm:w-5 sm:h-5" />
-              <span className="text-urbik-black/60 sm:text-lg">
+            <div className="flex justify-end items-center gap-2 text-geora-muted font-medium italic">
+              <MapPin size={16} className="text-geora-black/60 shrink-0 sm:w-5 sm:h-5" />
+              <span className="text-geora-black/60 sm:text-lg">
                 {property.address}{property.neighborhood ? `, ${property.neighborhood}` : ""}, {property.city}
                 {property.locality && property.locality !== property.city ? ` (${property.locality})` : ""}
               </span>
@@ -378,7 +378,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
             <div className="lg:text-right w-full lg:w-auto">
               <div className={`flex flex-col ${isBoth ? "gap-2" : ""}`}>
                 <div className="flex flex-wrap justify-end items-center gap-3 mb-2 z-100">
-                  <span className="bg-urbik-black text-urbik-white text-xs font-black uppercase tracking-wider border border-urbik-g100 px-4 py-2 rounded-full">
+                  <span className="bg-geora-black text-geora-white text-xs font-black uppercase tracking-wider border border-geora-g100 px-4 py-2 rounded-full">
                     {getPropertyLabel(property.type)}
                   </span>
                   <span className={`text-xs font-black uppercase px-4 py-2 rounded-full tracking-wider shadow-sm ${statusBadge.color}`}>
@@ -388,13 +388,13 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
                 </div>
                 {(property.operationType === "SALE" || isBoth) && property.salePrice && (
                   <div className="flex flex-col lg:items-end">
-                    {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1">Venta</span>}
+                    {isBoth && <span className="text-xs font-black text-geora-muted uppercase tracking-widest mb-1">Venta</span>}
                     <div className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-5xl"} font-display font-bold tracking-tighter flex items-baseline`}>
-                      <span className="text-urbik-black/30 mr-2 font-black text-0.5em">{property.saleCurrency}</span>
-                      <span className="text-urbik-black">${formatter.format(property.salePrice)}</span>
+                      <span className="text-geora-black/30 mr-2 font-black text-0.5em">{property.saleCurrency}</span>
+                      <span className="text-geora-black">${formatter.format(property.salePrice)}</span>
                     </div>
                     {property.expenses && (
-                      <p className="text-sm font-bold text-urbik-muted lg:text-right mt-1">
+                      <p className="text-sm font-bold text-geora-muted lg:text-right mt-1">
                         + Expensas: {property.saleCurrency} {formatter.format(property.expenses)}
                       </p>
                     )}
@@ -402,13 +402,13 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
                 )}
                 {(property.operationType === "RENT" || property.operationType === "TEMP_RENT" || isBoth) && property.rentPrice && (
                   <div className="flex flex-col lg:items-end">
-                    {isBoth && <span className="text-xs font-black text-urbik-muted uppercase tracking-widest mb-1 mt-2">Alquiler</span>}
+                    {isBoth && <span className="text-xs font-black text-geora-muted uppercase tracking-widest mb-1 mt-2">Alquiler</span>}
                     <div className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
-                      <span className="text-urbik-black/30 mr-2 font-black text-0.5em">{property.rentCurrency}</span>
-                      <span className="text-urbik-black">{formatter.format(property.rentPrice)}</span>
+                      <span className="text-geora-black/30 mr-2 font-black text-0.5em">{property.rentCurrency}</span>
+                      <span className="text-geora-black">{formatter.format(property.rentPrice)}</span>
                     </div>
                     {property.expenses && (
-                      <p className="text-sm font-bold text-urbik-muted lg:text-right mt-1">
+                      <p className="text-sm font-bold text-geora-muted lg:text-right mt-1">
                         + Expensas: {property.rentCurrency} {formatter.format(property.expenses)}
                       </p>
                     )}
@@ -419,7 +419,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
           )}
           {property.isPriceHidden && (
             <div className="lg:text-right">
-              <p className="text-4xl font-black text-urbik-muted italic">Consultar precio</p>
+              <p className="text-4xl font-black text-geora-muted italic">Consultar precio</p>
             </div>
           )}
         </div>
@@ -428,7 +428,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
           <div className="lg:col-span-8 space-y-10">
             {statChips.length > 0 && (
               <div>
-                <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Resumen</h3>
+                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">Resumen</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {statChips.map((chip, i) => (
                     <StatChip key={i} icon={chip.icon} label={chip.label} value={chip.value} />
@@ -439,15 +439,15 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
 
             {hasSurfaceBreakdown && (
               <div>
-                <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Superficies</h3>
-                <div className="bg-white border border-urbik-g100 rounded-2xl px-6 py-2 shadow-sm">
+                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">Superficies</h3>
+                <div className="bg-white border border-geora-g100 rounded-2xl px-6 py-2 shadow-sm">
                   <SurfaceRow label="Superficie cubierta" value={property.area} />
                   <SurfaceRow label="Superficie semicubierta" value={property.semiCoveredArea} />
                   <SurfaceRow label="Superficie descubierta" value={property.uncoveredArea} />
                   {(property.area || 0) + (property.semiCoveredArea || 0) + (property.uncoveredArea || 0) > 0 && (
-                    <div className="flex items-center justify-between py-2.5 pt-3 border-t border-urbik-g100">
-                      <span className="text-sm font-black text-urbik-black">Total</span>
-                      <span className="text-sm font-black text-urbik-emerald">
+                    <div className="flex items-center justify-between py-2.5 pt-3 border-t border-geora-g100">
+                      <span className="text-sm font-black text-geora-black">Total</span>
+                      <span className="text-sm font-black text-geora-emerald">
                         {(property.area || 0) + (property.semiCoveredArea || 0) + (property.uncoveredArea || 0)} m²
                       </span>
                     </div>
@@ -458,7 +458,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
 
             {detailRows.length > 0 && (
               <div>
-                <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Ficha Técnica</h3>
+                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">Ficha Técnica</h3>
                 <div className="px-6 py-2">
                   {detailRows.map((row, i) => (
                     <DetailRow key={i} icon={row.icon} label={row.label} value={row.value} />
@@ -469,9 +469,9 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
 
             {property.description && (
               <div>
-                <h3 className="text-2xl font-display font-bold text-urbik-muted tracking-tight mb-4 ml-2">Descripción</h3>
-                <div className="bg-white p-8 rounded-2xl border border-urbik-g100 shadow-sm">
-                  <div className="text-urbik-black/80 leading-relaxed whitespace-pre-wrap font-serif text-lg">
+                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">Descripción</h3>
+                <div className="bg-white p-8 rounded-2xl border border-geora-g100 shadow-sm">
+                  <div className="text-geora-black/80 leading-relaxed whitespace-pre-wrap font-serif text-lg">
                     {property.description}
                   </div>
                 </div>
@@ -487,7 +487,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-8">
                     <div className="flex flex-col w-full justify-center items-center mt-5">
-                      <p className="text-xs font-bold uppercase tracking-widest text-urbik-muted mb-3">Comercializa</p>
+                      <p className="text-xs font-bold uppercase tracking-widest text-geora-muted mb-3">Comercializa</p>
                       <Link
                         href={`/realestate/${property.realEstateId}`}
                         className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
@@ -501,7 +501,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
                             className="w-20 h-20 object-cover"
                           />
                         ) : (
-                          <div className="w-20 h-20 rounded-full bg-urbik-g100 flex items-center justify-center text-urbik-black/50 font-black text-2xl">
+                          <div className="w-20 h-20 rounded-full bg-geora-g100 flex items-center justify-center text-geora-black/50 font-black text-2xl">
                             {(property.RealEstate?.agencyName || "I").charAt(0)}
                           </div>
                         )}
@@ -513,21 +513,21 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
                   </div>
                   <div className="space-y-3 mb-8 ml-3">
                     <div className="flex items-center gap-4 p-4">
-                      <div className="p-2"><Phone size={18} className="text-urbik-dark" /></div>
+                      <div className="p-2"><Phone size={18} className="text-geora-dark" /></div>
                       <div>
-                        <p className="text-[10px] font-bold text-urbik-muted uppercase">Teléfono</p>
+                        <p className="text-[10px] font-bold text-geora-muted uppercase">Teléfono</p>
                         <span className="font-bold text-md">{property.RealEstate?.phone || "No disponible"}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-4 p-4">
-                      <div className="p-2"><Mail size={18} className="text-urbik-dark" /></div>
+                      <div className="p-2"><Mail size={18} className="text-geora-dark" /></div>
                       <div>
-                        <p className="text-[10px] font-bold text-urbik-muted uppercase">Email</p>
+                        <p className="text-[10px] font-bold text-geora-muted uppercase">Email</p>
                         <span className="font-bold text-md">Consultar</span>
                       </div>
                     </div>
                   </div>
-                  <Link href={`/realestate/${property.realEstateId}`} className="block mt-4 mb-5 italic text-center text-xs font-bold text-urbik-muted hover:text-urbik-black underline decoration-dashed">
+                  <Link href={`/realestate/${property.realEstateId}`} className="block mt-4 mb-5 italic text-center text-xs font-bold text-geora-muted hover:text-geora-black underline decoration-dashed">
                     Ver todas las propiedades
                   </Link>
                 </div>
@@ -543,10 +543,10 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
           </div>
         )}
         
-        <div className="mt-12 sm:mt-24 pt-8 sm:pt-12 border-t border-urbik-g100">
-          <h3 className="text-2xl sm:text-3xl font-display text-urbik-black tracking-tighter mb-6 sm:mb-8">
+        <div className="mt-12 sm:mt-24 pt-8 sm:pt-12 border-t border-geora-g100">
+          <h3 className="text-2xl sm:text-3xl font-display text-geora-black tracking-tighter mb-6 sm:mb-8">
             <span className="font-medium">Más propiedades de </span>
-            <span className="font-black italic uppercase text-urbik-black">{property.RealEstate?.agencyName || "la inmobiliaria"}</span>
+            <span className="font-black italic uppercase text-geora-black">{property.RealEstate?.agencyName || "la inmobiliaria"}</span>
           </h3>
           {otherProperties.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -561,11 +561,11 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
                     </div>
                   </div>
                   <div className="p-5 flex flex-col grow">
-                    <h3 className="text-md font-bold mb-1 line-clamp-2 text-urbik-dark group-hover:text-urbik-black/60 transition-colors">{other.title}</h3>
-                    <div className="flex items-center text-urbik-muted mb-4 text-xs font-medium"><MapPin size={12} className="mr-1" /><p>{other.city}</p></div>
+                    <h3 className="text-md font-bold mb-1 line-clamp-2 text-geora-dark group-hover:text-geora-black/60 transition-colors">{other.title}</h3>
+                    <div className="flex items-center text-geora-muted mb-4 text-xs font-medium"><MapPin size={12} className="mr-1" /><p>{other.city}</p></div>
                     <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-end">
-                      <p className="text-[10px] font-bold text-urbik-muted uppercase tracking-wider">{getOperationLabel(other.operationType)}</p>
-                      <p className="text-lg font-black text-urbik-dark">{other.currency} {(other.salePrice || other.rentPrice || 0).toLocaleString("es-AR")}</p>
+                      <p className="text-[10px] font-bold text-geora-muted uppercase tracking-wider">{getOperationLabel(other.operationType)}</p>
+                      <p className="text-lg font-black text-geora-dark">{other.currency} {(other.salePrice || other.rentPrice || 0).toLocaleString("es-AR")}</p>
                     </div>
                   </div>
                 </div>

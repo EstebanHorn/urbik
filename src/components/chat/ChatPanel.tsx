@@ -41,8 +41,8 @@ export default function ChatPanel({ defaultThreadId }: Props = {}) {
       <div className={`w-full md:w-72 shrink-0 border-r border-gray-100 flex flex-col ${showConversation ? "hidden md:flex" : "flex"}`}>
         <div className="px-4 py-3 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-2">
-            <MessageCircle size={16} className="text-urbik-black" />
-            <h3 className="font-black text-sm text-urbik-black">Conversaciones</h3>
+            <MessageCircle size={16} className="text-geora-black" />
+            <h3 className="font-black text-sm text-geora-black">Conversaciones</h3>
           </div>
         </div>
         <div className="flex-1 min-h-0">
@@ -67,7 +67,7 @@ export default function ChatPanel({ defaultThreadId }: Props = {}) {
                 <ArrowLeft size={16} />
               </button>
               <div>
-                <p className="font-black text-sm text-urbik-black">{activeThread?.otherParty ?? "Conversación"}</p>
+                <p className="font-black text-sm text-geora-black">{activeThread?.otherParty ?? "Conversación"}</p>
                 {activeThread?.property && (
                   <p className="text-xs text-gray-400 truncate">{activeThread.property.title}</p>
                 )}

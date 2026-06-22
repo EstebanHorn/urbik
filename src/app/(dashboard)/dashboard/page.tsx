@@ -133,7 +133,7 @@ function DashboardPageInner() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const cachedProfile = sessionStorage.getItem("urbik_profile_cache");
+      const cachedProfile = sessionStorage.getItem("geora_profile_cache");
       if (cachedProfile) {
         setProfile(JSON.parse(cachedProfile));
       }
@@ -149,7 +149,7 @@ function DashboardPageInner() {
       const data = await res.json();
       
       setProfile(data);
-      sessionStorage.setItem("urbik_profile_cache", JSON.stringify(data));
+      sessionStorage.setItem("geora_profile_cache", JSON.stringify(data));
     } catch (error) {
       console.error("❌ Fallo en fetchProfile:", error);
     }
@@ -186,7 +186,7 @@ function DashboardPageInner() {
         <div className="max-w-md rounded-md border border-gray-200 bg-gray-50 p-8 shadow-sm text-center">
           <h1 className="text-2xl font-black text-black">Iniciá sesión para ver tu panel</h1>
           <p className="mt-2 text-sm text-gray-500">Vas a poder ver estadísticas y gestionar tu cuenta.</p>
-          <button onClick={() => router.push("/auth/login")} className="mt-6 rounded-full cursor-pointer bg-urbik-black px-6 py-3 text-sm font-bold text-white hover:opacity-90 transition">
+          <button onClick={() => router.push("/auth/login")} className="mt-6 rounded-full cursor-pointer bg-geora-black px-6 py-3 text-sm font-bold text-white hover:opacity-90 transition">
             Iniciar sesión
           </button>
         </div>

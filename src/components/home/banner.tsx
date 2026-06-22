@@ -112,7 +112,7 @@ export default function Banner({ items }: BannerProps) {
       <style>{animationStyles}</style>
 
       <div
-        className={`relative w-full h-[230px] md:h-[650px] -mb-25 overflow-hidden bg-urbik-black transition-all duration-1000 ease-out ${
+        className={`relative w-full h-[230px] md:h-[650px] -mb-25 overflow-hidden bg-geora-black transition-all duration-1000 ease-out ${
           isMounted ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -125,7 +125,7 @@ export default function Banner({ items }: BannerProps) {
           >
             <Image
               src={image}
-              alt={`Urbik Background ${index + 1}`}
+              alt={`Geora Background ${index + 1}`}
               fill
               className="object-cover animate-ken-burns"
               priority={index === 0}
@@ -160,7 +160,7 @@ export default function Banner({ items }: BannerProps) {
               className="relative mb-4 hidden md:flex p-1 rounded-full bg-white/20 mr-10 border border-white/20 backdrop-blur-md shadow-lg isolate"
             >
               <div
-                className="absolute top-1 bottom-1 -z-10 rounded-full bg-urbik-white1 transition-all duration-300 ease-out shadow-md"
+                className="absolute top-1 bottom-1 -z-10 rounded-full bg-geora-white1 transition-all duration-300 ease-out shadow-md"
                 style={{ left: `${pillProps.left}px`, width: `${pillProps.width}px` }}
               />
               {OPERATIONS.map((op) => (
@@ -169,7 +169,7 @@ export default function Banner({ items }: BannerProps) {
                   ref={operation === op ? activeBtnRef : null}
                   onClick={() => setOperation(op)}
                   className={`px-5 cursor-pointer py-2 md:px-6 md:py-2.5 rounded-full text-sm md:text-base font-semibold capitalize transition-all duration-300 ${
-                    operation === op ? "text-urbik-black" : "text-white/80 hover:text-white"
+                    operation === op ? "text-geora-black" : "text-white/80 hover:text-white"
                   }`}
                 >
                   {op}
@@ -197,7 +197,7 @@ export default function Banner({ items }: BannerProps) {
                 )}
                 <button
                   onClick={handleBuscar}
-                  className="cursor-pointer rounded-full bg-urbik-accent px-4 py-2.5 md:px-8 md:py-3 text-sm md:text-lg font-bold text-white transition-all hover:bg-urbik-accent/80 hover:scale-105 active:scale-95"
+                  className="cursor-pointer rounded-full bg-geora-accent px-4 py-2.5 md:px-8 md:py-3 text-sm md:text-lg font-bold text-white transition-all hover:bg-geora-accent/80 hover:scale-105 active:scale-95"
                 >
                   Buscar
                 </button>

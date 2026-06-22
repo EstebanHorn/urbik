@@ -71,7 +71,7 @@ export default function ChatThreadList({ threads, loading, activeThreadId, onSel
             onClick={() => onSelect(t.id)}
             className={`w-full text-left px-3 py-2.5 flex items-start gap-3 transition-colors cursor-pointer ${
               isActive
-                ? "bg-urbik-black/80"
+                ? "bg-geora-black/80"
                 : "hover:bg-gray-100/80"
             }`}
           >
@@ -81,7 +81,7 @@ export default function ChatThreadList({ threads, loading, activeThreadId, onSel
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <span className={`font-black text-sm truncate ${isActive ? "text-white" : "text-urbik-black"}`}>
+                <span className={`font-black text-sm truncate ${isActive ? "text-white" : "text-geora-black"}`}>
                   {t.otherParty}
                 </span>
                 <span className={`text-[10px] shrink-0 tabular-nums ${isActive ? "text-white/40" : "text-gray-400"}`}>
@@ -94,7 +94,7 @@ export default function ChatThreadList({ threads, loading, activeThreadId, onSel
               </p>
 
               {hasUnread && !isActive && (
-                <span className="inline-flex items-center mt-1 bg-urbik-black/40 text-urbik-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center mt-1 bg-geora-black/40 text-geora-white text-[10px] font-black px-2 py-0.5 rounded-full">
                   {t.unreadCount} nuevo{t.unreadCount > 1 ? "s" : ""}
                 </span>
               )}

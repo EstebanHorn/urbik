@@ -10,25 +10,25 @@ const TERMS = [
   {
     id: 1,
     title: "1. Objeto",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
+    icon: <FileText size={18} className="text-geora-black/60" />,
     content: (
       <>
-        <p>Los presentes Términos y Condiciones regulan el acceso y uso de la plataforma digital “Urbik” (en adelante, la “Plataforma”), operada por Joaquín Menéndez, CUIT 23-40065566-9, con domicilio en la ciudad de La Plata, Provincia de Buenos Aires, República Argentina.</p>
-        <p className="mt-2">Urbik es una plataforma digital que permite a inmobiliarias publicar inmuebles y a los usuarios acceder a dicha información y establecer contacto con los anunciantes.</p>
-        <p className="mt-2 text-urbik-black/90 font-bold">Urbik no es propietario, desarrollador, comercializador ni intermediario en las operaciones inmobiliarias, ni participa en negociaciones o contratos entre usuarios.</p>
+        <p>Los presentes Términos y Condiciones regulan el acceso y uso de la plataforma digital “Geora” (en adelante, la “Plataforma”), operada por Joaquín Menéndez, CUIT 23-40065566-9, con domicilio en la ciudad de La Plata, Provincia de Buenos Aires, República Argentina.</p>
+        <p className="mt-2">Geora es una plataforma digital que permite a inmobiliarias publicar inmuebles y a los usuarios acceder a dicha información y establecer contacto con los anunciantes.</p>
+        <p className="mt-2 text-geora-black/90 font-bold">Geora no es propietario, desarrollador, comercializador ni intermediario en las operaciones inmobiliarias, ni participa en negociaciones o contratos entre usuarios.</p>
       </>
     )
   },
   {
     id: 2,
     title: "2. Aceptación",
-    icon: <ShieldCheck size={18} className="text-urbik-black/60" />,
+    icon: <ShieldCheck size={18} className="text-geora-black/60" />,
     content: "El acceso, navegación y uso de la Plataforma implica la aceptación plena, expresa e incondicionada de los presentes Términos y Condiciones."
   },
   {
     id: 3,
     title: "3. Usuarios",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
+    icon: <FileText size={18} className="text-geora-black/60" />,
     content: (
       <>
         <p>El uso de la Plataforma está permitido únicamente a personas mayores de 18 años con capacidad legal para contratar.</p>
@@ -39,33 +39,33 @@ const TERMS = [
   {
     id: 4,
     title: "4. Registro y verificación",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
+    icon: <FileText size={18} className="text-geora-black/60" />,
     content: (
       <>
         <p>Para publicar en la Plataforma, las inmobiliarias deberán proporcionar información veraz y actualizada, incluyendo:</p>
-        <ul className="list-disc pl-5 mt-2 space-y-1 text-urbik-black/80 font-medium">
+        <ul className="list-disc pl-5 mt-2 space-y-1 text-geora-black/80 font-medium">
           <li>Matrícula profesional</li>
           <li>Nombre del matriculado</li>
           <li>Nombre comercial</li>
         </ul>
-        <p className="mt-2">Urbik se reserva el derecho de aceptar o rechazar solicitudes de registro a su exclusivo criterio, sin necesidad de expresar causa.</p>
+        <p className="mt-2">Geora se reserva el derecho de aceptar o rechazar solicitudes de registro a su exclusivo criterio, sin necesidad de expresar causa.</p>
       </>
     )
   },
   {
     id: 5,
     title: "5. Uso de la Plataforma",
-    icon: <Scale size={18} className="text-urbik-black/60" />,
+    icon: <Scale size={18} className="text-geora-black/60" />,
     content: "El Usuario se compromete a utilizar la Plataforma conforme a la ley, la moral y las buenas costumbres, y a no realizar actividades ilícitas o que perjudiquen a terceros."
   },
   {
     id: 6,
     title: "6. Usos prohibidos",
-    icon: <AlertTriangle size={18} className="text-urbik-black/60" />,
+    icon: <AlertTriangle size={18} className="text-geora-black/60" />,
     content: (
       <>
         <p>Se prohíbe explícitamente:</p>
-        <ul className="list-disc pl-5 mt-2 space-y-1 text-urbik-black/80 font-medium">
+        <ul className="list-disc pl-5 mt-2 space-y-1 text-geora-black/80 font-medium">
           <li>Publicar información falsa, incompleta o engañosa.</li>
           <li>Suplantar identidad.</li>
           <li>Utilizar bots, scraping o herramientas automatizadas.</li>
@@ -78,22 +78,22 @@ const TERMS = [
   {
     id: 7,
     title: "7. Contenido",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
+    icon: <FileText size={18} className="text-geora-black/60" />,
     content: (
       <>
         <p>Toda la información publicada es responsabilidad exclusiva de las inmobiliarias.</p>
-        <p className="mt-2">Urbik no garantiza la veracidad, exactitud o actualización de los contenidos.</p>
+        <p className="mt-2">Geora no garantiza la veracidad, exactitud o actualización de los contenidos.</p>
       </>
     )
   },
   {
     id: 8,
-    title: "8. Facultades de Urbik",
-    icon: <Scale size={18} className="text-urbik-black/60" />,
+    title: "8. Facultades de Geora",
+    icon: <Scale size={18} className="text-geora-black/60" />,
     content: (
       <>
-        <p>Urbik podrá, a su exclusivo criterio y sin necesidad de notificación previa:</p>
-        <ul className="list-disc pl-5 mt-2 space-y-1 text-urbik-black/80 font-medium">
+        <p>Geora podrá, a su exclusivo criterio y sin necesidad de notificación previa:</p>
+        <ul className="list-disc pl-5 mt-2 space-y-1 text-geora-black/80 font-medium">
           <li>Eliminar publicaciones.</li>
           <li>Suspender o bloquear cuentas.</li>
           <li>Modificar o discontinuar servicios.</li>
@@ -104,47 +104,47 @@ const TERMS = [
   {
     id: 9,
     title: "9. Limitación de responsabilidad",
-    icon: <AlertTriangle size={18} className="text-urbik-black/60" />,
+    icon: <AlertTriangle size={18} className="text-geora-black/60" />,
     content: (
       <>
-        <p>Urbik no será responsable por:</p>
-        <ul className="list-disc pl-5 mt-2 space-y-1 text-urbik-black/80 font-medium">
+        <p>Geora no será responsable por:</p>
+        <ul className="list-disc pl-5 mt-2 space-y-1 text-geora-black/80 font-medium">
           <li>Operaciones realizadas entre usuarios.</li>
           <li>Daños directos o indirectos derivados del uso de la Plataforma.</li>
           <li>Errores en publicaciones.</li>
         </ul>
-        <p className="mt-2 font-bold text-urbik-black/90">La Plataforma actúa únicamente como un espacio de contacto.</p>
+        <p className="mt-2 font-bold text-geora-black/90">La Plataforma actúa únicamente como un espacio de contacto.</p>
       </>
     )
   },
   {
     id: 10,
     title: "10. Funcionamiento técnico",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
-    content: "Urbik no garantiza disponibilidad continua ni ausencia de errores o interrupciones en el sistema."
+    icon: <FileText size={18} className="text-geora-black/60" />,
+    content: "Geora no garantiza disponibilidad continua ni ausencia de errores o interrupciones en el sistema."
   },
   {
     id: 11,
     title: "11. Propiedad intelectual",
-    icon: <ShieldCheck size={18} className="text-urbik-black/60" />,
-    content: "Todo el contenido, diseño, software y marca de la Plataforma es propiedad de Urbik, quedando prohibida su reproducción sin autorización."
+    icon: <ShieldCheck size={18} className="text-geora-black/60" />,
+    content: "Todo el contenido, diseño, software y marca de la Plataforma es propiedad de Geora, quedando prohibida su reproducción sin autorización."
   },
   {
     id: 12,
     title: "12. Datos personales",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
+    icon: <FileText size={18} className="text-geora-black/60" />,
     content: "El uso de la Plataforma implica la aceptación íntegra de nuestra Política de Privacidad."
   },
   {
     id: 13,
     title: "13. Modificaciones",
-    icon: <FileText size={18} className="text-urbik-black/60" />,
-    content: "Urbik podrá modificar en cualquier momento los presentes Términos y Condiciones. Las modificaciones entrarán en vigencia desde su publicación en la Plataforma."
+    icon: <FileText size={18} className="text-geora-black/60" />,
+    content: "Geora podrá modificar en cualquier momento los presentes Términos y Condiciones. Las modificaciones entrarán en vigencia desde su publicación en la Plataforma."
   },
   {
     id: 14,
     title: "14. Jurisdicción",
-    icon: <Scale size={18} className="text-urbik-black/60" />,
+    icon: <Scale size={18} className="text-geora-black/60" />,
     content: (
       <>
         <p>Los presentes Términos se rigen por las leyes de la República Argentina.</p>
@@ -156,16 +156,16 @@ const TERMS = [
 
 export default function TermsAndConditions() {
   return (
-    <div className="min-h-screen mt-15 bg-urbik-white py-10 px-4 sm:px-6 lg:px-8 pb-28 flex flex-col items-center">
+    <div className="min-h-screen mt-15 bg-geora-white py-10 px-4 sm:px-6 lg:px-8 pb-28 flex flex-col items-center">
       
       <div className="w-full max-w-4xl flex items-center mb-10 mt-5 relative z-10 animate-fade-in-up">
         <Link 
           href="/" 
-          className="w-10 h-10 flex items-center justify-center  cursor-pointer border-black/10 text-urbik-black/80 hover:scale-105 transition duration-200 absolute left-0"
+          className="w-10 h-10 flex items-center justify-center  cursor-pointer border-black/10 text-geora-black/80 hover:scale-105 transition duration-200 absolute left-0"
         >
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="w-full text-center text-2xl md:text-3xl font-black text-urbik-black/90 uppercase tracking-tighter">
+        <h1 className="w-full text-center text-2xl md:text-3xl font-black text-geora-black/90 uppercase tracking-tighter">
           Términos y Condiciones
         </h1>
       </div>
@@ -183,11 +183,11 @@ export default function TermsAndConditions() {
                 }}
               >
                 <div className="flex items-center gap-3 ml-15 mb-2">
-                  <h3 className="text-lg font-black tracking-tight text-urbik-black uppercase">
+                  <h3 className="text-lg font-black tracking-tight text-geora-black uppercase">
                     {term.title}
                   </h3>
                 </div>
-                <div className="pl-11 text-sm md:text-base font-medium text-urbik-black/70 leading-relaxed">
+                <div className="pl-11 text-sm md:text-base font-medium text-geora-black/70 leading-relaxed">
                   {term.content}
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function TermsAndConditions() {
 
         </div>
       </div>
-                  <p className="text-sm font-semibold text-urbik-muted mt-10">
+                  <p className="text-sm font-semibold text-geora-muted mt-10">
               Última actualización: {new Date().toLocaleDateString('es-AR')}
             </p>
     </div>

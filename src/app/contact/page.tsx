@@ -33,51 +33,51 @@ export default function Contact() {
   };
 
   return (
-    <div className="bg-urbik-white min-h-screen pt-16 font-sans">
+    <div className="bg-geora-white min-h-screen pt-16 font-sans">
       <div className="max-w-7xl mx-auto px-6 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mt-10">
         
         <div>
           <motion.h1 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-6xl font-display font-bold text-urbik-black leading-[0.8] tracking-tighter mb-8"
+            className="text-6xl font-display font-bold text-geora-black leading-[0.8] tracking-tighter mb-8"
           >
             <span>Ponete en</span><br />
             <div className="flex flex-wrap items-baseline gap-x-3">
-              <span className="font-black text-7xl text-urbik-black">contacto.</span>
+              <span className="font-black text-7xl text-geora-black">contacto.</span>
             </div>
           </motion.h1>
 
-          <p className="text-urbik-black/60 font-medium text-lg">
+          <p className="text-geora-black/60 font-medium text-lg">
             ¿Tenés dudas sobre una propiedad o querés publicar con nosotros? 
           </p>
-          <p className="text-urbik-black/80 mb-12 max-w-md font-bold text-lg">
+          <p className="text-geora-black/80 mb-12 max-w-md font-bold text-lg">
             Nuestro equipo de expertos está listo para ayudarte.
           </p>
 
           <div className="space-y-4">
             <div className="flex items-center bg-white border border-black/10 shadow-sm w-fit px-4 py-2 rounded-full">
-              <div className="text-urbik-black/80"><Mail size={18} /></div>
+              <div className="text-geora-black/80"><Mail size={18} /></div>
               <div className="ml-5">
-                <p className="font-bold text-urbik-dark">hola@urbik.com</p>
+                <p className="font-bold text-geora-dark">hola@geora.com</p>
               </div>
             </div>
 
             <div className="flex items-center bg-white border border-black/10 shadow-sm w-fit px-4 py-2 rounded-full">
-              <div className="text-urbik-black/80">
+              <div className="text-geora-black/80">
                 <Phone size={18} />
               </div>
               <div className="ml-5">
-                <p className="font-bold text-urbik-dark">+54 11 1234-5678</p>
+                <p className="font-bold text-geora-dark">+54 11 1234-5678</p>
               </div>
             </div>
 
             <div className="flex items-center bg-white border border-black/10 shadow-sm w-fit px-4 py-2 rounded-full">
-              <div className="text-urbik-black/80">
+              <div className="text-geora-black/80">
                 <MapPin size={18} />
               </div>
               <div className="ml-5">
-                <p className="font-bold text-urbik-dark">La Plata, Argentina</p>
+                <p className="font-bold text-geora-dark">La Plata, Argentina</p>
               </div>
             </div>
           </div>
@@ -86,11 +86,11 @@ export default function Contact() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           {submitted ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-urbik-emerald/10 p-6 rounded-full mb-6">
-                <CheckCircle2 size={64} className="text-urbik-emerald" />
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-geora-emerald/10 p-6 rounded-full mb-6">
+                <CheckCircle2 size={64} className="text-geora-emerald" />
               </motion.div>
               <h2 className="text-3xl font-display font-bold mb-2">¡Mensaje enviado!</h2>
-              <button onClick={() => setSubmitted(false)} className="px-8 cursor-pointer py-3 rounded-full bg-urbik-black text-white font-bold hover:bg-urbik-emerald transition-all">
+              <button onClick={() => setSubmitted(false)} className="px-8 cursor-pointer py-3 rounded-full bg-geora-black text-white font-bold hover:bg-geora-emerald transition-all">
                 Enviar otro mensaje
               </button>
             </div>
@@ -98,22 +98,22 @@ export default function Contact() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="ml-10 text-xmd font-medium text-urbik-black opacity-40">Nombre</label>
-                  <input required type="text" className="w-full px-6 py-4 rounded-full bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium" placeholder="Tu nombre" />
+                  <label className="ml-10 text-xmd font-medium text-geora-black opacity-40">Nombre</label>
+                  <input required type="text" className="w-full px-6 py-4 rounded-full bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none transition-all font-medium" placeholder="Tu nombre" />
                 </div>
                 <div className="space-y-2">
-                  <label className="ml-10 text-xmd font-medium text-urbik-black opacity-40">Email</label>
-                  <input required type="email" className="w-full px-6 py-4 rounded-full bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium" placeholder="tu@email.com" />
+                  <label className="ml-10 text-xmd font-medium text-geora-black opacity-40">Email</label>
+                  <input required type="email" className="w-full px-6 py-4 rounded-full bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none transition-all font-medium" placeholder="tu@email.com" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="ml-10 text-xmd font-medium text-urbik-black opacity-40">Asunto</label>
+                <label className="ml-10 text-xmd font-medium text-geora-black opacity-40">Asunto</label>
                 <div className="relative" ref={dropdownRef}>
                   <button
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}
-                    className="w-full px-6 py-4 rounded-full cursor-pointer bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none flex items-center justify-between font-medium transition-all"
+                    className="w-full px-6 py-4 rounded-full cursor-pointer bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none flex items-center justify-between font-medium transition-all"
                   >
                     <span>{subject}</span>
                     <ChevronDown className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} size={20} />
@@ -125,7 +125,7 @@ export default function Contact() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute z-50 w-full mt-2 rounded-2xl bg-urbik-dark2 border border-white/10 shadow-2xl overflow-hidden"
+                        className="absolute z-50 w-full mt-2 rounded-2xl bg-geora-dark2 border border-white/10 shadow-2xl overflow-hidden"
                       >
                         {options.map((option) => (
                           <button
@@ -147,15 +147,15 @@ export default function Contact() {
               </div>
 
               <div className="space-y-2">
-                <label className="ml-10 text-xmd font-medium text-urbik-black opacity-40">Mensaje</label>
-                <textarea required rows={9} className="w-full px-6 py-5 rounded-4xl bg-urbik-white border border-gray-300 focus:ring-2 focus:ring-urbik-black outline-none transition-all font-medium resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
+                <label className="ml-10 text-xmd font-medium text-geora-black opacity-40">Mensaje</label>
+                <textarea required rows={9} className="w-full px-6 py-5 rounded-4xl bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none transition-all font-medium resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
               </div>
 
               <div className="flex justify-end pt-4">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-10 py-4 rounded-full font-bold transition-all  cursor-pointer flex items-center gap-3 active:scale-95 ${isSubmitting ? "bg-urbik-g300 text-urbik-muted cursor-not-allowed" : "bg-urbik-black text-white hover:bg-urbik-emerald hover:shadow-lg hover:shadow-urbik-emerald/20"}`}
+                  className={`px-10 py-4 rounded-full font-bold transition-all  cursor-pointer flex items-center gap-3 active:scale-95 ${isSubmitting ? "bg-geora-g300 text-geora-muted cursor-not-allowed" : "bg-geora-black text-white hover:bg-geora-emerald hover:shadow-lg hover:shadow-geora-emerald/20"}`}
                 >
                   {isSubmitting ? "Enviando..." : "Enviar mensaje"}
                   

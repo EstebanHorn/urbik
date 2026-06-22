@@ -38,7 +38,7 @@ export default function HelpSearch({ initialPosts }: { initialPosts: Post[] }) {
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 pb-20 mt-13">
-      <div className="mb-20"><Image src="/Urbik_Help_Logo.svg" alt="Logo" width={220} height={40} priority /></div>
+      <div className="mb-20"><Image src="/Geora_Help_Logo.svg" alt="Logo" width={220} height={40} priority /></div>
       <h1 className="text-4xl md:text-5xl font-bold text-black mb-6 text-center tracking-tight">¿Cómo podemos ayudarte?</h1>
 
       <div className="w-full max-w-3xl relative" ref={searchRef}>
@@ -49,18 +49,18 @@ export default function HelpSearch({ initialPosts }: { initialPosts: Post[] }) {
               placeholder="Escribe tu pregunta aquí..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="italic w-full h-14 pl-5 pr-12 border border-gray-300 rounded-full bg-urbik-white2 text-center placeholder:text-urbik-dark font-medium opacity-70 focus:ring-2 focus:ring-urbik-black outline-none transition-all"
+              className="italic w-full h-14 pl-5 pr-12 border border-gray-300 rounded-full bg-geora-white2 text-center placeholder:text-geora-dark font-medium opacity-70 focus:ring-2 focus:ring-geora-black outline-none transition-all"
             />
           </div>
         </div>
 
         {searchQuery !== "" && (
-          <div className="absolute z-50 w-full mb-8 border border-gray-100 rounded-4xl p-2 shadow-xl bg-urbik-black">
+          <div className="absolute z-50 w-full mb-8 border border-gray-100 rounded-4xl p-2 shadow-xl bg-geora-black">
             {results.length > 0 ? (
               results.map((art) => (
-                <Link key={art.slug} href={`/help/${art.slug}`} className="flex items-center justify-between p-4 hover:bg-urbik-dark rounded-4xl group font-medium hover:font-bold">
-                  <span className="text-urbik-white group-hover:text-white">{art.title}</span>
-                  <span className="text-xs bg-urbik-emerald px-2 py-1 rounded text-urbik-black">{art.category}</span>
+                <Link key={art.slug} href={`/help/${art.slug}`} className="flex items-center justify-between p-4 hover:bg-geora-dark rounded-4xl group font-medium hover:font-bold">
+                  <span className="text-geora-white group-hover:text-white">{art.title}</span>
+                  <span className="text-xs bg-geora-emerald px-2 py-1 rounded text-geora-black">{art.category}</span>
                 </Link>
               ))
             ) : (
@@ -73,9 +73,9 @@ export default function HelpSearch({ initialPosts }: { initialPosts: Post[] }) {
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             return (
-              <Link key={cat.slug} href={`/help/category/${cat.slug}`} className="flex items-center gap-4 p-2 text-center rounded-full bg-urbik-white border border-gray-200 hover:border-urbik-black transition-all group">
-                <div className="bg-urbik-black p-2.5 rounded-full text-white group-hover:bg-urbik-emerald transition-colors"><Icon size={20} /></div>
-                <span className="text-md font-bold text-urbik-black grow tracking-tight mr-5">{cat.name}</span>
+              <Link key={cat.slug} href={`/help/category/${cat.slug}`} className="flex items-center gap-4 p-2 text-center rounded-full bg-geora-white border border-gray-200 hover:border-geora-black transition-all group">
+                <div className="bg-geora-black p-2.5 rounded-full text-white group-hover:bg-geora-emerald transition-colors"><Icon size={20} /></div>
+                <span className="text-md font-bold text-geora-black grow tracking-tight mr-5">{cat.name}</span>
               </Link>
             );
           })}
@@ -84,7 +84,7 @@ export default function HelpSearch({ initialPosts }: { initialPosts: Post[] }) {
         <div className="mt-10 pt-10 border-t border-gray-100 flex flex-col items-center text-center">
           <h2 className="text-3xl font-bold text-black mb-3 italic">Mandanos un mensaje.</h2>
           <p className="text-gray-600 mb-8 max-w-sm">Comentanos tus inquietudes y en breve te estaremos contestando.</p>
-          <Link href="/contact" className="bg-urbik-black text-white hover:text-urbik-emerald font-bold py-4 px-10 rounded-full transition-all shadow-md active:scale-95">
+          <Link href="/contact" className="bg-geora-black text-white hover:text-geora-emerald font-bold py-4 px-10 rounded-full transition-all shadow-md active:scale-95">
             Contactanos
           </Link>
         </div>

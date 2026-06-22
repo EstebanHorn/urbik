@@ -26,15 +26,15 @@ export default function Footer() {
   if (pathname === "/map") return null;
 
   return (
-    <footer className="w-full bg-urbik-black2 text-white py-10 sm:py-12 px-4 sm:px-8">
+    <footer className="w-full bg-geora-black2 text-white py-10 sm:py-12 px-4 sm:px-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="flex flex-col gap-4">
           <div className="relative h-12 w-32">
-            <Image src="/Urbik_Logo_Mini.svg" alt="Urbik Logo" fill className="object-contain object-left" priority />
+            <Image src="/Geora_Logo_Mini.svg" alt="Geora Logo" fill className="object-contain object-left" priority />
           </div>
           <div className="flex gap-4 mt-2">
             <a href="#" className="hover:text-gray-400 transition-colors"><Instagram size={20} /></a>
-            <a href="mailto:contacto@urbik.com" className="hover:text-gray-400 transition-colors"><Mail size={20} /></a>
+            <a href="mailto:contacto@geora.com" className="hover:text-gray-400 transition-colors"><Mail size={20} /></a>
           </div>
         </div>
 
@@ -82,7 +82,7 @@ export default function Footer() {
             <Link href="/conditions" className="hover:text-white transition-colors">Condiciones</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacidad</Link>
           </div>
-          <p>© 2026 Urbik. Todos los derechos reservados.</p>
+          <p>© 2026 Geora. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

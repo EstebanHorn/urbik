@@ -27,8 +27,8 @@ const TARGET_LABELS: Record<ReportTargetType, string> = {
 };
 
 const TARGET_COLORS: Record<ReportTargetType, string> = {
-  AGENCY: "bg-urbik-cyan/15 text-urbik-cyan border-urbik-cyan/30",
-  PROPERTY: "bg-urbik-emerald/15 text-urbik-emerald border-urbik-emerald/30",
+  AGENCY: "bg-geora-cyan/15 text-geora-cyan border-geora-cyan/30",
+  PROPERTY: "bg-geora-emerald/15 text-geora-emerald border-geora-emerald/30",
   REVIEW: "bg-amber-500/15 text-amber-600 border-amber-500/30",
   PARCEL: "bg-purple-500/15 text-purple-600 border-purple-500/30",
 };
@@ -59,7 +59,7 @@ function ActionButtons({
       <button
         onClick={() => onAct(primaryAction)}
         disabled={busy}
-        className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full bg-urbik-rose text-white text-xs font-bold hover:opacity-80 transition-all active:scale-95 disabled:opacity-50"
+        className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full bg-geora-rose text-white text-xs font-bold hover:opacity-80 transition-all active:scale-95 disabled:opacity-50"
       >
         {primaryAction === "UNLINK" ? (
           <Unlink size={14} />
@@ -71,7 +71,7 @@ function ActionButtons({
       <button
         onClick={() => onAct("DISMISS")}
         disabled={busy}
-        className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-urbik-black/15 text-urbik-black/70 text-xs font-bold hover:bg-urbik-black/5 transition-all active:scale-95 disabled:opacity-50"
+        className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-geora-black/15 text-geora-black/70 text-xs font-bold hover:bg-geora-black/5 transition-all active:scale-95 disabled:opacity-50"
       >
         <XCircle size={14} /> Desestimar
       </button>
@@ -154,8 +154,8 @@ export default function ReportsPanel() {
             onClick={() => setTab(t.v)}
             className={`cursor-pointer px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95 ${
               tab === t.v
-                ? "bg-urbik-black text-white"
-                : "bg-white border border-urbik-black/15 text-urbik-black/60 hover:bg-urbik-black/5"
+                ? "bg-geora-black text-white"
+                : "bg-white border border-geora-black/15 text-geora-black/60 hover:bg-geora-black/5"
             }`}
           >
             {t.label}
@@ -165,14 +165,14 @@ export default function ReportsPanel() {
 
       {loading ? (
         <div className="py-16 flex items-center justify-center">
-          <Loader2 className="animate-spin text-urbik-black" size={28} />
+          <Loader2 className="animate-spin text-geora-black" size={28} />
         </div>
       ) : items.length === 0 ? (
         <div className="py-16 text-center">
           <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-            <Flag className="text-urbik-muted" size={24} />
+            <Flag className="text-geora-muted" size={24} />
           </div>
-          <p className="font-bold text-urbik-black">
+          <p className="font-bold text-geora-black">
             {tab === "PENDING"
               ? "No hay reportes pendientes"
               : "Sin reportes en esta categoría"}
@@ -191,7 +191,7 @@ export default function ReportsPanel() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.97 }}
-                  className="bg-white rounded-3xl border border-urbik-black/10 p-5 flex flex-col gap-4"
+                  className="bg-white rounded-3xl border border-geora-black/10 p-5 flex flex-col gap-4"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex items-center gap-3 flex-wrap">
@@ -200,15 +200,15 @@ export default function ReportsPanel() {
                       >
                         {TARGET_LABELS[r.targetType]}
                       </span>
-                      <span className="text-xs font-bold text-urbik-black/70 uppercase tracking-wider">
+                      <span className="text-xs font-bold text-geora-black/70 uppercase tracking-wider">
                         {REPORT_REASON_LABELS[r.reason]}
                       </span>
-                      <span className="text-[11px] text-urbik-black/40">
+                      <span className="text-[11px] text-geora-black/40">
                         {formatDate(r.createdAt)}
                       </span>
                     </div>
                     {r.status !== "PENDING" && r.adminAction && (
-                      <span className="flex items-center gap-1.5 text-[11px] font-bold text-urbik-emerald">
+                      <span className="flex items-center gap-1.5 text-[11px] font-bold text-geora-emerald">
                         <CheckCircle2 size={12} />
                         {r.adminAction === "DELETED"
                           ? "Eliminado"
@@ -221,7 +221,7 @@ export default function ReportsPanel() {
 
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-urbik-black line-clamp-1">
+                      <span className="text-sm font-bold text-geora-black line-clamp-1">
                         {r.target?.label ?? r.targetId}
                       </span>
                       {r.target?.href && (
@@ -229,7 +229,7 @@ export default function ReportsPanel() {
                           href={r.target.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-urbik-cyan hover:opacity-70"
+                          className="text-geora-cyan hover:opacity-70"
                           aria-label="Abrir objeto reportado"
                         >
                           <ExternalLink size={13} />
@@ -237,20 +237,20 @@ export default function ReportsPanel() {
                       )}
                     </div>
                     {r.target?.extra?.cca && (
-                      <p className="text-[11px] text-urbik-black/50 font-medium">
+                      <p className="text-[11px] text-geora-black/50 font-medium">
                         CCA {r.target.extra.cca}
                         {r.target.extra.pda ? ` · PDA ${r.target.extra.pda}` : ""}
                       </p>
                     )}
                     {r.comment && (
-                      <p className="text-sm text-urbik-black/70 mt-2 italic">
+                      <p className="text-sm text-geora-black/70 mt-2 italic">
                         "{r.comment}"
                       </p>
                     )}
                   </div>
 
-                  <div className="flex flex-wrap items-end justify-between gap-3 pt-2 border-t border-urbik-black/5">
-                    <div className="text-[11px] text-urbik-black/50">
+                  <div className="flex flex-wrap items-end justify-between gap-3 pt-2 border-t border-geora-black/5">
+                    <div className="text-[11px] text-geora-black/50">
                       <span className="font-bold">Reportado por:</span>{" "}
                       {r.reporter?.name ||
                         r.reporter?.email ||
@@ -260,13 +260,13 @@ export default function ReportsPanel() {
                       <>
                         {isConfirming ? (
                           <div className="flex items-center gap-2 flex-wrap justify-end">
-                            <span className="text-xs font-bold text-urbik-black">
+                            <span className="text-xs font-bold text-geora-black">
                               {isBusy ? "Procesando..." : "¿Confirmar?"}
                             </span>
                             <button
                               onClick={() => setConfirmAction(null)}
                               disabled={isBusy}
-                              className="cursor-pointer px-3 py-1.5 rounded-full bg-white border border-urbik-black/15 text-urbik-black/60 text-xs font-bold hover:bg-urbik-black/5"
+                              className="cursor-pointer px-3 py-1.5 rounded-full bg-white border border-geora-black/15 text-geora-black/60 text-xs font-bold hover:bg-geora-black/5"
                             >
                               Cancelar
                             </button>
@@ -275,7 +275,7 @@ export default function ReportsPanel() {
                                 handleAction(r.id, confirmAction!.action)
                               }
                               disabled={isBusy}
-                              className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-full bg-urbik-black text-white text-xs font-bold hover:opacity-80 disabled:opacity-50"
+                              className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-full bg-geora-black text-white text-xs font-bold hover:opacity-80 disabled:opacity-50"
                             >
                               {isBusy && (
                                 <Loader2 size={12} className="animate-spin" />

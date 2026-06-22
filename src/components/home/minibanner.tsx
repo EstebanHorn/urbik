@@ -5,7 +5,7 @@ export default function Banners() {
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mt-5">
       
-      <div className="relative flex flex-col bg-urbik-black rounded-4xl overflow-hidden shadow-lg border border-gray-100 transition-transform hover:-translate-y-1">
+      <div className="relative flex flex-col bg-geora-black rounded-4xl overflow-hidden shadow-lg border border-gray-100 transition-transform hover:-translate-y-1">
         
         <Image 
           src="/crearcuentagratis.png" 
@@ -60,32 +60,32 @@ export default function Banners() {
           className="object-cover opacity-5"
         />
 
-        <div className="relative z-10 p-6 md:p-8 flex flex-col flex-grow text-urbik-black">
-          <span className="text-urbik-black/60 font-bold uppercase text-sm tracking-wider">
+        <div className="relative z-10 p-6 md:p-8 flex flex-col flex-grow text-geora-black">
+          <span className="text-geora-black/60 font-bold uppercase text-sm tracking-wider">
             Para inmobiliarias
           </span>
           <h2 className="text-4xl font-bold mt-2 leading-tight">
             Publicá y empezá a recibir consultas hoy mismo
           </h2>
-          <p className="text-urbik-black/70 mt-3">
-            Sumá tu inmobiliaria a Urbik sin costo. Accedé a compradores reales que buscan activamente en el portal.
+          <p className="text-geora-black/70 mt-3">
+            Sumá tu inmobiliaria a Geora sin costo. Accedé a compradores reales que buscan activamente en el portal.
           </p>
           
-          <ul className="mt-5 space-y-3 text-urbik-black/60 flex-grow">
+          <ul className="mt-5 space-y-3 text-geora-black/60 flex-grow">
             <li className="flex items-start gap-2">
-              <span className="text-urbik-black font-bold">✓</span>
+              <span className="text-geora-black font-bold">✓</span>
               <span>Registrá tu inmobiliaria y verificala gratis</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-urbik-black font-bold">✓</span>
+              <span className="text-geora-black font-bold">✓</span>
               <span>Publicá ilimitadamente</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-urbik-black font-bold">✓</span>
+              <span className="text-geora-black font-bold">✓</span>
               <span>Recibí consultas y nuevas propiedades</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-urbik-black font-bold">✓</span>
+              <span className="text-geora-black font-bold">✓</span>
               <span>Obtené tu sitio web</span>
             </li>
           </ul>

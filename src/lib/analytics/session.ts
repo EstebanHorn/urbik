@@ -1,4 +1,4 @@
-const STORAGE_KEY = "urbik_sid";
+const STORAGE_KEY = "geora_sid";
 
 function generateId(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {

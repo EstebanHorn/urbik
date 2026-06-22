@@ -47,16 +47,16 @@ export function CustomDropdown({
   );
 
   const variantStyles = {
-    black: "text-urbik-white",
-    white3: "text-urbik-black/60",
-    white: "bg-urbik-white1 text-urbik-black hover:bg-urbik-white border border-black/70",
-    white1: "bg-white/50 text-urbik-black/70 hover:bg-white hover:border-black/30 border border-white/70 shadow-md",
+    black: "text-geora-white",
+    white3: "text-geora-black/60",
+    white: "bg-geora-white1 text-geora-black hover:bg-geora-white border border-black/70",
+    white1: "bg-white/50 text-geora-black/70 hover:bg-white hover:border-black/30 border border-white/70 shadow-md",
     white2:
-      "bg-urbik-white text-urbik-black/70 border border-black/70 hover:bg-urbik-dark hover:text-urbik-white",
+      "bg-geora-white text-geora-black/70 border border-black/70 hover:bg-geora-dark hover:text-geora-white",
     "map-layer":
       "bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm",
     "mobile-black": 
-      "text-urbik-white md:bg-urbik-white1 md:text-urbik-black md:hover:bg-urbik-white",
+      "text-geora-white md:bg-geora-white1 md:text-geora-black md:hover:bg-geora-white",
   };
 
   let positionClasses = "";
@@ -105,7 +105,7 @@ export function CustomDropdown({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className={`absolute w-56 rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden ${positionClasses}`}
+            className={`absolute w-56 rounded-2xl bg-geora-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden ${positionClasses}`}
           >
             {options.map((opt) => (
                 <button
@@ -117,8 +117,8 @@ export function CustomDropdown({
                   }}
                   className={`w-full text-left cursor-pointer px-5 py-3 text-sm font-medium transition ${
                     opt.value === "logout"
-                      ? "text-urbik-rose hover:bg-urbik-rose/90 hover:text-urbik-white"
-                      : "text-urbik-white hover:bg-white/10"
+                      ? "text-geora-rose hover:bg-geora-rose/90 hover:text-geora-white"
+                      : "text-geora-white hover:bg-white/10"
                   }`}
                 >
                   {opt.label}

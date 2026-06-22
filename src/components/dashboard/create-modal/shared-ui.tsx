@@ -15,9 +15,9 @@ interface CurrencySelectorProps {
 
 export function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
   return (
-    <div className="relative flex bg-urbik-white rounded-full w-fit overflow-hidden border border-black/50 focus:border-urbik-black outline-none transition-all">
+    <div className="relative flex bg-geora-white rounded-full w-fit overflow-hidden border border-black/50 focus:border-geora-black outline-none transition-all">
       <motion.div
-        className="absolute top-0 bottom-0 left-0 bg-urbik-dark rounded-full border border-black/50"
+        className="absolute top-0 bottom-0 left-0 bg-geora-dark rounded-full border border-black/50"
         initial={false}
         animate={{ x: value === "USD" ? "0%" : "100%" }}
         style={{ width: "50%" }}
@@ -28,8 +28,8 @@ export function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
         onClick={() => onChange("USD")}
         className={`relative z-10 px-8 cursor-pointer py-2.5 font-bold text-sm rounded-full transition-colors flex-1 ${
           value === "USD"
-            ? "text-urbik-g100"
-            : "text-urbik-dark/50 hover:bg-urbik-g400/50"
+            ? "text-geora-g100"
+            : "text-geora-dark/50 hover:bg-geora-g400/50"
         }`}
       >
         USD
@@ -40,8 +40,8 @@ export function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
         onClick={() => onChange("ARS")}
         className={`relative z-10 cursor-pointer px-8 py-2.5 font-bold text-sm rounded-full transition-colors flex-1 ${
           value === "ARS"
-            ? "text-urbik-g100"
-            : "text-urbik-muted hover:bg-urbik-g400/50"
+            ? "text-geora-g100"
+            : "text-geora-muted hover:bg-geora-g400/50"
         }`}
       >
         ARS
@@ -90,11 +90,11 @@ export function ModuleShell({
         className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50 transition-colors text-left rounded-t-2xl"
       >
         <div className="flex items-center gap-3">
-          <span className="w-6 h-6 rounded-full bg-urbik-black text-white flex items-center justify-center text-[10px] font-black shrink-0">
+          <span className="w-6 h-6 rounded-full bg-geora-black text-white flex items-center justify-center text-[10px] font-black shrink-0">
             {id}
           </span>
 
-          <span className="text-xs font-black uppercase tracking-wider text-urbik-black/80">
+          <span className="text-xs font-black uppercase tracking-wider text-geora-black/80">
             {label}
           </span>
 
@@ -374,7 +374,7 @@ export function AmenitiesGrid({
           className="overflow-hidden"
         >
           <div className="w-full flex items-center justify-between px-4 py-3text-left">
-            <span className="text-md font-bold text-urbik-black/60">
+            <span className="text-md font-bold text-geora-black/60">
               {cat.label}
             </span>
           </div>
@@ -391,8 +391,8 @@ export function AmenitiesGrid({
                   onClick={() => handleToggle(tag.key, !active)}
                   className={`group rounded-full border px-3 py-2 text-xs font-bold transition-all text-left flex items-center justify-between gap-1 overflow-hidden relative ${
                     active
-                      ? "bg-urbik-white text-urbik-black/80 border-none"
-                      : "border-white text-urbik-black/60 bg-white/30 hover:bg-gray-50"
+                      ? "bg-geora-white text-geora-black/80 border-none"
+                      : "border-white text-geora-black/60 bg-white/30 hover:bg-gray-50"
                   }`}
                 >
                   <span className="block w-full overflow-hidden">
@@ -435,7 +435,7 @@ export function MultiChipSelect({
 
   return (
     <div className="w-full">
-      <label className="block text-sm font-bold text-urbik-black/50 mb-2 ml-1">
+      <label className="block text-sm font-bold text-geora-black/50 mb-2 ml-1">
         {label}
       </label>
       <div className="flex flex-wrap gap-2">
@@ -448,8 +448,8 @@ export function MultiChipSelect({
               onClick={() => handleToggle(opt.value)}
               className={`rounded-full border px-3 py-2 text-xs font-bold transition-all ${
                 active
-                  ? "bg-urbik-white text-urbik-black/80 border-none shadow-sm"
-                  : "border-white text-urbik-black/60 bg-white/30 hover:bg-gray-50"
+                  ? "bg-geora-white text-geora-black/80 border-none shadow-sm"
+                  : "border-white text-geora-black/60 bg-white/30 hover:bg-gray-50"
               }`}
             >
               {opt.label}

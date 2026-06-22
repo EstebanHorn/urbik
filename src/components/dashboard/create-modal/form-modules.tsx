@@ -49,7 +49,7 @@ interface Module02LocationProps extends ModuleProps {
 }
 
 const SURFACE_INPUT_CLASS =
-  "bg-white/30 shadow-md border border-white w-full px-5 py-2.5 rounded-full focus:border-urbik-black outline-none transition-all text-sm";
+  "bg-white/30 shadow-md border border-white w-full px-5 py-2.5 rounded-full focus:border-geora-black outline-none transition-all text-sm";
 
 const AnimatedInput = ({
   fieldName,
@@ -57,7 +57,7 @@ const AnimatedInput = ({
   rhf,
   type = "text",
   align = "left",
-  inputClassName = "bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all text-sm",
+  inputClassName = "bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all text-sm",
 }: {
   fieldName: Path<PropertyUploadFormData>;
   placeholder: string;
@@ -78,7 +78,7 @@ const AnimatedInput = ({
       placeholder={placeholder}
       onChange={(e) => setValue(fieldName, e.target.value as any)}
       onWheel={type === "number" ? (e) => (e.currentTarget as HTMLInputElement).blur() : undefined}
-      className={`${inputClassName} ${textAlignClass} text-urbik-black placeholder:text-urbik-black/50 caret-urbik-black [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]`}
+      className={`${inputClassName} ${textAlignClass} text-geora-black placeholder:text-geora-black/50 caret-geora-black [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]`}
     />
   );
 };
@@ -97,24 +97,24 @@ const CounterInput = ({
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <span className="text-xs font-bold text-urbik-black/50 text-center whitespace-nowrap">
+      <span className="text-xs font-bold text-geora-black/50 text-center whitespace-nowrap">
         {label}
       </span>
       <div className="flex items-center gap-2 bg-white/30 shadow-md border border-white rounded-full px-3 py-2">
         <button
           type="button"
           onClick={() => setValue(fieldName, Math.max(0, value - 1) as any)}
-          className="w-6 h-6 flex items-center justify-center rounded-full bg-white text-urbik-black font-bold hover:bg-white/80 transition-colors text-sm leading-none"
+          className="w-6 h-6 flex items-center justify-center rounded-full bg-white text-geora-black font-bold hover:bg-white/80 transition-colors text-sm leading-none"
         >
           −
         </button>
-        <span className="w-7 text-center text-sm font-bold text-urbik-black">
+        <span className="w-7 text-center text-sm font-bold text-geora-black">
           {value > 0 ? value : "—"}
         </span>
         <button
           type="button"
           onClick={() => setValue(fieldName, (value + 1) as any)}
-          className="w-6 h-6 flex items-center justify-center rounded-full bg-white text-urbik-black font-bold hover:bg-white/80 transition-colors text-sm leading-none"
+          className="w-6 h-6 flex items-center justify-center rounded-full bg-white text-geora-black font-bold hover:bg-white/80 transition-colors text-sm leading-none"
         >
           +
         </button>
@@ -164,7 +164,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
   return (
     <div className="flex flex-col items-center w-full max-w-lg mx-auto space-y-8">
       <div className="w-full text-center flex flex-col items-center">
-        <label className="block text-sm font-bold text-urbik-black/50 mb-2">
+        <label className="block text-sm font-bold text-geora-black/50 mb-2">
           Tipo de propiedad
         </label>
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-2">
@@ -178,8 +178,8 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
               }}
               className={`text-md font-bold transition-colors duration-200 ${
                 propertyType === opt.id
-                  ? "text-urbik-black/80"
-                  : "text-urbik-black/30 hover:text-urbik-black/50"
+                  ? "text-geora-black/80"
+                  : "text-geora-black/30 hover:text-geora-black/50"
               }`}
             >
               {opt.label}
@@ -189,13 +189,13 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
       </div>
 
       <div className="w-full text-center flex flex-col items-center">
-        <label className="block text-sm font-bold text-urbik-black/50 mb-2">
+        <label className="block text-sm font-bold text-geora-black/50 mb-2">
           Operación
         </label>
         <div className="relative p-0.5 bg-white/30 shadow-md rounded-full border border-white w-full overflow-hidden">
           <div className="relative grid grid-cols-4 w-full h-full items-center min-w-[280px] sm:min-w-[360px]">
             <div
-              className="absolute top-0 bottom-0 left-0 w-1/4 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
+              className="absolute top-0 bottom-0 left-0 w-1/4 bg-geora-white2 rounded-full border border-white transition-transform duration-300 ease-out"
               style={{
                 transform: `translateX(${opActiveIndex !== -1 ? opActiveIndex * 100 : 0}%)`,
               }}
@@ -207,8 +207,8 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 onClick={() => setValue("operationType", opt.id as any)}
                 className={`relative z-10 py-2.5 text-center text-md font-bold transition-colors duration-300 rounded-full cursor-pointer ${
                   operationType === opt.id
-                    ? "text-urbik-black/80"
-                    : "text-urbik-black/50 hover:text-urbik-black"
+                    ? "text-geora-black/80"
+                    : "text-geora-black/50 hover:text-geora-black"
                 }`}
               >
                 {opt.label}
@@ -219,13 +219,13 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
       </div>
 
       <div className="w-full text-center flex flex-col items-center">
-        <label className="block text-sm font-bold text-urbik-black/50 mb-2">
+        <label className="block text-sm font-bold text-geora-black/50 mb-2">
           Estado
         </label>
         <div className="relative p-0.5 bg-white/30 shadow-md rounded-full border border-white w-full overflow-hidden">
           <div className="relative grid grid-cols-3 w-full h-full items-center min-w-[280px] sm:min-w-[360px]">
             <div
-              className="absolute top-0 bottom-0 left-0 w-1/3 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
+              className="absolute top-0 bottom-0 left-0 w-1/3 bg-geora-white2 rounded-full border border-white transition-transform duration-300 ease-out"
               style={{
                 transform: `translateX(${statusActiveIndex !== -1 ? statusActiveIndex * 100 : 0}%)`,
               }}
@@ -237,8 +237,8 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 onClick={() => setValue("status", opt.id as any)}
                 className={`relative z-10 py-2.5 px-2 text-center text-md font-bold transition-colors duration-300 rounded-full cursor-pointer ${
                   statusType === opt.id
-                    ? "text-urbik-black/80"
-                    : "text-urbik-black/50 hover:text-urbik-black"
+                    ? "text-geora-black/80"
+                    : "text-geora-black/50 hover:text-geora-black"
                 }`}
               >
                 {opt.label}
@@ -254,7 +254,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
           checked={Boolean(watch("isPriceHidden"))}
           onChange={(e) => setValue("isPriceHidden", e.target.checked)}
         />
-        <span className="text-sm font-semibold text-urbik-black/70">
+        <span className="text-sm font-semibold text-geora-black/70">
           Publicar como &ldquo;Sin precio&rdquo;
         </span>
       </label>
@@ -268,8 +268,8 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 onClick={() => setValue("saleCurrency", "ARS" as any)}
                 className={`font-bold transition-colors duration-200 ${
                   saleCurrency === "ARS"
-                    ? "text-urbik-black/80"
-                    : "text-urbik-black/30"
+                    ? "text-geora-black/80"
+                    : "text-geora-black/30"
                 }`}
               >
                 ARS
@@ -279,8 +279,8 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 onClick={() => setValue("saleCurrency", "USD" as any)}
                 className={`font-bold transition-colors duration-200 ${
                   saleCurrency === "USD"
-                    ? "text-urbik-black/80"
-                    : "text-urbik-black/30"
+                    ? "text-geora-black/80"
+                    : "text-geora-black/30"
                 }`}
               >
                 USD
@@ -313,7 +313,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
           {(propertyType === "APARTMENT" || propertyType === "PH") && (
             <div className="w-full space-y-4">
               <div className="w-full text-center flex flex-col items-center md:items-start">
-                <label className="block text-sm font-bold text-urbik-black/50 mb-2 md:pl-2">
+                <label className="block text-sm font-bold text-geora-black/50 mb-2 md:pl-2">
                   Estado del edificio
                 </label>
                 {(() => {
@@ -331,7 +331,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                       <div className="relative grid grid-cols-5 w-full h-full items-center">
                         {idx !== -1 && (
                           <div
-                            className="absolute top-0 bottom-0 left-0 w-1/5 bg-urbik-white2 rounded-full border border-white transition-transform duration-300 ease-out"
+                            className="absolute top-0 bottom-0 left-0 w-1/5 bg-geora-white2 rounded-full border border-white transition-transform duration-300 ease-out"
                             style={{
                               transform: `translateX(${idx * 100}%)`,
                             }}
@@ -344,7 +344,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                             onClick={() =>
                               setValue("buildingCondition", opt.value as any)
                             }
-                            className={`relative z-10 py-2.5 text-center text-[10px] sm:text-xs font-bold transition-colors duration-300 rounded-full cursor-pointer px-1 ${cur === opt.value ? "text-urbik-black/80" : "text-urbik-black/50 hover:text-urbik-black"}`}
+                            className={`relative z-10 py-2.5 text-center text-[10px] sm:text-xs font-bold transition-colors duration-300 rounded-full cursor-pointer px-1 ${cur === opt.value ? "text-geora-black/80" : "text-geora-black/50 hover:text-geora-black"}`}
                           >
                             {opt.label}
                           </button>
@@ -410,7 +410,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                   }
                   className="w-4 h-4"
                 />
-                <span className="text-sm font-semibold text-urbik-black/70">
+                <span className="text-sm font-semibold text-geora-black/70">
                   Tiene construcción existente
                 </span>
               </label>
@@ -461,7 +461,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                     }
                     className="w-4 h-4"
                   />
-                  <span className="text-sm font-semibold text-urbik-black/70">
+                  <span className="text-sm font-semibold text-geora-black/70">
                     Tiene riego
                   </span>
                 </label>
@@ -472,7 +472,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                     onChange={(e) => setValue("hasFencing", e.target.checked)}
                     className="w-4 h-4"
                   />
-                  <span className="text-sm font-semibold text-urbik-black/70">
+                  <span className="text-sm font-semibold text-geora-black/70">
                     Tiene alambrado
                   </span>
                 </label>
@@ -559,7 +559,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
                 onChange={(e) => setValue("hasLoadingDock", e.target.checked)}
                 className="w-4 h-4"
               />
-              <span className="text-sm font-semibold text-urbik-black/70">
+              <span className="text-sm font-semibold text-geora-black/70">
                 Tiene playa de carga
               </span>
             </label>
@@ -623,7 +623,7 @@ export function Module02Location({
       </div>
 
       <div>
-        <label className="block text-sm font-bold text-urbik-black/50 mb-2 md:pl-2">
+        <label className="block text-sm font-bold text-geora-black/50 mb-2 md:pl-2">
           Dirección a mostrar (opcional)
         </label>
         <AnimatedInput
@@ -631,7 +631,7 @@ export function Module02Location({
           fieldName="displayAddress"
           placeholder="ej: Calle 11 entre 40 y 41"
         />
-        <p className="mt-1 md:pl-2 text-[10px] text-urbik-black/40">
+        <p className="mt-1 md:pl-2 text-[10px] text-geora-black/40">
           Si la dejás vacía, se muestra la dirección estándar en las tarjetas.
         </p>
       </div>
@@ -654,7 +654,7 @@ export function Module02Location({
             className={`w-full py-4 px-6 rounded-full border-2 border-dashed transition-all flex items-center justify-center gap-3 font-medium text-xs ${
               isActive
                 ? "border-emerald-500 text-emerald-700 bg-emerald-50"
-                : "border-white text-white hover:border-urbik-black hover:text-urbik-black"
+                : "border-white text-white hover:border-geora-black hover:text-geora-black"
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {isSearchingCity
@@ -687,7 +687,7 @@ export function Module03Content({ rhf }: ModuleProps) {
         placeholder="Describí los puntos fuertes de la propiedad..."
         value={rhf.watch("description") ?? ""}
         onChange={(e) => rhf.setValue("description", e.target.value)}
-        className="w-full px-5 py-4 rounded-xl border border-white focus:border-urbik-black outline-none transition-all text-sm bg-white/30 shadow-md focus:bg-white resize-none"
+        className="w-full px-5 py-4 rounded-xl border border-white focus:border-geora-black outline-none transition-all text-sm bg-white/30 shadow-md focus:bg-white resize-none"
       />
     </div>
   );
@@ -762,7 +762,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       <div className="grid grid-cols-1 gap-4">
         {isField && (
           <div>
-            <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
+            <label className="block text-sm font-bold text-geora-black/50 mb-1 ml-1">
               Hectáreas totales *
             </label>
             <AnimatedInput
@@ -775,7 +775,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
           </div>
         )}
         <div>
-          <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
+          <label className="block text-sm font-bold text-geora-black/50 mb-1 ml-1">
             {isField ? "m² cubiertos" : "M2 cubiertos (m²) *"}
           </label>
           <AnimatedInput
@@ -789,7 +789,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
         {showSemiAndUncovered && (
           <>
             <div>
-              <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
+              <label className="block text-sm font-bold text-geora-black/50 mb-1 ml-1">
                 Sup. semicubierta (m²)
               </label>
               <AnimatedInput
@@ -801,7 +801,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
+              <label className="block text-sm font-bold text-geora-black/50 mb-1 ml-1">
                 Sup. descubierta (m²)
               </label>
               <AnimatedInput
@@ -818,7 +818,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
         {showFrontBack && (
           <>
             <div>
-              <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
+              <label className="block text-sm font-bold text-geora-black/50 mb-1 ml-1">
                 Frente (m)
               </label>
               <AnimatedInput
@@ -830,7 +830,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-urbik-black/50 mb-1 ml-1">
+              <label className="block text-sm font-bold text-geora-black/50 mb-1 ml-1">
                 Fondo (m)
               </label>
               <AnimatedInput
@@ -935,7 +935,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
     <div className="flex flex-col items-center w-full mx-auto space-y-6">
       {showCondition && (
         <div className="w-full">
-          <label className="block text-sm font-bold text-urbik-black/50 mb-2">
+          <label className="block text-sm font-bold text-geora-black/50 mb-2">
             Estado del inmueble
           </label>
           <CustomDropdown
@@ -979,14 +979,14 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
             rhf={rhf}
             fieldName="constructionYear"
             placeholder="Año de construcción"
-            inputClassName="bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all duration-300 text-sm"
+            inputClassName="bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all duration-300 text-sm"
           />
           <AnimatedInput
             type="number"
             rhf={rhf}
             fieldName="renovationYear"
             placeholder="Año de renovación (opcional)"
-            inputClassName="bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all duration-300 text-sm"
+            inputClassName="bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all duration-300 text-sm"
           />
         </>
       )}
@@ -994,7 +994,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
       {isAptOrPH && (
         <>
           <div className="w-full pt-4 border-t border-white/40 space-y-4">
-            <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">
+            <p className="text-xs font-bold text-geora-black/40 uppercase tracking-widest">
               Detalles adicionales
             </p>
             <CustomDropdown
@@ -1039,7 +1039,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
       {isHouseOrCountry && (
         <>
           <div className="w-full pt-4 border-t border-white/40 space-y-4">
-            <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">
+            <p className="text-xs font-bold text-geora-black/40 uppercase tracking-widest">
               Terreno y entorno
             </p>
             <CustomDropdown
@@ -1075,7 +1075,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
           </div>
 
           <div className="w-full space-y-4">
-            <p className="text-xs font-bold text-urbik-black/40 uppercase tracking-widest">
+            <p className="text-xs font-bold text-geora-black/40 uppercase tracking-widest">
               Edificación
             </p>
             <MultiChipSelect
@@ -1139,7 +1139,7 @@ export function Module10Multimedia({ rhf }: ModuleProps) {
           rhf={rhf}
           fieldName="youtubeUrl"
           placeholder="URL video de YouTube"
-          inputClassName="bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
+          inputClassName="bg-white/30 shadow-md border border-white w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all text-sm"
         />
       </div>
     </div>
@@ -1154,7 +1154,7 @@ export function Module11ContactInfo({ rhf }: ModuleProps) {
         rhf={rhf}
         fieldName="contactName"
         placeholder="Nombre contacto"
-        inputClassName="bg-white border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
+        inputClassName="bg-white border border-black/50 w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all text-sm"
       />
 
       <AnimatedInput
@@ -1162,7 +1162,7 @@ export function Module11ContactInfo({ rhf }: ModuleProps) {
         rhf={rhf}
         fieldName="contactPhone"
         placeholder="Teléfono"
-        inputClassName="bg-white border border-black/50 w-full px-5 py-3 rounded-full focus:border-urbik-black outline-none transition-all text-sm"
+        inputClassName="bg-white border border-black/50 w-full px-5 py-3 rounded-full focus:border-geora-black outline-none transition-all text-sm"
       />
     </div>
   );

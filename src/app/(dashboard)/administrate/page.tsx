@@ -65,17 +65,17 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="bg-urbik-white min-h-screen pt-32 pb-20 font-sans">
+    <div className="bg-geora-white min-h-screen pt-32 pb-20 font-sans">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-left text-5xl font-display font-bold text-urbik-black">
+          <h1 className="text-left text-5xl font-display font-bold text-geora-black">
             Panel de Control.
           </h1>
-          <p className="text-left text-urbik-muted mt-2 font-medium">
+          <p className="text-left text-geora-muted mt-2 font-medium">
             Gestión de cuentas y moderación de contenido
           </p>
         </motion.div>
@@ -85,8 +85,8 @@ export default function AdminPage() {
             onClick={() => setTab("pending")}
             className={`cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 ${
               tab === "pending"
-                ? "bg-urbik-black text-white"
-                : "bg-white border border-urbik-black/15 text-urbik-black/60 hover:bg-urbik-black/5"
+                ? "bg-geora-black text-white"
+                : "bg-white border border-geora-black/15 text-geora-black/60 hover:bg-geora-black/5"
             }`}
           >
             <ShieldCheck size={16} /> Inmobiliarias pendientes
@@ -95,8 +95,8 @@ export default function AdminPage() {
             onClick={() => setTab("reports")}
             className={`cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 ${
               tab === "reports"
-                ? "bg-urbik-black text-white"
-                : "bg-white border border-urbik-black/15 text-urbik-black/60 hover:bg-urbik-black/5"
+                ? "bg-geora-black text-white"
+                : "bg-white border border-geora-black/15 text-geora-black/60 hover:bg-geora-black/5"
             }`}
           >
             <Flag size={16} /> Reportes
@@ -115,7 +115,7 @@ export default function AdminPage() {
             {loading && users.length === 0 ? (
               <div className="py-20 flex items-center justify-center">
                 <Loader2
-                  className="animate-spin text-urbik-black"
+                  className="animate-spin text-geora-black"
                   size={40}
                 />
               </div>
@@ -123,7 +123,7 @@ export default function AdminPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-separate border-spacing-y-4">
                   <thead>
-                    <tr className="text-urbik-muted text-md font-bold">
+                    <tr className="text-geora-muted text-md font-bold">
                       <th className="px-6 py-2">Agencia</th>
                       <th className="px-6 py-2">Matrícula</th>
                       <th className="px-6 py-2">Email</th>
@@ -139,28 +139,28 @@ export default function AdminPage() {
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.95 }}
-                          className="bg-white group hover:bg-urbik-black/5 transition-all duration-300"
+                          className="bg-white group hover:bg-geora-black/5 transition-all duration-300"
                         >
-                          <td className="px-6 py-5 rounded-md font-bold text-urbik-black">
+                          <td className="px-6 py-5 rounded-md font-bold text-geora-black">
                             {u.realEstate?.agencyName}
                           </td>
-                          <td className="px-6 py-5 text-sm text-urbik-muted">
+                          <td className="px-6 py-5 text-sm text-geora-muted">
                             {u.realEstate?.license}
                           </td>
-                          <td className="px-6 py-5 text-urbik-muted">
+                          <td className="px-6 py-5 text-geora-muted">
                             {u.email}
                           </td>
                           <td className="px-6 py-5 rounded-md text-right">
                             <div className="flex justify-end gap-3">
                               <button
                                 onClick={() => handleAction(u.id, "APPROVE")}
-                                className="cursor-pointer flex items-center gap-2 bg-urbik-black text-urbik-white shadow-md px-5 py-2.5 rounded-full text-sm font-bold hover:bg-urbik-white hover:border-urbik-emerald hover:text-urbik-emerald transition-all active:scale-95"
+                                className="cursor-pointer flex items-center gap-2 bg-geora-black text-geora-white shadow-md px-5 py-2.5 rounded-full text-sm font-bold hover:bg-geora-white hover:border-geora-emerald hover:text-geora-emerald transition-all active:scale-95"
                               >
                                 Habilitar
                               </button>
                               <button
                                 onClick={() => handleAction(u.id, "DELETE")}
-                                className="cursor-pointer flex items-center gap-2 bg-urbik-white text-urbik-black/70 border border-urbik-white shadow-md px-5 py-2.5 rounded-full text-sm font-bold hover:bg-urbik-white hover:border-urbik-rose hover:text-urbik-rose transition-all active:scale-95"
+                                className="cursor-pointer flex items-center gap-2 bg-geora-white text-geora-black/70 border border-geora-white shadow-md px-5 py-2.5 rounded-full text-sm font-bold hover:bg-geora-white hover:border-geora-rose hover:text-geora-rose transition-all active:scale-95"
                               >
                                 Rechazar
                               </button>
@@ -175,18 +175,18 @@ export default function AdminPage() {
             ) : (
               <div className="py-20 text-center">
                 <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
-                  <Users className="text-urbik-muted" size={32} />
+                  <Users className="text-geora-muted" size={32} />
                 </div>
-                <h3 className="text-2xl font-display font-bold text-urbik-black">
+                <h3 className="text-2xl font-display font-bold text-geora-black">
                   Todo al día
                 </h3>
-                <p className="text-urbik-muted mt-2 font-medium">
+                <p className="text-geora-muted mt-2 font-medium">
                   No hay solicitudes de inmobiliarias pendientes de revisión.
                 </p>
               </div>
             )}
 
-            <div className="mt-8 w-full justify-center flex items-center gap-2 text-urbik-muted text-sm px-6">
+            <div className="mt-8 w-full justify-center flex items-center gap-2 text-geora-muted text-sm px-6">
               <AlertCircle size={16} />
               <span>
                 Las cuentas aprobadas recibirán una notificación automática por

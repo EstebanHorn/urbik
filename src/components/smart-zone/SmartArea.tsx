@@ -37,7 +37,7 @@ export const ZoneAnalysis = ({ data }: ZoneAnalysisProps) => {
   if (!data) return null;
 
   return (
-    <div className="bg-black/90 backdrop-blur-xl p-5 rounded-2xl shadow-[0_0_40px_-12px_rgba(16,185,129,0.3)] border border-urbik-emerald/30 w-80 transition-all duration-500 ease-in-out">
+    <div className="bg-black/90 backdrop-blur-xl p-5 rounded-2xl shadow-[0_0_40px_-12px_rgba(16,185,129,0.3)] border border-geora-emerald/30 w-80 transition-all duration-500 ease-in-out">
       <div
         className={`flex flex-col items-center justify-center transition-all duration-500 ${loading ? "opacity-100 h-28" : "opacity-0 h-0 overflow-hidden"}`}
       >
@@ -58,14 +58,14 @@ export const ZoneAnalysis = ({ data }: ZoneAnalysisProps) => {
           <div className="flex w-full mb-4 border-b border-white/10 pb-3">
             <div className="flex justify-between items-center w-full">
               <Image
-                src="/Urbik_Logo_Smart_Zone.svg"
-                alt="Urbik Logo"
+                src="/Geora_Logo_Smart_Zone.svg"
+                alt="Geora Logo"
                 width={24}
                 height={24}
                 className="w-6 h-6 object-contain drop-shadow-[0_0_3px_rgba(16,185,129,1)]"
               />
               <h3 className="text-sm font-black text-white italic tracking-tighter uppercase mr-2">
-                Urbik <span className="text-urbik-emerald">Smart Zone</span>
+                Geora <span className="text-geora-emerald">Smart Zone</span>
               </h3>
             </div>
           </div>
@@ -73,13 +73,13 @@ export const ZoneAnalysis = ({ data }: ZoneAnalysisProps) => {
           <div className="space-y-4">
             <div>
               <div className="flex items-center gap-1.5 mb-2">
-                <MapPin className="w-3 h-3 text-urbik-emerald" />
+                <MapPin className="w-3 h-3 text-geora-emerald" />
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                   {data.zone}
                 </p>
               </div>
 
-              <div className="bg-urbik-emerald/5 border border-urbik-emerald/20 p-3 rounded-xl">
+              <div className="bg-geora-emerald/5 border border-geora-emerald/20 p-3 rounded-xl">
                 <p className="text-sm text-emerald-50/90 leading-relaxed font-medium italic">
                   &quot;{analysis}&quot;
                 </p>

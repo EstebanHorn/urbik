@@ -279,7 +279,7 @@ const handleBoundsChange = useCallback(
                   filters.rooms.length > 0 ||
                   filters.bedrooms.length > 0 ||
                   filters.bathrooms.length > 0) && (
-                  <span className="h-5 w-5 flex items-center justify-center rounded-full bg-urbik-cyan text-[10px] font-black text-white">
+                  <span className="h-5 w-5 flex items-center justify-center rounded-full bg-geora-cyan text-[10px] font-black text-white">
                     ●
                   </span>
                 )}

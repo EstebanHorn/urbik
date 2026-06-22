@@ -70,7 +70,7 @@ function DropdownMenu({
       ref={menuRef}
       tabIndex={0}
       onKeyDown={handleSearchByKey}
-      className={`absolute z-50 left-0 mt-2 min-w-[280px] max-h-72 overflow-y-auto rounded-2xl bg-urbik-dark border border-white/10 shadow-2xl transition-all duration-200 outline-none
+      className={`absolute z-50 left-0 mt-2 min-w-[280px] max-h-72 overflow-y-auto rounded-2xl bg-geora-dark border border-white/10 shadow-2xl transition-all duration-200 outline-none
       ${
         isOpen
           ? "opacity-100 translate-y-0"
@@ -86,7 +86,7 @@ function DropdownMenu({
           }}
           type="button"
           onClick={() => onSelect(item)}
-          className="w-full text-left cursor-pointer px-5 py-3 text-md font-bold text-urbik-white hover:bg-white/10 transition"
+          className="w-full text-left cursor-pointer px-5 py-3 text-md font-bold text-geora-white hover:bg-white/10 transition"
         >
           {item.nombre}
         </button>

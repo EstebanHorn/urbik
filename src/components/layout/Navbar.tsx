@@ -7,8 +7,8 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Search, Map, SlidersHorizontal, Menu, List, X, ChevronDown } from "lucide-react";
 import Image from "next/image";
 
-import UrbikLogo from "@/assets/Urbik_Logo.svg";
-import UrbikLogo2 from "@/assets/Urbik_Logo_Mini.svg";
+import GeoraLogo from "@/assets/Geora_Logo.svg";
+import GeoraLogo2 from "@/assets/Geora_Logo_Mini.svg";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import { createClient } from "@/lib/supabase/client";
 import { useSearch, type SearchSuggestion } from "@/hooks/useSearch";
@@ -211,7 +211,7 @@ function NavbarInner() {
 
   if (loading) {
     return (
-      <nav className="fixed z-[1001] bottom-0 top-auto md:bottom-auto md:top-0 left-0 right-0 w-full py-4 px-6 bg-urbik-black text-urbik-white flex items-center justify-between h-16 md:h-[76px] box-border shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] md:shadow-xl">
+      <nav className="fixed z-[1001] bottom-0 top-auto md:bottom-auto md:top-0 left-0 right-0 w-full py-4 px-6 bg-geora-black text-geora-white flex items-center justify-between h-16 md:h-[76px] box-border shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] md:shadow-xl">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
           <div className="h-5 w-24 rounded animate-pulse bg-white/10" />
           <div className="flex-1 max-w-2xl h-10 rounded-full animate-pulse bg-white/10" />
@@ -253,7 +253,7 @@ function NavbarInner() {
       
     const inputClass = isDesktop
       ? "text-black placeholder:text-black/70"
-      : "text-urbik-white placeholder:text-white/40";
+      : "text-geora-white placeholder:text-white/40";
       
     const iconClass = isDesktop ? "text-gray-500 hover:text-gray-700" : "text-white/50 hover:text-white";
 
@@ -327,7 +327,7 @@ function NavbarInner() {
   };
 
 const renderNavLinks = () => {
-    const linkClass = "text-sm md:text-base text-urbik-white hover:text-white/70 font-semibold transition-colors";
+    const linkClass = "text-sm md:text-base text-geora-white hover:text-white/70 font-semibold transition-colors";
 
     if (!session) {
       return (
@@ -367,20 +367,20 @@ const renderNavLinks = () => {
 
   return (
     <>
-      <nav className="fixed z-[1001] bottom-0 top-auto md:bottom-auto md:top-0 left-0 right-0 w-full py-3 px-4 md:py-4 md:px-6 bg-urbik-black text-urbik-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] md:shadow-xl flex items-center h-[60px] md:h-[76px] box-border">
+      <nav className="fixed z-[1001] bottom-0 top-auto md:bottom-auto md:top-0 left-0 right-0 w-full py-3 px-4 md:py-4 md:px-6 bg-geora-black text-geora-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] md:shadow-xl flex items-center h-[60px] md:h-[76px] box-border">
         
         <div className="relative z-10 max-w-7xl mx-auto w-full md:px-10 h-full flex items-center justify-between gap-2 md:gap-6">
           
           <div className="shrink-0 flex items-center">
             <Link href="/">
               <Image 
-                src={UrbikLogo} 
-                alt="Urbik Logo" 
+                src={GeoraLogo} 
+                alt="Geora Logo" 
                 className="hidden md:block w-auto h-7 antialiased subpixel-antialiased"
               />
               <Image 
-                src={UrbikLogo2} 
-                alt="Urbik Logo Mini" 
+                src={GeoraLogo2} 
+                alt="Geora Logo Mini" 
                 className="block md:hidden w-auto h-7 ml-1" 
               />
             </Link>
@@ -399,7 +399,7 @@ const renderNavLinks = () => {
                         window.dispatchEvent(new CustomEvent('toggle-sidebar'));
                       }
                     }}
-                    className="p-2 transition-colors duration-300 hover:cursor-pointer text-white hover:text-urbik-white"
+                    className="p-2 transition-colors duration-300 hover:cursor-pointer text-white hover:text-geora-white"
                   >
                     <SlidersHorizontal className="w-4 h-4" />
                   </button>
@@ -409,7 +409,7 @@ const renderNavLinks = () => {
 
                 <Link 
                   href={viewToggleHref} 
-                  className="flex items-center justify-center transition-colors duration-300 ml-1 shrink-0 text-urbik-white"
+                  className="flex items-center justify-center transition-colors duration-300 ml-1 shrink-0 text-geora-white"
                 >
                   <ViewToggleIcon className="w-5 h-5" />
                 </Link>
@@ -495,10 +495,10 @@ const renderNavLinks = () => {
                     onClick={() => setActiveFilter((v) => (v === "price" ? null : "price"))}
                     className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 w-[180px] font-bold ${
                       currentFilters.minPrice || currentFilters.maxPrice || currentFilters.currency
-                        ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                        ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                         : activeFilter === "price"
-                          ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
-                          : "bg-white/70 border border-white text-urbik-black/70 hover:bg-gray-50 shadow-sm"
+                          ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
+                          : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
                     }`}
                   >
                     <span className="text-md tracking-wider flex items-center justify-center truncate">
@@ -510,7 +510,7 @@ const renderNavLinks = () => {
                   </button>
 
                   {activeFilter === "price" && (
-                    <div className="absolute top-full left-0 mt-3 z-999 w-80 rounded-2xl border border-gray-200 bg-white text-urbik-black/70 shadow-xl p-5">
+                    <div className="absolute top-full left-0 mt-3 z-999 w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
                       <PriceFilterCard
                         minPrice={localMinPrice}
                         maxPrice={localMaxPrice}
@@ -531,10 +531,10 @@ const renderNavLinks = () => {
                     onClick={() => setActiveFilter((v) => (v === "rooms" ? null : "rooms"))}
                     className={`h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center md:justify-between gap-2 w-[130px] md:w-[170px] font-bold ${
                       currentFilters.rooms.length > 0 || currentFilters.bedrooms.length > 0 || currentFilters.bathrooms.length > 0
-                        ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
+                        ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                         : activeFilter === "rooms"
-                          ? "bg-white/70 border border-white text-urbik-black/70 shadow-md"
-                          : "bg-white/70 border border-white text-urbik-black/70 hover:bg-gray-50 shadow-sm"
+                          ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
+                          : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
                     }`}
                   >
                     <span className="text-md tracking-wider flex items-center justify-center">
@@ -548,7 +548,7 @@ const renderNavLinks = () => {
                   </button>
 
                   {activeFilter === "rooms" && (
-                    <div className="absolute top-full left-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-urbik-black/70 shadow-xl p-5">
+                    <div className="absolute top-full left-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
                       <RoomsFilterCard
                         rooms={searchParams.getAll("rooms")}
                         bedrooms={searchParams.getAll("bedrooms")}
@@ -563,7 +563,7 @@ const renderNavLinks = () => {
               <div className="anim-item delay-6">
                 <Link
                   href={viewToggleHref}
-                  className="flex items-center px-4 py-1.5 font-medium transition-colors duration-300 text-sm shrink-0 text-urbik-black/80 hover:text-urbik-black"
+                  className="flex items-center px-4 py-1.5 font-medium transition-colors duration-300 text-sm shrink-0 text-geora-black/80 hover:text-geora-black"
                 >
                   {viewToggleText}
                 </Link>

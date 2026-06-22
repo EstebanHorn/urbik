@@ -5,8 +5,8 @@ export default function Loading() {
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
       <div className="relative animate-pulse duration-1000">
         <Image
-          src="/Urbik_Logo_Negro.svg"
-          alt="Urbik"
+          src="/Geora_Logo_Negro.svg"
+          alt="Geora"
           width={180}
           height={60}
           priority

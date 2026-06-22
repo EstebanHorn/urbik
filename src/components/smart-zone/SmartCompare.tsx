@@ -98,7 +98,7 @@ export default function Versus({
 
     if (max === min) return "text-white/80";
     if (isLowerBetter ? value === min : value === max) {
-      return "text-urbik-emerald drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]";
+      return "text-geora-emerald drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]";
     }
     if (isLowerBetter ? value === max : value === min) {
       return "text-red-400";
@@ -136,16 +136,16 @@ export default function Versus({
   ];
 
   return (
-    <div className="mt-10 flex flex-col items-center w-full shadow-[0_0_40px_-12px_rgba(16,185,129,1)] border border-urbik-emerald/30 pt-10 pb-20 relative overflow-hidden bg-urbik-black rounded-3xl mx-auto max-w-7xl px-4 md:px-6">
-      <div className="absolute top-0 left-1/4 w-64 h-64 bg-urbik-emerald/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-urbik-emerald/5 rounded-full blur-[80px] pointer-events-none" />
+    <div className="mt-10 flex flex-col items-center w-full shadow-[0_0_40px_-12px_rgba(16,185,129,1)] border border-geora-emerald/30 pt-10 pb-20 relative overflow-hidden bg-geora-black rounded-3xl mx-auto max-w-7xl px-4 md:px-6">
+      <div className="absolute top-0 left-1/4 w-64 h-64 bg-geora-emerald/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-geora-emerald/5 rounded-full blur-[80px] pointer-events-none" />
 
       <div className="max-w-4xl w-full flex flex-col items-center px-0 relative z-10">
-        <div className="w-full bg-black/50 backdrop-blur-md rounded-full py-3 px-8 flex items-center justify-between shadow-2xl mb-8 border border-urbik-emerald/30">
+        <div className="w-full bg-black/50 backdrop-blur-md rounded-full py-3 px-8 flex items-center justify-between shadow-2xl mb-8 border border-geora-emerald/30">
           <div className="flex items-center justify-between w-2/3">
             <img
-              src="/Urbik_Logo_Smart_Zone.svg"
-              alt="Urbik Smart Zone"
+              src="/Geora_Logo_Smart_Zone.svg"
+              alt="Geora Smart Zone"
               className={`h-6 md:h-8 transition-all duration-700 ease-in-out ${
                 isVersusMode
                   ? "brightness-100 invert-0 drop-shadow-[0_0_5px_rgba(16,185,129,1)]"
@@ -155,10 +155,10 @@ export default function Versus({
             <span
               className={`mr-5 text-xs md:text-sm font-black italic tracking-tighter w-1/3 uppercase transition-colors duration-300 ${isVersusMode ? "text-white" : "text-white/30"}`}
             >
-              Urbik{" "}
+              Geora{" "}
               <span
                 className={
-                  isVersusMode ? "text-urbik-emerald" : "text-white/30"
+                  isVersusMode ? "text-geora-emerald" : "text-white/30"
                 }
               >
                 Smart Zone
@@ -168,7 +168,7 @@ export default function Versus({
 
           <div className="flex items-center gap-4">
             <span
-              className={`hidden md:block text-[10px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 ${isVersusMode ? "text-urbik-emerald" : "text-white/30"}`}
+              className={`hidden md:block text-[10px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 ${isVersusMode ? "text-geora-emerald" : "text-white/30"}`}
             >
               {isVersusMode ? "Análisis Activo" : "Modo Comparación"}
             </span>
@@ -177,7 +177,7 @@ export default function Versus({
                 setIsVersusMode(!isVersusMode);
                 if (isVersusMode) setSelectedIds([]);
               }}
-              className={`w-12 h-6 md:w-14 cursor-pointer md:h-7 flex items-center rounded-full p-1 transition-all duration-300 shadow-inner ${isVersusMode ? "bg-urbik-emerald shadow-emerald-500/50" : "bg-white/10"}`}
+              className={`w-12 h-6 md:w-14 cursor-pointer md:h-7 flex items-center rounded-full p-1 transition-all duration-300 shadow-inner ${isVersusMode ? "bg-geora-emerald shadow-emerald-500/50" : "bg-white/10"}`}
             >
               <motion.div
                 layout
@@ -214,10 +214,10 @@ export default function Versus({
                 animate={{ opacity: 1, y: 0 }}
                 className="relative overflow-hidden w-full text-center"
               >
-                <div className="bg-urbik-emerald/5 border border-urbik-emerald/20 p-6 rounded-2xl backdrop-blur-sm">
+                <div className="bg-geora-emerald/5 border border-geora-emerald/20 p-6 rounded-2xl backdrop-blur-sm">
                   <div className="flex items-center justify-center gap-2 mb-3">
-                    <div className="w-1.5 h-1.5 bg-urbik-emerald rounded-full shadow-[0_0_8px_rgba(16,185,129,1)]" />
-                    <span className="text-[11px] font-black tracking-[0.2em] text-urbik-emerald uppercase">
+                    <div className="w-1.5 h-1.5 bg-geora-emerald rounded-full shadow-[0_0_8px_rgba(16,185,129,1)]" />
+                    <span className="text-[11px] font-black tracking-[0.2em] text-geora-emerald uppercase">
                       Resultado de la consulta
                     </span>
                   </div>
@@ -234,7 +234,7 @@ export default function Versus({
                 className="text-center"
               >
                 {isVersusMode && selectedProperties.length < 2 ? (
-                  <span className="text-urbik-emerald text-xl font-black italic uppercase tracking-tighter animate-pulse">
+                  <span className="text-geora-emerald text-xl font-black italic uppercase tracking-tighter animate-pulse">
                     {selectedProperties.length === 0
                       ? "Elegí propiedades para comparar"
                       : "Seleccioná una segunda opción"}
@@ -242,8 +242,8 @@ export default function Versus({
                 ) : (
                   <div className="max-w-xl mx-auto opacity-60">
                     <h4 className="text-white text-lg font-black italic uppercase tracking-tighter mb-2">
-                      Urbik{" "}
-                      <span className="text-urbik-emerald">Smart Zone®</span>
+                      Geora{" "}
+                      <span className="text-geora-emerald">Smart Zone®</span>
                     </h4>
                     <p className="text-gray-400 text-sm font-medium">
                       Análisis de brechas y rentabilidad en tiempo real.
@@ -292,7 +292,7 @@ export default function Versus({
                     key={stat.key}
                     className="border-b border-white/5 hover:bg-white/2 transition-colors"
                   >
-                    <td className="p-6 text-[10px] font-bold text-urbik-white/50 uppercase tracking-widest">
+                    <td className="p-6 text-[10px] font-bold text-geora-white/50 uppercase tracking-widest">
                       {stat.label}
                     </td>
                     {selectedProperties.map((p) => {

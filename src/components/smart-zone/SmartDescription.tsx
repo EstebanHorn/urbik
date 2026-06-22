@@ -28,7 +28,7 @@ export default function SmartDescription({
       const data = await res.json();
       setAnalysis(data.text);
     } catch {
-      setAnalysis("Error al conectar con Urbik AI.");
+      setAnalysis("Error al conectar con Geora AI.");
     } finally {
       setLoading(false);
     }
@@ -47,8 +47,8 @@ export default function SmartDescription({
     loading || (isActive && (!description || description.length < 20));
 
   return (
-    <div className="mt-4 flex flex-col items-center w-full shadow-[0_0_30px_-10px_rgba(16,185,129,0.6)] border border-urbik-emerald/30 p-1 relative overflow-hidden bg-urbik-black rounded-2xl mx-auto">
-      <div className="absolute top-0 left-1/4 w-32 h-32 bg-urbik-emerald/5 rounded-full blur-[60px] pointer-events-none" />
+    <div className="mt-4 flex flex-col items-center w-full shadow-[0_0_30px_-10px_rgba(16,185,129,0.6)] border border-geora-emerald/30 p-1 relative overflow-hidden bg-geora-black rounded-2xl mx-auto">
+      <div className="absolute top-0 left-1/4 w-32 h-32 bg-geora-emerald/5 rounded-full blur-[60px] pointer-events-none" />
 
       <div className="w-full relative z-10 p-2">
         <div className="w-full flex items-center justify-between mb-1">
@@ -61,8 +61,8 @@ export default function SmartDescription({
               }`}
             >
               <Image
-                src="/Urbik_Logo_Smart_Zone.svg"
-                alt="Urbik Smart Zone"
+                src="/Geora_Logo_Smart_Zone.svg"
+                alt="Geora Smart Zone"
                 width={20}
                 height={20}
                 className="object-contain"
@@ -71,9 +71,9 @@ export default function SmartDescription({
             <span
               className={`text-xs font-black italic uppercase transition-colors ${isActive ? "text-white" : "text-white/30"}`}
             >
-              Urbik{" "}
+              Geora{" "}
               <span
-                className={isActive ? "text-urbik-emerald" : "text-white/30"}
+                className={isActive ? "text-geora-emerald" : "text-white/30"}
               >
                 Smart Description
               </span>
@@ -82,13 +82,13 @@ export default function SmartDescription({
 
           <div className="flex items-center gap-3">
             <span
-              className={`hidden sm:block text-[8px] font-bold uppercase tracking-widest transition-colors ${isActive ? "text-urbik-emerald" : "text-white/20"}`}
+              className={`hidden sm:block text-[8px] font-bold uppercase tracking-widest transition-colors ${isActive ? "text-geora-emerald" : "text-white/20"}`}
             >
               {isActive ? "Análisis Activo" : "IA Desactivada"}
             </span>
             <button
               onClick={() => setIsActive(!isActive)}
-              className={`w-10 cursor-pointer h-5 flex items-center rounded-full p-1 transition-all duration-300 ${isActive ? "bg-urbik-emerald shadow-[0_0_10px_rgba(16,185,129,0.4)]" : "bg-white/10"}`}
+              className={`w-10 cursor-pointer h-5 flex items-center rounded-full p-1 transition-all duration-300 ${isActive ? "bg-geora-emerald shadow-[0_0_10px_rgba(16,185,129,0.4)]" : "bg-white/10"}`}
             >
               <motion.div
                 layout
@@ -126,10 +126,10 @@ export default function SmartDescription({
                       animate={{ opacity: 1, y: 0 }}
                       className="w-full"
                     >
-                      <div className="bg-urbik-emerald/5 border border-urbik-emerald/10 p-4 rounded-xl backdrop-blur-sm relative">
+                      <div className="bg-geora-emerald/5 border border-geora-emerald/10 p-4 rounded-xl backdrop-blur-sm relative">
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-1 h-1 bg-urbik-emerald rounded-full shadow-[0_0_5px_rgba(16,185,129,1)]" />
-                          <span className="text-[9px] font-bold text-urbik-emerald/80 uppercase tracking-widest">
+                          <div className="w-1 h-1 bg-geora-emerald rounded-full shadow-[0_0_5px_rgba(16,185,129,1)]" />
+                          <span className="text-[9px] font-bold text-geora-emerald/80 uppercase tracking-widest">
                             Sugerencia de IA
                           </span>
                         </div>

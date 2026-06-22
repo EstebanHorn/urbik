@@ -440,10 +440,10 @@ export default function HomePage() {
             {!isSearchMode && <Banner items={items} />}
             <section className="max-w-7xl w-full mx-auto px-4 md:px-8 mt-10">
               <div className="mt-10 md:mt-40 mb-5 ml-0 md:ml-10 text-center md:text-left">
-                <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">
+                <h1 className="text-3xl md:text-4xl text-geora-black/80 font-black">
                   Propiedades Destacadas
                 </h1>
-                <span className="text-urbik-black/50 text-sm md:text-base">
+                <span className="text-geora-black/50 text-sm md:text-base">
                   Las mejores oportunidades del mercado seleccionadas para vos.
                 </span>
               </div>
@@ -471,20 +471,20 @@ export default function HomePage() {
                     setHoveredPropertyId={setHoveredPropertyId}
                   />
                   <div className="mt-10 md:mt-30 ml-0 md:ml-10 text-center md:text-left">
-                    <span className="text-urbik-black/50 text-sm md:text-base ml-10">
+                    <span className="text-geora-black/50 text-sm md:text-base ml-10">
                       ¡Bienvenido!
                     </span>
-                    <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">
+                    <h1 className="text-3xl md:text-4xl text-geora-black/80 font-black">
                       ¿Qué tipo de usuario sos?
                     </h1>
                   </div>
                   <MiniBanner />
                   <div className="w-full h-10" />
                   <div className="mt-10 md:mt-20 mb-5 text-center md:text-right">
-                    <h1 className="text-3xl md:text-4xl text-urbik-black/80 font-black">
+                    <h1 className="text-3xl md:text-4xl text-geora-black/80 font-black">
                       Opciones listas para vos
                     </h1>
-                    <span className="text-urbik-black/50 text-sm md:text-base">
+                    <span className="text-geora-black/50 text-sm md:text-base">
                       Explorá todo nuestro catálogo de propiedades disponibles.
                     </span>
                   </div>

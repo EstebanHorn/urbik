@@ -1,4 +1,4 @@
-# Urbik
+# Geora
 
 Plataforma web para buscar y publicar propiedades con autenticacion, perfiles de usuarios e inmobiliarias, y exploracion en mapa.
 

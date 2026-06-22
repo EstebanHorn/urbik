@@ -86,7 +86,7 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
               </motion.div>
             </AnimatePresence>
           ) : (
-            <div className="flex items-center justify-center h-full text-urbik-g300 flex-col gap-2 bg-gray-50 [mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_80%,transparent_100%)]">
+            <div className="flex items-center justify-center h-full text-geora-g300 flex-col gap-2 bg-gray-50 [mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_80%,transparent_100%)]">
               <Building2 size={64} />
               <span className="text-sm font-bold">Sin imágenes</span>
             </div>
@@ -96,18 +96,18 @@ export default function ImageGallery({ images = [], title, parcelGeom, latitude,
         {!!parcelGeom && latitude != null && longitude != null && (
           <div className="absolute top-6 right-6 z-20 w-32 h-32 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-2xl border-4 border-white hidden sm:block opacity-80 hover:opacity-100 transition-opacity">
             <PropertyParcelMap lat={latitude} lon={longitude} selectedGeom={parcelGeom as GeoJsonObject} allProperties={[]} />
-            <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 text-[10px] font-bold rounded shadow flex items-center gap-1 z-40 text-urbik-black">
-              <MapPin size={10} className="text-urbik-emerald" /> Mapa
+            <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 text-[10px] font-bold rounded shadow flex items-center gap-1 z-40 text-geora-black">
+              <MapPin size={10} className="text-geora-emerald" /> Mapa
             </div>
           </div>
         )}
 
         {images.length > 1 && (
             <>
-                <button onClick={prevImage} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/30 backdrop-blur hover:bg-white/60 rounded-full text-urbik-black transition-all hover:scale-110 shadow-lg hidden sm:flex">
+                <button onClick={prevImage} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/30 backdrop-blur hover:bg-white/60 rounded-full text-geora-black transition-all hover:scale-110 shadow-lg hidden sm:flex">
                     <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
                 </button>
-                <button onClick={nextImage} className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/30 backdrop-blur hover:bg-white/60 rounded-full text-urbik-black transition-all hover:scale-110 shadow-lg hidden sm:flex">
+                <button onClick={nextImage} className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/30 backdrop-blur hover:bg-white/60 rounded-full text-geora-black transition-all hover:scale-110 shadow-lg hidden sm:flex">
                     <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
                 </button>
             </>

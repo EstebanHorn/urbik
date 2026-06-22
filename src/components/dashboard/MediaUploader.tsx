@@ -42,11 +42,11 @@ export default function MediaUploader({ currentUrl, onImageChange, disabled = fa
   const triggerClick = () => { if (!isUploading && !disabled) fileInputRef.current?.click(); };
 
   return (
-    <div onClick={triggerClick} className={`relative w-full h-full rounded-full border-2 border-urbik-g100 border-dashed shadow-lg overflow-hidden group cursor-pointer bg-urbik-white z-20 ${isUploading ? "pointer-events-none" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}>
+    <div onClick={triggerClick} className={`relative w-full h-full rounded-full border-2 border-geora-g100 border-dashed shadow-lg overflow-hidden group cursor-pointer bg-geora-white z-20 ${isUploading ? "pointer-events-none" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}>
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} disabled={disabled || isUploading} />
       {isUploading ? (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-20">
-          <Loader2 className="animate-spin text-urbik-emerald" size={24} />
+          <Loader2 className="animate-spin text-geora-emerald" size={24} />
         </div>
       ) : currentUrl ? (
         <>
@@ -61,7 +61,7 @@ export default function MediaUploader({ currentUrl, onImageChange, disabled = fa
           )}
         </>
       ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center text-urbik-muted hover:bg-urbik-g100 transition-colors z-200">
+        <div className="w-full h-full flex flex-col items-center justify-center text-geora-muted hover:bg-geora-g100 transition-colors z-200">
           <ImagePlus size={24} className="mb-1 opacity-50" />
           <span className="text-[10px] font-bold uppercase tracking-wider">Logo</span>
         </div>

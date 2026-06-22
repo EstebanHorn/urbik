@@ -28,27 +28,27 @@ export default function LoginToast({
           transition={{ type: "spring", stiffness: 400, damping: 28 }}
           className="fixed bottom-6 right-4 z-[9999] max-w-xs w-full pointer-events-auto"
         >
-          <div className="relative flex items-start gap-3 rounded-2xl border border-urbik-rose/20 bg-white/80 backdrop-blur-xl px-4 py-3.5 shadow-[0_8px_32px_rgba(255,0,119,0.12)]">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-urbik-rose/10">
-              <Lock size={15} className="text-urbik-rose" strokeWidth={2.5} />
+          <div className="relative flex items-start gap-3 rounded-2xl border border-geora-rose/20 bg-white/80 backdrop-blur-xl px-4 py-3.5 shadow-[0_8px_32px_rgba(255,0,119,0.12)]">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-geora-rose/10">
+              <Lock size={15} className="text-geora-rose" strokeWidth={2.5} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-urbik-black leading-snug">
+              <p className="text-sm font-bold text-geora-black leading-snug">
                 Iniciá sesión para guardar
               </p>
-              <p className="text-xs text-urbik-black/50 mt-0.5">
+              <p className="text-xs text-geora-black/50 mt-0.5">
                 Guardá propiedades y accedé a tus favoritos desde cualquier dispositivo.
               </p>
               <Link
                 href="/auth/login"
-                className="mt-2 inline-block text-xs font-bold text-urbik-black underline underline-offset-2 hover:text-urbik-rose transition-colors"
+                className="mt-2 inline-block text-xs font-bold text-geora-black underline underline-offset-2 hover:text-geora-rose transition-colors"
               >
                 Iniciar sesión →
               </Link>
             </div>
             <button
               onClick={onClose}
-              className="mt-0.5 shrink-0 text-urbik-black/30 hover:text-urbik-black transition-colors cursor-pointer"
+              className="mt-0.5 shrink-0 text-geora-black/30 hover:text-geora-black transition-colors cursor-pointer"
             >
               <X size={15} />
             </button>

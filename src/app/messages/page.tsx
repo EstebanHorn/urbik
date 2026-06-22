@@ -48,7 +48,7 @@ export default function MessagesPage() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="w-2 h-2 bg-urbik-black/20 rounded-full animate-bounce"
+              className="w-2 h-2 bg-geora-black/20 rounded-full animate-bounce"
               style={{ animationDelay: `${i * 0.12}s` }}
             />
           ))}
@@ -64,7 +64,7 @@ export default function MessagesPage() {
           <MessageCircle size={28} className="text-gray-300" />
         </div>
         <div className="text-center">
-          <p className="text-xl font-black text-urbik-black tracking-tight">
+          <p className="text-xl font-black text-geora-black tracking-tight">
             Iniciá sesión para ver tus mensajes
           </p>
           <p className="text-sm text-gray-400 mt-1">
@@ -73,7 +73,7 @@ export default function MessagesPage() {
         </div>
         <Link
           href="/auth/login?redirect=/messages"
-          className="bg-urbik-black text-white font-black px-8 py-3.5 rounded-full hover:bg-urbik-dark2 transition-colors"
+          className="bg-geora-black text-white font-black px-8 py-3.5 rounded-full hover:bg-geora-dark2 transition-colors"
         >
           Iniciar sesión
         </Link>
@@ -87,11 +87,11 @@ export default function MessagesPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 pt-28 pb-12">
         <div className="flex items-center gap-3 mb-6">
-          <h1 className="text-3xl font-display font-black text-urbik-black tracking-tighter">
+          <h1 className="text-3xl font-display font-black text-geora-black tracking-tighter">
             Mensajes
           </h1>
           {totalUnread > 0 && (
-            <span className="bg-urbik-cyan text-urbik-black text-xs font-black px-2.5 py-1 rounded-full">
+            <span className="bg-geora-cyan text-geora-black text-xs font-black px-2.5 py-1 rounded-full">
               {totalUnread}
             </span>
           )}
@@ -129,17 +129,17 @@ export default function MessagesPage() {
                   >
                     <ArrowLeft size={15} />
                   </button>
-                  <div className="w-9 h-9 rounded-full bg-urbik-black text-white flex items-center justify-center font-black text-sm shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-geora-black text-white flex items-center justify-center font-black text-sm shrink-0">
                     {(activeThread?.otherParty ?? "?").charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-black text-sm text-urbik-black truncate leading-tight">
+                    <p className="font-black text-sm text-geora-black truncate leading-tight">
                       {activeThread?.otherParty ?? "Conversación"}
                     </p>
                     {activeThread?.property ? (
                       <Link
                         href={`/property/${activeThread.property.id}`}
-                        className="text-[11px] text-urbik-cyan hover:underline inline-flex items-center gap-1 mt-0.5"
+                        className="text-[11px] text-geora-cyan hover:underline inline-flex items-center gap-1 mt-0.5"
                       >
                         <Home size={9} />
                         <span className="truncate max-w-[180px]">{activeThread.property.title}</span>

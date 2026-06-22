@@ -111,14 +111,14 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
   return (
     <div className="pb-28">
       <div className="flex items-center gap-6 mb-10 ml-2 md:ml-6">
-        <div className="w-20 h-20 bg-urbik-black text-white rounded-full flex items-center justify-center text-2xl font-black">
+        <div className="w-20 h-20 bg-geora-black text-white rounded-full flex items-center justify-center text-2xl font-black">
           {formData.firstName.charAt(0).toUpperCase() || <User size={32} />}
         </div>
         <div>
-          <h1 className="text-3xl md:text-4xl font-black text-urbik-black/90 uppercase tracking-tighter">
+          <h1 className="text-3xl md:text-4xl font-black text-geora-black/90 uppercase tracking-tighter">
             Hola, {formData.firstName || "Usuario"}
           </h1>
-          <p className="flex items-center gap-2 text-urbik-black/60 font-medium">
+          <p className="flex items-center gap-2 text-geora-black/60 font-medium">
             <Mail size={14} /> {profile?.email}
           </p>
         </div>
@@ -127,37 +127,37 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
       <div className="w-full">
         <div className={activeTab === "profile" ? "block w-full mx-auto" : "hidden"}>
           <div className="mb-20">
-            <h2 className="text-xl font-black text-urbik-black/90 mb-6 uppercase tracking-tight border-b border-black/10 pb-4">
+            <h2 className="text-xl font-black text-geora-black/90 mb-6 uppercase tracking-tight border-b border-black/10 pb-4">
               Información Básica
             </h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-2 ml-2">Nombre</label>
+                <label className="block text-xs font-bold text-geora-black/90 uppercase mb-2 ml-2">Nombre</label>
                 <input 
                   type="text" name="firstName" value={formData.firstName} onChange={handleChange} 
-                  className="w-full border border-white bg-white/50 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-urbik-black/20 shadow-sm transition-all" 
+                  className="w-full border border-white bg-white/50 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-geora-black/20 shadow-sm transition-all" 
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-2 ml-2">Apellido</label>
+                <label className="block text-xs font-bold text-geora-black/90 uppercase mb-2 ml-2">Apellido</label>
                 <input 
                   type="text" name="lastName" value={formData.lastName} onChange={handleChange} 
-                  className="w-full border border-white bg-white/50 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-urbik-black/20 shadow-sm transition-all" 
+                  className="w-full border border-white bg-white/50 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-geora-black/20 shadow-sm transition-all" 
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-2 ml-2 flex items-center gap-1"><Phone size={12}/> Teléfono</label>
+                <label className="block text-xs font-bold text-geora-black/90 uppercase mb-2 ml-2 flex items-center gap-1"><Phone size={12}/> Teléfono</label>
                 <input 
                   type="text" name="phone" value={formData.phone} onChange={handleChange} 
-                  className="w-full border border-white bg-white/50 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-urbik-black/20 shadow-sm transition-all" 
+                  className="w-full border border-white bg-white/50 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-geora-black/20 shadow-sm transition-all" 
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-urbik-black/90 uppercase mb-2 ml-2 flex items-center gap-1"><MapPin size={12}/> Ciudad</label>
+                <label className="block text-xs font-bold text-geora-black/90 uppercase mb-2 ml-2 flex items-center gap-1"><MapPin size={12}/> Ciudad</label>
                 <input 
                   type="text" name="city" value={formData.city} onChange={handleChange} 
-                  className="w-full border border-white bg-white/50 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-urbik-black/20 shadow-sm transition-all" 
+                  className="w-full border border-white bg-white/50 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-geora-black/20 shadow-sm transition-all" 
                 />
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
               )}
               <button
                 onClick={handleSaveProfile} disabled={isSaving}
-                className="px-8 py-3 cursor-pointer rounded-full text-sm font-bold text-white bg-urbik-black hover:opacity-90 transition shadow-md disabled:opacity-50"
+                className="px-8 py-3 cursor-pointer rounded-full text-sm font-bold text-white bg-geora-black hover:opacity-90 transition shadow-md disabled:opacity-50"
               >
                 {isSaving ? "Guardando..." : "Guardar Cambios"}
               </button>
@@ -181,9 +181,9 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
             <div className="mt-6 flex flex-col items-center w-full">
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/40 border border-black/10 backdrop-blur-md shadow-sm text-sm font-bold text-urbik-black/80 hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/40 border border-black/10 backdrop-blur-md shadow-sm text-sm font-bold text-geora-black/80 hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer"
               >
-                <Settings size={16} className={`transition-transform duration-500 ${showSettings ? "rotate-90 text-urbik-rose" : ""}`} />
+                <Settings size={16} className={`transition-transform duration-500 ${showSettings ? "rotate-90 text-geora-rose" : ""}`} />
                 {showSettings ? "Ocultar Ajustes Avanzados" : "Configuración Avanzada de Cuenta"}
                 <ChevronDown size={16} className={`transition-transform duration-300 ${showSettings ? "rotate-180" : ""}`} />
               </button>
@@ -203,22 +203,22 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
 
         <div className={activeTab === "saved" ? "block w-full" : "hidden"}>
           <div className="mb-6 flex items-baseline justify-between px-2">
-            <h2 className="text-2xl font-black text-urbik-black/90 uppercase tracking-tight">
+            <h2 className="text-2xl font-black text-geora-black/90 uppercase tracking-tight">
               Tus Propiedades Guardadas
             </h2>
           </div>
 
           {loadingFavorites ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 animate-pulse">
-              {[1, 2, 3].map((i) => <div key={i} className={`bg-urbik-g200 h-96 ${glassCard}`} />)}
+              {[1, 2, 3].map((i) => <div key={i} className={`bg-geora-g200 h-96 ${glassCard}`} />)}
             </div>
           ) : favorites.length === 0 ? (
-            <div className="text-center py-24 border-2 border-dashed border-urbik-g200 rounded-3xl mx-2">
-              <Bookmark size={40} className="mx-auto text-urbik-g400 mb-4" />
-              <p className="text-urbik-muted font-bold text-lg">
+            <div className="text-center py-24 border-2 border-dashed border-geora-g200 rounded-3xl mx-2">
+              <Bookmark size={40} className="mx-auto text-geora-g400 mb-4" />
+              <p className="text-geora-muted font-bold text-lg">
                 Todavía no guardaste ninguna propiedad.
               </p>
-              <Link href="/" className="text-urbik-black font-bold underline mt-4 block">Explorar propiedades</Link>
+              <Link href="/" className="text-geora-black font-bold underline mt-4 block">Explorar propiedades</Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-15">
@@ -237,7 +237,7 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
                     <FavoriteButton propertyId={prop.id} initialIsFavorite={true} small={true} />
                   </div>
 
-                  <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-urbik-g200">
+                  <div className="relative h-64 md:h-72 w-full overflow-hidden rounded-t-2xl bg-geora-g200">
                     <Image
                       src={prop.images[0] || "/placeholder-property.jpg"}
                       alt={prop.title}
@@ -250,26 +250,26 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
                   <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
                     <div>
                       <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                        <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                           {getPropertyLabel(prop.type)}
                         </span>
-                        <span className="rounded-full border border-white/20 bg-urbik-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                        <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
                           {getOperationLabel(prop.operationType)}
                         </span>
                       </div>
 
-                      <h3 className="line-clamp-2 text-base font-black tracking-tight text-urbik-black uppercase">
+                      <h3 className="line-clamp-2 text-base font-black tracking-tight text-geora-black uppercase">
                         {prop.title}
                       </h3>
 
-                      <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-urbik-black/80">
-                        <MapPin size={12} className="shrink-0 text-urbik-cyan" strokeWidth={3} />
+                      <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-geora-black/80">
+                        <MapPin size={12} className="shrink-0 text-geora-cyan" strokeWidth={3} />
                         {prop.address ? `${prop.address}, ` : ''}{prop.city}
                       </p>
                     </div>
 
                     <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-white/60 pt-4">
-                      <span className="text-base font-black tracking-tight text-urbik-black/70 z-1">
+                      <span className="text-base font-black tracking-tight text-geora-black/70 z-1">
                         {prop.currency === 'USD' ? 'USD' : '$'} {prop.price?.toLocaleString("es-AR") ?? "Consultar"}
                       </span>
                     </div>
@@ -287,10 +287,10 @@ export default function DashboardUser({ profile, onRefresh }: { profile: Profile
             className="absolute top-0 bottom-0 left-0 w-1/2 bg-white/50 rounded-full shadow-sm transition-transform duration-300 ease-out "
             style={{ transform: `translateX(${activeTab === "profile" ? "0%" : "100%"})` }}
           />
-          <button onClick={() => setActiveTab("profile")} className={`relative z-10 flex items-center justify-center py-3 px-8 rounded-full transition-colors duration-300 cursor-pointer font-bold ${activeTab === "profile" ? "text-urbik-black" : "text-urbik-black/50 hover:text-urbik-black"}`}>
+          <button onClick={() => setActiveTab("profile")} className={`relative z-10 flex items-center justify-center py-3 px-8 rounded-full transition-colors duration-300 cursor-pointer font-bold ${activeTab === "profile" ? "text-geora-black" : "text-geora-black/50 hover:text-geora-black"}`}>
             <span className="text-sm">Mi Perfil</span>
           </button>
-          <button onClick={() => setActiveTab("saved")} className={`relative z-10 flex items-center justify-center py-3 px-8 rounded-full transition-colors duration-300 cursor-pointer font-bold ${activeTab === "saved" ? "text-urbik-black" : "text-urbik-black/50 hover:text-urbik-black"}`}>
+          <button onClick={() => setActiveTab("saved")} className={`relative z-10 flex items-center justify-center py-3 px-8 rounded-full transition-colors duration-300 cursor-pointer font-bold ${activeTab === "saved" ? "text-geora-black" : "text-geora-black/50 hover:text-geora-black"}`}>
             <span className="text-sm">Guardados</span>
           </button>
         </div>

@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     router.prefetch("/");
-    const savedEmail = localStorage.getItem("urbik_remember_email");
+    const savedEmail = localStorage.getItem("geora_remember_email");
 
     if (savedEmail) {
       setEmail(savedEmail);
@@ -73,9 +73,9 @@ export default function LoginPage() {
       }
 
       if (rememberMe) {
-        localStorage.setItem("urbik_remember_email", email);
+        localStorage.setItem("geora_remember_email", email);
       } else {
-        localStorage.removeItem("urbik_remember_email");
+        localStorage.removeItem("geora_remember_email");
       }
 
       document.documentElement.style.backgroundColor = "#ffffff";
@@ -128,7 +128,7 @@ export default function LoginPage() {
         }
       `}</style>
 
-      <div className={`absolute top-[-10%] left-[-10%] w-200 h-200 bg-urbik-black/20 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0s')}></div>
+      <div className={`absolute top-[-10%] left-[-10%] w-200 h-200 bg-geora-black/20 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0s')}></div>
       <div className={`absolute -bottom-10 right-[-10%] w-200 h-200 bg-white/10 mix-blend-screen filter blur-[128px] opacity-70 pointer-events-none z-0 ${animClass}`} style={getAnimStyle('0.1s')}></div>
 
       <div className={`absolute opacity-50 -bottom-10 -left-10 w-240 h-160 bg-linear-to-tr from-white/5 to-transparent backdrop-blur-md border border-white/10 rounded-3xl pointer-events-none z-0 hidden md:block ${animClass}`} style={getAnimStyle('0.2s')}></div>
@@ -141,7 +141,7 @@ export default function LoginPage() {
           
           <div className={`flex flex-col items-center text-center mb-10 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.25s')}>
             <Link href="/" className="relative w-48 h-16 lg:w-56 lg:h-20 mb-4 transition-transform hover:scale-105">
-              <Image src="/Urbik_Logo_Negro.svg" alt="Logo Urbik" fill priority className="object-contain invert opacity-50" />
+              <Image src="/Geora_Logo_Negro.svg" alt="Logo Geora" fill priority className="object-contain invert opacity-50" />
             </Link>
             <h2 className="text-2xl font-display font-semibold text-white mb-2 tracking-wide">Iniciar sesión</h2>
             <p className="text-white/80 text-sm font-light">Ingresá tus credenciales para continuar</p>
@@ -168,19 +168,19 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className={`space-y-5 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.45s')}>
             <div>
               <label className="block text-sm font-medium mb-2 ml-2 text-white/80">Correo electrónico</label>
-              <input type="email" placeholder="ejemplo@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading || isSuccess} className="w-full rounded-full px-5 py-3.5 text-sm outline-none bg-white/10 border border-white/30 text-white placeholder-white/30 focus:bg-white/10 focus:border-urbik-black/50 focus:ring-1 focus:ring-urbik-black/50 shadow-sm transition-all" required />
+              <input type="email" placeholder="ejemplo@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading || isSuccess} className="w-full rounded-full px-5 py-3.5 text-sm outline-none bg-white/10 border border-white/30 text-white placeholder-white/30 focus:bg-white/10 focus:border-geora-black/50 focus:ring-1 focus:ring-geora-black/50 shadow-sm transition-all" required />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2 ml-2 text-white/80">Contraseña</label>
-              <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading || isSuccess} className="w-full rounded-full px-5 py-3.5 text-sm outline-none bg-white/10 border border-white/30 text-white placeholder-white/30 focus:bg-white/10 focus:border-urbik-black/50 focus:ring-1 focus:ring-urbik-black/50 shadow-sm transition-all" required />
+              <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading || isSuccess} className="w-full rounded-full px-5 py-3.5 text-sm outline-none bg-white/10 border border-white/30 text-white placeholder-white/30 focus:bg-white/10 focus:border-geora-black/50 focus:ring-1 focus:ring-geora-black/50 shadow-sm transition-all" required />
             </div>
 
             <div className="flex items-center justify-between px-1 pt-1">
-              <Link href="/forgot-password" className="text-sm text-urbik-white/90 font-medium hover:text-urbik-black hover:underline transition-colors">¿Olvidaste tu contraseña?</Link>
+              <Link href="/forgot-password" className="text-sm text-geora-white/90 font-medium hover:text-geora-black hover:underline transition-colors">¿Olvidaste tu contraseña?</Link>
             </div>
 
-            <button type="submit" disabled={isLoading || isSuccess} className="w-full cursor-pointer bg-urbik-white2 text-[#0a0a0a] font-bold py-3.5 rounded-full text-md shadow-[0_0_15px_rgba(var(--urbik-black-rgb),0.3)] hover:shadow-[0_0_25px_rgba(var(--urbik-black-rgb),0.5)] transition-all mt-6 disabled:opacity-60 disabled:cursor-not-allowed">
+            <button type="submit" disabled={isLoading || isSuccess} className="w-full cursor-pointer bg-geora-white2 text-[#0a0a0a] font-bold py-3.5 rounded-full text-md shadow-[0_0_15px_rgba(var(--geora-black-rgb),0.3)] hover:shadow-[0_0_25px_rgba(var(--geora-black-rgb),0.5)] transition-all mt-6 disabled:opacity-60 disabled:cursor-not-allowed">
               {isLoading && !isSuccess ? "Ingresando..." : (isSuccess ? "Ingresando..." : "INGRESAR")}
             </button>
           </form>
@@ -198,12 +198,12 @@ export default function LoginPage() {
 
           <div className={`text-center mt-8 text-sm text-white/50 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.75s')}>
             ¿No tenés una cuenta?{" "}
-            <Link href="/auth/register" className="text-urbik-white/90 font-medium hover:text-urbik-black hover:underline transition-colors">Registrate</Link>
+            <Link href="/auth/register" className="text-geora-white/90 font-medium hover:text-geora-black hover:underline transition-colors">Registrate</Link>
           </div>
         </div>
 
         <div className={`absolute bottom-6 text-white/30 text-xs font-light ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.85s')}>
-          © 2026 Urbik. Todos los derechos reservados.
+          © 2026 Geora. Todos los derechos reservados.
         </div>
       </div>
     </div>

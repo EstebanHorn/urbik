@@ -51,7 +51,7 @@ function HeaderFractionalStars({
           );
         })}
       </div>
-      <span className="text-xs text-urbik-muted font-medium">
+      <span className="text-xs text-geora-muted font-medium">
         ({total} {total === 1 ? "reseña" : "reseñas"})
       </span>
     </div>
@@ -139,23 +139,23 @@ export default async function RealEstatePage({
                 }}
               >
                 {!realEstate.logo_url && (
-                  <Building2 size={40} className="text-urbik-g400" />
+                  <Building2 size={40} className="text-geora-g400" />
                 )}
               </div>
 
               <div className="min-w-0 w-full flex flex-col items-start justify-center">
-                <h1 className="text-3xl md:text-4xl font-black text-urbik-black/90 uppercase tracking-tighter mb-1">
+                <h1 className="text-3xl md:text-4xl font-black text-geora-black/90 uppercase tracking-tighter mb-1">
                   {realEstate.agency_name}
                 </h1>
 
-                <p className="flex items-center gap-2 text-urbik-black/60 font-medium mb-3">
+                <p className="flex items-center gap-2 text-geora-black/60 font-medium mb-3">
                   <MapPin size={16} />
                   {realEstate.city}, {realEstate.province}. {realEstate.street}{" "}
                   {realEstate.address}
                 </p>
 
                 {realEstate.bio && (
-                  <p className="text-sm font-medium text-urbik-black/70 mb-3 max-w-2xl leading-relaxed">
+                  <p className="text-sm font-medium text-geora-black/70 mb-3 max-w-2xl leading-relaxed">
                     {realEstate.bio}
                   </p>
                 )}
@@ -166,7 +166,7 @@ export default async function RealEstatePage({
                   />
                 ) : (
                   <div className="mb-3 mt-1">
-                    <span className="text-sm font-medium text-urbik-muted bg-urbik-g100 px-2.5 py-1 rounded-md">
+                    <span className="text-sm font-medium text-geora-muted bg-geora-g100 px-2.5 py-1 rounded-md">
                       Sin reseñas todavía
                     </span>
                   </div>
@@ -177,7 +177,7 @@ export default async function RealEstatePage({
             <div className="flex flex-col items-center gap-3 justify-end md:mr-8 w-full md:w-1/4">
               <a
                 href={`tel:${realEstate.phone}`}
-                className="text-center rounded-full bg-white border border-black/10 px-5 py-2 text-sm font-bold text-urbik-black/80 hover:scale-105 hover:text-urbik-black/50 transform transition duration-200"
+                className="text-center rounded-full bg-white border border-black/10 px-5 py-2 text-sm font-bold text-geora-black/80 hover:scale-105 hover:text-geora-black/50 transform transition duration-200"
               >
                 Contactar Agencia
               </a>

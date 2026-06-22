@@ -2,19 +2,19 @@
 @import "leaflet/dist/leaflet.css";
 
 @theme {
-  --color-urbik-black: #000000;
-  --color-urbik-dark: #2e2e2e;
-  --color-urbik-dark2: #3e3e3e;
-  --color-urbik-white: #ffffff;
+  --color-geora-black: #000000;
+  --color-geora-dark: #2e2e2e;
+  --color-geora-dark2: #3e3e3e;
+  --color-geora-white: #ffffff;
 
-  --color-urbik-g100: #e9e9e9;
-  --color-urbik-g200: #eeeeee;
-  --color-urbik-g300: #e6e6e6;
-  --color-urbik-g400: #c5c5c5;
+  --color-geora-g100: #e9e9e9;
+  --color-geora-g200: #eeeeee;
+  --color-geora-g300: #e6e6e6;
+  --color-geora-g400: #c5c5c5;
 
-  --color-urbik-cyan: #00deff;
-  --color-urbik-emerald: #00ff8e;
-  --color-urbik-rose: #ff0077;
+  --color-geora-cyan: #00deff;
+  --color-geora-emerald: #00ff8e;
+  --color-geora-rose: #ff0077;
 
 
 --font-body: var(--font-inter);
@@ -36,9 +36,9 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--color-urbik-white);
+  background: var(--color-geora-white);
   font-family: var(--font-body); 
-  color: var(--color-urbik-black);
+  color: var(--color-geora-black);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -78,11 +78,11 @@ a {
 }
 
 .price-tag-badge.is-sale {
-  background-color: var(--color-urbik-dark2);
+  background-color: var(--color-geora-dark2);
 }
 
 .price-tag-badge.is-rent {
-  background-color: var(--color-urbik-dark2);
+  background-color: var(--color-geora-dark2);
 }
 
 .leaflet-tooltip.custom-property-tooltip {
@@ -110,111 +110,111 @@ a {
 
 
 @layer utilities {
-  .bg-urbik-gray1 {
+  .bg-geora-gray1 {
     background-image: linear-gradient(
       to right, 
-      var(--color-urbik-white) 0%, 
-      var(--color-urbik-g300) 25%, 
-      var(--color-urbik-white) 100%
+      var(--color-geora-white) 0%, 
+      var(--color-geora-g300) 25%, 
+      var(--color-geora-white) 100%
     );
   }
-    .bg-urbik-black {
+    .bg-geora-black {
     background-image: linear-gradient(
       to right, 
-      var(--color-urbik-dark2) 0%, 
-      var(--color-urbik-black) 15%, 
-      var(--color-urbik-dark) 100%
-    );
-  }
-
-  .bg-urbik-black2 {
-    background-image: linear-gradient(
-      to right, 
-      var(--color-urbik-black) 0%, 
-      var(--color-urbik-black) 15%, 
-      var(--color-urbik-black) 100%
+      var(--color-geora-dark2) 0%, 
+      var(--color-geora-black) 15%, 
+      var(--color-geora-dark) 100%
     );
   }
 
-      .bg-urbik-white1 {
+  .bg-geora-black2 {
     background-image: linear-gradient(
       to right, 
-      var(--color-urbik-white) 0%, 
-      var(--color-urbik-white) 15%, 
-      var(--color-urbik-g400) 100%
+      var(--color-geora-black) 0%, 
+      var(--color-geora-black) 15%, 
+      var(--color-geora-black) 100%
     );
   }
-        .bg-urbik-white3 {
+
+      .bg-geora-white1 {
     background-image: linear-gradient(
       to right, 
-      var(--color-urbik-g300) 0%, 
-      var(--color-urbik-white) 15%, 
-      var(--color-urbik-g400) 100%
+      var(--color-geora-white) 0%, 
+      var(--color-geora-white) 15%, 
+      var(--color-geora-g400) 100%
     );
-
-    
   }
-
-        .bg-urbik-white2 {
+        .bg-geora-white3 {
     background-image: linear-gradient(
       to right, 
-      var(--color-urbik-g100) 0%, 
-      var(--color-urbik-white) 50%, 
-      var(--color-urbik-g200) 100%
+      var(--color-geora-g300) 0%, 
+      var(--color-geora-white) 15%, 
+      var(--color-geora-g400) 100%
     );
 
     
   }
 
-  .bg-urbik-emerald {
-    background-color: var(--color-urbik-emerald);
-  }
-    .bg-urbik-cyan {
-    background-color: var(--color-urbik-cyan);
-  }
-  .bg-urbik-rose {
-    background-color: var(--color-urbik-rose);
-  }
-  .bg-urbik-dark {
-    background-color: var(--color-urbik-dark);
-  }
-  .bg-urbik-dark2 {
-    background-color: var(--color-urbik-dark2);
-  }
-  .bg-urbik-white {
-    background-color: var(--color-urbik-white);
-  }
-  .bg-urbik-g100 {
-    background-color: var(--color-urbik-g100);
-  }
-  .bg-urbik-g200 {
-    background-color: var(--color-urbik-g200);
-  }
-  .bg-urbik-g300 {
-    background-color: var(--color-urbik-g300);
-  }
-  .bg-urbik-g400 {
-    background-color: var(--color-urbik-g400);
-  }
-  .bg-urbik-cyan {
-    background-color: var(--color-urbik-cyan);
+        .bg-geora-white2 {
+    background-image: linear-gradient(
+      to right, 
+      var(--color-geora-g100) 0%, 
+      var(--color-geora-white) 50%, 
+      var(--color-geora-g200) 100%
+    );
+
+    
   }
 
-  .text-urbik-black {
-    color: var(--color-urbik-black);
+  .bg-geora-emerald {
+    background-color: var(--color-geora-emerald);
   }
-  .text-urbik-white {
-    color: var(--color-urbik-white);
+    .bg-geora-cyan {
+    background-color: var(--color-geora-cyan);
   }
-  .text-urbik-muted {
-    color: var(--color-urbik-dark2);
+  .bg-geora-rose {
+    background-color: var(--color-geora-rose);
   }
-  .text-urbik-cyan {
-    color: var(--color-urbik-cyan);
+  .bg-geora-dark {
+    background-color: var(--color-geora-dark);
+  }
+  .bg-geora-dark2 {
+    background-color: var(--color-geora-dark2);
+  }
+  .bg-geora-white {
+    background-color: var(--color-geora-white);
+  }
+  .bg-geora-g100 {
+    background-color: var(--color-geora-g100);
+  }
+  .bg-geora-g200 {
+    background-color: var(--color-geora-g200);
+  }
+  .bg-geora-g300 {
+    background-color: var(--color-geora-g300);
+  }
+  .bg-geora-g400 {
+    background-color: var(--color-geora-g400);
+  }
+  .bg-geora-cyan {
+    background-color: var(--color-geora-cyan);
   }
 
-  .border-urbik {
-    border-color: var(--color-urbik-g400);
+  .text-geora-black {
+    color: var(--color-geora-black);
+  }
+  .text-geora-white {
+    color: var(--color-geora-white);
+  }
+  .text-geora-muted {
+    color: var(--color-geora-dark2);
+  }
+  .text-geora-cyan {
+    color: var(--color-geora-cyan);
+  }
+
+  .border-geora {
+    border-color: var(--color-geora-g400);
   }
 
   .font-body {
@@ -253,14 +253,14 @@ a {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-urbik-white);
+  background: var(--color-geora-white);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-urbik-dark2);
+  background: var(--color-geora-dark2);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-urbik-black);
+  background: var(--color-geora-black);
 }
 
 @layer utilities {

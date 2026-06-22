@@ -57,16 +57,16 @@ function PriceRow({ history }: { history: PriceEntry[] }) {
       {history.length >= 2 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="rounded-lg border border-white/50 bg-white/40 p-3 backdrop-blur-sm">
-            <p className="text-[10px] font-bold text-urbik-muted uppercase">Primer registro</p>
-            <p className="text-sm font-black text-urbik-black mt-1">
+            <p className="text-[10px] font-bold text-geora-muted uppercase">Primer registro</p>
+            <p className="text-sm font-black text-geora-black mt-1">
               {formatPrice(first.sale_price, first.sale_currency) ??
                 formatPrice(first.rent_price, first.rent_currency) ?? "—"}
             </p>
             <p className="text-[11px] text-gray-500 mt-0.5">{formatDate(first.changed_at)}</p>
           </div>
           <div className="rounded-lg border border-white/50 bg-white/40 p-3 backdrop-blur-sm">
-            <p className="text-[10px] font-bold text-urbik-muted uppercase">Actual</p>
-            <p className="text-sm font-black text-urbik-black mt-1 flex items-center gap-2">
+            <p className="text-[10px] font-bold text-geora-muted uppercase">Actual</p>
+            <p className="text-sm font-black text-geora-black mt-1 flex items-center gap-2">
               {formatPrice(last.sale_price, last.sale_currency) ??
                 formatPrice(last.rent_price, last.rent_currency) ?? "—"}
               {saleDelta != null && saleDelta !== 0 && (
@@ -110,7 +110,7 @@ function PriceRow({ history }: { history: PriceEntry[] }) {
       <div className="rounded-lg border border-white/50 overflow-hidden bg-white/30 backdrop-blur-sm">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="text-[10px] uppercase text-urbik-black/50 font-bold border-b border-white/50 bg-white/40">
+            <tr className="text-[10px] uppercase text-geora-black/50 font-bold border-b border-white/50 bg-white/40">
               <th className="px-3 py-2">Fecha</th>
               <th className="px-3 py-2 text-right">Venta</th>
               <th className="px-3 py-2 text-right">Alquiler</th>
@@ -120,10 +120,10 @@ function PriceRow({ history }: { history: PriceEntry[] }) {
             {[...history].reverse().map((h) => (
               <tr key={h.id} className="hover:bg-white/20 transition-colors">
                 <td className="px-3 py-2 text-xs text-gray-600">{formatDate(h.changed_at)}</td>
-                <td className="px-3 py-2 text-right text-xs font-bold text-urbik-black">
+                <td className="px-3 py-2 text-right text-xs font-bold text-geora-black">
                   {formatPrice(h.sale_price, h.sale_currency) ?? "—"}
                 </td>
-                <td className="px-3 py-2 text-right text-xs font-bold text-urbik-black">
+                <td className="px-3 py-2 text-right text-xs font-bold text-geora-black">
                   {formatPrice(h.rent_price, h.rent_currency) ?? "—"}
                 </td>
               </tr>
@@ -157,14 +157,14 @@ function PropertyAccordion({ property }: { property: PropertyLite }) {
         className="relative z-10 w-full px-5 py-4 flex items-center justify-between hover:bg-white/30 transition-colors cursor-pointer"
       >
         <div className="text-left min-w-0">
-          <p className="font-bold text-urbik-black text-sm truncate">
+          <p className="font-bold text-geora-black text-sm truncate">
             {property.title ?? "Sin título"}
           </p>
           <p className="text-xs text-gray-500 truncate">
             {property.city ?? "—"}, {property.province ?? "—"}
           </p>
         </div>
-        <div className="text-urbik-black/60">
+        <div className="text-geora-black/60">
           {open ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
         </div>
       </button>
