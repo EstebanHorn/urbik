@@ -189,7 +189,7 @@ export default function ParcelPickerModal({
   const isConfirmDisabled = mode === "draw" ? drawnPath.length < 3 : !selected;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center pt-20 px-6 pb-6">
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center pt-20 px-6 pb-6">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
       <div className="relative w-full max-w-4xl h-[80vh] bg-white/70 border border-white rounded-3xl flex flex-col shadow-2xl overflow-hidden">

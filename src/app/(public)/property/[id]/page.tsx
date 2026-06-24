@@ -5,10 +5,31 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AdminActions from "@/components/administrate/AdminActions";
 import {
-  MapPin, Maximize2, BedDouble, Bath, Hash, ChevronLeft, Building2,
-  Phone, Mail, Car, CheckCircle2, XCircle, Layers, Flame,
-  Waves, Wifi, Zap, Droplets, ShieldCheck, Trees, Snowflake,
-  CalendarDays, Star, FlipVertical, Home,
+  MapPin,
+  Maximize2,
+  BedDouble,
+  Bath,
+  Hash,
+  ChevronLeft,
+  Building2,
+  Phone,
+  Mail,
+  Car,
+  CheckCircle2,
+  XCircle,
+  Layers,
+  Flame,
+  Waves,
+  Wifi,
+  Zap,
+  Droplets,
+  ShieldCheck,
+  Trees,
+  Snowflake,
+  CalendarDays,
+  Star,
+  FlipVertical,
+  Home,
 } from "lucide-react";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import ImageGallery from "@/components/property/ImageGallery";
@@ -22,26 +43,41 @@ export const dynamic = "force-dynamic";
 
 const getOperationLabel = (type: string) => {
   switch (type) {
-    case "SALE": return "Venta";
-    case "RENT": return "Alquiler";
-    case "TEMP_RENT": return "Temporal";
-    case "SALE_RENT": return "Venta y alquiler";
-    default: return type;
+    case "SALE":
+      return "Venta";
+    case "RENT":
+      return "Alquiler";
+    case "TEMP_RENT":
+      return "Temporal";
+    case "SALE_RENT":
+      return "Venta y alquiler";
+    default:
+      return type;
   }
 };
 
 const getPropertyLabel = (type: string) => {
   switch (type) {
-    case "HOUSE": return "Casa";
-    case "APARTMENT": return "Departamento";
-    case "PH": return "PH";
-    case "COUNTRY": return "Country";
-    case "LAND": return "Terreno";
-    case "FIELD": return "Campo";
-    case "COMMERCIAL_PROPERTY": return "Local Comercial";
-    case "OFFICE": return "Oficina";
-    case "WAREHOUSE": return "Depósito";
-    default: return type;
+    case "HOUSE":
+      return "Casa";
+    case "APARTMENT":
+      return "Departamento";
+    case "PH":
+      return "PH";
+    case "COUNTRY":
+      return "Country";
+    case "LAND":
+      return "Terreno";
+    case "FIELD":
+      return "Campo";
+    case "COMMERCIAL_PROPERTY":
+      return "Local Comercial";
+    case "OFFICE":
+      return "Oficina";
+    case "WAREHOUSE":
+      return "Depósito";
+    default:
+      return type;
   }
 };
 
@@ -156,7 +192,11 @@ interface Property {
   isFavorite: boolean;
   legacyAmenities: Record<string, boolean>;
   featureGroups: Record<string, Record<string, boolean>>;
-  RealEstate: { agencyName: string; phone: string; logoUrl: string | null } | null;
+  RealEstate: {
+    agencyName: string;
+    phone: string;
+    logoUrl: string | null;
+  } | null;
 }
 
 interface FormattedOtherProperty {
@@ -175,7 +215,9 @@ interface FormattedOtherProperty {
 
 async function getPropertyData(id: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const userId = user?.id;
 
   try {
@@ -189,22 +231,35 @@ async function getPropertyData(id: string) {
 
     let isFavorite = false;
     if (userId) {
-      const { count } = await supabase.from("favorites").select("*", { count: "exact", head: true })
-        .eq("property_id", id).eq("profile_id", userId);
+      const { count } = await supabase
+        .from("favorites")
+        .select("*", { count: "exact", head: true })
+        .eq("property_id", id)
+        .eq("profile_id", userId);
       isFavorite = (count || 0) > 0;
     }
 
     let otherProperties: Array<{
-      id: string; title: string; type: string; operation_type: string;
-      sale_price: number | null; rent_price: number | null;
-      sale_currency: string | null; rent_currency: string | null;
-      city: string; province: string; images: string[] | null; isFavorite?: boolean;
+      id: string;
+      title: string;
+      type: string;
+      operation_type: string;
+      sale_price: number | null;
+      rent_price: number | null;
+      sale_currency: string | null;
+      rent_currency: string | null;
+      city: string;
+      province: string;
+      images: string[] | null;
+      isFavorite?: boolean;
     }> = [];
 
     if (propRaw.real_estate_id) {
       const { data: othersRaw } = await supabase
         .from("properties")
-        .select("id, title, type, operation_type, sale_price, rent_price, sale_currency, rent_currency, city, province, images")
+        .select(
+          "id, title, type, operation_type, sale_price, rent_price, sale_currency, rent_currency, city, province, images",
+        )
         .eq("real_estate_id", propRaw.real_estate_id)
         .eq("status", "AVAILABLE")
         .neq("id", id)
@@ -213,19 +268,28 @@ async function getPropertyData(id: string) {
       if (othersRaw) {
         if (userId) {
           const otherIds = othersRaw.map((p) => p.id);
-          const { data: favs } = await supabase.from("favorites").select("property_id").eq("profile_id", userId).in("property_id", otherIds);
+          const { data: favs } = await supabase
+            .from("favorites")
+            .select("property_id")
+            .eq("profile_id", userId)
+            .in("property_id", otherIds);
           const favSet = new Set(favs?.map((f) => f.property_id));
-          otherProperties = othersRaw.map((p) => ({ ...p, isFavorite: favSet.has(p.id) }));
+          otherProperties = othersRaw.map((p) => ({
+            ...p,
+            isFavorite: favSet.has(p.id),
+          }));
         } else {
           otherProperties = othersRaw.map((p) => ({ ...p, isFavorite: false }));
         }
       }
     }
 
-    const featureGroups: Record<string, Record<string, boolean>> =
-      (propRaw.feature_groups && typeof propRaw.feature_groups === "object")
-        ? (propRaw.feature_groups as Record<string, Record<string, boolean>>)
-        : {};
+    const featureGroups: Record<
+      string,
+      Record<string, boolean>
+    > = propRaw.feature_groups && typeof propRaw.feature_groups === "object"
+      ? (propRaw.feature_groups as Record<string, Record<string, boolean>>)
+      : {};
 
     const property: Property = {
       id: propRaw.id,
@@ -288,12 +352,21 @@ async function getPropertyData(id: string) {
         : null,
     };
 
-    const formattedOtherProps: FormattedOtherProperty[] = otherProperties.map((p) => ({
-      id: p.id, title: p.title, type: p.type, operationType: p.operation_type,
-      salePrice: p.sale_price, rentPrice: p.rent_price,
-      currency: p.sale_currency || p.rent_currency || "USD",
-      city: p.city, province: p.province, images: p.images || [], isFavorite: p.isFavorite || false,
-    }));
+    const formattedOtherProps: FormattedOtherProperty[] = otherProperties.map(
+      (p) => ({
+        id: p.id,
+        title: p.title,
+        type: p.type,
+        operationType: p.operation_type,
+        salePrice: p.sale_price,
+        rentPrice: p.rent_price,
+        currency: p.sale_currency || p.rent_currency || "USD",
+        city: p.city,
+        province: p.province,
+        images: p.images || [],
+        isFavorite: p.isFavorite || false,
+      }),
+    );
 
     return { property, otherProperties: formattedOtherProps };
   } catch (err) {
@@ -302,13 +375,27 @@ async function getPropertyData(id: string) {
   }
 }
 
-function StatChip({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
+function StatChip({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+}) {
   return (
     <div className="flex items-center gap-3 bg-white border border-geora-g100 rounded-2xl px-4 py-3 shadow-sm">
-      <span className="text-geora-black bg-geora-g100 p-2 rounded-full shrink-0">{icon}</span>
+      <span className="text-geora-black bg-geora-g100 p-2 rounded-full shrink-0">
+        {icon}
+      </span>
       <div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-geora-muted leading-none mb-0.5">{label}</p>
-        <p className="text-base font-black text-geora-black leading-tight">{value}</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-geora-muted leading-none mb-0.5">
+          {label}
+        </p>
+        <p className="text-base font-black text-geora-black leading-tight">
+          {value}
+        </p>
       </div>
     </div>
   );
@@ -324,11 +411,21 @@ function SurfaceRow({ label, value }: { label: string; value: number | null }) {
   );
 }
 
-function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
+function DetailRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+}) {
   return (
     <div className="flex items-center gap-3 py-3">
       <span className="text-geora-muted shrink-0">{icon}</span>
-      <span className="text-sm font-semibold text-geora-muted flex-1">{label}</span>
+      <span className="text-sm font-semibold text-geora-muted flex-1">
+        {label}
+      </span>
       <span className="text-sm font-black text-geora-black">{value}</span>
     </div>
   );
@@ -355,18 +452,22 @@ function FeaturesSection({
   }
 
   const visibleCats = AMENITY_CATEGORIES.filter(
-    (cat) => cat.visibleFor.length === 0 || cat.visibleFor.includes(propertyType),
+    (cat) =>
+      cat.visibleFor.length === 0 || cat.visibleFor.includes(propertyType),
   );
 
   const catsWithData = visibleCats.filter((cat) =>
     cat.tags.some((t) => flat[t.key] === true || flat[t.key] === false),
   );
 
-  const catsToShow = visibleCats.length > 0
-    ? visibleCats.filter(
-        (cat) => cat.key === "servicios" || cat.tags.some((t) => flat[t.key] === true),
-      )
-    : [];
+  const catsToShow =
+    visibleCats.length > 0
+      ? visibleCats.filter(
+          (cat) =>
+            cat.key === "servicios" ||
+            cat.tags.some((t) => flat[t.key] === true),
+        )
+      : [];
 
   if (catsToShow.length === 0 && catsWithData.length === 0) {
     const legacyActive = Object.entries(legacyAmenities).filter(([, v]) => v);
@@ -378,9 +479,15 @@ function FeaturesSection({
         </h3>
         <div className="flex flex-wrap gap-2">
           {legacyActive.map(([key]) => (
-            <span key={key} className="inline-flex items-center gap-2 px-3 py-2 bg-geora-black text-white text-xs font-bold rounded-full">
+            <span
+              key={key}
+              className="inline-flex items-center gap-2 px-3 py-2 bg-geora-black text-white text-xs font-bold rounded-full"
+            >
               {LEGACY_ICON[key] ?? <CheckCircle2 size={14} />}
-              {key.replace("has", "").replace(/([A-Z])/g, " $1").trim()}
+              {key
+                .replace("has", "")
+                .replace(/([A-Z])/g, " $1")
+                .trim()}
             </span>
           ))}
         </div>
@@ -420,10 +527,11 @@ function FeaturesSection({
                           : "bg-white text-geora-muted border-geora-g200"
                       }`}
                     >
-                      {isTrue
-                        ? <CheckCircle2 size={13} className="shrink-0" />
-                        : <XCircle size={13} className="shrink-0 opacity-40" />
-                      }
+                      {isTrue ? (
+                        <CheckCircle2 size={13} className="shrink-0" />
+                      ) : (
+                        <XCircle size={13} className="shrink-0 opacity-40" />
+                      )}
                       {tag.label}
                     </span>
                   );
@@ -437,15 +545,28 @@ function FeaturesSection({
   );
 }
 
-const getStatusBadge = (property: { status?: string; operationType: string }) => {
+const getStatusBadge = (property: {
+  status?: string;
+  operationType: string;
+}) => {
   const s = property.status || "AVAILABLE";
-  if (s === "SOLD") return { label: "VENDIDA", color: "bg-geora-white2 text-geora-dark" };
-  if (s === "RENTED") return { label: "ALQUILADA", color: "bg-geora-white2 text-geora-dark" };
-  if (s === "PAUSED") return { label: "PAUSADA", color: "bg-geora-white2 text-geora-dark" };
-  return { label: getOperationLabel(property.operationType), color: "bg-geora-white2 text-geora-dark" };
+  if (s === "SOLD")
+    return { label: "VENDIDA", color: "bg-geora-white2 text-geora-dark" };
+  if (s === "RENTED")
+    return { label: "ALQUILADA", color: "bg-geora-white2 text-geora-dark" };
+  if (s === "PAUSED")
+    return { label: "PAUSADA", color: "bg-geora-white2 text-geora-dark" };
+  return {
+    label: getOperationLabel(property.operationType),
+    color: "bg-geora-white2 text-geora-dark",
+  };
 };
 
-export default async function PropertyPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PropertyPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   if (!id) return notFound();
 
@@ -453,41 +574,111 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   if (!result) return notFound();
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   let isAdmin = false;
   if (user) {
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
     isAdmin = profile?.role === "ADMIN";
   }
 
   const { property, otherProperties } = result;
-  const formatter = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 });
+  const formatter = new Intl.NumberFormat("es-AR", {
+    maximumFractionDigits: 0,
+  });
   const statusBadge = getStatusBadge(property);
   const isBoth = property.operationType === "SALE_RENT";
 
   const statChips = [
-    property.rooms && { icon: <Home size={16} />, label: "Ambientes", value: property.rooms },
-    property.bedrooms && { icon: <BedDouble size={16} />, label: "Dormitorios", value: property.bedrooms },
-    property.bathrooms && { icon: <Bath size={16} />, label: "Baños", value: property.bathrooms },
-    property.toilets && { icon: <Bath size={16} />, label: "Toilettes", value: property.toilets },
-    property.garages && { icon: <Car size={16} />, label: "Cocheras", value: property.garages },
-    property.plants && { icon: <Layers size={16} />, label: "Plantas", value: property.plants },
-    property.area && { icon: <Maximize2 size={16} />, label: "Sup. cubierta", value: `${property.area} m²` },
-  ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string | number }[];
+    property.rooms && {
+      icon: <Home size={16} />,
+      label: "Ambientes",
+      value: property.rooms,
+    },
+    property.bedrooms && {
+      icon: <BedDouble size={16} />,
+      label: "Dormitorios",
+      value: property.bedrooms,
+    },
+    property.bathrooms && {
+      icon: <Bath size={16} />,
+      label: "Baños",
+      value: property.bathrooms,
+    },
+    property.toilets && {
+      icon: <Bath size={16} />,
+      label: "Toilettes",
+      value: property.toilets,
+    },
+    property.garages && {
+      icon: <Car size={16} />,
+      label: "Cocheras",
+      value: property.garages,
+    },
+    property.plants && {
+      icon: <Layers size={16} />,
+      label: "Plantas",
+      value: property.plants,
+    },
+    property.area && {
+      icon: <Maximize2 size={16} />,
+      label: "Sup. cubierta",
+      value: `${property.area} m²`,
+    },
+  ].filter(Boolean) as {
+    icon: React.ReactNode;
+    label: string;
+    value: string | number;
+  }[];
 
   const detailRows = [
-    property.type && { icon: <Building2 size={16} />, label: "Tipo", value: getPropertyLabel(property.type) },
-    property.floor && { icon: <Layers size={16} />, label: "Piso", value: property.floor },
-    property.unitNumber && { icon: <Hash size={16} />, label: "Unidad", value: property.unitNumber },
+    property.type && {
+      icon: <Building2 size={16} />,
+      label: "Tipo",
+      value: getPropertyLabel(property.type),
+    },
+    property.floor && {
+      icon: <Layers size={16} />,
+      label: "Piso",
+      value: property.floor,
+    },
+    property.unitNumber && {
+      icon: <Hash size={16} />,
+      label: "Unidad",
+      value: property.unitNumber,
+    },
     property.condition && {
       icon: <Star size={16} />,
       label: "Estado del inmueble",
-      value: property.condition.charAt(0).toUpperCase() + property.condition.slice(1),
+      value:
+        property.condition.charAt(0).toUpperCase() +
+        property.condition.slice(1),
     },
-    property.constructionYear && { icon: <CalendarDays size={16} />, label: "Año de construcción", value: property.constructionYear },
-    property.frontLength && { icon: <FlipVertical size={16} />, label: "Frente", value: `${property.frontLength} m` },
-    property.backLength && { icon: <FlipVertical size={16} />, label: "Fondo", value: `${property.backLength} m` },
-  ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string | number }[];
+    property.constructionYear && {
+      icon: <CalendarDays size={16} />,
+      label: "Año de construcción",
+      value: property.constructionYear,
+    },
+    property.frontLength && {
+      icon: <FlipVertical size={16} />,
+      label: "Frente",
+      value: `${property.frontLength} m`,
+    },
+    property.backLength && {
+      icon: <FlipVertical size={16} />,
+      label: "Fondo",
+      value: `${property.backLength} m`,
+    },
+  ].filter(Boolean) as {
+    icon: React.ReactNode;
+    label: string;
+    value: string | number;
+  }[];
 
   const hasSurfaceBreakdown =
     property.coveredArea || property.semiCoveredArea || property.uncoveredArea;
@@ -495,7 +686,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   return (
     <main className="min-h-screen bg-white pb-32 lg:pb-20">
       <TrackPropertyView propertyId={String(property.id)} />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-25 mb-6 sm:mb-2 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 md:pt-10 mb-6 sm:mb-2 flex items-center justify-between gap-3">
         <Link
           href="/dashboard"
           className="group text-geora-black/50 inline-flex items-center gap-2 text-sm font-bold hover:text-geora-black transition-colors"
@@ -523,10 +714,16 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             />
           )}
         </div>
-        {isAdmin && <AdminActions id={property.id} currentStatus={property.status} type="property" />}
+        {isAdmin && (
+          <AdminActions
+            id={property.id}
+            currentStatus={property.status}
+            type="property"
+          />
+        )}
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 -mb-15">
-              <ImageGallery
+        <ImageGallery
           images={property.images}
           title={property.title}
           parcelGeom={property.parcelGeom}
@@ -535,86 +732,132 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
         />
       </div>
 
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-2 sm:gap-3 px-5 mb-10 sm:mb-20">
           <div className="space-y-2 w-full lg:w-auto">
             <h1 className="text-3xl md:text-4xl lg:text-4xl font-display font-black text-geora-black italic tracking-tighter leading-tight">
               {property.title}
             </h1>
             <div className="flex justify-start items-center gap-2 text-geora-muted font-medium italic">
-              <MapPin size={16} className="text-geora-black/60 shrink-0 sm:w-5 sm:h-5" />
+              <MapPin
+                size={16}
+                className="text-geora-black/60 shrink-0 sm:w-5 sm:h-5"
+              />
               <span className="text-geora-black/60 sm:text-lg">
-                {property.address}{property.neighborhood ? `, ${property.neighborhood}` : ""}, {property.city}
-                {property.locality && property.locality !== property.city ? ` (${property.locality})` : ""}
+                {property.address}
+                {property.neighborhood
+                  ? `, ${property.neighborhood}`
+                  : ""}, {property.city}
+                {property.locality && property.locality !== property.city
+                  ? ` (${property.locality})`
+                  : ""}
               </span>
             </div>
-
           </div>
 
           {!property.isPriceHidden && (
             <div className="lg:text-right w-full lg:w-auto">
               <div className={`flex flex-col ${isBoth ? "gap-2" : ""}`}>
-              <div className="flex flex-wrap justify-end items-center gap-3 mb-2 z-100">
-              <span className="bg-geora-black text-geora-white text-xs font-black uppercase tracking-wider border border-geora-g100 px-4 py-2 rounded-full">
-                {getPropertyLabel(property.type)}
-              </span>
-              <span className={`text-xs font-black uppercase px-4 py-2 rounded-full tracking-wider shadow-sm ${statusBadge.color}`}>
-                {statusBadge.label}
-              </span>
-                            <FavoriteButton propertyId={property.id} initialIsFavorite={property.isFavorite} />
-
-            </div>
-                {(property.operationType === "SALE" || isBoth) && property.salePrice && (
-                  <div className="flex flex-col lg:items-end">
-                    {isBoth && <span className="text-xs font-black text-geora-muted uppercase tracking-widest mb-1">Venta</span>}
-                    <div className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-5xl"} font-display font-bold tracking-tighter flex items-baseline`}>
-                      <span className="text-geora-black/30 mr-2 font-black text-0.5em">{property.saleCurrency}</span>
-                      <span className="text-geora-black">${formatter.format(property.salePrice)}</span>
+                <div className="flex flex-wrap justify-end items-center gap-3 mb-2 z-100">
+                  <span className="bg-geora-black text-geora-white text-xs font-black uppercase tracking-wider border border-geora-g100 px-4 py-2 rounded-full">
+                    {getPropertyLabel(property.type)}
+                  </span>
+                  <span
+                    className={`text-xs font-black uppercase px-4 py-2 rounded-full tracking-wider shadow-sm ${statusBadge.color}`}
+                  >
+                    {statusBadge.label}
+                  </span>
+                  <FavoriteButton
+                    propertyId={property.id}
+                    initialIsFavorite={property.isFavorite}
+                  />
+                </div>
+                {(property.operationType === "SALE" || isBoth) &&
+                  property.salePrice && (
+                    <div className="flex flex-col lg:items-end">
+                      {isBoth && (
+                        <span className="text-xs font-black text-geora-muted uppercase tracking-widest mb-1">
+                          Venta
+                        </span>
+                      )}
+                      <div
+                        className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-5xl"} font-display font-bold tracking-tighter flex items-baseline`}
+                      >
+                        <span className="text-geora-black/30 mr-2 font-black text-0.5em">
+                          {property.saleCurrency}
+                        </span>
+                        <span className="text-geora-black">
+                          ${formatter.format(property.salePrice)}
+                        </span>
+                      </div>
+                      {property.expenses && (
+                        <p className="text-sm font-bold text-geora-muted lg:text-right mt-1">
+                          + Expensas: {property.saleCurrency}{" "}
+                          {formatter.format(property.expenses)}
+                        </p>
+                      )}
                     </div>
-                    {property.expenses && (
-                      <p className="text-sm font-bold text-geora-muted lg:text-right mt-1">
-                        + Expensas: {property.saleCurrency} {formatter.format(property.expenses)}
-                      </p>
-                    )}
-                  </div>
-                )}
-                {(property.operationType === "RENT" || property.operationType === "TEMP_RENT" || isBoth) && property.rentPrice && (
-                  <div className="flex flex-col lg:items-end">
-                    {isBoth && <span className="text-xs font-black text-geora-muted uppercase tracking-widest mb-1 mt-2">Alquiler</span>}
-                    <div className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}>
-                      <span className="text-geora-black/30 mr-2 font-black text-0.5em">{property.rentCurrency}</span>
-                      <span className="text-geora-black">{formatter.format(property.rentPrice)}</span>
+                  )}
+                {(property.operationType === "RENT" ||
+                  property.operationType === "TEMP_RENT" ||
+                  isBoth) &&
+                  property.rentPrice && (
+                    <div className="flex flex-col lg:items-end">
+                      {isBoth && (
+                        <span className="text-xs font-black text-geora-muted uppercase tracking-widest mb-1 mt-2">
+                          Alquiler
+                        </span>
+                      )}
+                      <div
+                        className={`${isBoth ? "text-3xl" : "text-4xl sm:text-5xl md:text-7xl"} font-display font-bold tracking-tighter flex items-baseline`}
+                      >
+                        <span className="text-geora-black/30 mr-2 font-black text-0.5em">
+                          {property.rentCurrency}
+                        </span>
+                        <span className="text-geora-black">
+                          {formatter.format(property.rentPrice)}
+                        </span>
+                      </div>
+                      {property.expenses && (
+                        <p className="text-sm font-bold text-geora-muted lg:text-right mt-1">
+                          + Expensas: {property.rentCurrency}{" "}
+                          {formatter.format(property.expenses)}
+                        </p>
+                      )}
                     </div>
-                    {property.expenses && (
-                      <p className="text-sm font-bold text-geora-muted lg:text-right mt-1">
-                        + Expensas: {property.rentCurrency} {formatter.format(property.expenses)}
-                      </p>
-                    )}
-                  </div>
-                )}
+                  )}
               </div>
               {property.isPriceHidden && (
-                <p className="text-xl font-black text-geora-muted">Consultar precio</p>
+                <p className="text-xl font-black text-geora-muted">
+                  Consultar precio
+                </p>
               )}
             </div>
           )}
           {property.isPriceHidden && (
             <div className="lg:text-right">
-              <p className="text-4xl font-black text-geora-muted italic">Consultar precio</p>
+              <p className="text-4xl font-black text-geora-muted italic">
+                Consultar precio
+              </p>
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 mt-8 sm:mt-12">
           <div className="lg:col-span-8 space-y-10">
-
             {statChips.length > 0 && (
               <div>
-                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">Resumen</h3>
+                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">
+                  Resumen
+                </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {statChips.map((chip, i) => (
-                    <StatChip key={i} icon={chip.icon} label={chip.label} value={chip.value} />
+                    <StatChip
+                      key={i}
+                      icon={chip.icon}
+                      label={chip.label}
+                      value={chip.value}
+                    />
                   ))}
                 </div>
               </div>
@@ -622,16 +865,35 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
             {hasSurfaceBreakdown && (
               <div>
-                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">Superficies</h3>
+                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">
+                  Superficies
+                </h3>
                 <div className="bg-white border border-geora-g100 rounded-2xl px-6 py-2 shadow-sm">
-                  <SurfaceRow label="Superficie cubierta" value={property.area} />
-                  <SurfaceRow label="Superficie semicubierta" value={property.semiCoveredArea} />
-                  <SurfaceRow label="Superficie descubierta" value={property.uncoveredArea} />
-                  {(property.area || 0) + (property.semiCoveredArea || 0) + (property.uncoveredArea || 0) > 0 && (
+                  <SurfaceRow
+                    label="Superficie cubierta"
+                    value={property.area}
+                  />
+                  <SurfaceRow
+                    label="Superficie semicubierta"
+                    value={property.semiCoveredArea}
+                  />
+                  <SurfaceRow
+                    label="Superficie descubierta"
+                    value={property.uncoveredArea}
+                  />
+                  {(property.area || 0) +
+                    (property.semiCoveredArea || 0) +
+                    (property.uncoveredArea || 0) >
+                    0 && (
                     <div className="flex items-center justify-between py-2.5 pt-3 border-t border-geora-g100">
-                      <span className="text-sm font-black text-geora-black">Total</span>
+                      <span className="text-sm font-black text-geora-black">
+                        Total
+                      </span>
                       <span className="text-sm font-black text-geora-emerald">
-                        {(property.area || 0) + (property.semiCoveredArea || 0) + (property.uncoveredArea || 0)} m²
+                        {(property.area || 0) +
+                          (property.semiCoveredArea || 0) +
+                          (property.uncoveredArea || 0)}{" "}
+                        m²
                       </span>
                     </div>
                   )}
@@ -641,10 +903,17 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
             {detailRows.length > 0 && (
               <div>
-                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">Ficha Técnica</h3>
+                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">
+                  Ficha Técnica
+                </h3>
                 <div className="px-6 py-2">
                   {detailRows.map((row, i) => (
-                    <DetailRow key={i} icon={row.icon} label={row.label} value={row.value} />
+                    <DetailRow
+                      key={i}
+                      icon={row.icon}
+                      label={row.label}
+                      value={row.value}
+                    />
                   ))}
                 </div>
               </div>
@@ -652,7 +921,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
             {property.description && (
               <div>
-                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">Descripción</h3>
+                <h3 className="text-2xl font-display font-bold text-geora-muted tracking-tight mb-4 ml-2">
+                  Descripción
+                </h3>
                 <div className="bg-white p-8 rounded-2xl border border-geora-g100 shadow-sm">
                   <div className="text-geora-black/80 leading-relaxed whitespace-pre-wrap text-lg">
                     {property.description}
@@ -674,7 +945,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-8">
                     <div className="flex flex-col w-full justify-center items-center mt-5">
-                      <p className="text-xs font-bold uppercase tracking-widest text-geora-muted mb-3">Comercializa</p>
+                      <p className="text-xs font-bold uppercase tracking-widest text-geora-muted mb-3">
+                        Comercializa
+                      </p>
                       <Link
                         href={`/realestate/${property.realEstateId}`}
                         className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
@@ -682,7 +955,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                         {property.RealEstate?.logoUrl ? (
                           <Image
                             src={property.RealEstate.logoUrl}
-                            alt={property.RealEstate.agencyName || "Inmobiliaria"}
+                            alt={
+                              property.RealEstate.agencyName || "Inmobiliaria"
+                            }
                             width={80}
                             height={80}
                             className="w-20 h-20 rounded-full object-cover border border-geora-g100 shadow-sm"
@@ -700,16 +975,26 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                   </div>
                   <div className="space-y-3 mb-8 ml-3">
                     <div className="flex items-center gap-4 p-4">
-                      <div className="p-2"><Phone size={18} className="text-geora-dark" /></div>
+                      <div className="p-2">
+                        <Phone size={18} className="text-geora-dark" />
+                      </div>
                       <div>
-                        <p className="text-[10px] font-bold text-geora-muted uppercase">Teléfono</p>
-                        <span className="font-bold text-md">{property.RealEstate?.phone || "No disponible"}</span>
+                        <p className="text-[10px] font-bold text-geora-muted uppercase">
+                          Teléfono
+                        </p>
+                        <span className="font-bold text-md">
+                          {property.RealEstate?.phone || "No disponible"}
+                        </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-4 p-4">
-                      <div className="p-2"><Mail size={18} className="text-geora-dark" /></div>
+                      <div className="p-2">
+                        <Mail size={18} className="text-geora-dark" />
+                      </div>
                       <div>
-                        <p className="text-[10px] font-bold text-geora-muted uppercase">Email</p>
+                        <p className="text-[10px] font-bold text-geora-muted uppercase">
+                          Email
+                        </p>
                         <span className="font-bold text-md">Consultar</span>
                       </div>
                     </div>
@@ -722,23 +1007,25 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                   </Link>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
-            
-              {property.realEstateId === user?.id ? (
-                <OwnerPropertyPanel propertyId={property.id} />
-              ) : (
-                <>
-                  <InquiryForm propertyId={property.id} />
-                  {property.realEstateId && (
-                    <div className="mt-4 w-full items-end flex justify-end">
-                      <StartChatButton propertyId={property.id} realEstateId={property.realEstateId as string} />
-                    </div>
-                  )}
-                </>
-              )}
+
+        {property.realEstateId === user?.id ? (
+          <OwnerPropertyPanel propertyId={property.id} />
+        ) : (
+          <>
+            <InquiryForm propertyId={property.id} />
+            {property.realEstateId && (
+              <div className="mt-4 w-full items-end flex justify-end">
+                <StartChatButton
+                  propertyId={property.id}
+                  realEstateId={property.realEstateId as string}
+                />
+              </div>
+            )}
+          </>
+        )}
         <div className="mt-12 sm:mt-24 pt-8 sm:pt-12 border-t border-geora-g100">
           <h3 className="text-2xl sm:text-3xl font-display text-geora-black tracking-tighter mb-6 sm:mb-8">
             <span className="font-medium">Más propiedades de </span>
@@ -750,10 +1037,20 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           {otherProperties.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               {otherProperties.map((other) => (
-                <div key={other.id} className="group relative flex flex-col h-full bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <Link href={`/property/${other.id}`} className="absolute inset-0 z-10" />
+                <div
+                  key={other.id}
+                  className="group relative flex flex-col h-full bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                >
+                  <Link
+                    href={`/property/${other.id}`}
+                    className="absolute inset-0 z-10"
+                  />
                   <div className="absolute top-3 right-3 z-20">
-                    <FavoriteButton propertyId={other.id} initialIsFavorite={!!other.isFavorite} small />
+                    <FavoriteButton
+                      propertyId={other.id}
+                      initialIsFavorite={!!other.isFavorite}
+                      small
+                    />
                   </div>
                   <div className="relative h-48 bg-gray-200 overflow-hidden">
                     <Image
@@ -782,7 +1079,12 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                         {getOperationLabel(other.operationType)}
                       </p>
                       <p className="text-lg font-black text-geora-dark">
-                        {other.currency} {(other.salePrice || other.rentPrice || 0).toLocaleString("es-AR")}
+                        {other.currency}{" "}
+                        {(
+                          other.salePrice ||
+                          other.rentPrice ||
+                          0
+                        ).toLocaleString("es-AR")}
                       </p>
                     </div>
                   </div>
@@ -792,7 +1094,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           ) : (
             <div className="bg-gray-50 p-12 rounded-2xl text-center border-2 border-dashed border-gray-200">
               <Building2 size={40} className="mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500 font-medium">Esta inmobiliaria no tiene otras propiedades similares.</p>
+              <p className="text-gray-500 font-medium">
+                Esta inmobiliaria no tiene otras propiedades similares.
+              </p>
             </div>
           )}
         </div>
@@ -803,16 +1107,22 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           {!property.isPriceHidden ? (
             <>
               <p className="text-[10px] font-bold text-geora-muted uppercase tracking-widest leading-none mb-0.5">
-                {(property.operationType === "RENT" || property.operationType === "TEMP_RENT") ? "Alquiler" : "Venta"}
+                {property.operationType === "RENT" ||
+                property.operationType === "TEMP_RENT"
+                  ? "Alquiler"
+                  : "Venta"}
               </p>
               <p className="text-lg font-black text-geora-black truncate">
-                {(property.operationType === "RENT" || property.operationType === "TEMP_RENT")
+                {property.operationType === "RENT" ||
+                property.operationType === "TEMP_RENT"
                   ? `${property.rentCurrency} ${formatter.format(property.rentPrice ?? 0)}`
                   : `${property.saleCurrency} ${formatter.format(property.salePrice ?? 0)}`}
               </p>
             </>
           ) : (
-            <p className="text-lg font-black text-geora-muted italic">Consultar precio</p>
+            <p className="text-lg font-black text-geora-muted italic">
+              Consultar precio
+            </p>
           )}
         </div>
         <a

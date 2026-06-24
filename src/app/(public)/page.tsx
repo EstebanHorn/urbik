@@ -136,12 +136,14 @@ export default function HomePage() {
   const searchParams = useSearchParams();
 
   const [showAuthOverlay, setShowAuthOverlay] = useState(
-    searchParams.get("fromAuth") === "true"
+    searchParams.get("fromAuth") === "true",
   );
 
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
+  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(
+    null,
+  );
   const [items, setItems] = useState<SearchProperty[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -191,14 +193,14 @@ export default function HomePage() {
 
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete("fromAuth");
-      window.history.replaceState({}, '', newUrl.toString());
+      window.history.replaceState({}, "", newUrl.toString());
 
       const timer = setTimeout(() => {
         setShowAuthOverlay(false);
         document.documentElement.style.backgroundColor = "";
         document.body.style.backgroundColor = "";
       }, 900);
-      
+
       return () => {
         clearTimeout(timer);
         document.documentElement.style.backgroundColor = "";
@@ -419,7 +421,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white relative">
-      
       {showAuthOverlay && (
         <div className="fixed inset-0 z-[9999] bg-white overflow-hidden pointer-events-none animate-reveal-up">
           <style>{`
@@ -438,7 +439,7 @@ export default function HomePage() {
         <div className="relative flex min-h-[800px] flex-col items-start gap-4 lg:flex-row">
           <main className="flex-1 min-w-0 w-full">
             {!isSearchMode && <Banner items={items} />}
-            <section className="max-w-7xl w-full mx-auto px-4 md:px-8 mt-10">
+            <section className="max-w-7xl w-full mx-auto px-4 md:px-8 mt-40 md:mt-0">
               <div className="mt-10 md:mt-40 mb-5 ml-0 md:ml-10 text-center md:text-left">
                 <h1 className="text-3xl md:text-4xl text-geora-black/80 font-black">
                   Propiedades Destacadas
@@ -447,7 +448,7 @@ export default function HomePage() {
                   Las mejores oportunidades del mercado seleccionadas para vos.
                 </span>
               </div>
-              
+
               {isLoading ? (
                 <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                   {Array.from({ length: 6 }).map((_, idx) => (

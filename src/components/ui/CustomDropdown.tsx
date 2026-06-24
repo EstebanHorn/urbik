@@ -59,8 +59,13 @@ export function CustomDropdown({
       "text-geora-white md:bg-geora-white1 md:text-geora-black md:hover:bg-geora-white",
   };
 
+  // Field-style dropdowns (used in forms): full width, left aligned, open downward.
+  const isField = variant === "white2" || variant === "white3";
+
   let positionClasses = "";
-  if (direction === "up") {
+  if (isField) {
+    positionClasses = "top-full mt-2 left-0 right-0";
+  } else if (direction === "up") {
     positionClasses = "bottom-full mb-3 right-0";
   } else if (direction === "down") {
     positionClasses = "top-full mt-3 right-0 md:left-0 md:right-auto";
@@ -73,16 +78,22 @@ export function CustomDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`${variantStyles[variant]} h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition flex items-center justify-center md:justify-between gap-2 min-w-10 md:min-w-[120px] ${
-          variant !== "map-layer" ? "font-bold" : ""
-        }`}
+        className={`${variantStyles[variant]} h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition flex items-center gap-2 ${
+          isField
+            ? "w-full justify-between min-w-0"
+            : "justify-center md:justify-between min-w-10 md:min-w-[120px]"
+        } ${variant !== "map-layer" ? "font-bold" : ""}`}
       >
-        <span className="text-md tracking-wider flex items-center justify-center">
+        <span
+          className={`text-md tracking-wider flex items-center ${
+            isField ? "justify-start text-left truncate" : "justify-center"
+          }`}
+        >
           {selectedOption ? selectedOption.label : label}
         </span>
-        
+
         <svg
-          className={`hidden md:block w-4 h-4 transition-transform duration-200 ${
+          className={`${isField ? "block" : "hidden md:block"} w-4 h-4 shrink-0 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
           fill="none"
@@ -105,7 +116,7 @@ export function CustomDropdown({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className={`absolute w-56 rounded-2xl bg-geora-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden ${positionClasses}`}
+            className={`absolute ${isField ? "w-full" : "w-56"} rounded-2xl bg-geora-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden ${positionClasses}`}
           >
             {options.map((opt) => (
                 <button

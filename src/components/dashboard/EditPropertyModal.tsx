@@ -184,6 +184,15 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated, 
   }, [activeModuleId]);
 
   useEffect(() => {
+    if (!open) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [open]);
+
+  useEffect(() => {
     if (open) {
       rhf.reset(toDefaultValues(property, defaultContactInfo));
       setActiveModuleId(1);
@@ -417,13 +426,13 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated, 
     <>
       <style dangerouslySetInnerHTML={{ __html: MODAL_ANIMATION_STYLES }} />
 
-      <div className="fixed inset-0 z-50 flex items-center justify-center pt-20 px-6 pb-6">
+      <div className="fixed inset-0 z-[1100] flex items-center justify-center p-0 md:pt-20 md:px-6 md:pb-6">
         <div
           className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={onClose}
         />
 
-        <div className="relative w-full max-w-xl h-[80vh] bg-white/70 border border-white rounded-3xl flex flex-col shadow-2xl overflow-hidden">
+        <div className="relative w-full h-full max-w-none rounded-none md:max-w-xl md:h-[80vh] md:rounded-3xl bg-white/70 border border-white flex flex-col shadow-2xl overflow-hidden">
 
           <div className="flex flex-col shrink-0 bg-white/70">
             <div className="flex items-center justify-between px-8 py-5">
@@ -476,7 +485,7 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated, 
             </div>
           </div>
 
-          <div className="px-8 flex items-center justify-between gap-4 bg-white/70">
+          <div className="px-8 py-4 shrink-0 flex items-center justify-between gap-4 bg-white/70 border-t border-white/40">
             <button
               type="button"
               onClick={handleBack}
