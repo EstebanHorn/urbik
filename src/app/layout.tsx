@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
+import Navbar from "@/components/home/layout/Navbar";
 import { Providers } from "./providers";
 import { Inter } from "next/font/google";
-import Footer from "@/components/layout/Footer";
+import Footer from "@/components/home/layout/Footer";
 import SidebarFilters from "@/components/ui/PhoneFilters";
 import GoogleMapProvider from "@/components/google-map/GoogleMapProvider";
 

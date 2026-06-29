@@ -89,7 +89,7 @@ export async function loadIndex(): Promise<CachedIndex> {
   if (LOADING) return LOADING;
 
   LOADING = (async () => {
-    const filePath = path.join(process.cwd(), "public", "rio.geojson");
+    const filePath = path.join(process.cwd(), "public", "riocolorado.geojson");
     const raw = await fs.readFile(filePath, "utf-8");
     const data = JSON.parse(raw) as { features: RawFeature[] };
 

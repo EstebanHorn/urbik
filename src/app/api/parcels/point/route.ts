@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadIndex, type LonLatGeometry } from "@/lib/rioNegroIndex";
+import { loadIndex, type LonLatGeometry } from "@/lib/rioColoradoIndex";
 
 function pointInRing(px: number, py: number, ring: number[][]): boolean {
   let inside = false;
@@ -33,9 +33,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "lat/lng inválido" }, { status: 400 });
   }
 
-  const isRioNegro = /r[íi]o\s*negro/i.test(province);
+  // Río Colorado es una localidad de la provincia de Río Negro: las propiedades
+  // de esa zona tienen province = "Río Negro", así que el gate sigue siendo la provincia.
+  const usesLocalParcels = /r[íi]o\s*negro/i.test(province);
 
-  if (isRioNegro) {
+  if (usesLocalParcels) {
     const DELTA = 0.002;
     try {
       const { features, spatial } = await loadIndex();
@@ -49,7 +51,7 @@ export async function GET(request: Request) {
       }
       return NextResponse.json({ error: "No se encontró parcela en ese punto" }, { status: 404 });
     } catch (err) {
-      console.error("Error querying Rio Negro parcels:", err);
+      console.error("Error querying Rio Colorado parcels:", err);
       return NextResponse.json({ error: "Error interno" }, { status: 500 });
     }
   }

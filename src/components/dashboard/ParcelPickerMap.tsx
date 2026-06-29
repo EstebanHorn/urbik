@@ -47,7 +47,9 @@ function getProvinceCenter(province: string): { lat: number; lng: number } {
   return { lat: -34.6, lng: -58.4 };
 }
 
-function isRioNegro(province: string) {
+// Río Colorado es una localidad de la provincia de Río Negro: el formulario carga
+// province = "Río Negro", así que el gate sigue siendo la provincia.
+function usesLocalParcels(province: string) {
   return /r[íi]o\s*negro/i.test(province);
 }
 
@@ -58,7 +60,7 @@ const DATA_STYLE_SELECTED = {
   fillOpacity: 0.35,
   zIndex: 10,
 };
-const DATA_STYLE_RIO_NEGRO = {
+const DATA_STYLE_RIO_COLORADO = {
   strokeColor: "#00c96e",
   strokeWeight: 2,
   fillColor: "#00c96e",
@@ -68,7 +70,7 @@ const DATA_STYLE_RIO_NEGRO = {
 function applyDataStyle(map: google.maps.Map) {
   map.data.setStyle((feature) => {
     if (feature.getProperty("isSelectedParcel")) return DATA_STYLE_SELECTED;
-    if (feature.getProperty("rioNegro")) return DATA_STYLE_RIO_NEGRO;
+    if (feature.getProperty("rioColorado")) return DATA_STYLE_RIO_COLORADO;
     return {};
   });
 }
@@ -154,7 +156,7 @@ function ARBAWMSLayer() {
 
 // ── Rio Negro GeoJSON layer (via Data layer) ─────────────────────────────────
 
-function RioNegroLayer({
+function RioColoradoLayer({
   onMapClick,
 }: {
   onMapClick: (lat: number, lng: number) => void;
@@ -172,7 +174,7 @@ function RioNegroLayer({
       const zoom = map.getZoom() ?? 0;
       if (zoom < 13) {
         map.data.forEach((f) => {
-          if (f.getProperty("rioNegro")) map.data.remove(f);
+          if (f.getProperty("rioColorado")) map.data.remove(f);
         });
         return;
       }
@@ -188,13 +190,13 @@ function RioNegroLayer({
       const cached = cacheRef.current.get(key);
       if (cached) {
         map.data.forEach((f) => {
-          if (f.getProperty("rioNegro")) map.data.remove(f);
+          if (f.getProperty("rioColorado")) map.data.remove(f);
         });
         cached.features.forEach((f) => {
           map.data.addGeoJson({
             type: "Feature",
             geometry: f.geometry,
-            properties: { ...f.properties, rioNegro: true },
+            properties: { ...f.properties, rioColorado: true },
           });
         });
         applyDataStyle(map);
@@ -207,7 +209,7 @@ function RioNegroLayer({
 
       try {
         const url =
-          `/api/parcels/rio-negro?minLat=${sw.lat()}&maxLat=${ne.lat()}` +
+          `/api/parcels/rio-colorado?minLat=${sw.lat()}&maxLat=${ne.lat()}` +
           `&minLon=${sw.lng()}&maxLon=${ne.lng()}&limit=3000`;
         const res = await fetch(url, { signal: ctrl.signal });
         if (!res.ok) return;
@@ -220,13 +222,13 @@ function RioNegroLayer({
         cacheRef.current.set(key, json);
 
         map.data.forEach((f) => {
-          if (f.getProperty("rioNegro")) map.data.remove(f);
+          if (f.getProperty("rioColorado")) map.data.remove(f);
         });
         json.features.forEach((f) => {
           map.data.addGeoJson({
             type: "Feature",
             geometry: f.geometry,
-            properties: { ...f.properties, rioNegro: true },
+            properties: { ...f.properties, rioColorado: true },
           });
         });
         applyDataStyle(map);
@@ -266,7 +268,7 @@ function RioNegroLayer({
       google.maps.event.removeListener(mapClick);
       google.maps.event.removeListener(idleListener);
       map.data.forEach((f) => {
-        if (f.getProperty("rioNegro")) map.data.remove(f);
+        if (f.getProperty("rioColorado")) map.data.remove(f);
       });
     };
   }, [map, fetchParcels, onMapClick]);
@@ -366,9 +368,9 @@ export default function ParcelPickerMap({
   drawnPath,
   initialCenter,
 }: ParcelPickerMapProps) {
-  const rioNegro = isRioNegro(province);
+  const rioColorado = usesLocalParcels(province);
   const center = initialCenter ?? getProvinceCenter(province);
-  const initialZoom = initialCenter ? 17 : rioNegro ? 13 : 15;
+  const initialZoom = initialCenter ? 17 : rioColorado ? 13 : 15;
 
   const handleMapClick = useCallback(
     (e: MapMouseEvent) => {
@@ -385,15 +387,15 @@ export default function ParcelPickerMap({
       mapTypeId="hybrid"
       disableDefaultUI
       gestureHandling="greedy"
-      onClick={rioNegro ? undefined : handleMapClick}
+      onClick={rioColorado ? undefined : handleMapClick}
       draggableCursor="pointer"
       draggingCursor="move"
       style={{ width: "100%", height: "100%" }}
     >
       {!initialCenter && <MapAutoCenter city={city} province={province} />}
 
-      {rioNegro ? (
-        <RioNegroLayer onMapClick={onMapClick} />
+      {rioColorado ? (
+        <RioColoradoLayer onMapClick={onMapClick} />
       ) : (
         <ARBAWMSLayer />
       )}

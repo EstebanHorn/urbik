@@ -57,7 +57,7 @@ Client-side data-fetching helpers that wrap `fetch()` calls to API routes:
 - `types.ts` — All shared TypeScript types and enums (Role, PropertyType, OperationType, PropertyStatus, Currency, Property interface)
 - `utils.ts` — `slugify()`, `generateUniqueSlug()` (DB-checking, handles collisions)
 - `jurisdictions.ts` — `JURISDICTIONS_BY_PROVINCE`: hardcoded mapping of 23 Argentine provinces, used for real estate license dropdowns
-- `rioNegroIndex.ts` — Flatbush spatial index for Rio Negro land parcels
+- `rioColoradoIndex.ts` — Flatbush spatial index for Río Colorado land parcels (`public/riocolorado.geojson`)
 
 ### Data Layer
 
@@ -112,7 +112,7 @@ Staging uses HTTP Basic Auth via `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` env v
 
 **Search & Geocoding:**
 - `/api/search` — Full-text DB search + agency suggestions
-- `/api/parcels` / `/api/parcels/rio-negro` — Land parcel polygon data
+- `/api/parcels` / `/api/parcels/rio-colorado` — Land parcel polygon data
 
 **Other:**
 - `/api/administrate` — Admin user management (ADMIN only)

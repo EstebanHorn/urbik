@@ -11,7 +11,7 @@ const PAD_RATIO = 0.25;
 
 const canvasRenderer = L.canvas({ padding: 0.5 });
 
-export function RioNegroGeoJsonLayer() {
+export function RioColoradoGeoJsonLayer() {
   const map = useMap();
   const [data, setData] = useState<FeatureCollection | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -63,7 +63,7 @@ export function RioNegroGeoJsonLayer() {
       abortRef.current = controller;
 
       try {
-        const url = `/api/parcels/rio-negro?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
+        const url = `/api/parcels/rio-colorado?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
         const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) return;
         const json = (await res.json()) as FeatureCollection;
@@ -76,7 +76,7 @@ export function RioNegroGeoJsonLayer() {
         setData(json);
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
-          console.error("Error fetching Rio Negro parcels:", err);
+          console.error("Error fetching Rio Colorado parcels:", err);
         }
       }
     }, DEBOUNCE_MS);

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadIndex } from "@/lib/rioNegroIndex";
+import { loadIndex } from "@/lib/rioColoradoIndex";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
       },
     );
   } catch (error) {
-    console.error("Error loading rio-negro parcels:", error);
+    console.error("Error loading rio-colorado parcels:", error);
     return NextResponse.json(
       { type: "FeatureCollection", features: [] },
       { status: 500 },

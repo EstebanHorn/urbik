@@ -58,14 +58,14 @@ export function GoogleStaticParcelsLayer() {
   }, [map, region]);
 
   useEffect(() => {
-    if (!map || region !== "rio-negro") {
+    if (!map || region !== "rio-colorado") {
       map?.data.forEach((feature: google.maps.Data.Feature) => {
-        if (feature.getProperty("isRioNegro")) map.data.remove(feature);
+        if (feature.getProperty("isRioColorado")) map.data.remove(feature);
       });
       return;
     }
 
-    const fetchRioNegro = async () => {
+    const fetchRioColorado = async () => {
       const zoom = map.getZoom() || 0;
       if (zoom < 14) return;
 
@@ -78,18 +78,26 @@ export function GoogleStaticParcelsLayer() {
       const maxLon = bounds.getNorthEast().lng();
 
       try {
-        const res = await fetch(`/api/parcels/rio-negro?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`);
+        const res = await fetch(`/api/parcels/rio-colorado?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`);
         if (res.ok) {
           const json = (await res.json()) as FeatureCollection;
           json.features.forEach(f => {
             if (!f.properties) f.properties = {};
-            f.properties.isRioNegro = true;
+            f.properties.isRioColorado = true;
           });
           map.data.addGeoJson(json);
-          
+
           map.data.setStyle((feature: google.maps.Data.Feature) => {
-            if (feature.getProperty("isRioNegro")) {
-              return { fillColor: "transparent", strokeColor: "#00ff8e", strokeWeight: 1 };
+            if (feature.getProperty("isRioColorado")) {
+              // Referencia catastral tenue: sin relleno y con borde gris, así solo
+              // destacan las parcelas con propiedad (GoogleDbParcelsLayer).
+              return {
+                fillColor: "transparent",
+                fillOpacity: 0,
+                strokeColor: "#9ca3af",
+                strokeWeight: 0.6,
+                strokeOpacity: 0.7,
+              };
             }
             return {};
           });
@@ -98,8 +106,8 @@ export function GoogleStaticParcelsLayer() {
       }
     };
 
-    const listener = map.addListener("idle", fetchRioNegro);
-    fetchRioNegro();
+    const listener = map.addListener("idle", fetchRioColorado);
+    fetchRioColorado();
 
     return () => { google.maps.event.removeListener(listener); };
   }, [map, region]);
