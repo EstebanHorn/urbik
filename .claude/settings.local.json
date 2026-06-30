@@ -63,7 +63,9 @@
       "PowerShell(npm run *)",
       "Bash(find public *)",
       "Bash(ls -la tailwind.config.*)",
-      "Bash(find . -iname '*geora*' -not -path './node_modules/*' -not -path './.git/*' -not -path './.next/*')"
+      "Bash(find . -iname '*geora*' -not -path './node_modules/*' -not -path './.git/*' -not -path './.next/*')",
+      "Bash(cp /tmp/bench.mjs ./bench.mjs)",
+      "Bash(rm -f ./bench.mjs)"
     ]
   }
 }
