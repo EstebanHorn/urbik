@@ -23,6 +23,7 @@ import {
   PlusCircle,
   User,
   Shield,
+  Network,
   type LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
@@ -90,9 +91,7 @@ function NavbarInner() {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<"price" | "rooms" | null>(
-    null,
-  );
+  const [activeFilter, setActiveFilter] = useState<"price" | "rooms" | null>(null);
   const [localMinPrice, setLocalMinPrice] = useState("");
   const [localMaxPrice, setLocalMaxPrice] = useState("");
 
@@ -446,8 +445,9 @@ function NavbarInner() {
 
     if (role === "REALESTATE") {
       return [
-        { href: `${pathname}?nueva=1`, label: "Publicar", Icon: PlusCircle },
+        { href: `/dashboard?nueva=1`, label: "Publicar", Icon: PlusCircle },
         { href: "/dashboard", label: "Mi Perfil", short: "Perfil", Icon: User },
+        { href: "/connections", label: "Bolsa", short: "Bolsa", Icon: Network },
         { href: "/", label: "Buscar", Icon: Search },
       ];
     }
