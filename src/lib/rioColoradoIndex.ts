@@ -1,15 +1,12 @@
-import { promises as fs } from "fs";
-import path from "path";
 import Flatbush from "flatbush";
+import { gunzipSync } from "zlib";
+import { createAdminClient } from "@/lib/supabase/admin";
 
-interface RawFeature {
-  type: "Feature";
-  properties: { fid: number; cca: string };
-  geometry: {
-    type: "MultiPolygon" | "Polygon";
-    coordinates: number[][][][] | number[][][];
-  };
-}
+// Artefacto pre-procesado: coordenadas ya en lon/lat (6 decimales), estructura
+// compacta y comprimido con gzip. Se genera con `scripts/prepare-riocolorado.mjs`
+// a partir del geojson crudo (Web Mercator) que vive en el mismo bucket.
+const GEOJSON_BUCKET = "geojson";
+const GEOJSON_PATH = "riocolorado.min.json.gz";
 
 export type LonLatGeometry = {
   type: "Polygon" | "MultiPolygon";
@@ -30,58 +27,25 @@ interface CachedIndex {
 let CACHE: CachedIndex | null = null;
 let LOADING: Promise<CachedIndex> | null = null;
 
-const ORIGIN = 20037508.342789244;
-
-function mercatorToLonLat(x: number, y: number): [number, number] {
-  const lon = (x / ORIGIN) * 180;
-  const lat =
-    (180 / Math.PI) *
-    (2 * Math.atan(Math.exp((y / ORIGIN) * Math.PI)) - Math.PI / 2);
-  return [
-    Math.round(lon * 1e6) / 1e6,
-    Math.round(lat * 1e6) / 1e6,
-  ];
-}
-
-function reprojectRing(ring: number[][]): number[][] {
-  return ring.map((c) => {
-    const [lon, lat] = mercatorToLonLat(c[0], c[1]);
-    return [lon, lat];
-  });
-}
-
-function reprojectAndBBox(geom: RawFeature["geometry"]): {
-  geometry: LonLatGeometry;
-  bbox: [number, number, number, number];
-} {
+function computeBBox(geom: LonLatGeometry): [number, number, number, number] {
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 
-  const trackRing = (ring: number[][]): number[][] =>
-    ring.map((c) => {
-      const [lon, lat] = mercatorToLonLat(c[0], c[1]);
+  const scanRing = (ring: number[][]) => {
+    for (const [lon, lat] of ring) {
       if (lon < minX) minX = lon;
       if (lon > maxX) maxX = lon;
       if (lat < minY) minY = lat;
       if (lat > maxY) maxY = lat;
-      return [lon, lat];
-    });
+    }
+  };
 
-  let geometry: LonLatGeometry;
   if (geom.type === "Polygon") {
-    geometry = {
-      type: "Polygon",
-      coordinates: (geom.coordinates as number[][][]).map(trackRing),
-    };
+    (geom.coordinates as number[][][]).forEach(scanRing);
   } else {
-    geometry = {
-      type: "MultiPolygon",
-      coordinates: (geom.coordinates as number[][][][]).map((poly) =>
-        poly.map(trackRing),
-      ),
-    };
+    (geom.coordinates as number[][][][]).forEach((poly) => poly.forEach(scanRing));
   }
 
-  return { geometry, bbox: [minX, minY, maxX, maxY] };
+  return [minX, minY, maxX, maxY];
 }
 
 export async function loadIndex(): Promise<CachedIndex> {
@@ -89,28 +53,36 @@ export async function loadIndex(): Promise<CachedIndex> {
   if (LOADING) return LOADING;
 
   LOADING = (async () => {
-    const filePath = path.join(process.cwd(), "public", "riocolorado.geojson");
-    const raw = await fs.readFile(filePath, "utf-8");
-    const data = JSON.parse(raw) as { features: RawFeature[] };
+    const supabase = createAdminClient();
+    const { data: blob, error } = await supabase.storage
+      .from(GEOJSON_BUCKET)
+      .download(GEOJSON_PATH);
+
+    if (error || !blob) {
+      LOADING = null;
+      throw new Error(
+        `No se pudo descargar ${GEOJSON_PATH} del bucket ${GEOJSON_BUCKET}: ${error?.message ?? "respuesta vacía"}`,
+      );
+    }
+
+    const buf = Buffer.from(await blob.arrayBuffer());
+    const data = JSON.parse(gunzipSync(buf).toString("utf8")) as {
+      features: CompactFeature[];
+    };
 
     const total = data.features.length;
-    const compact: CompactFeature[] = new Array(total);
     const spatial = new Flatbush(total);
 
     for (let i = 0; i < total; i++) {
-      const f = data.features[i];
-      const { geometry, bbox } = reprojectAndBBox(f.geometry);
-      compact[i] = { fid: f.properties.fid, cca: f.properties.cca, geometry };
+      const bbox = computeBBox(data.features[i].geometry);
       spatial.add(bbox[0], bbox[1], bbox[2], bbox[3]);
     }
     spatial.finish();
 
-    CACHE = { features: compact, spatial };
+    CACHE = { features: data.features, spatial };
     LOADING = null;
     return CACHE;
   })();
 
   return LOADING;
 }
-
-export { reprojectRing };

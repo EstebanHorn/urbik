@@ -4,10 +4,10 @@ import { GeoJSON, useMap, useMapEvents } from "react-leaflet";
 import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import type { FeatureCollection } from "geojson";
+import { snapBBoxToGrid } from "./utils";
 
 const MIN_ZOOM = 14;
 const DEBOUNCE_MS = 250;
-const PAD_RATIO = 0.25;
 
 const canvasRenderer = L.canvas({ padding: 0.5 });
 
@@ -42,13 +42,14 @@ export function RioColoradoGeoJsonLayer() {
       }
 
       const bounds = map.getBounds();
-      const padded = bounds.pad(PAD_RATIO);
-      const minLat = padded.getSouth();
-      const maxLat = padded.getNorth();
-      const minLon = padded.getWest();
-      const maxLon = padded.getEast();
+      const { minLat, maxLat, minLon, maxLon } = snapBBoxToGrid({
+        minLat: bounds.getSouth(),
+        maxLat: bounds.getNorth(),
+        minLon: bounds.getWest(),
+        maxLon: bounds.getEast(),
+      });
 
-      const key = `${minLat.toFixed(3)},${maxLat.toFixed(3)},${minLon.toFixed(3)},${maxLon.toFixed(3)}`;
+      const key = `${minLat},${maxLat},${minLon},${maxLon}`;
       if (key === lastBoundsKeyRef.current) return;
       lastBoundsKeyRef.current = key;
 

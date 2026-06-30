@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { Map, AdvancedMarker, useMap, useMapsLibrary, type MapMouseEvent } from "@vis.gl/react-google-maps";
 import type { FeatureCollection, Geometry } from "geojson";
+import { snapBBoxToGrid } from "@/components/map/utils";
 
 const PROVINCE_CENTERS: Record<string, { lat: number; lng: number }> = {
   // ... (Tus PROVINCE_CENTERS iguales)
@@ -183,7 +184,13 @@ function RioColoradoLayer({
       if (!bounds) return;
       const sw = bounds.getSouthWest();
       const ne = bounds.getNorthEast();
-      const key = `${sw.lat().toFixed(3)},${ne.lat().toFixed(3)},${sw.lng().toFixed(3)},${ne.lng().toFixed(3)}`;
+      const { minLat, maxLat, minLon, maxLon } = snapBBoxToGrid({
+        minLat: sw.lat(),
+        maxLat: ne.lat(),
+        minLon: sw.lng(),
+        maxLon: ne.lng(),
+      });
+      const key = `${minLat},${maxLat},${minLon},${maxLon}`;
       if (key === lastKeyRef.current) return;
       lastKeyRef.current = key;
 
@@ -209,8 +216,8 @@ function RioColoradoLayer({
 
       try {
         const url =
-          `/api/parcels/rio-colorado?minLat=${sw.lat()}&maxLat=${ne.lat()}` +
-          `&minLon=${sw.lng()}&maxLon=${ne.lng()}&limit=3000`;
+          `/api/parcels/rio-colorado?minLat=${minLat}&maxLat=${maxLat}` +
+          `&minLon=${minLon}&maxLon=${maxLon}&limit=3000`;
         const res = await fetch(url, { signal: ctrl.signal });
         if (!res.ok) return;
         const json = (await res.json()) as FeatureCollection;

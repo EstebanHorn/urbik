@@ -57,7 +57,7 @@ Client-side data-fetching helpers that wrap `fetch()` calls to API routes:
 - `types.ts` — All shared TypeScript types and enums (Role, PropertyType, OperationType, PropertyStatus, Currency, Property interface)
 - `utils.ts` — `slugify()`, `generateUniqueSlug()` (DB-checking, handles collisions)
 - `jurisdictions.ts` — `JURISDICTIONS_BY_PROVINCE`: hardcoded mapping of 23 Argentine provinces, used for real estate license dropdowns
-- `rioColoradoIndex.ts` — Flatbush spatial index for Río Colorado land parcels (`public/riocolorado.geojson`)
+- `rioColoradoIndex.ts` — Flatbush spatial index for Río Colorado land parcels. Loads `riocolorado.geojson` from the Supabase `geojson` storage bucket (via `createAdminClient()`), cached in-memory per server instance.
 
 ### Data Layer
 

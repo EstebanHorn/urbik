@@ -47,3 +47,32 @@ export function detectRegion(lat: number, lon: number): Region {
 export function getZoomThresholdForRegion(region: Region): number {
   return region === "rio-colorado" ? 14 : 15;
 }
+
+// Grilla (~0.02° ≈ 2.2km) a la que se "snapea" el bbox pedido al endpoint de
+// parcelas de Río Colorado. Discretizar el bbox hace que paneos cortos generen
+// la misma URL → el CDN puede cachear la respuesta (s-maxage) y el cache del
+// cliente acierta en vez de re-bajar ~2MB de geometría en cada movimiento.
+// floor/ceil garantizan que el viewport quede siempre cubierto.
+export const PARCEL_GRID = 0.02;
+
+export interface BBox {
+  minLat: number;
+  maxLat: number;
+  minLon: number;
+  maxLon: number;
+}
+
+export function snapBBoxToGrid(bbox: BBox, grid = PARCEL_GRID): BBox {
+  const snap = (v: number, dir: "floor" | "ceil") => {
+    const n = dir === "floor" ? Math.floor(v / grid) : Math.ceil(v / grid);
+    // Redondeo final para evitar ruido de punto flotante (-39.620000000000005)
+    // y mantener URLs/keys estables.
+    return Math.round(n * grid * 1e6) / 1e6;
+  };
+  return {
+    minLat: snap(bbox.minLat, "floor"),
+    maxLat: snap(bbox.maxLat, "ceil"),
+    minLon: snap(bbox.minLon, "floor"),
+    maxLon: snap(bbox.maxLon, "ceil"),
+  };
+}

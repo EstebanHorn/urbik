@@ -3,13 +3,14 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useMap } from "@vis.gl/react-google-maps";
-import { detectRegion, type Region } from "@/components/map/utils";
+import { detectRegion, snapBBoxToGrid, type Region } from "@/components/map/utils";
 import type { FeatureCollection } from "geojson";
 
 export function GoogleStaticParcelsLayer() {
   const map = useMap();
   const [region, setRegion] = useState<Region>("buenos-aires");
   const wmsLayerRef = useRef<google.maps.ImageMapType | null>(null);
+  const lastRioKeyRef = useRef<string>("");
 
   useEffect(() => {
     if (!map) return;
@@ -62,20 +63,39 @@ export function GoogleStaticParcelsLayer() {
       map?.data.forEach((feature: google.maps.Data.Feature) => {
         if (feature.getProperty("isRioColorado")) map.data.remove(feature);
       });
+      lastRioKeyRef.current = "";
       return;
     }
 
+    const removeRioFeatures = () => {
+      map.data.forEach((feature: google.maps.Data.Feature) => {
+        if (feature.getProperty("isRioColorado")) map.data.remove(feature);
+      });
+    };
+
     const fetchRioColorado = async () => {
       const zoom = map.getZoom() || 0;
-      if (zoom < 14) return;
+      if (zoom < 14) {
+        if (lastRioKeyRef.current) {
+          removeRioFeatures();
+          lastRioKeyRef.current = "";
+        }
+        return;
+      }
 
       const bounds = map.getBounds();
       if (!bounds) return;
 
-      const minLat = bounds.getSouthWest().lat();
-      const minLon = bounds.getSouthWest().lng();
-      const maxLat = bounds.getNorthEast().lat();
-      const maxLon = bounds.getNorthEast().lng();
+      const { minLat, maxLat, minLon, maxLon } = snapBBoxToGrid({
+        minLat: bounds.getSouthWest().lat(),
+        maxLat: bounds.getNorthEast().lat(),
+        minLon: bounds.getSouthWest().lng(),
+        maxLon: bounds.getNorthEast().lng(),
+      });
+
+      const key = `${minLat},${maxLat},${minLon},${maxLon}`;
+      if (key === lastRioKeyRef.current) return;
+      lastRioKeyRef.current = key;
 
       try {
         const res = await fetch(`/api/parcels/rio-colorado?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`);
@@ -85,6 +105,7 @@ export function GoogleStaticParcelsLayer() {
             if (!f.properties) f.properties = {};
             f.properties.isRioColorado = true;
           });
+          removeRioFeatures();
           map.data.addGeoJson(json);
 
           map.data.setStyle((feature: google.maps.Data.Feature) => {
