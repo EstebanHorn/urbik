@@ -30,22 +30,24 @@ export const getDynamicParcelStyle = (
   return { color: fillColor, fillColor: fillColor, weight: 2, fillOpacity: 0.6 };
 };
 
-export type Region = "buenos-aires" | "rio-colorado" | "other";
+export type Region = "buenos-aires" | "rio-negro" | "other";
 
-// Acotado a la zona de Río Colorado (localidad de la provincia de Río Negro).
-// Ajustar si la extensión real de riocolorado.geojson lo requiere; el layer solo
-// renderiza cuando hay features, así que un bbox algo holgado es inofensivo.
-const RIO_COLORADO_BOUNDS = { minLat: -39.65, maxLat: -38.78, minLon: -65.30, maxLon: -63.35 };
+// Bbox de toda la provincia de Río Negro (cordillera → Atlántico). El catastro
+// provincial (ArcGIS) cubre la provincia entera, así que la región ya no se
+// acota a Río Colorado. Se evalúa antes que Buenos Aires porque se solapan en la
+// franja este (~lon -63.5..-62.7): ahí el punto es Río Negro (Viedma/Conesa).
+const RIO_NEGRO_BOUNDS = { minLat: -42.10, maxLat: -37.40, minLon: -72.00, maxLon: -62.70 };
 const BUENOS_AIRES_BOUNDS = { minLat: -41.05, maxLat: -33.05, minLon: -63.50, maxLon: -56.19 };
 
 export function detectRegion(lat: number, lon: number): Region {
-  if (lat >= RIO_COLORADO_BOUNDS.minLat && lat <= RIO_COLORADO_BOUNDS.maxLat && lon >= RIO_COLORADO_BOUNDS.minLon && lon <= RIO_COLORADO_BOUNDS.maxLon) return "rio-colorado";
+  if (lat >= RIO_NEGRO_BOUNDS.minLat && lat <= RIO_NEGRO_BOUNDS.maxLat && lon >= RIO_NEGRO_BOUNDS.minLon && lon <= RIO_NEGRO_BOUNDS.maxLon) return "rio-negro";
   if (lat >= BUENOS_AIRES_BOUNDS.minLat && lat <= BUENOS_AIRES_BOUNDS.maxLat && lon >= BUENOS_AIRES_BOUNDS.minLon && lon <= BUENOS_AIRES_BOUNDS.maxLon) return "buenos-aires";
   return "other";
 }
 
 export function getZoomThresholdForRegion(region: Region): number {
-  return region === "rio-colorado" ? 14 : 15;
+  // Ambas capas son teselas raster con minZoom 15.
+  return region === "rio-negro" ? 15 : 15;
 }
 
 // Grilla (~0.02° ≈ 2.2km) a la que se "snapea" el bbox pedido al endpoint de

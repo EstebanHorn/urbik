@@ -3,14 +3,13 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useMap } from "@vis.gl/react-google-maps";
-import { detectRegion, snapBBoxToGrid, type Region } from "@/components/map/utils";
-import type { FeatureCollection } from "geojson";
+import { detectRegion, type Region } from "@/components/map/utils";
+import { parcelTileUrl, PARCEL_MIN_ZOOM } from "@/lib/rioNegroParcels";
 
 export function GoogleStaticParcelsLayer() {
   const map = useMap();
   const [region, setRegion] = useState<Region>("buenos-aires");
-  const wmsLayerRef = useRef<google.maps.ImageMapType | null>(null);
-  const lastRioKeyRef = useRef<string>("");
+  const overlayRef = useRef<google.maps.ImageMapType | null>(null);
 
   useEffect(() => {
     if (!map) return;
@@ -25,112 +24,53 @@ export function GoogleStaticParcelsLayer() {
   }, [map]);
 
   useEffect(() => {
-    if (!map || region !== "buenos-aires") {
-      if (wmsLayerRef.current) {
-        map?.overlayMapTypes.removeAt(0);
-        wmsLayerRef.current = null;
-      }
-      return;
-    }
+    if (!map) return;
 
-    if (!wmsLayerRef.current) {
-      const wmsMapType = new google.maps.ImageMapType({
-        getTileUrl: function (coord: google.maps.Point, zoom: number) {
-          if (zoom < 15) return null;
-          const r = 6378137;
-          const mapSize = 256 * Math.pow(2, zoom);
-          const res = (2 * Math.PI * r) / mapSize;
-          const xmin = (coord.x * 256) * res - (Math.PI * r);
-          const ymax = (Math.PI * r) - (coord.y * 256) * res;
-          const xmax = ((coord.x + 1) * 256) * res - (Math.PI * r);
-          const ymin = (Math.PI * r) - ((coord.y + 1) * 256) * res;
-          const bbox = `${xmin},${ymin},${xmax},${ymax}`;
-          
-          return `https://geo.arba.gov.ar/geoserver/idera/ows?service=WMS&version=1.1.1&request=GetMap&layers=Parcela&styles=&bbox=${bbox}&width=256&height=256&srs=EPSG:3857&format=image/png&transparent=true`;
-        },
-        tileSize: new google.maps.Size(256, 256),
-        maxZoom: 19,
-        opacity: 0.8,
-      });
-
-      map.overlayMapTypes.push(wmsMapType);
-      wmsLayerRef.current = wmsMapType;
-    }
-  }, [map, region]);
-
-  useEffect(() => {
-    if (!map || region !== "rio-colorado") {
-      map?.data.forEach((feature: google.maps.Data.Feature) => {
-        if (feature.getProperty("isRioColorado")) map.data.remove(feature);
-      });
-      lastRioKeyRef.current = "";
-      return;
-    }
-
-    const removeRioFeatures = () => {
-      map.data.forEach((feature: google.maps.Data.Feature) => {
-        if (feature.getProperty("isRioColorado")) map.data.remove(feature);
-      });
+    // Quita el overlay anterior (si cambió la región).
+    const detach = () => {
+      if (!overlayRef.current) return;
+      const arr = map.overlayMapTypes.getArray();
+      const idx = arr.indexOf(overlayRef.current);
+      if (idx !== -1) map.overlayMapTypes.removeAt(idx);
+      overlayRef.current = null;
     };
+    detach();
 
-    const fetchRioColorado = async () => {
-      const zoom = map.getZoom() || 0;
-      if (zoom < 14) {
-        if (lastRioKeyRef.current) {
-          removeRioFeatures();
-          lastRioKeyRef.current = "";
-        }
-        return;
-      }
-
-      const bounds = map.getBounds();
-      if (!bounds) return;
-
-      const { minLat, maxLat, minLon, maxLon } = snapBBoxToGrid({
-        minLat: bounds.getSouthWest().lat(),
-        maxLat: bounds.getNorthEast().lat(),
-        minLon: bounds.getSouthWest().lng(),
-        maxLon: bounds.getNorthEast().lng(),
-      });
-
-      const key = `${minLat},${maxLat},${minLon},${maxLon}`;
-      if (key === lastRioKeyRef.current) return;
-      lastRioKeyRef.current = key;
-
-      try {
-        const res = await fetch(`/api/parcels/rio-colorado?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`);
-        if (res.ok) {
-          const json = (await res.json()) as FeatureCollection;
-          json.features.forEach(f => {
-            if (!f.properties) f.properties = {};
-            f.properties.isRioColorado = true;
-          });
-          removeRioFeatures();
-          map.data.addGeoJson(json);
-
-          map.data.setStyle((feature: google.maps.Data.Feature) => {
-            if (feature.getProperty("isRioColorado")) {
-              // Referencia catastral tenue: sin relleno y con borde gris, así solo
-              // destacan las parcelas con propiedad (GoogleDbParcelsLayer).
-              return {
-                fillColor: "transparent",
-                fillOpacity: 0,
-                strokeColor: "#9ca3af",
-                strokeWeight: 0.6,
-                strokeOpacity: 0.7,
-              };
+    // Buenos Aires: WMS de ARBA. Río Negro: teselas del catastro provincial
+    // (ArcGIS). Ambas se sirven como imágenes PNG por bbox.
+    const getTileUrl =
+      region === "buenos-aires"
+        ? (coord: google.maps.Point, zoom: number) => {
+            if (zoom < 15) return null;
+            const r = 6378137;
+            const mapSize = 256 * Math.pow(2, zoom);
+            const res = (2 * Math.PI * r) / mapSize;
+            const xmin = (coord.x * 256) * res - (Math.PI * r);
+            const ymax = (Math.PI * r) - (coord.y * 256) * res;
+            const xmax = ((coord.x + 1) * 256) * res - (Math.PI * r);
+            const ymin = (Math.PI * r) - ((coord.y + 1) * 256) * res;
+            const bbox = `${xmin},${ymin},${xmax},${ymax}`;
+            return `https://geo.arba.gov.ar/geoserver/idera/ows?service=WMS&version=1.1.1&request=GetMap&layers=Parcela&styles=&bbox=${bbox}&width=256&height=256&srs=EPSG:3857&format=image/png&transparent=true`;
+          }
+        : region === "rio-negro"
+          ? (coord: google.maps.Point, zoom: number) => {
+              if (zoom < PARCEL_MIN_ZOOM) return null;
+              return parcelTileUrl(coord.x, coord.y, zoom);
             }
-            return {};
-          });
-        }
-      } catch {
-      }
-    };
+          : null;
 
-    const listener = map.addListener("idle", fetchRioColorado);
-    fetchRioColorado();
+    if (!getTileUrl) return;
 
-    return () => { google.maps.event.removeListener(listener); };
+    const overlay = new google.maps.ImageMapType({
+      getTileUrl,
+      tileSize: new google.maps.Size(256, 256),
+      maxZoom: 19,
+      opacity: 0.85,
+    });
+    map.overlayMapTypes.push(overlay);
+    overlayRef.current = overlay;
+
+    return detach;
   }, [map, region]);
 
   return null;

@@ -3,7 +3,7 @@
 import { WMSTileLayer, useMapEvents } from "react-leaflet";
 import { useState } from "react";
 import { detectRegion, type Region } from "./utils";
-import { RioColoradoGeoJsonLayer } from "./RioColoradoGeoJsonLayer";
+import { RioNegroParcelsTileLayer } from "./RioNegroParcelsTileLayer";
 
 export function StaticParcelsLayer() {
   const [region, setRegion] = useState<Region>("buenos-aires");
@@ -15,8 +15,8 @@ export function StaticParcelsLayer() {
     },
   });
 
-  if (region === "rio-colorado") {
-    return <RioColoradoGeoJsonLayer key="rio-colorado-geojson" />;
+  if (region === "rio-negro") {
+    return <RioNegroParcelsTileLayer key="rio-negro-parcels" />;
   }
 
   return (
