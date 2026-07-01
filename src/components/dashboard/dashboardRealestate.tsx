@@ -881,7 +881,9 @@ const [clients, setClients] = useState<any[]>([]);
         const err = await res.json();
         throw new Error(err.error || "Error al guardar el cliente");
       }
+      const created = await res.json();
       fetchClients();
+      return created;
     } catch (error: any) {
       alert(error.message);
     }
@@ -895,7 +897,9 @@ const [clients, setClients] = useState<any[]>([]);
         body: JSON.stringify(clientData),
       });
       if (!res.ok) throw new Error("Error al actualizar");
+      const updated = await res.json();
       fetchClients();
+      return updated;
     } catch (error: any) {
       alert(error.message);
     }

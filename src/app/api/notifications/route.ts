@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Notification, ReportTargetType } from "@/lib/types";
+import type {
+  Notification,
+  NotificationType,
+  NotificationRelatedType,
+} from "@/lib/types";
 
 interface NotificationRow {
   id: string;
-  type: "REPORT_ACTION";
+  type: NotificationType;
   title: string;
   body: string;
-  related_type: ReportTargetType | null;
+  related_type: NotificationRelatedType | null;
   related_id: string | null;
   status: "UNREAD" | "READ";
   created_at: string;
