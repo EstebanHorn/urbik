@@ -127,6 +127,14 @@ function DashboardPageInner() {
   const supabase = createClient();
   const searchParams = useSearchParams();
   const autoOpenCreate = searchParams.get("nueva") === "1";
+  const initialTab = searchParams.get("tab") as
+    | "properties"
+    | "statistics"
+    | "notifications"
+    | "chat"
+    | "saved"
+    | "clients"
+    | null;
 
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -198,11 +206,12 @@ function DashboardPageInner() {
     <div className="min-h-screen bg-white pt-0 sm:pt-15">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {profile?.role === "REALESTATE" ? (
-          <DashboardRealestate 
-            profile={profile} 
-            properties={properties} 
-            onRefresh={fetchProfile} 
-            autoOpenCreate={autoOpenCreate} 
+          <DashboardRealestate
+            profile={profile}
+            properties={properties}
+            onRefresh={fetchProfile}
+            autoOpenCreate={autoOpenCreate}
+            initialTab={initialTab || undefined}
           />
         ) : (
           <DashboardUser 

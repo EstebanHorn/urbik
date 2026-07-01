@@ -23,6 +23,8 @@ interface LocationSelectorsProps {
   localityLabel?: string;
   cityApiEndpoint?: "municipios" | "departamentos";
   showLocality?: boolean;
+  /** "grid3": Provincia/Departamento/Ciudad en una sola fila de 3 columnas (desktop). Default: apiladas. */
+  layout?: "stack" | "grid3";
 }
 
 // Definido a nivel de módulo (identidad estable entre renders) para que el
@@ -106,6 +108,7 @@ export default function LocationSelectors({
   localityLabel = "LOCALIDAD",
   cityApiEndpoint = "municipios",
   showLocality = false,
+  layout = "stack",
 }: LocationSelectorsProps) {
   const [localidades, setLocalidades] = useState<GeorefItem[]>([]);
   const [loadingLocalidades, setLoadingLocalidades] = useState(false);
@@ -195,7 +198,13 @@ export default function LocationSelectors({
   }, [openDropdown]);
 
   return (
-    <div className={`flex flex-col gap-2 w-full ${showLocality ? "flex-wrap" : ""}`}>
+    <div
+      className={
+        layout === "grid3"
+          ? "grid grid-cols-1 sm:grid-cols-3 gap-3 w-full"
+          : `flex flex-col gap-2 w-full ${showLocality ? "flex-wrap" : ""}`
+      }
+    >
       <div className="relative flex-1" ref={provRef}>
         <button
           type="button"

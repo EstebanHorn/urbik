@@ -78,7 +78,7 @@ export function CustomDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`${variantStyles[variant]} h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition flex items-center gap-2 ${
+        className={`${variantStyles[variant]} h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition flex items-center gap-2 overflow-visible ${
           isField
             ? "w-full justify-between min-w-0"
             : "justify-center md:justify-between min-w-10 md:min-w-[120px]"

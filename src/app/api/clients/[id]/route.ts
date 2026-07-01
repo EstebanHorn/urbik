@@ -2,6 +2,56 @@ import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+// GET — detalle de un contacto propio (perfil de contacto).
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+    const admin = createAdminClient();
+    const { data: c, error } = await admin
+      .from("clients")
+      .select(
+        `*, properties ( title, city ), property_searches ( id, status )`
+      )
+      .eq("id", id)
+      .eq("real_estate_id", user.id)
+      .single();
+
+    if (error || !c) {
+      return NextResponse.json({ error: "Contacto no encontrado." }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      id: c.id,
+      name: c.name,
+      phone: c.phone,
+      email: c.email,
+      notes: c.notes,
+      role: c.role,
+      georaStatus: c.geora_status,
+      linkedUserId: c.linked_user_id,
+      searchParams: c.search_params,
+      linkedPropertyId: c.linked_property_id,
+      linkedPropertyTitle: c.properties?.title || "",
+      linkedPropertyCity: c.properties?.city || "",
+      hasActiveSearch:
+        c.property_searches?.some((s: { status: string }) => s.status === "ACTIVE") || false,
+    });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
 // PUT — actualizar un contacto propio.
 export async function PUT(
   req: NextRequest,

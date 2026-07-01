@@ -391,6 +391,7 @@ function NotificationsPanel({
   onRead?: () => void;
   onChatStart?: (threadId: string) => void;
 }) {
+  const router = useRouter();
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -558,11 +559,19 @@ function NotificationsPanel({
             const isExpanded = expandedId === n.id;
             const isConnectionReq = n.type === "CONNECTION_REQUEST";
             const showActions = isConnectionReq && isUnread;
+            // Notificaciones de la Bolsa de Conexiones (nueva coincidencia o
+            // respuesta recibida): llevan directo a la búsqueda en cuestión.
+            const goesToSearch = n.relatedType === "SEARCH" && !!n.relatedId;
             return (
               <div
                 key={`notif-${n.id}`}
                 className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-geora-rose/40 border-2 bg-white" : "border-white bg-white"} shadow-sm hover:scale-[1.01]`}
                 onClick={() => {
+                  if (goesToSearch) {
+                    if (isUnread) markNotificationAsRead(n.id);
+                    router.push(`/connections/${n.relatedId}`);
+                    return;
+                  }
                   setExpandedId(isExpanded ? null : n.id);
                   if (!isExpanded && isUnread && !isConnectionReq) markNotificationAsRead(n.id);
                 }}
@@ -853,11 +862,13 @@ export default function DashboardRealestate({
   properties,
   onRefresh,
   autoOpenCreate = false,
+  initialTab,
 }: {
   profile: ProfileData | null;
   properties: PropertySummary[];
   onRefresh: () => void;
   autoOpenCreate?: boolean;
+  initialTab?: ActiveTab;
 }) {
   const router = useRouter();
   const [isCreateOpen, setCreateOpen] = useState(false);
@@ -865,7 +876,7 @@ export default function DashboardRealestate({
   const [unreadCount, setUnreadCount] = useState(0);
   const [editingProperty, setEditingProperty] =
     useState<PropertySummary | null>(null);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("properties");
+  const [activeTab, setActiveTab] = useState<ActiveTab>(initialTab || "properties");
   const [targetThreadId, setTargetThreadId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -1316,7 +1327,7 @@ const [clients, setClients] = useState<any[]>([]);
               }
             }}
             onPublishSearch={(id) => {
-              router.push(`/connections?clientId=${id}`);
+              router.push(`/connections/new?clientId=${id}`);
             }}
           />
         </div>

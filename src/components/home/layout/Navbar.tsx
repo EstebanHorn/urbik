@@ -66,6 +66,18 @@ function getSuggestionLabel(s: SearchSuggestion): string {
   return parts.length > 3 ? parts.slice(0, 3).join(",").trim() : display.trim();
 }
 
+// Punto de notificación pulsante (verde Urbik). z-20 + overflow-visible en
+// los contenedores que lo usan para que no quede recortado por el botón
+// redondeado del dropdown de perfil.
+function NotificationDot({ className = "" }: { className?: string }) {
+  return (
+    <span className={`absolute z-20 flex h-2.5 w-2.5 ${className}`}>
+      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-geora-emerald opacity-75" />
+      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-geora-emerald ring-2 ring-geora-black" />
+    </span>
+  );
+}
+
 function formatPriceShort(val: string) {
   if (!val) return "";
   const n = Number(val);
@@ -341,14 +353,12 @@ function NavbarInner() {
   };
 
   const dropdownLabel = (
-    <span className="relative flex items-center gap-2">
+    <span className="relative flex items-center gap-2 overflow-visible">
       <span className="hidden md:block">
         {session ? "Mi Perfil" : "Ingresar"}
       </span>
       <Menu className="block md:hidden w-6 h-6" />
-      {session && hasUnread && (
-        <span className="absolute -top-1 -right-2 w-2 h-2 rounded-full bg-geora-rose ring-2 ring-geora-black" />
-      )}
+      {session && hasUnread && <NotificationDot className="-top-1.5 -right-2" />}
     </span>
   );
 
@@ -513,11 +523,9 @@ function NavbarInner() {
     return getNavItems().map((item) => {
       const showDot = hasUnread && item.href === "/dashboard";
       return (
-        <Link key={item.label} href={item.href} className={`relative ${linkClass}`}>
+        <Link key={item.label} href={item.href} className={`relative overflow-visible ${linkClass}`}>
           {item.label}
-          {showDot && (
-            <span className="absolute -top-1 -right-2.5 w-2 h-2 rounded-full bg-geora-rose" />
-          )}
+          {showDot && <NotificationDot className="-top-1.5 -right-2.5" />}
         </Link>
       );
     });
@@ -536,11 +544,9 @@ function NavbarInner() {
             active ? "text-geora-white" : "text-white/55 hover:text-white/80"
           }`}
         >
-          <span className="relative">
+          <span className="relative overflow-visible">
             <Icon className="w-[22px] h-[22px] shrink-0" />
-            {showDot && (
-              <span className="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-geora-rose ring-2 ring-geora-black" />
-            )}
+            {showDot && <NotificationDot className="-top-1 -right-1.5" />}
           </span>
           <span className="text-[10px] font-medium leading-none truncate max-w-full">
             {item.short ?? item.label}

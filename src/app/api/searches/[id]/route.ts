@@ -46,13 +46,26 @@ export async function GET(
       return NextResponse.json({ error: "Búsqueda no disponible." }, { status: 404 });
     }
 
-    let result: Record<string, unknown> = { ...search, isOwner };
+    const { data: publisherAgency } = await admin
+      .from("real_estates")
+      .select("agency_name, logo_url")
+      .eq("profile_id", search.real_estate_id)
+      .maybeSingle();
+
+    let result: Record<string, unknown> = {
+      ...search,
+      isOwner,
+      publisher: {
+        name: publisherAgency?.agency_name ?? null,
+        logo: publisherAgency?.logo_url ?? null,
+      },
+    };
 
     if (isOwner) {
       // adjuntar contacto + respuestas recibidas con datos de la propiedad y la inmobiliaria
       const { data: client } = await admin
         .from("clients")
-        .select("id, name, phone, email")
+        .select("id, name, phone, email, geora_status, linked_user_id")
         .eq("id", search.client_id)
         .maybeSingle();
 
@@ -78,7 +91,8 @@ export async function GET(
   }
 }
 
-// PATCH — actualizar estado (PAUSED / ACTIVE / CLOSED). Sólo el dueño.
+// PATCH — actualizar una búsqueda propia: estado (PAUSED / ACTIVE / CLOSED)
+// y/o los criterios de búsqueda (edición). Sólo el dueño.
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -93,15 +107,45 @@ export async function PATCH(
     if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
     const body = await req.json();
-    const status = body.status as string | undefined;
-    if (!status || !["ACTIVE", "PAUSED", "CLOSED"].includes(status)) {
-      return NextResponse.json({ error: "Estado inválido." }, { status: 400 });
+    const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
+
+    if (body.status !== undefined) {
+      if (!["ACTIVE", "PAUSED", "CLOSED"].includes(body.status)) {
+        return NextResponse.json({ error: "Estado inválido." }, { status: 400 });
+      }
+      update.status = body.status;
+    }
+    if (body.clientId !== undefined) update.client_id = body.clientId;
+    if (body.operationType !== undefined) update.operation_type = body.operationType;
+    if (body.propertyType !== undefined) update.property_type = body.propertyType;
+    if (body.province !== undefined) update.province = body.province || "";
+    if (body.city !== undefined) update.city = body.city || null;
+    if (body.neighborhoods !== undefined) update.neighborhoods = body.neighborhoods || null;
+    if (body.radiusKm !== undefined)
+      update.radius_km = body.radiusKm ? Number(body.radiusKm) : null;
+    if (body.minArea !== undefined)
+      update.min_area = body.minArea ? Number(body.minArea) : null;
+    if (body.maxArea !== undefined)
+      update.max_area = body.maxArea ? Number(body.maxArea) : null;
+    if (body.areaUnit !== undefined) update.area_unit = body.areaUnit || "M2";
+    if (body.minPrice !== undefined)
+      update.min_price = body.minPrice ? Number(body.minPrice) : null;
+    if (body.maxPrice !== undefined)
+      update.max_price = body.maxPrice ? Number(body.maxPrice) : null;
+    if (body.currency !== undefined) update.currency = body.currency || "USD";
+    if (body.conditions !== undefined)
+      update.additional_conditions = body.conditions || null;
+    if (body.mandatoryFields !== undefined)
+      update.mandatory_fields = body.mandatoryFields || [];
+
+    if (Object.keys(update).length === 1) {
+      return NextResponse.json({ error: "Nada para actualizar." }, { status: 400 });
     }
 
     const admin = createAdminClient();
     const { data, error } = await admin
       .from("property_searches")
-      .update({ status, updated_at: new Date().toISOString() })
+      .update(update)
       .eq("id", id)
       .eq("real_estate_id", user.id)
       .select()

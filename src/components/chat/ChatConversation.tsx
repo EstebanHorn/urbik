@@ -1,7 +1,9 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Send, Check, CheckCheck, Clock } from "lucide-react";
+import Link from "next/link";
+import { Send, Check, CheckCheck, Clock, Home } from "lucide-react";
 import { useChatMessages, type ChatMessage } from "@/hooks/useChatMessages";
+import { parsePropertyShareMessage } from "@/lib/chat/propertyShare";
 
 interface Props {
   threadId: string;
@@ -22,10 +24,54 @@ function formatDateLabel(iso: string) {
   return date.toLocaleDateString("es-AR", { day: "numeric", month: "long" });
 }
 
-function MessageStatus({ msg }: { msg: ChatMessage }) {
-  if (msg.id.startsWith("temp-")) return <Clock size={10} className="text-white/40 shrink-0" />;
+function MessageStatus({ msg, onDark = true }: { msg: ChatMessage; onDark?: boolean }) {
+  if (msg.id.startsWith("temp-"))
+    return <Clock size={10} className={`${onDark ? "text-white/40" : "text-gray-400"} shrink-0`} />;
   if (msg.read_at) return <CheckCheck size={11} className="text-geora-cyan shrink-0" />;
-  return <Check size={11} className="text-white/50 shrink-0" />;
+  return <Check size={11} className={`${onDark ? "text-white/50" : "text-gray-400"} shrink-0`} />;
+}
+
+function PropertyShareCardBubble({
+  card,
+  isOwn,
+}: {
+  card: ReturnType<typeof parsePropertyShareMessage>;
+  isOwn: boolean;
+}) {
+  if (!card) return null;
+  return (
+    <Link
+      href={`/property/${card.id}`}
+      target="_blank"
+      rel="noreferrer"
+      className={`flex items-center gap-3 p-2 pr-4 rounded-2xl transition-opacity hover:opacity-90 ${
+        isOwn
+          ? "bg-geora-black text-white"
+          : "bg-white border border-gray-100 text-geora-black shadow-sm"
+      }`}
+    >
+      <div className="w-14 h-14 rounded-xl bg-gray-200/30 overflow-hidden shrink-0 flex items-center justify-center">
+        {card.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={card.image} alt={card.title} className="w-full h-full object-cover" />
+        ) : (
+          <Home size={20} className="opacity-40" />
+        )}
+      </div>
+      <div className="min-w-0">
+        <p className={`text-[10px] font-bold uppercase tracking-wide ${isOwn ? "text-white/50" : "text-geora-black/40"}`}>
+          {card.typeLabel || "Propiedad"}
+        </p>
+        <p className="text-sm font-bold truncate max-w-[170px]">{card.title}</p>
+        {card.city && (
+          <p className={`text-xs truncate max-w-[170px] ${isOwn ? "text-white/60" : "text-geora-black/50"}`}>
+            {card.city}
+          </p>
+        )}
+        <p className="text-sm font-black mt-0.5">{card.price}</p>
+      </div>
+    </Link>
+  );
 }
 
 export default function ChatConversation({ threadId, currentUserId }: Props) {
@@ -142,6 +188,7 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
           const nextMsg = messages[i + 1];
           const sameSenderAsPrev = !showDate && prevMsg?.sender_id === msg.sender_id;
           const sameSenderAsNext = nextMsg?.sender_id === msg.sender_id;
+          const propertyCard = parsePropertyShareMessage(msg.body);
 
           return (
             <React.Fragment key={msg.id}>
@@ -160,24 +207,36 @@ export default function ChatConversation({ threadId, currentUserId }: Props) {
                   sameSenderAsPrev ? "mt-0.5" : "mt-2.5"
                 }`}
               >
-                <div
-                  className={`
-                    max-w-[70%] px-3.5 py-2 text-sm font-medium leading-relaxed
-                    ${isOwn
-                      ? `bg-geora-black text-white rounded-2xl ${sameSenderAsNext ? "rounded-br-md" : "rounded-br-sm"}`
-                      : `bg-white border border-gray-100 text-geora-black shadow-sm rounded-2xl ${sameSenderAsNext ? "rounded-bl-md" : "rounded-bl-sm"}`
-                    }
-                    ${msg.id.startsWith("temp-") ? "opacity-50" : ""}
-                  `}
-                >
-                  <p className="whitespace-pre-wrap wrap-break-word">{msg.body}</p>
-                  <div className={`flex items-center gap-1 mt-1 ${isOwn ? "justify-end" : "justify-start"}`}>
-                    <span className={`text-[10px] leading-none tabular-nums ${isOwn ? "text-white/35" : "text-gray-400"}`}>
-                      {formatTime(msg.created_at)}
-                    </span>
-                    {isOwn && <MessageStatus msg={msg} />}
+                {propertyCard ? (
+                  <div className={`max-w-[70%] ${msg.id.startsWith("temp-") ? "opacity-50" : ""}`}>
+                    <PropertyShareCardBubble card={propertyCard} isOwn={isOwn} />
+                    <div className={`flex items-center gap-1 mt-1 px-1 ${isOwn ? "justify-end" : "justify-start"}`}>
+                      <span className="text-[10px] leading-none tabular-nums text-gray-400">
+                        {formatTime(msg.created_at)}
+                      </span>
+                      {isOwn && <MessageStatus msg={msg} onDark={false} />}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div
+                    className={`
+                      max-w-[70%] px-3.5 py-2 text-sm font-medium leading-relaxed
+                      ${isOwn
+                        ? `bg-geora-black text-white rounded-2xl ${sameSenderAsNext ? "rounded-br-md" : "rounded-br-sm"}`
+                        : `bg-white border border-gray-100 text-geora-black shadow-sm rounded-2xl ${sameSenderAsNext ? "rounded-bl-md" : "rounded-bl-sm"}`
+                      }
+                      ${msg.id.startsWith("temp-") ? "opacity-50" : ""}
+                    `}
+                  >
+                    <p className="whitespace-pre-wrap wrap-break-word">{msg.body}</p>
+                    <div className={`flex items-center gap-1 mt-1 ${isOwn ? "justify-end" : "justify-start"}`}>
+                      <span className={`text-[10px] leading-none tabular-nums ${isOwn ? "text-white/35" : "text-gray-400"}`}>
+                        {formatTime(msg.created_at)}
+                      </span>
+                      {isOwn && <MessageStatus msg={msg} />}
+                    </div>
+                  </div>
+                )}
               </div>
             </React.Fragment>
           );

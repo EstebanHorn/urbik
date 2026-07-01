@@ -15,7 +15,7 @@ export async function GET() {
       .from("clients")
       .select(`
     *,
-    properties ( title ),
+    properties ( title, city ),
     property_searches (
         id,
         status
@@ -34,9 +34,11 @@ export async function GET() {
   notes: c.notes,
   role: c.role,
   georaStatus: c.geora_status,
+  linkedUserId: c.linked_user_id,
   searchParams: c.search_params,
   linkedPropertyId: c.linked_property_id,
   linkedPropertyTitle: c.properties?.title || "",
+  linkedPropertyCity: c.properties?.city || "",
   hasActiveSearch:
     c.property_searches?.some((s: any) => s.status === "ACTIVE") || false,
 }));

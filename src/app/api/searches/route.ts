@@ -78,11 +78,34 @@ export async function GET() {
     return NextResponse.json({ error: networkError.message }, { status: 500 });
   }
 
+  // Datos de la inmobiliaria publicante (credibilidad en la tarjeta de red).
+  const agencyIds = Array.from(
+    new Set((networkRaw ?? []).map((row) => row.real_estate_id).filter(Boolean))
+  );
+  let agencyById: Record<string, { agencyName: string | null; agencyLogo: string | null }> = {};
+  if (agencyIds.length > 0) {
+    const { data: agencies } = await admin
+      .from("real_estates")
+      .select("profile_id, agency_name, logo_url")
+      .in("profile_id", agencyIds);
+    agencyById = (agencies ?? []).reduce(
+      (acc: typeof agencyById, a) => {
+        acc[a.profile_id] = { agencyName: a.agency_name, agencyLogo: a.logo_url };
+        return acc;
+      },
+      {}
+    );
+  }
+
   // Ocultar el contacto interno (client_id) en las búsquedas de la red.
   const networkSearches = (networkRaw ?? []).map((row) => {
     const rest = { ...row };
     delete rest.client_id;
-    return rest;
+    return {
+      ...rest,
+      agencyName: agencyById[row.real_estate_id]?.agencyName ?? null,
+      agencyLogo: agencyById[row.real_estate_id]?.agencyLogo ?? null,
+    };
   });
 
   return NextResponse.json({
