@@ -2,8 +2,8 @@
 
 import React, { useCallback, useEffect, useRef } from "react";
 import { Map, AdvancedMarker, useMap, useMapsLibrary, type MapMouseEvent } from "@vis.gl/react-google-maps";
-import type { FeatureCollection, Geometry } from "geojson";
-import { snapBBoxToGrid } from "@/components/map/utils";
+import type { Geometry } from "geojson";
+import { parcelTileUrl, PARCEL_MIN_ZOOM } from "@/lib/rioNegroParcels";
 
 const PROVINCE_CENTERS: Record<string, { lat: number; lng: number }> = {
   // ... (Tus PROVINCE_CENTERS iguales)
@@ -155,130 +155,36 @@ function ARBAWMSLayer() {
   return null;
 }
 
-// ── Rio Negro GeoJSON layer (via Data layer) ─────────────────────────────────
+// ── Río Negro: teselas del catastro provincial (ArcGIS) ──────────────────────
+// Reemplaza la capa vectorial de Río Colorado (lenta): el server dibuja las
+// parcelas como PNG. El click se maneja con el onClick nativo del <Map> (igual
+// que ARBA), que dispara /api/parcels/point → identify.
 
-function RioColoradoLayer({
-  onMapClick,
-}: {
-  onMapClick: (lat: number, lng: number) => void;
-}) {
+function RioNegroArcGISLayer() {
   const map = useMap();
-  const abortRef = useRef<AbortController | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cacheRef = useRef<globalThis.Map<string, FeatureCollection>>(new globalThis.Map());
-  const lastKeyRef = useRef("");
-
-  const fetchParcels = useCallback(() => {
-    if (!map) return;
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      const zoom = map.getZoom() ?? 0;
-      if (zoom < 13) {
-        map.data.forEach((f) => {
-          if (f.getProperty("rioColorado")) map.data.remove(f);
-        });
-        return;
-      }
-
-      const bounds = map.getBounds();
-      if (!bounds) return;
-      const sw = bounds.getSouthWest();
-      const ne = bounds.getNorthEast();
-      const { minLat, maxLat, minLon, maxLon } = snapBBoxToGrid({
-        minLat: sw.lat(),
-        maxLat: ne.lat(),
-        minLon: sw.lng(),
-        maxLon: ne.lng(),
-      });
-      const key = `${minLat},${maxLat},${minLon},${maxLon}`;
-      if (key === lastKeyRef.current) return;
-      lastKeyRef.current = key;
-
-      const cached = cacheRef.current.get(key);
-      if (cached) {
-        map.data.forEach((f) => {
-          if (f.getProperty("rioColorado")) map.data.remove(f);
-        });
-        cached.features.forEach((f) => {
-          map.data.addGeoJson({
-            type: "Feature",
-            geometry: f.geometry,
-            properties: { ...f.properties, rioColorado: true },
-          });
-        });
-        applyDataStyle(map);
-        return;
-      }
-
-      abortRef.current?.abort();
-      const ctrl = new AbortController();
-      abortRef.current = ctrl;
-
-      try {
-        const url =
-          `/api/parcels/rio-colorado?minLat=${minLat}&maxLat=${maxLat}` +
-          `&minLon=${minLon}&maxLon=${maxLon}&limit=3000`;
-        const res = await fetch(url, { signal: ctrl.signal });
-        if (!res.ok) return;
-        const json = (await res.json()) as FeatureCollection;
-
-        if (cacheRef.current.size > 20) {
-          const firstKey = cacheRef.current.keys().next().value;
-          if (firstKey) cacheRef.current.delete(firstKey);
-        }
-        cacheRef.current.set(key, json);
-
-        map.data.forEach((f) => {
-          if (f.getProperty("rioColorado")) map.data.remove(f);
-        });
-        json.features.forEach((f) => {
-          map.data.addGeoJson({
-            type: "Feature",
-            geometry: f.geometry,
-            properties: { ...f.properties, rioColorado: true },
-          });
-        });
-        applyDataStyle(map);
-      } catch {
-        // aborted or network error — ignore
-      }
-    }, 250);
-  }, [map]);
 
   useEffect(() => {
     if (!map) return;
 
-    applyDataStyle(map);
+    const overlay = new google.maps.ImageMapType({
+      name: "Parcelas RN",
+      tileSize: new google.maps.Size(256, 256),
+      minZoom: PARCEL_MIN_ZOOM,
+      maxZoom: 19,
+      opacity: 0.9,
+      getTileUrl(coord, zoom) {
+        if (zoom < PARCEL_MIN_ZOOM) return null;
+        return parcelTileUrl(coord.x, coord.y, zoom);
+      },
+    });
 
-    const dataClick = map.data.addListener(
-      "click",
-      (e: google.maps.Data.MouseEvent) => {
-        e.stop(); // evita doble trigger en map click
-        if (e.latLng) onMapClick(e.latLng.lat(), e.latLng.lng());
-      }
-    );
-
-    const mapClick = map.addListener(
-      "click",
-      (e: google.maps.MapMouseEvent) => {
-        if (e.latLng) onMapClick(e.latLng.lat(), e.latLng.lng());
-      }
-    );
-
-    fetchParcels();
-    const idleListener = map.addListener("idle", fetchParcels);
-
+    map.overlayMapTypes.push(overlay);
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      abortRef.current?.abort();
-      google.maps.event.removeListener(dataClick);
-      google.maps.event.removeListener(mapClick);
-      google.maps.event.removeListener(idleListener);
-      map.data.forEach((f) => {
-        if (f.getProperty("rioColorado")) map.data.remove(f);
-      });
+      const arr = map.overlayMapTypes.getArray();
+      const idx = arr.indexOf(overlay);
+      if (idx !== -1) map.overlayMapTypes.removeAt(idx);
     };
-  }, [map, fetchParcels, onMapClick]);
+  }, [map]);
 
   return null;
 }
@@ -375,9 +281,9 @@ export default function ParcelPickerMap({
   drawnPath,
   initialCenter,
 }: ParcelPickerMapProps) {
-  const rioColorado = usesLocalParcels(province);
+  const rioNegro = usesLocalParcels(province);
   const center = initialCenter ?? getProvinceCenter(province);
-  const initialZoom = initialCenter ? 17 : rioColorado ? 13 : 15;
+  const initialZoom = initialCenter ? 17 : 15;
 
   const handleMapClick = useCallback(
     (e: MapMouseEvent) => {
@@ -394,18 +300,14 @@ export default function ParcelPickerMap({
       mapTypeId="hybrid"
       disableDefaultUI
       gestureHandling="greedy"
-      onClick={rioColorado ? undefined : handleMapClick}
+      onClick={handleMapClick}
       draggableCursor="pointer"
       draggingCursor="move"
       style={{ width: "100%", height: "100%" }}
     >
       {!initialCenter && <MapAutoCenter city={city} province={province} />}
 
-      {rioColorado ? (
-        <RioColoradoLayer onMapClick={onMapClick} />
-      ) : (
-        <ARBAWMSLayer />
-      )}
+      {rioNegro ? <RioNegroArcGISLayer /> : <ARBAWMSLayer />}
 
       <SelectedParcelLayer geometry={selectedGeometry} />
 

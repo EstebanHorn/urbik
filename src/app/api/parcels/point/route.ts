@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { loadIndex, type LonLatGeometry } from "@/lib/rioColoradoIndex";
+import { identifyParcel } from "@/lib/rioNegroParcels";
 
 function pointInRing(px: number, py: number, ring: number[][]): boolean {
   let inside = false;
@@ -38,6 +39,16 @@ export async function GET(request: Request) {
   const usesLocalParcels = /r[íi]o\s*negro/i.test(province);
 
   if (usesLocalParcels) {
+    // Primario: catastro provincial (ArcGIS SIREC), que cubre toda Río Negro.
+    try {
+      const parcel = await identifyParcel(lat, lng);
+      if (parcel) return NextResponse.json(parcel);
+    } catch (err) {
+      console.error("ArcGIS identify falló, se intenta fallback Flatbush:", err);
+    }
+
+    // Fallback: índice Flatbush self-hosted (solo Río Colorado). Cubre el caso
+    // de que el ArcGIS provincial esté caído o no tenga la parcela del punto.
     const DELTA = 0.002;
     try {
       const { features, spatial } = await loadIndex();
@@ -51,7 +62,7 @@ export async function GET(request: Request) {
       }
       return NextResponse.json({ error: "No se encontró parcela en ese punto" }, { status: 404 });
     } catch (err) {
-      console.error("Error querying Rio Colorado parcels:", err);
+      console.error("Error querying Rio Negro parcels:", err);
       return NextResponse.json({ error: "Error interno" }, { status: 500 });
     }
   }
