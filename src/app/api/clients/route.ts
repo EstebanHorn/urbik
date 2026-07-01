@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET() {
   try {
@@ -55,6 +56,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
+    const admin = createAdminClient();
     const body = await req.json();
     const { name, phone, email, notes, role, searchParams, linkedPropertyId } = body;
 
@@ -62,13 +64,14 @@ export async function POST(req: Request) {
     let linkedUserId = null;
 
     if (email && email.trim() !== "") {
-      const { data: existingProfile } = await supabase
+      // Lectura con admin: RLS de profiles impide ver perfiles ajenos por email.
+      const { data: existingProfile } = await admin
         .from("profiles")
         .select("id")
         .eq("email", email.trim().toLowerCase())
         .maybeSingle();
 
-      if (existingProfile) {
+      if (existingProfile && existingProfile.id !== session.user.id) {
         georaStatus = "PENDING";
         linkedUserId = existingProfile.id;
       }
@@ -94,15 +97,27 @@ export async function POST(req: Request) {
     if (insertError) throw insertError;
 
     if (georaStatus === "PENDING" && linkedUserId) {
-      await supabase.from("notifications").insert({
+      // Nombre de la inmobiliaria para personalizar el aviso.
+      const { data: agency } = await admin
+        .from("real_estates")
+        .select("agency_name")
+        .eq("profile_id", session.user.id)
+        .maybeSingle();
+      const agencyName = agency?.agency_name || "Una inmobiliaria";
+
+      // Insert con admin: notifications tiene RLS sin policy de INSERT.
+      const { error: notifError } = await admin.from("notifications").insert({
         recipient_id: linkedUserId,
         type: "CONNECTION_REQUEST",
         title: "Nueva solicitud de conexión",
-        body: `Una inmobiliaria quiere vincularte como su cliente.`,
+        body: `${agencyName} quiere vincularte como su cliente en Geora.`,
         related_type: "AGENCY",
         related_id: session.user.id,
         status: "UNREAD",
       });
+      if (notifError) {
+        console.error("Error al crear notificación de conexión:", notifError);
+      }
     }
 
     return NextResponse.json(newClient);

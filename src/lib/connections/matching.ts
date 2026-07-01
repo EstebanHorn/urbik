@@ -19,6 +19,10 @@ export interface SearchCriteria {
   minArea?: number | string | null;
   max_area?: number | string | null;
   maxArea?: number | string | null;
+  min_bedrooms?: number | string | null;
+  minBedrooms?: number | string | null;
+  min_bathrooms?: number | string | null;
+  minBathrooms?: number | string | null;
   mandatory_fields?: string[] | null;
   mandatoryFields?: string[] | null;
 }
@@ -39,6 +43,8 @@ function normalizeCriteria(c: SearchCriteria) {
     currency: c.currency ?? null,
     minArea: num(c.min_area ?? c.minArea),
     maxArea: num(c.max_area ?? c.maxArea),
+    minBedrooms: num(c.min_bedrooms ?? c.minBedrooms),
+    minBathrooms: num(c.min_bathrooms ?? c.minBathrooms),
     mandatory: c.mandatory_fields ?? c.mandatoryFields ?? [],
   };
 }
@@ -58,6 +64,7 @@ export interface MatchedProperty {
   rent_currency: string | null;
   area: number | null;
   rooms: number | null;
+  bedrooms: number | null;
   bathrooms: number | null;
   images: string[] | null;
   status: string;
@@ -93,7 +100,7 @@ export async function findMatchingProperties(
     .from("properties")
     .select(
       "id, title, type, operation_type, city, province, address, display_address, " +
-        "sale_price, rent_price, sale_currency, rent_currency, area, rooms, bathrooms, " +
+        "sale_price, rent_price, sale_currency, rent_currency, area, rooms, bedrooms, bathrooms, " +
         "images, status, real_estate_id"
     )
     .eq("status", "AVAILABLE");
@@ -114,6 +121,9 @@ export async function findMatchingProperties(
 
   if (c.minArea !== null) query = query.gte("area", c.minArea);
   if (c.maxArea !== null) query = query.lte("area", c.maxArea);
+
+  if (c.minBedrooms !== null) query = query.gte("bedrooms", c.minBedrooms);
+  if (c.minBathrooms !== null) query = query.gte("bathrooms", c.minBathrooms);
 
   query = query.limit(opts.limit ?? 100);
 

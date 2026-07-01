@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Users, Plus, Mail, Phone, MessageSquare, Edit2, X, CheckCircle2, Clock, Network, Home, Loader2, Building2, MapPin, Sparkles } from "lucide-react";
+import LocationSelectors from "@/components/ui/LocationSelectors";
 
 const glassCard = "md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
 
@@ -12,13 +13,18 @@ export interface SearchParams {
   operationType?: string;
   propertyType?: string;
   province?: string;
+  department?: string;
+  locality?: string;
   city?: string;
+  radius?: string;
   minPrice?: string;
   maxPrice?: string;
   currency?: string;
   minArea?: string;
   maxArea?: string;
   areaUnit?: string;
+  minBedrooms?: string;
+  minBathrooms?: string;
 }
 
 export interface ClientData {
@@ -265,17 +271,30 @@ export default function ClientsPanel({ clients, properties, onAddClient, onEditC
   );
 }
 
+const RADIUS_OPTIONS = [
+  { value: "", label: "Indistinto" },
+  { value: "10", label: "Hasta 10 km" },
+  { value: "25", label: "Hasta 25 km" },
+  { value: "50", label: "Hasta 50 km" },
+  { value: "100", label: "Más de 50 km" },
+];
+
 const EMPTY_SEARCH: SearchParams = {
   operationType: "SALE",
   propertyType: "HOUSE",
   province: "",
+  department: "",
+  locality: "",
   city: "",
+  radius: "",
   minPrice: "",
   maxPrice: "",
   currency: "USD",
   minArea: "",
   maxArea: "",
   areaUnit: "M2",
+  minBedrooms: "",
+  minBathrooms: "",
 };
 
 function ClientModal({ isOpen, onClose, client, properties, onSave }: any) {
@@ -297,6 +316,30 @@ function ClientModal({ isOpen, onClose, client, properties, onSave }: any) {
   const setSp = (patch: Partial<SearchParams>) =>
     setFormData((prev) => ({ ...prev, searchParams: { ...(prev.searchParams || EMPTY_SEARCH), ...patch } }));
   const isRural = sp.propertyType === "FIELD" || sp.propertyType === "LAND";
+
+  // Cambiar el tipo ajusta la unidad de superficie y limpia campos según sea rural/urbano.
+  const setPropertyType = (value: string) => {
+    const rural = value === "FIELD" || value === "LAND";
+    setSp({
+      propertyType: value,
+      areaUnit: rural ? "HA" : "M2",
+      ...(rural ? { minBedrooms: "", minBathrooms: "" } : { radius: "" }),
+    });
+  };
+
+  // LocationSelectors emite province / city (=departamento) / locality.
+  // Mantenemos city = localidad || departamento para el matching.
+  const handleLocation = (name: string, value: string) => {
+    setFormData((prev) => {
+      const cur = prev.searchParams || EMPTY_SEARCH;
+      if (name === "province")
+        return { ...prev, searchParams: { ...cur, province: value, department: "", locality: "", city: "" } };
+      if (name === "city")
+        return { ...prev, searchParams: { ...cur, department: value, locality: "", city: value } };
+      // locality
+      return { ...prev, searchParams: { ...cur, locality: value, city: value || cur.department || "" } };
+    });
+  };
 
   if (!isOpen) return null;
 
@@ -385,22 +428,66 @@ function ClientModal({ isOpen, onClose, client, properties, onSave }: any) {
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-1.5 ml-1">Tipo</label>
-                      <select value={sp.propertyType} onChange={(e) => setSp({ propertyType: e.target.value })} className="w-full border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm">
+                      <select value={sp.propertyType} onChange={(e) => setPropertyType(e.target.value)} className="w-full border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm">
                         {PROPERTY_TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                       </select>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-1.5 ml-1">Provincia</label>
-                      <input type="text" value={sp.province} onChange={(e) => setSp({ province: e.target.value })} placeholder="Ej. Buenos Aires" className="w-full border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-1.5 ml-1">Ciudad / Localidad</label>
-                      <input type="text" value={sp.city} onChange={(e) => setSp({ city: e.target.value })} placeholder="Ej. Pergamino" className="w-full border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
-                    </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-1.5 ml-1">Zona de búsqueda</label>
+                    <LocationSelectors
+                      provinceValue={sp.province || ""}
+                      cityValue={sp.department || ""}
+                      localityValue={sp.locality || ""}
+                      onChange={handleLocation}
+                      showLocality
+                      provinceLabel="Provincia"
+                      cityLabel="Departamento"
+                      localityLabel="Ciudad / Localidad"
+                    />
                   </div>
+
+                  {isRural && (
+                    <div>
+                      <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-2 ml-1">Radio de búsqueda (rural)</label>
+                      <div className="flex flex-wrap gap-2">
+                        {RADIUS_OPTIONS.map((o) => (
+                          <button
+                            key={o.value}
+                            type="button"
+                            onClick={() => setSp({ radius: o.value })}
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                              (sp.radius || "") === o.value
+                                ? "bg-geora-black text-white border-geora-black"
+                                : "bg-white/60 text-geora-black/60 border-white hover:border-geora-black/30"
+                            }`}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {!isRural && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-1.5 ml-1">Dormitorios (mín.)</label>
+                        <select value={sp.minBedrooms || ""} onChange={(e) => setSp({ minBedrooms: e.target.value })} className="w-full border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm">
+                          <option value="">Indistinto</option>
+                          {["1", "2", "3", "4", "5"].map((n) => <option key={n} value={n}>{n}+</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-1.5 ml-1">Baños (mín.)</label>
+                        <select value={sp.minBathrooms || ""} onChange={(e) => setSp({ minBathrooms: e.target.value })} className="w-full border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm">
+                          <option value="">Indistinto</option>
+                          {["1", "2", "3", "4"].map((n) => <option key={n} value={n}>{n}+</option>)}
+                        </select>
+                      </div>
+                    </div>
+                  )}
 
                   <div>
                     <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-1.5 ml-1">Superficie ({isRural ? "ha" : "m²"})</label>

@@ -102,6 +102,36 @@ function NotificationsPanel({ onRead, onChatStart }: { onRead?: () => void; onCh
     }
   }
 
+  const [respondingId, setRespondingId] = useState<string | null>(null);
+  async function respondConnection(id: string, action: "ACCEPT" | "REJECT") {
+    setRespondingId(id);
+    try {
+      const res = await fetch(`/api/notifications/${id}/respond`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo procesar");
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === id
+            ? {
+                ...n,
+                status: "READ",
+                title: action === "ACCEPT" ? "Conexión aceptada" : "Solicitud rechazada",
+              }
+            : n
+        )
+      );
+      onRead?.();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setRespondingId(null);
+    }
+  }
+
   const handleSendReply = async (inq: any) => {
     if (!replyMsg.trim()) return;
     setIsSendingReply(true);
@@ -155,8 +185,10 @@ function NotificationsPanel({ onRead, onChatStart }: { onRead?: () => void; onCh
             const n = item.data;
             const isUnread = n.status === "UNREAD";
             const isExpanded = expandedId === n.id;
+            const isConnectionReq = n.type === "CONNECTION_REQUEST";
+            const showActions = isConnectionReq && isUnread;
             return (
-              <div key={`notif-${n.id}`} className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-geora-rose/40 border-2 bg-white" : "border-white bg-white"} shadow-sm hover:scale-[1.01]`} onClick={() => { setExpandedId(isExpanded ? null : n.id); if (!isExpanded && isUnread) markNotificationAsRead(n.id); }}>
+              <div key={`notif-${n.id}`} className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-geora-rose/40 border-2 bg-white" : "border-white bg-white"} shadow-sm hover:scale-[1.01]`} onClick={() => { setExpandedId(isExpanded ? null : n.id); if (!isExpanded && isUnread && !isConnectionReq) markNotificationAsRead(n.id); }}>
                 <div className="p-4 flex items-start gap-4">
                   <div className="bg-geora-rose/10 p-2 rounded-full shrink-0"><Bell size={16} className="text-geora-rose" /></div>
                   <div className="flex-1 min-w-0">
@@ -167,6 +199,25 @@ function NotificationsPanel({ onRead, onChatStart }: { onRead?: () => void; onCh
                       </div>
                     </div>
                     <p className={`text-xs text-gray-600 mt-1.5 font-medium ${isExpanded ? "whitespace-pre-wrap" : "line-clamp-2"}`}>{n.body}</p>
+
+                    {showActions && (
+                      <div className="flex items-center gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          disabled={respondingId === n.id}
+                          onClick={() => respondConnection(n.id, "ACCEPT")}
+                          className="px-4 py-1.5 rounded-full bg-geora-black text-white text-xs font-bold hover:bg-geora-black/80 transition-all disabled:opacity-50"
+                        >
+                          Aceptar
+                        </button>
+                        <button
+                          disabled={respondingId === n.id}
+                          onClick={() => respondConnection(n.id, "REJECT")}
+                          className="px-4 py-1.5 rounded-full bg-white border border-gray-200 text-geora-black/70 text-xs font-bold hover:bg-gray-50 transition-all disabled:opacity-50"
+                        >
+                          Rechazar
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
