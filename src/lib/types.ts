@@ -247,15 +247,24 @@ export interface Report {
   };
 }
 
-export type NotificationType = "REPORT_ACTION";
+export type NotificationType =
+  | "REPORT_ACTION"
+  | "CONNECTION_REQUEST"
+  | "SEARCH_MATCH"
+  | "SEARCH_RESPONSE";
 export type NotificationStatus = "UNREAD" | "READ";
+
+export type NotificationRelatedType =
+  | ReportTargetType
+  | "SEARCH"
+  | "RESPONSE";
 
 export interface Notification {
   id: string;
   type: NotificationType;
   title: string;
   body: string;
-  relatedType: ReportTargetType | null;
+  relatedType: NotificationRelatedType | null;
   relatedId: string | null;
   status: NotificationStatus;
   createdAt: string;

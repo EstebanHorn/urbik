@@ -28,6 +28,36 @@ interface PropertyRequestBody {
   featureGroups?: Record<string, Record<string, boolean>>;
 }
 
+// GET — propiedades del stock propio de la inmobiliaria autenticada.
+export async function GET() {
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  if (!authUser) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
+  try {
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("properties")
+      .select("*")
+      .eq("real_estate_id", authUser.id)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return NextResponse.json({ properties: data ?? [] });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json(
+      { error: "Error al obtener propiedades", detail: error.message },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
 

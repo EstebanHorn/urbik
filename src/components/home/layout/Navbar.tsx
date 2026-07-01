@@ -23,6 +23,7 @@ import {
   PlusCircle,
   User,
   Shield,
+  Network,
   type LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
@@ -90,9 +91,8 @@ function NavbarInner() {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<"price" | "rooms" | null>(
-    null,
-  );
+  const [hasUnread, setHasUnread] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<"price" | "rooms" | null>(null);
   const [localMinPrice, setLocalMinPrice] = useState("");
   const [localMaxPrice, setLocalMaxPrice] = useState("");
 
@@ -277,6 +277,39 @@ function NavbarInner() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Punto de notificación: hay notificaciones (o consultas) sin leer.
+  useEffect(() => {
+    if (!session) {
+      setHasUnread(false);
+      return;
+    }
+    let active = true;
+    const check = async () => {
+      try {
+        const [nRes, iRes] = await Promise.all([
+          fetch("/api/notifications"),
+          fetch("/api/inquiries"),
+        ]);
+        const notif = nRes.ok ? await nRes.json() : [];
+        const inq = iRes.ok ? await iRes.json() : [];
+        const count =
+          (Array.isArray(notif)
+            ? notif.filter((n: { status?: string }) => n.status === "UNREAD").length
+            : 0) +
+          (Array.isArray(inq)
+            ? inq.filter((i: { status?: string }) => i.status === "UNREAD").length
+            : 0);
+        if (active) setHasUnread(count > 0);
+      } catch {
+        if (active) setHasUnread(false);
+      }
+    };
+    check();
+    return () => {
+      active = false;
+    };
+  }, [session]);
+
   if (isExcluded) return null;
 
   if (loading) {
@@ -308,11 +341,14 @@ function NavbarInner() {
   };
 
   const dropdownLabel = (
-    <span className="flex items-center gap-2">
+    <span className="relative flex items-center gap-2">
       <span className="hidden md:block">
         {session ? "Mi Perfil" : "Ingresar"}
       </span>
       <Menu className="block md:hidden w-6 h-6" />
+      {session && hasUnread && (
+        <span className="absolute -top-1 -right-2 w-2 h-2 rounded-full bg-geora-rose ring-2 ring-geora-black" />
+      )}
     </span>
   );
 
@@ -446,8 +482,9 @@ function NavbarInner() {
 
     if (role === "REALESTATE") {
       return [
-        { href: `${pathname}?nueva=1`, label: "Publicar", Icon: PlusCircle },
+        { href: `/dashboard?nueva=1`, label: "Publicar", Icon: PlusCircle },
         { href: "/dashboard", label: "Mi Perfil", short: "Perfil", Icon: User },
+        { href: "/connections", label: "Bolsa", short: "Bolsa", Icon: Network },
         { href: "/", label: "Buscar", Icon: Search },
       ];
     }
@@ -473,17 +510,24 @@ function NavbarInner() {
   const renderNavLinks = () => {
     const linkClass =
       "text-sm md:text-base text-geora-white hover:text-white/70 font-semibold transition-colors";
-    return getNavItems().map((item) => (
-      <Link key={item.label} href={item.href} className={linkClass}>
-        {item.label}
-      </Link>
-    ));
+    return getNavItems().map((item) => {
+      const showDot = hasUnread && item.href === "/dashboard";
+      return (
+        <Link key={item.label} href={item.href} className={`relative ${linkClass}`}>
+          {item.label}
+          {showDot && (
+            <span className="absolute -top-1 -right-2.5 w-2 h-2 rounded-full bg-geora-rose" />
+          )}
+        </Link>
+      );
+    });
   };
 
   const renderMobileNavIcons = () => {
     return getNavItems().map((item) => {
       const active = isNavActive(item.href);
       const Icon = item.Icon;
+      const showDot = hasUnread && item.href === "/dashboard";
       return (
         <Link
           key={item.label}
@@ -492,7 +536,12 @@ function NavbarInner() {
             active ? "text-geora-white" : "text-white/55 hover:text-white/80"
           }`}
         >
-          <Icon className="w-[22px] h-[22px] shrink-0" />
+          <span className="relative">
+            <Icon className="w-[22px] h-[22px] shrink-0" />
+            {showDot && (
+              <span className="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-geora-rose ring-2 ring-geora-black" />
+            )}
+          </span>
           <span className="text-[10px] font-medium leading-none truncate max-w-full">
             {item.short ?? item.label}
           </span>

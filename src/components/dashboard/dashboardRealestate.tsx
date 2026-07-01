@@ -36,7 +36,8 @@ import FavoriteButton from "@/components/ui/FavoriteButton";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import PriceFilterCard from "@/components/search/PriceFilterCard";
 import RoomsFilterCard from "@/components/search/RoomsFilterCard";
-
+import ClientsPanel from "@/components/dashboard/ClientsPanel";
+import { Users } from "lucide-react"; 
 import {
   SecuritySection,
   DangerZone,
@@ -447,6 +448,36 @@ function NotificationsPanel({
     }
   }
 
+  const [respondingId, setRespondingId] = useState<string | null>(null);
+  async function respondConnection(id: string, action: "ACCEPT" | "REJECT") {
+    setRespondingId(id);
+    try {
+      const res = await fetch(`/api/notifications/${id}/respond`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo procesar");
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === id
+            ? {
+                ...n,
+                status: "READ",
+                title: action === "ACCEPT" ? "Conexión aceptada" : "Solicitud rechazada",
+              }
+            : n,
+        ),
+      );
+      onRead?.();
+    } catch (err) {
+      alert((err as Error).message);
+    } finally {
+      setRespondingId(null);
+    }
+  }
+
   const handleSendReply = async (inq: any) => {
     if (!replyMsg.trim()) return;
     setIsSendingReply(true);
@@ -525,13 +556,15 @@ function NotificationsPanel({
             const n = item.data;
             const isUnread = n.status === "UNREAD";
             const isExpanded = expandedId === n.id;
+            const isConnectionReq = n.type === "CONNECTION_REQUEST";
+            const showActions = isConnectionReq && isUnread;
             return (
               <div
                 key={`notif-${n.id}`}
                 className={`rounded-xl border transition-all cursor-pointer ${isUnread ? "border-geora-rose/40 border-2 bg-white" : "border-white bg-white"} shadow-sm hover:scale-[1.01]`}
                 onClick={() => {
                   setExpandedId(isExpanded ? null : n.id);
-                  if (!isExpanded && isUnread) markNotificationAsRead(n.id);
+                  if (!isExpanded && isUnread && !isConnectionReq) markNotificationAsRead(n.id);
                 }}
               >
                 <div className="p-4 flex items-start gap-4">
@@ -560,6 +593,25 @@ function NotificationsPanel({
                     >
                       {n.body}
                     </p>
+
+                    {showActions && (
+                      <div className="flex items-center gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          disabled={respondingId === n.id}
+                          onClick={() => respondConnection(n.id, "ACCEPT")}
+                          className="px-4 py-1.5 rounded-full bg-geora-black text-white text-xs font-bold hover:bg-geora-black/80 transition-all disabled:opacity-50"
+                        >
+                          Aceptar
+                        </button>
+                        <button
+                          disabled={respondingId === n.id}
+                          onClick={() => respondConnection(n.id, "REJECT")}
+                          className="px-4 py-1.5 rounded-full bg-white border border-gray-200 text-geora-black/70 text-xs font-bold hover:bg-gray-50 transition-all disabled:opacity-50"
+                        >
+                          Rechazar
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -774,7 +826,8 @@ type ActiveTab =
   | "statistics"
   | "notifications"
   | "chat"
-  | "saved";
+  | "saved"
+  | "clients";
 
 interface FavoriteProperty {
   id: string;
@@ -818,7 +871,7 @@ export default function DashboardRealestate({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-
+const [clients, setClients] = useState<any[]>([]);
   const [showSettings, setShowSettings] = useState(false);
 
   const [favorites, setFavorites] = useState<FavoriteProperty[]>([]);
@@ -848,6 +901,70 @@ export default function DashboardRealestate({
     createdAt: "Fecha de publicación",
     price: "Precio",
     area: "Superficie",
+  };
+
+  const fetchClients = useCallback(async () => {
+    try {
+      const res = await fetch("/api/clients");
+      if (res.ok) {
+        const data = await res.json();
+        setClients(data);
+      }
+    } catch (err) {
+      console.error("Error al traer los clientes:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "clients") {
+      fetchClients();
+    }
+  }, [activeTab, fetchClients]);
+
+  const handleAddClient = async (clientData: any) => {
+    try {
+      const res = await fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(clientData),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Error al guardar el cliente");
+      }
+      const created = await res.json();
+      fetchClients();
+      return created;
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  const handleEditClient = async (id: string, clientData: any) => {
+    try {
+      const res = await fetch(`/api/clients/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(clientData),
+      });
+      if (!res.ok) throw new Error("Error al actualizar");
+      const updated = await res.json();
+      fetchClients();
+      return updated;
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  const handleDeleteClient = async (id: string) => {
+    if (!confirm("¿Estás seguro de eliminar este cliente?")) return;
+    try {
+      const res = await fetch(`/api/clients/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Error al eliminar");
+      fetchClients();
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   useEffect(() => {
@@ -1033,6 +1150,8 @@ export default function DashboardRealestate({
         return 3;
       case "saved":
         return 4;
+      case "clients":
+        return 5;
       default:
         return 0;
     }
@@ -1051,6 +1170,7 @@ export default function DashboardRealestate({
             {activeTab === "notifications" && "Notificaciones"}
             {activeTab === "chat" && "Mensajes"}
             {activeTab === "saved" && "Propiedades Guardadas"}
+            {activeTab === "clients" && "Mis Clientes"}
           </h1>
         </div>
       )}
@@ -1058,7 +1178,7 @@ export default function DashboardRealestate({
       <div className="w-full">
         {activeTab === "chat" && (
           <div className={activeTab === "chat" ? "block h-[70vh]" : "hidden"}>
-            <ChatPanel />
+            <ChatPanel key={targetThreadId ?? "all"} defaultThreadId={targetThreadId} />
           </div>
         )}
 
@@ -1175,7 +1295,31 @@ export default function DashboardRealestate({
             </div>
           )}
         </div>
-
+<div className={activeTab === "clients" ? "block w-full" : "hidden"}>
+          <ClientsPanel 
+            clients={clients} 
+            properties={properties} 
+            onAddClient={handleAddClient}
+            onEditClient={handleEditClient}
+            onDeleteClient={handleDeleteClient}
+            onStartChat={async (id) => {
+              try {
+                const res = await fetch(`/api/clients/${id}/chat`, {
+                  method: "POST",
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "No se pudo abrir el chat");
+                setTargetThreadId(data.threadId);
+                setActiveTab("chat");
+              } catch (err: any) {
+                alert(err.message);
+              }
+            }}
+            onPublishSearch={(id) => {
+              router.push(`/connections?clientId=${id}`);
+            }}
+          />
+        </div>
         <div className={activeTab === "properties" ? "block w-full" : "hidden"}>
           <div className="relative overflow-hidden group mb-20 mt-4">
             <div className="relative z-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
@@ -1623,9 +1767,9 @@ export default function DashboardRealestate({
       </div>
 
       <div className="fixed bottom-16 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 p-0.5 rounded-full backdrop-blur-xl bg-white/50 border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] w-[95vw] sm:w-max">
-        <div className="relative grid grid-cols-5 w-full h-full items-center">
+        <div className="relative grid grid-cols-6 w-full h-full items-center">
           <div
-            className="absolute top-0 bottom-0 left-0 w-1/5 bg-geora-white1/70 backdrop-blur-3xl rounded-full shadow-md transition-transform duration-300 ease-out"
+            className="absolute top-0 bottom-0 left-0 w-1/6 bg-geora-white1/70 backdrop-blur-3xl rounded-full shadow-md transition-transform duration-300 ease-out"
             style={{ transform: `translateX(${getTransformIndex() * 100}%)` }}
           />
 
@@ -1686,6 +1830,16 @@ export default function DashboardRealestate({
             <Bookmark size={22} className="sm:hidden" />
             <span className="hidden sm:inline font-bold text-sm">
               Guardados
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("clients")}
+            className={`relative z-10 flex items-center justify-center py-3 sm:py-2.5 sm:px-6 rounded-full transition-colors duration-300 cursor-pointer ${activeTab === "clients" ? "text-geora-black/80" : "text-geora-black/50 hover:text-geora-black"}`}
+          >
+            <Users size={22} className="sm:hidden" />
+            <span className="hidden sm:inline font-bold text-sm">
+              Clientes
             </span>
           </button>
         </div>
