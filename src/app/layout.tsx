@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 import { Inter } from "next/font/google";
 import Footer from "@/components/home/layout/Footer";
 import SidebarFilters from "@/components/ui/PhoneFilters";
+import MapListToggle from "@/components/search/MapListToggle";
 import GoogleMapProvider from "@/components/google-map/GoogleMapProvider";
 
 const inter = Inter({
@@ -33,6 +34,9 @@ export default function RootLayout({
             </Suspense>
             <Suspense fallback={null}>
               <SidebarFilters />
+            </Suspense>
+            <Suspense fallback={null}>
+              <MapListToggle />
             </Suspense>
             {children}
             <Footer/>

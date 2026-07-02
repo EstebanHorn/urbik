@@ -1,17 +1,22 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { X } from "lucide-react";
+import PriceFilterCard from "@/components/search/PriceFilterCard";
+import RoomsFilterCard from "@/components/search/RoomsFilterCard";
 
 export default function SidebarFilters() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [localMinPrice, setLocalMinPrice] = useState("");
+  const [localMaxPrice, setLocalMaxPrice] = useState("");
 
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const priceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -27,8 +32,14 @@ export default function SidebarFilters() {
   }, []);
 
   useEffect(() => {
-    if (pathname !== "/" && pathname !== "/map") setIsOpen(false);
+    if (pathname !== "/" && pathname !== "/map" && pathname !== "/properties")
+      setIsOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    setLocalMinPrice(searchParams.get("minPrice") || "");
+    setLocalMaxPrice(searchParams.get("maxPrice") || "");
+  }, [searchParams]);
 
   const handleFilterChange = useCallback((key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -36,6 +47,53 @@ export default function SidebarFilters() {
     params.set("page", "1");
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, [pathname, router, searchParams]);
+
+  const handlePriceChange = useCallback(
+    (field: "minPrice" | "maxPrice", value: string) => {
+      if (field === "minPrice") setLocalMinPrice(value);
+      else setLocalMaxPrice(value);
+      if (priceTimerRef.current) clearTimeout(priceTimerRef.current);
+      priceTimerRef.current = setTimeout(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        const newMin = field === "minPrice" ? value : localMinPrice;
+        const newMax = field === "maxPrice" ? value : localMaxPrice;
+        if (newMin) params.set("minPrice", newMin);
+        else params.delete("minPrice");
+        if (newMax) params.set("maxPrice", newMax);
+        else params.delete("maxPrice");
+        params.set("page", "1");
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+      }, 500);
+    },
+    [pathname, router, searchParams, localMinPrice, localMaxPrice],
+  );
+
+  const handleCurrencySwitch = useCallback(
+    (newCurrency: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (newCurrency) params.set("currency", newCurrency);
+      else params.delete("currency");
+      params.delete("minPrice");
+      params.delete("maxPrice");
+      params.set("page", "1");
+      setLocalMinPrice("");
+      setLocalMaxPrice("");
+      if (priceTimerRef.current) clearTimeout(priceTimerRef.current);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+
+  const handleRoomsChange = useCallback(
+    (field: "rooms" | "bedrooms" | "bathrooms", value: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete(field);
+      if (value) params.set(field, value);
+      params.set("page", "1");
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
 
   const currentOpType = searchParams.get("operationType") || "";
   const currentPropType = searchParams.get("propertyType") || "";
@@ -137,6 +195,34 @@ export default function SidebarFilters() {
                         {type.label}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Precio</span>
+                  <div className="rounded-2xl border border-slate-100 bg-white/50 p-4">
+                    <PriceFilterCard
+                      minPrice={localMinPrice}
+                      maxPrice={localMaxPrice}
+                      currency={searchParams.get("currency") || ""}
+                      operationType={currentOpType}
+                      propertyType={currentPropType}
+                      onChangeMin={(v) => handlePriceChange("minPrice", v)}
+                      onChangeMax={(v) => handlePriceChange("maxPrice", v)}
+                      onChangeCurrency={handleCurrencySwitch}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ambientes</span>
+                  <div className="rounded-2xl border border-slate-100 bg-white/50 p-4">
+                    <RoomsFilterCard
+                      rooms={searchParams.getAll("rooms")}
+                      bedrooms={searchParams.getAll("bedrooms")}
+                      bathrooms={searchParams.getAll("bathrooms")}
+                      onChange={handleRoomsChange}
+                    />
                   </div>
                 </div>
 

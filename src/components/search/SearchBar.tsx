@@ -71,7 +71,7 @@ export const SearchBar: React.FC = () => {
               return (
                 <li
                   key={`${suggestion.type}-${index}`}
-                  className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex justify-between items-center text-sm border-b last:border-none border-gray-50"
+                  className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex justify-between items-center text-sm border-b last:border-none border-gray-50 z-50"
                   onClick={() => onSelectSuggestion(suggestion)}
                 >
                   <div className="flex flex-col overflow-hidden mr-2">

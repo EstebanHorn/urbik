@@ -41,6 +41,8 @@ import PriceFilterCard from "@/components/search/PriceFilterCard";
 import RoomsFilterCard from "@/components/search/RoomsFilterCard";
 
 import PropertySlidePanel from "@/components/map/PropertySlidePanel";
+import MobileSearchFilterBar from "@/components/search/MobileSearchFilterBar";
+import DesktopSearchFilterBar from "@/components/search/DesktopSearchFilterBar";
 
 const PropertiesSidebar = dynamicImport(
   () =>
@@ -243,6 +245,8 @@ const handleBoundsChange = useCallback(
 
   return (
     <div className="fixed bottom-0 left-0 right-0 top-16 z-0 flex flex-col overflow-hidden bg-white">
+      {!showMobileList && !selectedProperty && <MobileSearchFilterBar />}
+      <DesktopSearchFilterBar />
       <div className="relative flex flex-1 overflow-hidden">
         <aside
           className={`absolute inset-0 z-30 flex flex-col transition-transform duration-300 ease-in-out md:static md:h-full md:w-1/3 lg:w-2/5 shadow-2xl md:shadow-none bg-white ${
