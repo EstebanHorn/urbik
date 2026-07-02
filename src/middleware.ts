@@ -4,29 +4,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import error from "./app/error";
 
 export async function middleware(request: NextRequest) {
-  const basicAuth = request.headers.get("authorization");
-  const userEnv = process.env.BASIC_AUTH_USER;
-  const pwdEnv = process.env.BASIC_AUTH_PASSWORD;
-
-  if (userEnv && pwdEnv) {
-    if (basicAuth) {
-      const authValue = basicAuth.split(" ")[1];
-      const [u, p] = atob(authValue).split(":");
-
-      if (u !== userEnv || p !== pwdEnv) {
-        return new NextResponse("Zona Privada - Acceso Restringido", {
-          status: 401,
-          headers: { "WWW-Authenticate": 'Basic realm="Sitio Privado"' },
-        });
-      }
-    } else {
-      return new NextResponse("Zona Privada - Acceso Restringido", {
-        status: 401,
-        headers: { "WWW-Authenticate": 'Basic realm="Sitio Privado"' },
-      });
-    }
-  }
-
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
