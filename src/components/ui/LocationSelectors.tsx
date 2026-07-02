@@ -239,7 +239,7 @@ export default function LocationSelectors({
           onClick={() =>
             setOpenDropdown(openDropdown === "city" ? null : "city")
           }
-          className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 mb-2 bg-white/30 border border-white font-bold disabled:opacity-30"
+          className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 mb-2 shadow-md bg-white/30 border border-white font-bold disabled:opacity-30"
         >
           {provinceValue && ciudades.length === 0 ? "SIN DATOS" : cityValue || cityLabel}
           <ChevronDown />
@@ -269,7 +269,7 @@ export default function LocationSelectors({
             onClick={() =>
               setOpenDropdown(openDropdown === "locality" ? null : "locality")
             }
-            className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 mb-2 bg-white/30 border border-white font-bold disabled:opacity-30"
+            className="uppercase w-full cursor-pointer flex items-center justify-between rounded-full px-6 py-3 mb-2 shadow-md bg-white/30 border border-white font-bold disabled:opacity-30"
           >
             {loadingLocalidades ? "..." : !hasLocalidades && cityValue ? "SIN DATOS" : localityValue || localityLabel}
             <ChevronDown />

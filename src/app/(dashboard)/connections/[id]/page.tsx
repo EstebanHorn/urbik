@@ -138,7 +138,7 @@ export default function SearchDetailPage() {
   const isOwner = !!data.isOwner;
 
   return (
-    <div className="pt-24 pb-28 min-h-screen bg-gray-50/50">
+    <div className="pt-24 pb-28 min-h-screen ">
       <div className="max-w-4xl mx-auto px-4 md:px-10">
         <Link
           href="/connections"
@@ -152,7 +152,7 @@ export default function SearchDetailPage() {
         </Link>
 
         {/* Bloque superior */}
-        <div className="bg-white rounded-[24px] border border-geora-black/10 shadow-sm p-6 md:p-8 mb-6">
+        <div className="bg-white rounded-[24px]  shadow-sm p-6 md:p-8 mb-6">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -207,7 +207,7 @@ export default function SearchDetailPage() {
         </div>
 
         {/* Bloque medio: parámetros */}
-        <div className="bg-white rounded-[24px] border border-geora-black/10 shadow-sm p-6 md:p-8 mb-6">
+        <div className="bg-white rounded-[24px]  shadow-sm p-6 md:p-8 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <ParamItem icon={Tag} label="Operación" value={opLabel(data.operation_type)} />
             <ParamItem
@@ -243,7 +243,7 @@ export default function SearchDetailPage() {
         </div>
 
         {/* Bloque inferior */}
-        <div className="bg-white rounded-[24px] border border-geora-black/10 shadow-sm p-6 md:p-8">
+        <div className="bg-white rounded-[24px]  p-6 md:p-8">
           {isOwner ? (
             <OwnerResponsesBlock data={data} />
           ) : (

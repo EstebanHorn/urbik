@@ -4,7 +4,7 @@ import React from "react";
 export type BadgeVariant = "neutral" | "emerald" | "cyan" | "amber" | "rose" | "black";
 
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  neutral: "bg-gray-100 text-geora-black/70",
+  neutral: "bg-geora-black/80 text-white",
   emerald: "bg-geora-emerald/10 text-geora-emerald",
   cyan: "bg-geora-cyan/10 text-geora-cyan",
   amber: "bg-amber-500/10 text-amber-600",

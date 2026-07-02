@@ -41,7 +41,7 @@ function NewSearchPageInner() {
   return (
     <div className="pt-24 pb-28 min-h-screen bg-gray-50/50">
       <style>{modalStyles}</style>
-      <div className="max-w-2xl mx-auto px-4 md:px-10">
+      <div className="max-w-4xl mx-auto px-4 md:px-10">
         <Link
           href="/connections"
           className="inline-flex items-center gap-1.5 text-sm font-bold text-geora-black/50 hover:text-geora-black transition-colors mb-4 group"
@@ -50,7 +50,7 @@ function NewSearchPageInner() {
           Volver a la Bolsa
         </Link>
 
-        <div className="bg-white rounded-[24px] border border-geora-black/10 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-[24px] overflow-hidden">
           <div className="px-6 md:px-8 py-6 border-b border-gray-100">
             <h1 className="text-xl font-black text-geora-black">Publicar Búsqueda</h1>
             <p className="text-sm text-geora-black/50 font-medium mt-1">

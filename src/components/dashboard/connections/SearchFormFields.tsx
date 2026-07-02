@@ -2,6 +2,7 @@
 
 import React from "react";
 import LocationSelectors from "@/components/ui/LocationSelectors";
+import { CustomDropdown } from "@/components/ui/CustomDropdown"; // <-- Ajusta esta ruta según tu proyecto
 import {
   OPERATION_OPTIONS,
   PROPERTY_TYPE_OPTIONS,
@@ -110,6 +111,14 @@ export default function SearchFormFields({
   isEditing,
   clients,
 }: Props) {
+  // Mapeamos los clientes al formato { value, label } para el CustomDropdown
+  const clientOptions = clients
+    .filter((c: any) => c.role !== "OWNER")
+    .map((c: any) => ({
+      value: c.id,
+      label: c.name,
+    }));
+
   return (
     <div className="space-y-7 step-transition">
       {/* 1. Tipo de operación */}
@@ -266,20 +275,17 @@ export default function SearchFormFields({
           7. Contacto interno{" "}
           <span className="normal-case text-geora-black/40">(oculto en la red)</span>
         </label>
-        <select
+        <div className="md:w-1/3 w-full">
+        <CustomDropdown
+          options={clientOptions}
           value={formData.clientId}
-          onChange={(e) => setField("clientId", e.target.value)}
-          className="w-full border border-gray-200 bg-white rounded-2xl px-4 py-3 text-sm focus:outline-none shadow-sm"
-        >
-          <option value="">Seleccionar contacto...</option>
-          {clients
-            .filter((c: any) => c.role !== "OWNER")
-            .map((c: any) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-        </select>
+          onChange={(value) => setField("clientId", value)}
+          label="Seleccionar contacto..."
+          variant="white2"
+          
+        />
+        </div>
+ 
       </section>
 
       {!isEditing && (
