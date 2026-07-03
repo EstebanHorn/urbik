@@ -55,6 +55,7 @@ interface ParcelPickerModalProps {
   open: boolean;
   province: string;
   city?: string;
+  locality?: string;
   onClose: () => void;
   onConfirm: (parcel: SelectedParcel) => void;
   // Parcela ya vinculada/dibujada al editar: se precarga para que se vea en el mapa.
@@ -65,6 +66,7 @@ export default function ParcelPickerModal({
   open,
   province,
   city,
+  locality,
   onClose,
   onConfirm,
   initialParcel,
@@ -251,6 +253,7 @@ export default function ParcelPickerModal({
           <ParcelPickerMap
             province={province}
             city={city}
+            locality={locality}
             onMapClick={handleMapClick}
             selectedGeometry={selected?.geometry ?? null}
             manualPin={mode === "manual" && selected ? { lat: selected.lat, lng: selected.lon } : null}
