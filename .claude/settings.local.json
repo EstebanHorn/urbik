@@ -65,7 +65,10 @@
       "Bash(ls -la tailwind.config.*)",
       "Bash(find . -iname '*geora*' -not -path './node_modules/*' -not -path './.git/*' -not -path './.next/*')",
       "Bash(cp /tmp/bench.mjs ./bench.mjs)",
-      "Bash(rm -f ./bench.mjs)"
+      "Bash(rm -f ./bench.mjs)",
+      "Bash(netstat -ano)",
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 3000 -State Listen | Select-Object -ExpandProperty OwningProcess\")",
+      "Bash(powershell -Command \"Stop-Process -Id 18800 -Force\")"
     ]
   }
 }
