@@ -521,6 +521,7 @@ export default function EditPropertyModal({ open, property, onClose, onUpdated, 
         open={parcelPickerOpen}
         province={formData.province ?? ""}
         city={formData.city}
+        locality={formData.locality}
         initialParcel={initialParcel}
         onClose={() => setParcelPickerOpen(false)}
         onConfirm={handleParcelConfirm}

@@ -218,8 +218,6 @@ const handleBoundsChange = useCallback(
       boundsRef.current = bounds;
       fetchFilteredProperties(bounds, filters);
 
-      // Agregamos esto: inyectar los límites en la URL sin recargar la página
-      // para que el PriceFilterCard del Navbar pueda leerlos.
       const currentParams = new URLSearchParams(searchParams.toString());
       currentParams.set("minLat", bounds.minLat.toString());
       currentParams.set("maxLat", bounds.maxLat.toString());

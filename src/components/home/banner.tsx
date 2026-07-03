@@ -44,7 +44,7 @@ function getBadge(s: SearchSuggestion) {
   if (s.type === "PROPERTY_SEARCH")
     return { label: "Propiedades", className: "bg-violet-100 text-violet-700" };
   if (s.type === "ADDRESS")
-    return { label: "Dirección", className: "bg-blue-50 text-blue-600" };
+    return { label: "Dirección", className: "text-geora-black/80" };
   return { label: "Inmobiliaria", className: "bg-emerald-50 text-emerald-700" };
 }
 
@@ -248,7 +248,7 @@ export default function Banner({ items }: BannerProps) {
               </div>
 
               {suggestions.length > 0 && (
-                <ul className="absolute z-50 w-full mt-2 bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden">
+                <ul className="absolute z-9999 w-full mt-2 bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden">
                   {suggestions.map((suggestion, index) => {
                     const badge = getBadge(suggestion);
                     const agencyCity =

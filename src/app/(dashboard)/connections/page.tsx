@@ -24,10 +24,9 @@ import {
   opLabel,
   priceRange,
 } from "@/lib/connections/searchUi";
+export const glassCard =
+  "relative overflow-hidden md:rounded-[30px] rounded-3xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] before:absolute before:inset-0 before:rounded-[30px] before:p-[1px] before:bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,250,250,0.9),rgba(240,240,240,0.45),rgba(255,255,255,0.9))] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:pointer-events-none";
 
-// ---------------------------------------------------------------------------
-// Página
-// ---------------------------------------------------------------------------
 export default function ConnectionsPage() {
   return (
     <Suspense
@@ -117,10 +116,10 @@ function ConnectionsInner() {
           </button>
         </div>
 
-        <div className="flex gap-2 mb-8 p-1 bg-geora-black/5 rounded-2xl w-fit">
+        <div className="flex gap-2 mb-8 p-1 w-fit">
           <button
             onClick={() => setActiveTab("network")}
-            className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${
+            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
               activeTab === "network"
                 ? "bg-white text-geora-black shadow-sm"
                 : "text-geora-black/50 hover:text-geora-black/80"
@@ -130,7 +129,7 @@ function ConnectionsInner() {
           </button>
           <button
             onClick={() => setActiveTab("my-searches")}
-            className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${
+            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
               activeTab === "my-searches"
                 ? "bg-white text-geora-black shadow-sm"
                 : "text-geora-black/50 hover:text-geora-black/80"
@@ -138,7 +137,7 @@ function ConnectionsInner() {
           >
             Mis Búsquedas
             {mySearches.length > 0 && (
-              <span className="ml-2 text-xs bg-geora-black/10 px-2 py-0.5 rounded-full">
+              <span className="ml-2 text-xs bg-geora-black/5 px-2 py-0.5 rounded-full">
                 {mySearches.length}
               </span>
             )}
@@ -186,9 +185,7 @@ function ConnectionsInner() {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Tarjetas
-// ---------------------------------------------------------------------------
+
 function SearchCardShell({
   search,
   children,
@@ -197,47 +194,51 @@ function SearchCardShell({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="bg-white p-6 rounded-[24px] shadow-sm border border-geora-black/10 flex flex-col gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all">
-      <Badge variant="neutral" className="self-start">
-        {opLabel(search.operation_type)} · {propLabel(search.property_type)}
-      </Badge>
+    <div className={`group flex flex-col p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] ${glassCard}`}>
+      
+      {/* Wrapper z-10 para asegurar que el contenido no quede tapado por los gradientes del glass */}
+      <div className="relative z-10 flex flex-col gap-4 h-full">
+        <Badge variant="neutral" className="self-start shadow-sm z-1">
+          {opLabel(search.operation_type)} · {propLabel(search.property_type)}
+        </Badge>
 
-      <div>
-        <h3 className="font-bold text-lg flex items-center gap-1.5 text-geora-black">
-          <MapPin size={16} className="text-geora-black/40 shrink-0" />
-          {search.city || search.province || "Zona a definir"}
-        </h3>
-        {search.province && search.city && (
-          <p className="text-xs font-medium text-geora-black/50 mt-0.5 ml-[22px]">
-            {search.province}
-          </p>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 py-3 border-t border-b border-gray-100">
         <div>
-          <p className="text-[10px] font-bold text-geora-black/40 uppercase tracking-wide mb-1">
-            Superficie
-          </p>
-          <p className="text-sm font-bold text-geora-black">
-            {search.min_area || search.max_area
-              ? `${search.min_area || "—"} a ${search.max_area || "—"} ${
-                  search.area_unit === "HA" ? "ha" : "m²"
-                }`
-              : "Indistinto"}
-          </p>
+          <h3 className="font-bold text-lg flex items-center gap-1.5 text-geora-black">
+            <MapPin size={16} className="text-geora-black/40 shrink-0" />
+            {search.city || search.province || "Zona a definir"}
+          </h3>
+          {search.province && search.city && (
+            <p className="text-xs font-medium text-geora-black/50 mt-0.5 ml-[22px]">
+              {search.province}
+            </p>
+          )}
         </div>
-        <div>
-          <p className="text-[10px] font-bold text-geora-black/40 uppercase tracking-wide mb-1">
-            Rango de precio
-          </p>
-          <p className="text-sm font-bold text-geora-black">
-            {priceRange(search)}
-          </p>
-        </div>
-      </div>
 
-      {children}
+        <div className="grid grid-cols-2 gap-3 py-3 border-t border-b border-white/60">
+          <div>
+            <p className="text-[10px] font-bold text-geora-black/40 uppercase tracking-wide mb-1">
+              Superficie
+            </p>
+            <p className="text-sm font-bold text-geora-black">
+              {search.min_area || search.max_area
+                ? `${search.min_area || "—"} a ${search.max_area || "—"} ${
+                    search.area_unit === "HA" ? "ha" : "m²"
+                  }`
+                : "Indistinto"}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-geora-black/40 uppercase tracking-wide mb-1">
+              Rango de precio
+            </p>
+            <p className="text-sm font-bold text-geora-black">
+              {priceRange(search)}
+            </p>
+          </div>
+        </div>
+
+        {children}
+      </div>
     </div>
   );
 }
@@ -273,11 +274,11 @@ function NetworkGrid({ searches }: { searches: any[] }) {
               onClick={() => router.push(`/connections/${s.id}`)}
               className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-geora-black text-white text-sm font-bold hover:bg-geora-black/80 transition-all cursor-pointer"
             >
-              <Send size={14} /> Tengo una propiedad para esto
+              Ofrecer Propiedad
             </button>
             <button
               onClick={() => router.push(`/connections/${s.id}`)}
-              className="py-2.5 rounded-xl border-2 border-geora-emerald text-geora-emerald text-sm font-bold hover:bg-geora-emerald/5 transition-all cursor-pointer"
+              className="py-2.5 rounded-xl shadow-sm text-urbik-black/70 text-sm font-bold hover:bg-geora-emerald/5 transition-all cursor-pointer"
             >
               Ver detalles
             </button>

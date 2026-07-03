@@ -27,9 +27,9 @@ import { createClient } from "@/lib/supabase/client";
 // redondeado del dropdown de perfil.
 function NotificationDot({ className = "" }: { className?: string }) {
   return (
-    <span className={`absolute z-20 flex h-2.5 w-2.5 ${className}`}>
+    <span className={`absolute z-9999 flex h-1.5 w-1.5 ${className}`}>
       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-geora-emerald opacity-75" />
-      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-geora-emerald ring-2 ring-geora-black" />
+      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-geora-emerald ring-2 ring-geora-black" />
     </span>
   );
 }
@@ -166,7 +166,6 @@ function NavbarInner() {
         {session ? "Mi Perfil" : "Ingresar"}
       </span>
       <Menu className="block md:hidden w-6 h-6" />
-      {session && hasUnread && <NotificationDot className="-top-1.5 -right-2" />}
     </span>
   );
 
@@ -230,9 +229,9 @@ function NavbarInner() {
     return getNavItems().map((item) => {
       const showDot = hasUnread && item.href === "/dashboard";
       return (
-        <Link key={item.label} href={item.href} className={`relative overflow-visible ${linkClass}`}>
+        <Link key={item.label} href={item.href} className={`relative  overflow-visible ${linkClass}`}>
           {item.label}
-          {showDot && <NotificationDot className="-top-1.5 -right-2.5" />}
+          {showDot && <NotificationDot className="-top-0.5 -right-2.5" />}
         </Link>
       );
     });
@@ -253,7 +252,7 @@ function NavbarInner() {
         >
           <span className="relative overflow-visible">
             <Icon className="w-[22px] h-[22px] shrink-0" />
-            {showDot && <NotificationDot className="-top-1 -right-1.5" />}
+            {showDot && <NotificationDot className="-top-0.5 -right-2.5" />}
           </span>
           <span className="text-[10px] font-medium leading-none truncate max-w-full">
             {item.short ?? item.label}
@@ -289,7 +288,7 @@ function NavbarInner() {
               </div>
             </div>
 
-            <div className="hidden md:flex items-center justify-center gap-4 md:gap-8 overflow-x-auto no-scrollbar whitespace-nowrap px-2 w-full">
+            <div className="hidden md:flex items-center justify-center gap-4 md:gap-8 no-scrollbar whitespace-nowrap px-2 w-full">
               {renderNavLinks()}
             </div>
           </div>

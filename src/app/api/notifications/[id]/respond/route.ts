@@ -2,8 +2,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// POST — aceptar o rechazar una solicitud de conexión (CONNECTION_REQUEST).
-// body: { action: "ACCEPT" | "REJECT" }
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -37,7 +35,6 @@ export async function POST(
 
     const agencyId = notif.related_id;
 
-    // Nombre de la inmobiliaria para el mensaje de resultado
     const { data: agency } = await admin
       .from("real_estates")
       .select("agency_name")
@@ -45,7 +42,6 @@ export async function POST(
       .maybeSingle();
     const agencyName = agency?.agency_name || "la inmobiliaria";
 
-    // Actualizar el vínculo en el contacto del CRM de la inmobiliaria
     if (agencyId) {
       if (action === "ACCEPT") {
         await admin
@@ -62,7 +58,6 @@ export async function POST(
       }
     }
 
-    // Resolver la notificación (queda leída y con el resultado)
     const resolved =
       action === "ACCEPT"
         ? {

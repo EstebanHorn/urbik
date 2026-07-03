@@ -78,7 +78,7 @@ function applyDataStyle(map: google.maps.Map) {
 
 // ── Auto-center using Google Geocoding API ───────────────────────────────────
 
-function MapAutoCenter({ city, province }: { city?: string; province: string }) {
+function MapAutoCenter({ locality, city, province }: { locality?: string; city?: string; province: string }) {
   const map = useMap();
   const geocodingLib = useMapsLibrary("geocoding");
   const doneRef = useRef(false);
@@ -87,14 +87,16 @@ function MapAutoCenter({ city, province }: { city?: string; province: string }) 
     if (!map || !geocodingLib || doneRef.current) return;
     doneRef.current = true;
     const geocoder = new geocodingLib.Geocoder();
-    const address = [city, province, "Argentina"].filter(Boolean).join(", ");
+    
+    const address = [locality, city, province, "Argentina"].filter(Boolean).join(", ");
+    
     geocoder.geocode({ address }, (results, status) => {
       if (status === "OK" && results?.[0]) {
         map.panTo(results[0].geometry.location);
-        map.setZoom(16);
+        map.setZoom(16); 
       }
     });
-  }, [map, geocodingLib, city, province]);
+  }, [map, geocodingLib, locality, city, province]);
 
   return null;
 }
@@ -264,6 +266,7 @@ function DrawnPolygonLayer({ path }: { path: { lat: number; lng: number }[] }) {
 export interface ParcelPickerMapProps {
   province: string;
   city?: string;
+  locality?: string;
   onMapClick: (lat: number, lng: number) => void;
   selectedGeometry: Geometry | null;
   manualPin?: { lat: number; lng: number } | null;
@@ -275,6 +278,7 @@ export interface ParcelPickerMapProps {
 export default function ParcelPickerMap({
   province,
   city,
+  locality,
   onMapClick,
   selectedGeometry,
   manualPin,
@@ -305,7 +309,7 @@ export default function ParcelPickerMap({
       draggingCursor="move"
       style={{ width: "100%", height: "100%" }}
     >
-      {!initialCenter && <MapAutoCenter city={city} province={province} />}
+      {!initialCenter && <MapAutoCenter locality={locality} city={city} province={province} />}
 
       {rioNegro ? <RioNegroArcGISLayer /> : <ARBAWMSLayer />}
 

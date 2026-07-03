@@ -122,6 +122,7 @@ export default function CreatePropertyModal({
   const longitude = rhf.watch("longitude");
   const province = rhf.watch("province");
   const city = rhf.watch("city");
+  const locality = rhf.watch("locality");
 
   const initialParcel: SelectedParcel | null = useMemo(() => {
     const geom = parcelGeom as Geometry | undefined;
@@ -411,6 +412,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
         open={parcelPickerOpen}
         province={province ?? ""}
         city={city}
+        locality={locality}
         initialParcel={initialParcel}
         onClose={() => setParcelPickerOpen(false)}
         onConfirm={handleParcelConfirm}

@@ -1,14 +1,4 @@
-// Regenera el artefacto comprimido de parcelas de Río Colorado.
-//
-// Baja el geojson crudo (`riocolorado.geojson`, coordenadas Web Mercator) del
-// bucket `geojson` de Supabase, lo reproyecta a lon/lat redondeado a 6 decimales,
-// lo deja en una estructura compacta `{ features: [{ fid, cca, geometry }] }`,
-// lo comprime con gzip y lo sube de vuelta como `riocolorado.min.json.gz`.
-//
-// Correr cuando cambie el geojson fuente:
-//   node scripts/prepare-riocolorado.mjs
-//
-// Requiere NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en .env.local.
+
 
 import { createClient } from "@supabase/supabase-js";
 import { gzipSync } from "zlib";

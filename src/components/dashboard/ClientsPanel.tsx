@@ -170,7 +170,7 @@ export default function ClientsPanel({ clients, properties, onAddClient, onEditC
     <div className="w-full animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 px-2 md:px-6">
         <div className="flex items-center gap-3">
-          <div className="bg-geora-black/5 p-2.5 rounded-2xl">
+          <div className="p-2.5">
             <Users size={24} className="text-geora-black/80" />
           </div>
           <div>
@@ -178,8 +178,8 @@ export default function ClientsPanel({ clients, properties, onAddClient, onEditC
             <p className="text-sm font-medium text-geora-black/50">Gestioná tu cartera y publicá búsquedas</p>
           </div>
         </div>
-        <button onClick={openNewModal} className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-geora-black text-white text-sm font-bold shadow-lg hover:bg-geora-black/80 transition-all hover:-translate-y-0.5 cursor-pointer">
-          <Plus size={18} /> Agregar Cliente
+        <button onClick={openNewModal} className="flex gap-2 text-center rounded-full bg-white cursor-pointer border shadow-md border-black/10 px-5 py-2 text-sm font-bold text-geora-black/80 hover:scale-105 hover:text-geora-black/50 transform transition duration-200">
+          <Plus size={18} /> Cargar Cliente
         </button>
       </div>
 
@@ -199,7 +199,7 @@ export default function ClientsPanel({ clients, properties, onAddClient, onEditC
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar por nombre, email o teléfono..."
-                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-geora-black/30 shadow-sm"
+                className="w-full pl-11 pr-4 py-3 rounded-full  bg-white text-sm focus:outline-none focus:border-geora-black/30 shadow-md"
               />
             </div>
             <CustomDropdown
@@ -207,7 +207,7 @@ export default function ClientsPanel({ clients, properties, onAddClient, onEditC
               value={sortBy}
               options={SORT_OPTIONS}
               onChange={(v) => setSortBy(v as "recent" | "name")}
-              variant="white"
+              variant="white1"
             />
           </div>
 
@@ -223,9 +223,7 @@ export default function ClientsPanel({ clients, properties, onAddClient, onEditC
                     : "bg-white text-geora-black/70 border-gray-200 hover:border-geora-black/40"
                 }`}
               >
-                {f.value !== "ALL" && (
-                  <span className={`w-2 h-2 rounded-full ${ROLE_DOT_COLORS[f.value]}`} />
-                )}
+
                 {f.label}
               </button>
             ))}
@@ -237,20 +235,19 @@ export default function ClientsPanel({ clients, properties, onAddClient, onEditC
               <p className="text-geora-black/50 font-bold">No se encontraron contactos con ese filtro.</p>
             </div>
           ) : (
-            <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-visible">
+            <div className="overflow-visible">
               {pageClients.map((client) => (
                 <div
                   key={client.id}
                   onClick={() => router.push(`/contacts/${client.id}`)}
-                  className="flex items-center gap-4 px-4 sm:px-5 py-4 hover:bg-gray-50/80 transition-colors cursor-pointer border-b border-gray-100 last:border-0 first:rounded-t-[24px] last:rounded-b-[24px]"
+                  className="flex items-center gap-4 px-4 sm:px-5 py-4 hover:bg-gray-50/80 transition-colors cursor-pointer border-b border-gray-100 last:border-0"
                 >
-                  <Avatar name={client.name} />
 
                   <div className="w-36 sm:w-44 shrink-0 min-w-0">
                     <p className="font-bold text-sm text-geora-black truncate">{client.name}</p>
-                    <Badge variant={ROLE_BADGE_VARIANTS[client.role]} className="mt-1">
+                    <div className="mt-1 text-xs text-geora-black/80 flex items-center gap-2">
                       {ROLE_LABELS[client.role]}
-                    </Badge>
+                    </div>
                   </div>
 
                   <div className="w-40 shrink-0 min-w-0 hidden md:block">
