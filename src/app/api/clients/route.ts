@@ -66,7 +66,6 @@ export async function POST(req: Request) {
     let linkedUserId = null;
 
     if (email && email.trim() !== "") {
-      // Lectura con admin: RLS de profiles impide ver perfiles ajenos por email.
       const { data: existingProfile } = await admin
         .from("profiles")
         .select("id")
@@ -99,7 +98,6 @@ export async function POST(req: Request) {
     if (insertError) throw insertError;
 
     if (georaStatus === "PENDING" && linkedUserId) {
-      // Nombre de la inmobiliaria para personalizar el aviso.
       const { data: agency } = await admin
         .from("real_estates")
         .select("agency_name")
@@ -107,7 +105,6 @@ export async function POST(req: Request) {
         .maybeSingle();
       const agencyName = agency?.agency_name || "Una inmobiliaria";
 
-      // Insert con admin: notifications tiene RLS sin policy de INSERT.
       const { error: notifError } = await admin.from("notifications").insert({
         recipient_id: linkedUserId,
         type: "CONNECTION_REQUEST",

@@ -280,8 +280,8 @@ export default function SearchFormFields({
           options={clientOptions}
           value={formData.clientId}
           onChange={(value) => setField("clientId", value)}
-          label="Seleccionar contacto..."
-          variant="white2"
+          label="Seleccionar"
+          variant="white1"
           
         />
         </div>

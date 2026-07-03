@@ -2,7 +2,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// GET — detalle de un contacto propio (perfil de contacto).
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -52,7 +51,6 @@ export async function GET(
   }
 }
 
-// PUT — actualizar un contacto propio.
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -69,7 +67,6 @@ export async function PUT(
     const body = await req.json();
     const admin = createAdminClient();
 
-    // Verificar propiedad del contacto
     const { data: existing } = await admin
       .from("clients")
       .select("id, real_estate_id, email, linked_user_id, geora_status")
@@ -94,7 +91,6 @@ export async function PUT(
     if (body.linkedPropertyId !== undefined)
       updates.linked_property_id = body.linkedPropertyId || null;
 
-    // Si cambió el email, revalidar vínculo con una cuenta de Geora
     if (body.email !== undefined) {
       const newEmail = body.email?.trim().toLowerCase() || null;
       updates.email = newEmail;
@@ -131,7 +127,6 @@ export async function PUT(
   }
 }
 
-// DELETE — eliminar un contacto propio.
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

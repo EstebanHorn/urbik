@@ -2,8 +2,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// POST — obtiene (o crea) el hilo de chat entre la inmobiliaria y su contacto.
-// Solo funciona si el contacto tiene una cuenta de Geora vinculada (linked_user_id).
 export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -39,7 +37,6 @@ export async function POST(
       );
     }
 
-    // Hilo sin propiedad asociada entre el cliente (user_id) y la inmobiliaria (real_estate_id)
     const { data: existing } = await admin
       .from("chat_threads")
       .select("id")

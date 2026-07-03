@@ -218,22 +218,21 @@ export default function ContactDetailPage() {
         </Link>
 
         {/* Bloque superior: identidad + notas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="md:col-span-2 bg-white rounded-[24px] border border-geora-black/10 shadow-sm p-6 md:p-8">
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="md:col-span-2  p-6 md:p-8">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
-                <Avatar name={contact.name} size="lg" />
                 <div>
                   <h1 className="text-xl font-black text-geora-black">{contact.name}</h1>
-                  <Badge variant={ROLE_BADGE_VARIANTS[contact.role]} className="mt-1.5">
+                  <div className="mt-1.5 text-xs text-geora-black/70">
                     {ROLE_LABELS[contact.role]}
-                  </Badge>
+                  </div>
                 </div>
               </div>
               <button
                 onClick={() => setEditOpen(true)}
                 title="Editar contacto"
-                className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center cursor-pointer shrink-0"
+                className="w-10 h-10 flex items-center justify-center cursor-pointer shrink-0"
               >
                 <Pencil size={16} />
               </button>
@@ -263,22 +262,33 @@ export default function ContactDetailPage() {
                   <MessageCircle size={15} /> WhatsApp
                 </a>
               )}
-              <button
-                onClick={startChat}
-                disabled={contact.georaStatus !== "CONNECTED" || startingChat}
-                title={contact.georaStatus !== "CONNECTED" ? "Cliente no conectado a Geora" : undefined}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-sm font-bold text-geora-black transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {startingChat ? <Loader2 size={15} className="animate-spin" /> : <MessageSquare size={15} />}
-                Chat interno
-              </button>
+              <div className=" w-full flex justify-end">
+<div className="flex flex-col gap-1">
+  <button
+    onClick={startChat}
+    disabled={contact.georaStatus !== "CONNECTED" || startingChat}
+    title={contact.georaStatus !== "CONNECTED" ? "Cliente no conectado a Geora" : undefined}
+    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full shadow-sm text-sm font-bold text-geora-black transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+  >
+    {startingChat ? <Loader2 size={15} className="animate-spin" /> : <MessageSquare size={15} />}
+    Chat interno
+  </button>
+
+  {contact.georaStatus !== "CONNECTED" && (
+    <p className="text-xs text-red-500 text-center">
+      El cliente no está conectado a Geora
+    </p>
+  )}
+</div>
+              </div>
+
             </div>
           </div>
 
-          <div className="bg-amber-50/60 border border-amber-200/60 rounded-[24px] p-6 flex flex-col">
-            <div className="flex items-center gap-2 mb-3">
-              <Lock size={14} className="text-amber-700/70" />
-              <p className="text-xs font-bold text-amber-800 uppercase tracking-wide">Notas privadas</p>
+          <div className=" flex flex-col">
+            <div className="flex items-center gap-2 mb-3 ml-3">
+              <Lock size={14} className="text-geora-black/60" />
+              <p className="text-xs font-bold text-geora-black/60 uppercase tracking-wide">Notas privadas</p>
             </div>
             <textarea
               value={notes}
@@ -286,14 +296,14 @@ export default function ContactDetailPage() {
               onBlur={saveNotes}
               rows={6}
               placeholder="Preferencias, disponibilidad, seguimiento..."
-              className="flex-1 w-full bg-white/70 border border-amber-200/60 rounded-2xl px-3 py-2.5 text-sm focus:outline-none resize-none custom-scrollbar"
+              className="flex-1 w-full shadow-sm rounded-2xl px-3 py-2.5 text-sm focus:outline-none resize-none custom-scrollbar"
             />
             {savingNotes && <p className="text-[10px] text-amber-700/60 font-bold mt-1.5">Guardando...</p>}
           </div>
         </div>
 
         {/* Bloque medio */}
-        <div className="bg-white rounded-[24px] border border-geora-black/10 shadow-sm p-6 md:p-8 mb-6">
+        <div className="bg-white rounded-[24px]  shadow-sm p-6 md:p-8 mb-6">
           {isSearcher ? (
             <>
               <p className="text-xs font-bold text-geora-black/50 uppercase tracking-wider mb-4">
@@ -400,7 +410,7 @@ export default function ContactDetailPage() {
 
         {/* Banner CTA */}
         {isSearcher && (
-          <div className="bg-geora-black rounded-[24px] p-6 flex flex-col sm:flex-row items-center gap-4 justify-between">
+          <div className="bg-geora-black rounded-full p-6 flex flex-col sm:flex-row items-center gap-4 justify-between">
             <div className="flex items-center gap-3 text-white">
               <Network size={22} className="text-geora-emerald shrink-0" />
               <p className="text-sm font-bold">

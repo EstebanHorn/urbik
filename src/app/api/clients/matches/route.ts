@@ -5,8 +5,6 @@ import { findMatchingProperties } from "@/lib/connections/matching";
 
 const AGENCY_ROLES = ["REALESTATE", "AGENT"];
 
-// POST — matching de un contacto contra el STOCK PROPIO únicamente (Flujo 4).
-// body: { searchParams } (mismos campos que una búsqueda, en camelCase)
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
@@ -30,7 +28,6 @@ export async function POST(req: Request) {
     const searchParams = body.searchParams;
     if (!searchParams) return NextResponse.json([]);
 
-    // Cruza SOLO contra el stock de esta inmobiliaria, nunca contra el de otras.
     const matches = await findMatchingProperties(admin, searchParams, {
       ownerId: user.id,
     });

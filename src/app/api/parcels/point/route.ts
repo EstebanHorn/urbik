@@ -34,12 +34,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "lat/lng inválido" }, { status: 400 });
   }
 
-  // Río Colorado es una localidad de la provincia de Río Negro: las propiedades
-  // de esa zona tienen province = "Río Negro", así que el gate sigue siendo la provincia.
   const usesLocalParcels = /r[íi]o\s*negro/i.test(province);
 
   if (usesLocalParcels) {
-    // Primario: catastro provincial (ArcGIS SIREC), que cubre toda Río Negro.
     try {
       const parcel = await identifyParcel(lat, lng);
       if (parcel) return NextResponse.json(parcel);

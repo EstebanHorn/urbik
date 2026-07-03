@@ -152,7 +152,7 @@ export default function SearchDetailPage() {
         </Link>
 
         {/* Bloque superior */}
-        <div className="bg-white rounded-[24px]  shadow-sm p-6 md:p-8 mb-6">
+        <div className="mt-10 mb-6">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -197,7 +197,7 @@ export default function SearchDetailPage() {
                 <button
                   onClick={() => setEditOpen(true)}
                   title="Editar búsqueda"
-                  className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center cursor-pointer shrink-0"
+                  className="w-10 h-10  flex items-center justify-center cursor-pointer shrink-0"
                 >
                   <Pencil size={16} />
                 </button>
@@ -207,7 +207,7 @@ export default function SearchDetailPage() {
         </div>
 
         {/* Bloque medio: parámetros */}
-        <div className="bg-white rounded-[24px]  shadow-sm p-6 md:p-8 mb-6">
+        <div className="mask-t-from-100% mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <ParamItem icon={Tag} label="Operación" value={opLabel(data.operation_type)} />
             <ParamItem
@@ -243,7 +243,7 @@ export default function SearchDetailPage() {
         </div>
 
         {/* Bloque inferior */}
-        <div className="bg-white rounded-[24px]  p-6 md:p-8">
+        <div className="bg-white  p-6 md:p-8">
           {isOwner ? (
             <OwnerResponsesBlock data={data} />
           ) : (
@@ -304,7 +304,7 @@ function ParamItem({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
+      <div className="w-9 h-9 rounded-xl shadow-sm flex items-center justify-center shrink-0">
         <Icon size={16} className="text-geora-black/60" />
       </div>
       <div className="min-w-0">
@@ -317,9 +317,6 @@ function ParamItem({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Bloque inferior — dueño: respuestas recibidas
-// ---------------------------------------------------------------------------
 function OwnerResponsesBlock({ data }: { data: any }) {
   const responses: any[] = data.responses || [];
   const client = data.client;
@@ -374,7 +371,7 @@ function OwnerResponsesBlock({ data }: { data: any }) {
           return (
             <div
               key={r.id}
-              className="flex flex-col gap-3 p-4 rounded-2xl border border-gray-200"
+              className="flex flex-col gap-3 p-4 rounded-3xl shadow-sm"
             >
               <div className="flex items-center gap-3">
                 <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden shrink-0">
@@ -404,7 +401,7 @@ function OwnerResponsesBlock({ data }: { data: any }) {
                 <button
                   onClick={() => shareProperty(p, "whatsapp", client)}
                   title="WhatsApp"
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border border-gray-200 text-geora-black/70 hover:border-geora-emerald hover:text-geora-emerald text-xs font-bold transition-all cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 text-geora-black/70 hover:border-geora-emerald hover:text-geora-emerald text-xs font-bold transition-all cursor-pointer"
                 >
                   <MessageSquare size={13} /> WhatsApp
                 </button>
@@ -416,7 +413,7 @@ function OwnerResponsesBlock({ data }: { data: any }) {
                       ? "Enviar por chat de Geora"
                       : "Cliente no conectado a Geora"
                   }
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border border-gray-200 text-geora-black/70 hover:border-geora-emerald hover:text-geora-emerald text-xs font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-geora-black/70 cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 text-geora-black/70 hover:border-geora-emerald hover:text-geora-emerald text-xs font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-geora-black/70 cursor-pointer"
                 >
                   {sendingChatId === p.id ? (
                     <Loader2 size={13} className="animate-spin" />
@@ -428,14 +425,14 @@ function OwnerResponsesBlock({ data }: { data: any }) {
                 <button
                   onClick={() => shareProperty(p, "email", client)}
                   title="Email"
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border border-gray-200 text-geora-black/70 hover:border-geora-emerald hover:text-geora-emerald text-xs font-bold transition-all cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 text-geora-black/70 hover:border-geora-emerald hover:text-geora-emerald text-xs font-bold transition-all cursor-pointer"
                 >
                   <Mail size={13} /> Mail
                 </button>
                 <button
                   onClick={() => shareProperty(p, "copy", client)}
                   title="Copiar enlace"
-                  className="p-2 rounded-lg border border-gray-200 text-geora-black/50 hover:border-geora-black/30 hover:text-geora-black transition-all cursor-pointer shrink-0"
+                  className="p-2 rounded-lg shadow-sm text-geora-black/50 hover:border-geora-black/30 hover:text-geora-black transition-all cursor-pointer shrink-0"
                 >
                   <Share2 size={13} />
                 </button>
@@ -448,9 +445,6 @@ function OwnerResponsesBlock({ data }: { data: any }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Bloque inferior — no dueño: propiedades del stock que matchean
-// ---------------------------------------------------------------------------
 function ResponderMatchesBlock({
   matches,
   selected,
