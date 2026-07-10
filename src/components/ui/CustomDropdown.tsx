@@ -52,7 +52,7 @@ export function CustomDropdown({
     black: "text-geora-white",
     white3: "text-geora-black/60",
     white: "bg-geora-white1 text-geora-black hover:bg-geora-white border border-black/70",
-    white1: "bg-white/50 text-geora-black/70 hover:bg-white hover:border-black/30 border border-white/70 shadow-md",
+    white1: "bg-white/50 text-geora-black/70 hover:bg-gray-50 border border-white/70 shadow-md",
     white2:
       "bg-geora-white text-geora-black/70 border border-black/70 hover:bg-geora-dark hover:text-geora-white",
     "map-layer":

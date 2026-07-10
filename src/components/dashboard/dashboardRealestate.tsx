@@ -1499,10 +1499,10 @@ const [clients, setClients] = useState<any[]>([]);
                     ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                     : activeFilter === "price"
                       ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
-                      : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                      : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-md"
                 }`}
               >
-                <span className="text-sm md:text-md tracking-wider flex items-center justify-center">
+                <span className="text-md tracking-wider flex items-center justify-center">
                   {minPrice || maxPrice
                     ? `${filterCurrency || ""}${minPrice ? ` ≥${Number(minPrice).toLocaleString("es-AR")}` : ""}${maxPrice ? ` ≤${Number(maxPrice).toLocaleString("es-AR")}` : ""}`
                     : "Precio"}
@@ -1543,10 +1543,10 @@ const [clients, setClients] = useState<any[]>([]);
                     ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                     : activeFilter === "rooms"
                       ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
-                      : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                      : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-md"
                 }`}
               >
-                <span className="text-sm md:text-md tracking-wider flex items-center justify-center">
+                <span className="text-md tracking-wider flex items-center justify-center">
                   {filterRooms[0]
                     ? `${filterRooms[0]} amb.`
                     : filterBedrooms[0]

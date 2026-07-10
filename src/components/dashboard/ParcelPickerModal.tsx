@@ -194,7 +194,7 @@ export default function ParcelPickerModal({
     <div className="fixed inset-0 z-[1200] flex items-center justify-center pt-20 px-6 pb-6">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-4xl h-[80vh] bg-white/70 border border-white rounded-3xl flex flex-col shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-4xl h-[80vh] bg-white/90 border border-white rounded-3xl flex flex-col shadow-2xl overflow-hidden">
         
         {/* Header */}
         <div className="flex flex-col shrink-0 bg-white/70">
@@ -244,9 +244,7 @@ export default function ParcelPickerModal({
               Pin Manual
             </button>
           </div>
-          <p className="px-8 pt-2 pb-3 text-xs font-medium text-geora-black/50 italic">
-            Seleccioná una sola opción.
-          </p>
+
         </div>
 
         <div className="flex-1 min-h-0 relative mx-4 my-3 rounded-2xl overflow-hidden">
@@ -315,6 +313,7 @@ export default function ParcelPickerModal({
             </div>
           )}
         </div>
+          <span className="px-15 text-center text-xs mt-2 mb-2 italic text-black/60">Los límites catastrales que se muestran en el mapa corresponden a información pública provista por organismos catastrales provinciales y municipales, y pueden no reflejar modificaciones recientes.</span>
 
         {/* Footer */}
         <div className="px-8 pb-4 pt-0 flex items-center justify-between gap-4 bg-white/70 shrink-0">

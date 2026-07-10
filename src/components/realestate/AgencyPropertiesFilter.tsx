@@ -171,10 +171,10 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
                   ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                   : activeFilter === "price"
                     ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
-                    : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                    : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-md"
               }`}
             >
-              <span className="text-sm md:text-md tracking-wider flex items-center justify-center">
+              <span className="text-md tracking-wider flex items-center  justify-center">
                 {minPrice || maxPrice
                   ? `${filterCurrency || ""}${minPrice ? ` ≥${Number(minPrice).toLocaleString("es-AR")}` : ""}${maxPrice ? ` ≤${Number(maxPrice).toLocaleString("es-AR")}` : ""}`
                   : "Precio"}
@@ -183,7 +183,7 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
             </button>
 
             {activeFilter === "price" && (
-              <div className="absolute top-full left-0 md:right-0 md:left-auto mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
+              <div className="absolute top-full right-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
                 <PriceFilterCard
                   minPrice={minPrice}
                   maxPrice={maxPrice}
@@ -207,10 +207,10 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
                   ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
                   : activeFilter === "rooms"
                     ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
-                    : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                    : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-md"
               }`}
             >
-              <span className="text-sm md:text-md tracking-wider flex items-center justify-center">
+              <span className="text-md tracking-wider flex items-center justify-center">
                 {filterRooms[0]
                   ? `${filterRooms[0]} amb.`
                   : filterBedrooms[0]
@@ -221,7 +221,7 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
             </button>
 
             {activeFilter === "rooms" && (
-              <div className="absolute top-full right-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
+              <div className="absolute top-full right-0 mt-3 z-[999] w-80 rounded-2xl bg-white text-geora-black/70 shadow-xl p-5">
                 <RoomsFilterCard
                   rooms={filterRooms}
                   bedrooms={filterBedrooms}
@@ -246,7 +246,7 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
                 setFilterBathrooms([]);
                 setActiveFilter(null);
               }}
-              className="h-10 cursor-pointer px-3 md:px-4 py-2 rounded-full flex items-center gap-2 bg-geora-black/80 text-white text-sm font-bold hover:bg-geora-black transition-colors shadow-sm"
+              className="h-10 cursor-pointer px-3 md:px-4 py-2 rounded-full flex items-center gap-2 bg-geora-black/80 text-white text-sm font-bold hover:bg-geora-black transition-colors shadow-md"
             >
               <X size={14} strokeWidth={3} />
               <span className="hidden md:inline">Limpiar filtros</span>
@@ -294,10 +294,10 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
               <div className="flex flex-1 flex-col justify-between min-w-0 z-10">
                 <div>
                   <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-md z-1">
                       {PROPERTY_LABELS[property.type] ?? property.type}
                     </span>
-                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-sm z-1">
+                    <span className="rounded-full border border-white/20 bg-geora-black/80 px-3 py-1 text-xs font-bold text-white uppercase shadow-md z-1">
                       {OPERATION_LABELS[property.operation_type] ?? property.operation_type}
                     </span>
                   </div>

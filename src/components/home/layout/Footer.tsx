@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Instagram, Twitter, Facebook, Phone, MapPin } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
@@ -33,8 +33,15 @@ export default function Footer() {
             <Image src="/Geora_Logo_Mini.svg" alt="Geora Logo" fill className="object-contain object-left" priority />
           </div>
           <div className="flex gap-4 mt-2">
-            <a href="#" className="hover:text-gray-400 transition-colors"><Instagram size={20} /></a>
-            <a href="mailto:contacto@geora.com" className="hover:text-gray-400 transition-colors"><Mail size={20} /></a>
+            <a href="https://www.instagram.com/geora.app" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-colors">
+              <Instagram size={20} />
+            </a>
+            <a href="https://x.com/georaapp" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-colors">
+              <Twitter size={20} />
+            </a>
+            <a href="https://www.facebook.com/geora.ar" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-colors">
+              <Facebook size={20} />
+            </a>
           </div>
         </div>
 
@@ -72,8 +79,7 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-6 text-sm text-gray-400">
         <div className="flex flex-col md:flex-row gap-6 items-center">
-          <span className="flex items-center gap-2"><MapPin size={16} /> Calle 7 #1234, La Plata, Buenos Aires</span>
-          <span className="flex items-center gap-2"><Phone size={16} /> +54 221 123-4567</span>
+          <span className="flex items-center gap-2"><Phone size={16} /> +54 2920 486430</span>
         </div>
         
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">

@@ -171,8 +171,7 @@ export default function Banner({ items }: BannerProps) {
               <br className="hidden md:block" />
             </h1>
             <p className="max-w-lg text-sm sm:text-base font-medium text-slate-200 drop-shadow md:text-xl mx-auto md:mx-0 px-2 md:px-0">
-              Explorá miles de propiedades en las mejores ubicaciones con la
-              estética que buscás.
+              Encontrá tu próxima propiedad en cualquier rincón de Argentina, con todos los datos que necesitás para decidir.
             </p>
           </div>
 

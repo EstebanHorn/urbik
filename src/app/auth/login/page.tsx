@@ -185,16 +185,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className={`flex items-center my-8 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.55s')}>
-            <div className="flex-1 border-t border-white/10" />
-            <span className="px-4 text-xs tracking-wider text-white/40 uppercase font-medium">o continuá con</span>
-            <div className="flex-1 border-t border-white/10" />
-          </div>
 
-          <button type="button" onClick={handleGoogleSignIn} disabled={isLoading || isSuccess} className={`w-full cursor-pointer bg-white/5 border border-white/10 text-white font-medium py-3 rounded-full text-sm hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.65s')}>
-            <GoogleIcon />
-            <span>Google</span>
-          </button>
 
           <div className={`text-center mt-8 text-sm text-white/50 ${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.75s')}>
             ¿No tenés una cuenta?{" "}

@@ -9,6 +9,7 @@ import { useSearch, type SearchSuggestion } from "@/hooks/useSearch";
 import { parseFiltersFromQuery } from "@/utils/propertyFilters";
 import PriceFilterCard from "@/components/search/PriceFilterCard";
 import RoomsFilterCard from "@/components/search/RoomsFilterCard";
+import MapListToggle from "@/components/search/MapListToggle";
 
 function getSuggestionBadge(s: SearchSuggestion): {
   label: string;
@@ -193,7 +194,7 @@ export default function DesktopSearchFilterBar() {
       <div className="mx-auto w-full md:px-10 flex items-center justify-center gap-4">
         <div className="flex items-center gap-4 flex-1 max-w-md justify-end">
           <div ref={searchRef} className="relative flex-1 w-full anim-item delay-1">
-            <div className="flex items-center w-full rounded-full px-3 py-1 border transition-colors duration-300 bg-white border-gray-200 shadow-md">
+            <div className="flex items-center w-full rounded-full px-3 py-1 border transition-colors duration-300 bg-white border-white shadow-md">
               <input
                 type="text"
                 value={query}
@@ -354,10 +355,10 @@ export default function DesktopSearchFilterBar() {
                 currentFilters.minPrice ||
                 currentFilters.maxPrice ||
                 currentFilters.currency
-                  ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
+                  ? "bg-white  text-geora-black/70 shadow-md"
                   : activeFilter === "price"
-                    ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
-                    : "bg-white border border-gray-200 text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                    ? "bg-white  text-geora-black/70 shadow-md"
+                    : "bg-white  text-geora-black/70 hover:bg-gray-50 shadow-md"
               }`}
             >
               <span className="text-md tracking-wider flex items-center justify-center truncate">
@@ -371,7 +372,7 @@ export default function DesktopSearchFilterBar() {
             </button>
 
             {activeFilter === "price" && (
-              <div className="absolute top-full left-0 mt-3 z-999 w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
+              <div className="absolute top-full left-0 mt-3 z-999 w-80 rounded-2xl  bg-white text-geora-black/70 shadow-xl p-5">
                 <PriceFilterCard
                   minPrice={localMinPrice}
                   maxPrice={localMaxPrice}
@@ -396,10 +397,10 @@ export default function DesktopSearchFilterBar() {
                 currentFilters.rooms.length > 0 ||
                 currentFilters.bedrooms.length > 0 ||
                 currentFilters.bathrooms.length > 0
-                  ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
+                  ? "bg-white border border-white text-geora-black/70 shadow-md"
                   : activeFilter === "rooms"
-                    ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
-                    : "bg-white border border-gray-200 text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                    ? "bg-white border border-white text-geora-black/70 shadow-md"
+                    : "bg-white border border-white text-geora-black/70 hover:bg-gray-50 shadow-md"
               }`}
             >
               <span className="text-md tracking-wider flex items-center justify-center">
@@ -417,7 +418,7 @@ export default function DesktopSearchFilterBar() {
             </button>
 
             {activeFilter === "rooms" && (
-              <div className="absolute top-full left-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
+              <div className="absolute top-full left-0 mt-3 z-[999] w-80 rounded-2xl bg-white text-geora-black/70 shadow-xl p-5">
                 <RoomsFilterCard
                   rooms={searchParams.getAll("rooms")}
                   bedrooms={searchParams.getAll("bedrooms")}
@@ -433,14 +434,22 @@ export default function DesktopSearchFilterBar() {
             onClick={() => window.dispatchEvent(new CustomEvent("toggle-sidebar"))}
             className={`anim-item delay-6 h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center gap-2 font-bold ${
               hasMoreFilters
-                ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
-                : "bg-white border border-gray-200 text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                ? "bg-white border border-white text-geora-black/70 shadow-md"
+                : "bg-white border border-white text-geora-black/70 hover:bg-gray-50 shadow-md"
             }`}
           >
             <SlidersHorizontal size={15} />
             <span className="text-md tracking-wider">Más filtros</span>
           </button>
         </div>
+
+        {/* --- Contenedor de MapListToggle (alineado a la derecha del todo) --- */}
+        <div className="flex flex-1 justify-end items-center">
+          <div className="anim-item delay-7">
+            <MapListToggle />
+          </div>
+        </div>
+
       </div>
 
       <style>{`
@@ -464,6 +473,8 @@ export default function DesktopSearchFilterBar() {
         .delay-3 { animation-delay: 0.4s; }
         .delay-4 { animation-delay: 0.5s; }
         .delay-5 { animation-delay: 0.6s; }
+        .delay-6 { animation-delay: 0.7s; }
+        .delay-7 { animation-delay: 0.8s; }
       `}</style>
     </div>
   );

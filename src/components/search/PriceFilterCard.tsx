@@ -116,7 +116,7 @@ export default function PriceFilterCard({
               onClick={() => onChangeCurrency(currency === c ? "" : c)}
               className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                 currency === c
-                  ? "bg-geora-black text-white shadow-sm"
+                  ? "bg-geora-black text-white shadow-md"
                   : "text-geora-black/50"
               }`}
             >

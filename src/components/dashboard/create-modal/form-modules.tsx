@@ -595,14 +595,22 @@ export function Module02Location({
 }: Module02LocationProps) {
   const { watch, setValue } = rhf;
 
+  const provinceValue = watch("province") ?? "";
+
+  const isPBA = 
+    typeof provinceValue === "string" && 
+    provinceValue.toLowerCase().includes("buenos aires") && 
+    !provinceValue.toLowerCase().includes("ciudad") &&
+    !provinceValue.toLowerCase().includes("caba");
+
   return (
     <div className="space-y-4">
       <LocationSelectors
-        provinceValue={watch("province") ?? ""}
+        provinceValue={provinceValue}
         cityValue={watch("city") ?? ""}
         localityValue={watch("locality") ?? ""}
         onChange={(n, v) => setValue(n as Path<PropertyUploadFormData>, v)}
-        cityLabel="PARTIDO"
+        cityLabel={isPBA ? "PARTIDO" : "DEPARTAMENTO"}
         localityLabel="LOCALIDAD"
         cityApiEndpoint="departamentos"
         showLocality={true}

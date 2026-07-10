@@ -87,7 +87,7 @@ function ProfileMenu({
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="relative overflow-visible flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-geora-white1 text-geora-black hover:bg-geora-white border border-black/70 transition cursor-pointer"
+        className="relative overflow-visible flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full text-geora-white hover:bg-geora-white hover:text-geora-black border-2 border-white transition cursor-pointer"
       >
         <User className="w-[18px] h-[18px] md:w-5 md:h-5" />
         {hasUnread && <NotificationDot className="-top-0.5 -right-0.5" />}
