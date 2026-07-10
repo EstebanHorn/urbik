@@ -113,11 +113,13 @@ export function useSearchForm({
         province: sp.province || prev.province,
         department: sp.department || prev.department,
         locality: sp.locality || sp.city || prev.locality,
+        radius: sp.radius || prev.radius,
         minPrice: sp.minPrice ?? prev.minPrice,
         maxPrice: sp.maxPrice ?? prev.maxPrice,
         currency: sp.currency || prev.currency,
         minArea: sp.minArea ?? prev.minArea,
         maxArea: sp.maxArea ?? prev.maxArea,
+        areaUnit: sp.areaUnit || prev.areaUnit,
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

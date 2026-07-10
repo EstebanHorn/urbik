@@ -1031,6 +1031,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
               value={watch("viewType") ?? ""}
               onChange={(v) => setValue("viewType", v as any)}
               variant="white2"
+              matchEmptyValue
             />
           </div>
         </>
@@ -1045,6 +1046,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
             <CustomDropdown
               label="Pendiente del terreno"
               options={[
+                { value: "", label: "Ninguna" },
                 { value: "plana", label: "Plana" },
                 { value: "moderada", label: "Moderada" },
                 { value: "empinada", label: "Empinada" },
@@ -1052,6 +1054,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
               value={watch("slope") ?? ""}
               onChange={(v) => setValue("slope", v as any)}
               variant="white2"
+              matchEmptyValue
             />
             <CustomDropdown
               label="Costa"
@@ -1064,6 +1067,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
               value={watch("coastType") ?? ""}
               onChange={(v) => setValue("coastType", v as any)}
               variant="white2"
+              matchEmptyValue
             />
             <CustomDropdown
               label="Vista"
@@ -1071,6 +1075,7 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
               value={watch("viewType") ?? ""}
               onChange={(v) => setValue("viewType", v as any)}
               variant="white2"
+              matchEmptyValue
             />
           </div>
 

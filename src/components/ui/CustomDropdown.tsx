@@ -15,6 +15,7 @@ interface CustomDropdownProps {
   className?: string;
   variant?: "white" | "white1" | "white2" | "white3" | "map-layer" | "black" | "mobile-black";
   direction?: "up" | "down" | "responsive";
+  matchEmptyValue?: boolean;
 }
 
 export function CustomDropdown({
@@ -25,6 +26,7 @@ export function CustomDropdown({
   className = "",
   variant = "white",
   direction = "responsive",
+  matchEmptyValue = false,
 }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,7 +45,7 @@ export function CustomDropdown({
   }, []);
 
   const selectedOption = options.find(
-    (opt) => opt.value === value && opt.value !== "",
+    (opt) => opt.value === value && (matchEmptyValue || opt.value !== ""),
   );
 
   const variantStyles = {

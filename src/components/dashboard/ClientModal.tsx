@@ -209,8 +209,8 @@ export default function ClientModal({ isOpen, onClose, client, properties, onSav
                   <div>
                     <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-1.5 ml-1">Superficie ({isRural ? "ha" : "m²"})</label>
                     <div className="flex gap-2">
-                      <input type="number" value={sp.minArea} onChange={(e) => setSp({ minArea: e.target.value })} placeholder="Desde" className="w-1/3 border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
-                      <input type="number" value={sp.maxArea} onChange={(e) => setSp({ maxArea: e.target.value })} placeholder="Hasta" className="w-1/3 border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
+                      <input type="number" min="0" value={sp.minArea} onChange={(e) => (e.target.value === "" || Number(e.target.value) >= 0) && setSp({ minArea: e.target.value })} placeholder="Desde" className="w-1/3 border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
+                      <input type="number" min="0" value={sp.maxArea} onChange={(e) => (e.target.value === "" || Number(e.target.value) >= 0) && setSp({ maxArea: e.target.value })} placeholder="Hasta" className="w-1/3 border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
                       <select value={sp.areaUnit} onChange={(e) => setSp({ areaUnit: e.target.value })} className="w-1/3 border border-white bg-white/60 rounded-xl px-2 py-2.5 text-sm focus:outline-none shadow-sm">
                         <option value="M2">m²</option>
                         <option value="HA">ha</option>
@@ -221,8 +221,8 @@ export default function ClientModal({ isOpen, onClose, client, properties, onSav
                   <div>
                     <label className="block text-[10px] font-bold text-geora-black/60 uppercase mb-1.5 ml-1">Rango de precio</label>
                     <div className="flex gap-2">
-                      <input type="number" value={sp.minPrice} onChange={(e) => setSp({ minPrice: e.target.value })} placeholder="Desde" className="w-1/3 border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
-                      <input type="number" value={sp.maxPrice} onChange={(e) => setSp({ maxPrice: e.target.value })} placeholder="Hasta" className="w-1/3 border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
+                      <input type="number" min="0" value={sp.minPrice} onChange={(e) => (e.target.value === "" || Number(e.target.value) >= 0) && setSp({ minPrice: e.target.value })} placeholder="Desde" className="w-1/3 border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
+                      <input type="number" min="0" value={sp.maxPrice} onChange={(e) => (e.target.value === "" || Number(e.target.value) >= 0) && setSp({ maxPrice: e.target.value })} placeholder="Hasta" className="w-1/3 border border-white bg-white/60 rounded-xl px-3 py-2.5 text-sm focus:outline-none shadow-sm" />
                       <select value={sp.currency} onChange={(e) => setSp({ currency: e.target.value })} className="w-1/3 border border-white bg-white/60 rounded-xl px-2 py-2.5 text-sm focus:outline-none shadow-sm">
                         <option value="USD">USD</option>
                         <option value="ARS">ARS</option>

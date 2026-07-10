@@ -68,7 +68,8 @@
       "Bash(rm -f ./bench.mjs)",
       "Bash(netstat -ano)",
       "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 3000 -State Listen | Select-Object -ExpandProperty OwningProcess\")",
-      "Bash(powershell -Command \"Stop-Process -Id 18800 -Force\")"
+      "Bash(powershell -Command \"Stop-Process -Id 18800 -Force\")",
+      "Bash(grep -A5 \"form-modules.tsx$\")"
     ]
   }
 }

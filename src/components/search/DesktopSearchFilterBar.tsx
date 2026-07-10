@@ -189,11 +189,11 @@ export default function DesktopSearchFilterBar() {
   };
 
   return (
-    <div className="hidden md:flex fixed top-[76px] left-0 right-0 w-full bg-white/70 backdrop-blur-3xl shadow-sm border-b border-gray-200 z-[1000] h-[60px] items-center px-6 transition-all duration-300 anim-bar">
+    <div className="hidden md:flex fixed top-[76px] left-0 right-0 w-full bg-white shadow-sm border-b border-gray-200 z-[1000] h-[60px] items-center px-6 transition-all duration-300 anim-bar">
       <div className="mx-auto w-full md:px-10 flex items-center justify-center gap-4">
         <div className="flex items-center gap-4 flex-1 max-w-md justify-end">
           <div ref={searchRef} className="relative flex-1 w-full anim-item delay-1">
-            <div className="flex items-center w-full rounded-full px-3 py-1 border transition-colors duration-300 bg-white/50 border-white/70 shadow-md">
+            <div className="flex items-center w-full rounded-full px-3 py-1 border transition-colors duration-300 bg-white border-gray-200 shadow-md">
               <input
                 type="text"
                 value={query}
@@ -234,7 +234,7 @@ export default function DesktopSearchFilterBar() {
             </div>
 
             {!searchLoading && suggestions.length > 0 && (
-              <ul className="absolute bottom-full mb-1 md:bottom-auto md:top-full md:mb-0 md:mt-1 left-0 right-0 z-[1050] bg-white/70 backdrop-blur-2xl rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] border border-white/40 overflow-hidden max-h-72 overflow-y-auto">
+              <ul className="absolute bottom-full mb-1 md:bottom-auto md:top-full md:mb-0 md:mt-1 left-0 right-0 z-[1050] bg-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] border border-gray-200 overflow-hidden max-h-72 overflow-y-auto">
                 {suggestions.map((suggestion, index) => {
                   const badge = getSuggestionBadge(suggestion);
                   const label = getSuggestionLabel(suggestion);
@@ -245,7 +245,7 @@ export default function DesktopSearchFilterBar() {
                   return (
                     <li
                       key={`${suggestion.type}-${index}`}
-                      className="px-4 py-3 cursor-pointer hover:bg-white/50 transition-colors flex justify-between items-center text-sm border-b last:border-none border-white/30"
+                      className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex justify-between items-center text-sm border-b last:border-none border-gray-100"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => onSelectSuggestion(suggestion)}
                     >
@@ -354,10 +354,10 @@ export default function DesktopSearchFilterBar() {
                 currentFilters.minPrice ||
                 currentFilters.maxPrice ||
                 currentFilters.currency
-                  ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
+                  ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
                   : activeFilter === "price"
-                    ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
-                    : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                    ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
+                    : "bg-white border border-gray-200 text-geora-black/70 hover:bg-gray-50 shadow-sm"
               }`}
             >
               <span className="text-md tracking-wider flex items-center justify-center truncate">
@@ -396,10 +396,10 @@ export default function DesktopSearchFilterBar() {
                 currentFilters.rooms.length > 0 ||
                 currentFilters.bedrooms.length > 0 ||
                 currentFilters.bathrooms.length > 0
-                  ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
+                  ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
                   : activeFilter === "rooms"
-                    ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
-                    : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                    ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
+                    : "bg-white border border-gray-200 text-geora-black/70 hover:bg-gray-50 shadow-sm"
               }`}
             >
               <span className="text-md tracking-wider flex items-center justify-center">
@@ -433,8 +433,8 @@ export default function DesktopSearchFilterBar() {
             onClick={() => window.dispatchEvent(new CustomEvent("toggle-sidebar"))}
             className={`anim-item delay-6 h-10 cursor-pointer px-3 md:px-5 py-2 rounded-full tracking-wide transition-colors duration-200 flex items-center justify-center gap-2 font-bold ${
               hasMoreFilters
-                ? "bg-white/70 border border-white text-geora-black/70 shadow-md"
-                : "bg-white/70 border border-white text-geora-black/70 hover:bg-gray-50 shadow-sm"
+                ? "bg-white border border-gray-200 text-geora-black/70 shadow-md"
+                : "bg-white border border-gray-200 text-geora-black/70 hover:bg-gray-50 shadow-sm"
             }`}
           >
             <SlidersHorizontal size={15} />

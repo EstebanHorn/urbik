@@ -4,8 +4,8 @@ import React, { useEffect, useRef, useState, Suspense } from "react";
 import type { Session } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Menu,
   Home,
   Key,
   PlusCircle,
@@ -13,13 +13,18 @@ import {
   Shield,
   Network,
   Search,
+  Bell,
+  MessageSquare,
+  Bookmark,
+  Users as UsersIcon,
+  BarChart3,
+  LogOut,
   type LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
 
 import GeoraLogo from "@/assets/Geora_Logo.svg";
 import GeoraLogo2 from "@/assets/Geora_Logo_Mini.svg";
-import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import { createClient } from "@/lib/supabase/client";
 
 // Punto de notificación pulsante (verde Urbik). z-20 + overflow-visible en
@@ -31,6 +36,122 @@ function NotificationDot({ className = "" }: { className?: string }) {
       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-geora-emerald opacity-75" />
       <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-geora-emerald ring-2 ring-geora-black" />
     </span>
+  );
+}
+
+function ProfileMenu({
+  session,
+  role,
+  hasUnread,
+  onLogout,
+}: {
+  session: Session | null;
+  role: string | null;
+  hasUnread: boolean;
+  onLogout: () => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  type QuickLink = { href: string; label: string; Icon: LucideIcon; dot?: boolean };
+
+  const quickLinks: QuickLink[] = session
+    ? [
+        { href: "/dashboard?tab=notifications", label: "Notificaciones", Icon: Bell, dot: hasUnread },
+        { href: "/dashboard?tab=chat", label: "Mensajes", Icon: MessageSquare },
+        { href: "/dashboard?tab=saved", label: "Guardados", Icon: Bookmark },
+        ...(role === "REALESTATE"
+          ? [
+              { href: "/dashboard?tab=clients", label: "Clientes", Icon: UsersIcon },
+              { href: "/dashboard?tab=statistics", label: "Estadísticas", Icon: BarChart3 },
+            ]
+          : []),
+      ]
+    : [];
+
+  return (
+    <div className="relative shrink-0 overflow-visible" ref={containerRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
+        className="relative overflow-visible flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-geora-white1 text-geora-black hover:bg-geora-white border border-black/70 transition cursor-pointer"
+      >
+        <User className="w-[18px] h-[18px] md:w-5 md:h-5" />
+        {hasUnread && <NotificationDot className="-top-0.5 -right-0.5" />}
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute w-64 rounded-2xl bg-geora-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden bottom-full mb-3 md:bottom-auto md:top-full md:mt-3 right-0"
+          >
+            {session ? (
+              <>
+                {quickLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="relative flex items-center gap-3 px-5 py-3 text-sm font-medium text-geora-white hover:bg-white/10 transition"
+                  >
+                    <span className="relative overflow-visible flex items-center justify-center">
+                      <item.Icon className="w-4 h-4 shrink-0" />
+                      {item.dot && <NotificationDot className="-top-0.5 -right-1.5" />}
+                    </span>
+                    {item.label}
+                  </Link>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    onLogout();
+                  }}
+                  className="w-full flex items-center gap-3 text-left cursor-pointer px-5 py-3 text-sm font-medium text-geora-rose hover:bg-geora-rose/90 hover:text-geora-white transition"
+                >
+                  <LogOut className="w-4 h-4 shrink-0" />
+                  Cerrar Sesión
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-5 py-3 text-sm font-medium text-geora-white hover:bg-white/10 transition"
+                >
+                  Iniciar Sesión
+                </Link>
+                <Link
+                  href="/auth/register"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-5 py-3 text-sm font-medium text-geora-white hover:bg-white/10 transition"
+                >
+                  Registrarse
+                </Link>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -144,30 +265,10 @@ function NavbarInner() {
     );
   }
 
-  const profileOptions = session
-    ? [{ label: "Cerrar Sesión", value: "logout" }]
-    : [
-        { label: "Iniciar Sesión", value: "/auth/login" },
-        { label: "Registrarse", value: "/auth/register" },
-      ];
-
-  const handleProfileClick = async (value: string) => {
-    if (value === "logout") {
-      await supabase.auth.signOut();
-      router.push("/auth/login");
-    } else {
-      router.push(value);
-    }
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/auth/login");
   };
-
-  const dropdownLabel = (
-    <span className="relative flex items-center gap-2 overflow-visible">
-      <span className="hidden md:block">
-        {session ? "Mi Perfil" : "Ingresar"}
-      </span>
-      <Menu className="block md:hidden w-6 h-6" />
-    </span>
-  );
 
   type NavItem = {
     href: string;
@@ -294,13 +395,11 @@ function NavbarInner() {
           </div>
 
           <div className="shrink-0 flex items-center">
-            <CustomDropdown
-              label={dropdownLabel}
-              value=""
-              options={profileOptions}
-              onChange={handleProfileClick}
-              className="shrink-0"
-              variant="white"
+            <ProfileMenu
+              session={session}
+              role={role}
+              hasUnread={hasUnread}
+              onLogout={handleLogout}
             />
           </div>
         </div>

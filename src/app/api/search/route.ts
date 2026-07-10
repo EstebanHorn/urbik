@@ -89,22 +89,13 @@ export async function GET(request: NextRequest) {
     }
 
     let dbQuery = supabase
-      .from("profiles")
-      .select(`
-        user_id,
-        email,
-        role,
-        real_estates (
-          agency_name,
-          city
-        )
-      `)
-      .eq("role", "REALESTATE")
-      .ilike("real_estates.agency_name", `%${query}%`)
+      .from("real_estates")
+      .select("profile_id, agency_name, city")
+      .ilike("agency_name", `%${query}%`)
       .limit(3);
 
     if (cityFilter) {
-      dbQuery = dbQuery.ilike("real_estates.city", `%${cityFilter}%`);
+      dbQuery = dbQuery.ilike("city", `%${cityFilter}%`);
     }
 
     const [{ data: dbResults }, osmResponse] = await Promise.all([
@@ -118,19 +109,12 @@ export async function GET(request: NextRequest) {
     const osmResults = (await osmResponse.json()) as OsmResult[];
 
     const suggestions = [
-      ...(dbResults ?? []).map((user) => {
-  const realEstate = Array.isArray(user.real_estates)
-    ? user.real_estates[0]
-    : user.real_estates;
-
-  return {
-    type: "REALESTATE_USER",
-    id: user.user_id,
-    display_name:
-      realEstate?.agency_name || user.email,
-    city: realEstate?.city ?? null,
-  };
-}),
+      ...(dbResults ?? []).map((realEstate) => ({
+        type: "REALESTATE_USER",
+        id: realEstate.profile_id,
+        display_name: realEstate.agency_name,
+        city: realEstate.city ?? null,
+      })),
       ...osmResults.map((result) => ({
         type: "ADDRESS",
         id: result.place_id,

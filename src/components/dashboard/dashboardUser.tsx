@@ -278,8 +278,8 @@ function NotificationsPanel({ onRead, onChatStart }: { onRead?: () => void; onCh
   );
 }
 
-export default function DashboardUser({ profile, onRefresh }: { profile: ProfileData | null; onRefresh: () => void; }) {
-  const [activeTab, setActiveTab] = useState<UserTab>("profile");
+export default function DashboardUser({ profile, onRefresh, initialTab }: { profile: ProfileData | null; onRefresh: () => void; initialTab?: UserTab; }) {
+  const [activeTab, setActiveTab] = useState<UserTab>(initialTab || "profile");
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [showSettings, setShowSettings] = useState(false);

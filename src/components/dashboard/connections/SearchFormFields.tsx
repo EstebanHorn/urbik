@@ -82,9 +82,13 @@ export function UnitInput({
     <div className="relative w-1/2">
       <input
         type="number"
+        min="0"
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) =>
+          (e.target.value === "" || Number(e.target.value) >= 0) &&
+          onChange(e.target.value)
+        }
         className="w-full border border-gray-200 bg-white rounded-xl pl-3 pr-12 py-3 text-sm focus:outline-none shadow-sm"
       />
       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold text-gray-400 pointer-events-none">

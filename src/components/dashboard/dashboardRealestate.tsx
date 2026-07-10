@@ -1086,7 +1086,10 @@ const [clients, setClients] = useState<any[]>([]);
       alert("No se pudo generar el enlace porque falta el ID del perfil.");
       return;
     }
-    const url = `${window.location.origin}/realestate/${profile.id}`;
+    const slug = profile?.agencyData?.slug;
+    const url = slug
+      ? `${window.location.origin}/${slug}`
+      : `${window.location.origin}/realestate/${profile.id}`;
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(url);

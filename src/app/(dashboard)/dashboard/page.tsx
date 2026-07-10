@@ -134,6 +134,7 @@ function DashboardPageInner() {
     | "chat"
     | "saved"
     | "clients"
+    | "profile"
     | null;
 
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
@@ -211,12 +212,13 @@ function DashboardPageInner() {
             properties={properties}
             onRefresh={fetchProfile}
             autoOpenCreate={autoOpenCreate}
-            initialTab={initialTab || undefined}
+            initialTab={initialTab === "profile" ? undefined : initialTab || undefined}
           />
         ) : (
-          <DashboardUser 
-            profile={profile} 
-            onRefresh={fetchProfile} 
+          <DashboardUser
+            profile={profile}
+            onRefresh={fetchProfile}
+            initialTab={initialTab === "properties" || initialTab === "statistics" || initialTab === "clients" ? undefined : initialTab || undefined}
           />
         )}
       </div>
