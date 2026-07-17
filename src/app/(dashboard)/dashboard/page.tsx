@@ -78,6 +78,7 @@ export type PropertySummary = {
 export type ProfileData = {
   id?: string;
   role?: string;
+  status?: string;
   isActive?: boolean;
   email?: string;
   name?: string;
