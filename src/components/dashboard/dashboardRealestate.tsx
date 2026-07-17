@@ -1335,6 +1335,13 @@ const [clients, setClients] = useState<any[]>([]);
           />
         </div>
         <div className={activeTab === "properties" ? "block w-full" : "hidden"}>
+          {profile?.status === "PENDING" && (
+            <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center">
+              <p className="text-sm text-amber-700 font-medium">
+                Tu inmobiliaria está en revisión. Podés personalizar tu perfil, pero la publicación de propiedades, la Bolsa de Conexiones y la visibilidad pública se habilitan cuando el equipo de Geora te apruebe.
+              </p>
+            </div>
+          )}
           <div className="relative overflow-hidden group mb-20 mt-4">
             <div className="relative z-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
               <div
@@ -1428,7 +1435,13 @@ const [clients, setClients] = useState<any[]>([]);
 
                 <button
                   onClick={() => setCreateOpen(true)}
-                  className="text-center w-full rounded-full bg-white cursor-pointer border shadow-md border-black/10 px-5 py-2 text-sm font-bold text-geora-black/80 hover:scale-105 hover:text-geora-black/50 transform transition duration-200"
+                  disabled={profile?.status !== "APPROVED"}
+                  title={
+                    profile?.status !== "APPROVED"
+                      ? "Vas a poder cargar propiedades cuando tu inmobiliaria sea aprobada."
+                      : undefined
+                  }
+                  className="text-center w-full rounded-full bg-white cursor-pointer border shadow-md border-black/10 px-5 py-2 text-sm font-bold text-geora-black/80 hover:scale-105 hover:text-geora-black/50 transform transition duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
                 >
                   Cargar Propiedad
                 </button>

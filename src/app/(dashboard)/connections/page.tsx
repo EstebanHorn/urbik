@@ -53,11 +53,14 @@ function ConnectionsInner() {
   const [networkSearches, setNetworkSearches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
+  const [forbiddenMessage, setForbiddenMessage] = useState<string | null>(null);
 
   const loadSearches = useCallback(async () => {
     try {
       const res = await fetch("/api/searches");
       if (res.status === 403) {
+        const data = await res.json().catch(() => null);
+        setForbiddenMessage(data?.error ?? null);
         setForbidden(true);
         return;
       }
@@ -88,8 +91,8 @@ function ConnectionsInner() {
           Acceso exclusivo para inmobiliarias
         </h1>
         <p className="text-geora-black/60 font-medium mt-2 max-w-md">
-          La Bolsa de Conexiones es una red cerrada entre inmobiliarias
-          verificadas de Geora.
+          {forbiddenMessage ||
+            "La Bolsa de Conexiones es una red cerrada entre inmobiliarias verificadas de Geora."}
         </p>
       </div>
     );

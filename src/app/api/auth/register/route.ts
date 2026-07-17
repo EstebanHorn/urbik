@@ -3,11 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateUniqueSlug } from "@/lib/utils";
 
-const ALLOWED_DOMAINS = [
-  "gmail.com", "outlook.com", "hotmail.com", "yahoo.com",
-  "icloud.com", "protonmail.com", "live.com", "msn.com", "me.com", "aol.com",
-];
-
 interface LicensePayload {
   licenseNumber: string;
   province: string;
@@ -24,11 +19,6 @@ export async function POST(req: NextRequest) {
 
     if (!email || !email.includes("@")) {
       return NextResponse.json({ error: "Email inválido" }, { status: 400 });
-    }
-
-    const domain = email.split("@")[1];
-    if (!ALLOWED_DOMAINS.includes(domain)) {
-      return NextResponse.json({ error: "El dominio de correo no está permitido." }, { status: 400 });
     }
 
     const { data: authData, error: authError } = await supabase.auth.signUp({

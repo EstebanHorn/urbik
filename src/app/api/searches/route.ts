@@ -5,13 +5,13 @@ import { findMatchingProperties } from "@/lib/connections/matching";
 
 const AGENCY_ROLES = ["REALESTATE", "AGENT"];
 
-async function getAgencyRole(adminClient: ReturnType<typeof createAdminClient>, userId: string) {
+async function getAgencyProfile(adminClient: ReturnType<typeof createAdminClient>, userId: string) {
   const { data } = await adminClient
     .from("profiles")
-    .select("role")
+    .select("role, status")
     .eq("id", userId)
     .single();
-  return data?.role ?? null;
+  return data ?? null;
 }
 
 export async function GET() {
@@ -25,10 +25,16 @@ export async function GET() {
   }
 
   const admin = createAdminClient();
-  const role = await getAgencyRole(admin, user.id);
-  if (!role || !AGENCY_ROLES.includes(role)) {
+  const agencyProfile = await getAgencyProfile(admin, user.id);
+  if (!agencyProfile || !AGENCY_ROLES.includes(agencyProfile.role)) {
     return NextResponse.json(
       { error: "La Bolsa de Conexiones es exclusiva para inmobiliarias." },
+      { status: 403 }
+    );
+  }
+  if (agencyProfile.role === "REALESTATE" && agencyProfile.status !== "APPROVED") {
+    return NextResponse.json(
+      { error: "Tu inmobiliaria todavía no fue aprobada. Vas a poder usar la Bolsa de Conexiones apenas sea habilitada." },
       { status: 403 }
     );
   }
@@ -123,10 +129,16 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const admin = createAdminClient();
-  const role = await getAgencyRole(admin, user.id);
-  if (!role || !AGENCY_ROLES.includes(role)) {
+  const agencyProfile = await getAgencyProfile(admin, user.id);
+  if (!agencyProfile || !AGENCY_ROLES.includes(agencyProfile.role)) {
     return NextResponse.json(
       { error: "Sólo las inmobiliarias pueden publicar búsquedas." },
+      { status: 403 }
+    );
+  }
+  if (agencyProfile.role === "REALESTATE" && agencyProfile.status !== "APPROVED") {
+    return NextResponse.json(
+      { error: "Tu inmobiliaria todavía no fue aprobada. Vas a poder usar la Bolsa de Conexiones apenas sea habilitada." },
       { status: 403 }
     );
   }

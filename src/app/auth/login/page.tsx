@@ -59,19 +59,6 @@ export default function LoginPage() {
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role, status")
-        .eq("id", data.user.id)
-        .single();
-
-      if (profile?.role === "REALESTATE" && profile?.status === "PENDING") {
-        await supabase.auth.signOut();
-        setErrorMessage("Tu cuenta está en revisión. Te avisaremos cuando sea habilitada.");
-        setIsLoading(false);
-        return;
-      }
-
       if (rememberMe) {
         localStorage.setItem("geora_remember_email", email);
       } else {
@@ -150,7 +137,7 @@ export default function LoginPage() {
           <div className={`${!isSuccess ? 'animate-slide-up' : ''}`} style={getAnimStyle('0.35s')}>
             {isPending && (
               <div className="mb-6 p-4 rounded-full bg-amber-500/10 border border-amber-500/20 text-center">
-                <p className="text-sm text-amber-200 font-medium">Tu cuenta está pendiente de aprobación. Te avisaremos por email cuando esté habilitada.</p>
+                <p className="text-sm text-amber-200 font-medium">¡Cuenta creada! Ya podés iniciar sesión y personalizar el perfil de tu inmobiliaria. Te avisaremos por email cuando esté habilitada para publicar propiedades y usar la Bolsa de Conexiones.</p>
               </div>
             )}
             {isRegistered && (

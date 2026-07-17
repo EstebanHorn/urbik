@@ -70,7 +70,7 @@ export default async function RealEstateProfile({
     .select(
       `
       *,
-      profiles (role),
+      profiles (role, status),
       properties (*)
     `,
     )
@@ -79,20 +79,6 @@ export default async function RealEstateProfile({
 
   if (error || !realEstate) {
     notFound();
-  }
-
-  const { data: reviewsData } = await supabase
-    .from("real_estate_reviews")
-    .select("rating")
-    .eq("real_estate_id", profileId);
-
-  let averageRating = 0;
-  let totalReviews = 0;
-
-  if (reviewsData && reviewsData.length > 0) {
-    totalReviews = reviewsData.length;
-    const sum = reviewsData.reduce((acc, curr) => acc + curr.rating, 0);
-    averageRating = sum / totalReviews;
   }
 
   const {
@@ -109,6 +95,26 @@ export default async function RealEstateProfile({
       .single();
 
     isAdmin = currentUserProfile?.role === "ADMIN";
+  }
+
+  const isOwner = !!user && user.id === profileId;
+
+  if (realEstate.profiles?.status !== "APPROVED" && !isAdmin && !isOwner) {
+    notFound();
+  }
+
+  const { data: reviewsData } = await supabase
+    .from("real_estate_reviews")
+    .select("rating")
+    .eq("real_estate_id", profileId);
+
+  let averageRating = 0;
+  let totalReviews = 0;
+
+  if (reviewsData && reviewsData.length > 0) {
+    totalReviews = reviewsData.length;
+    const sum = reviewsData.reduce((acc, curr) => acc + curr.rating, 0);
+    averageRating = sum / totalReviews;
   }
 
   const activeProperties: Property[] =

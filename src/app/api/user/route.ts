@@ -82,7 +82,7 @@ export async function GET() {
   
   const { data: profile, error: profileError } = await admin
     .from("profiles")
-    .select("role, email, is_active") 
+    .select("role, email, is_active, status")
     .eq("id", authUser.id)
     .single();
 
@@ -118,8 +118,9 @@ export async function GET() {
     return NextResponse.json({
       id: authUser.id,
       role: profile.role,
-      email: profile.email, 
+      email: profile.email,
       isActive: Boolean(profile.is_active),
+      status: profile.status,
       agencyData: {
         name: realEstate?.agency_name ?? null,
         slug: realEstate?.slug ?? null,

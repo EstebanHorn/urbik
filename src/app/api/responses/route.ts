@@ -19,11 +19,17 @@ export async function POST(req: Request) {
     const admin = createAdminClient();
     const { data: profile } = await admin
       .from("profiles")
-      .select("role")
+      .select("role, status")
       .eq("id", user.id)
       .single();
     if (!profile || !AGENCY_ROLES.includes(profile.role)) {
       return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
+    }
+    if (profile.role === "REALESTATE" && profile.status !== "APPROVED") {
+      return NextResponse.json(
+        { error: "Tu inmobiliaria todavía no fue aprobada. Vas a poder usar la Bolsa de Conexiones apenas sea habilitada." },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();

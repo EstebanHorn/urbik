@@ -76,13 +76,20 @@ export async function POST(req: NextRequest) {
     const admin = createAdminClient();
     const { data: profile } = await admin
       .from("profiles")
-      .select("role")
+      .select("role, status")
       .eq("id", authUser.id)
       .single();
 
     if (!profile || profile.role !== "REALESTATE") {
       return NextResponse.json(
         { error: "Acceso denegado." },
+        { status: 403 },
+      );
+    }
+
+    if (profile.status !== "APPROVED") {
+      return NextResponse.json(
+        { error: "Tu inmobiliaria todavía no fue aprobada por el equipo de Geora." },
         { status: 403 },
       );
     }

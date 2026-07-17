@@ -189,8 +189,8 @@ export default function AdminPage() {
             <div className="mt-8 w-full justify-center flex items-center gap-2 text-geora-muted text-sm px-6">
               <AlertCircle size={16} />
               <span>
-                Las cuentas aprobadas recibirán una notificación automática por
-                correo.
+                Al aprobar, la inmobiliaria podrá publicar propiedades, usar la
+                Bolsa de Conexiones y su perfil será visible públicamente.
               </span>
             </div>
           </motion.div>

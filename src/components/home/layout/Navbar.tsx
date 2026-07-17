@@ -172,6 +172,7 @@ function NavbarInner() {
 
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasUnread, setHasUnread] = useState(false);
 
@@ -185,6 +186,7 @@ function NavbarInner() {
         if (res.ok) {
           const data = await res.json();
           setRole(data.role || "USER");
+          setStatus(data.status || null);
         } else {
           setRole("USER");
         }
@@ -299,9 +301,13 @@ function NavbarInner() {
 
     if (role === "REALESTATE") {
       return [
-        { href: `/dashboard?nueva=1`, label: "Publicar", Icon: PlusCircle },
+        ...(status === "APPROVED"
+          ? [{ href: `/dashboard?nueva=1`, label: "Publicar", Icon: PlusCircle }]
+          : []),
         { href: "/dashboard", label: "Mi Perfil", short: "Perfil", Icon: User },
-        { href: "/connections", label: "Bolsa", short: "Bolsa", Icon: Network },
+        ...(status === "APPROVED"
+          ? [{ href: "/connections", label: "Bolsa", short: "Bolsa", Icon: Network }]
+          : []),
         { href: "/", label: "Buscar", Icon: Search },
       ];
     }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 interface OsmAddress {
   house_number?: string;
@@ -88,9 +89,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ suggestions: [] });
     }
 
-    let dbQuery = supabase
+    const admin = createAdminClient();
+    let dbQuery = admin
       .from("real_estates")
-      .select("profile_id, agency_name, city")
+      .select("profile_id, agency_name, city, profiles!inner(status)")
+      .eq("profiles.status", "APPROVED")
       .ilike("agency_name", `%${query}%`)
       .limit(3);
 
