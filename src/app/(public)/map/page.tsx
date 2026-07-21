@@ -376,10 +376,10 @@ const handleBoundsChange = useCallback(
             </div>
           </div>
 
-          <div className="pointer-events-auto absolute bottom-6 left-1/2 z-50 w-max -translate-x-1/2 md:hidden">
+          <div className="pointer-events-auto absolute bottom-6 left-1 z-1000 w-max  md:hidden">
             <button
               onClick={() => setShowMobileList(!showMobileList)}
-              className="flex cursor-pointer items-center gap-3 rounded-full bg-slate-900 px-6 py-3 font-medium text-white shadow-2xl transition-transform active:scale-95"
+              className="flex cursor-pointer items-center gap-3 rounded-full mb-10 bg-white shadow-sm border-white border px-5 py-2 font-medium text-geora-black/70 transition-transform active:scale-95"
             >
               {showMobileList ? (
                 <>
@@ -387,10 +387,8 @@ const handleBoundsChange = useCallback(
                 </>
               ) : (
                 <>
-                  <List className="h-4 w-4" /> Ver Lista{" "}
-                  <span className="rounded-full bg-slate-700 px-2 text-xs">
-                    {properties.length}
-                  </span>
+                  <List className="h-4 w-4" />Ver Lista{" "}
+
                 </>
               )}
             </button>
