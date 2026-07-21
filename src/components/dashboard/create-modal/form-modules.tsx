@@ -722,6 +722,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       return [
         { key: "rooms", label: "Ambientes" },
         { key: "bedrooms", label: "Dormitorios" },
+        { key: "diningRooms", label: "Comedores" },
         { key: "bathrooms", label: "Baños" },
         { key: "toilets", label: "Toilettes" },
         { key: "garages", label: "Cocheras" },
@@ -732,6 +733,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       return [
         { key: "rooms", label: "Ambientes" },
         { key: "bedrooms", label: "Dormitorios" },
+        { key: "diningRooms", label: "Comedores" },
         { key: "bathrooms", label: "Baños" },
         { key: "toilets", label: "Toilettes" },
         { key: "garages", label: "Cocheras" },
@@ -742,6 +744,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       return [
         { key: "rooms", label: "Ambientes" },
         { key: "bedrooms", label: "Dormitorios" },
+        { key: "diningRooms", label: "Comedores" },
         { key: "bathrooms", label: "Baños" },
         { key: "toilets", label: "Toilettes" },
         { key: "garages", label: "Cocheras" },
@@ -1033,6 +1036,9 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
               value={normalizeFloorType(watch("floorType"))}
               onChange={(next) => setValue("floorType", next as any)}
             />
+                        <p className="text-sm font-bold text-geora-black/50 ml-1">
+             Vista
+            </p>
             <CustomDropdown
               label="Vista"
               options={viewOptions}

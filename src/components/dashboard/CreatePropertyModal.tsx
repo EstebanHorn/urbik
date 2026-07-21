@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation"; 
 import type { Geometry } from "geojson";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { X } from "lucide-react";
@@ -94,6 +95,8 @@ export default function CreatePropertyModal({
   onCreated,
   defaultContactInfo,
 }: CreatePropertyModalProps) {
+  const router = useRouter();
+
   const DEFAULT_VALUES: PropertyUploadFormData = {
     ...BASE_DEFAULT_VALUES,
     contactName: defaultContactInfo?.contactName,
@@ -109,6 +112,11 @@ export default function CreatePropertyModal({
   const [error, setError] = useState<string | null>(null);
   const [parcelPickerOpen, setParcelPickerOpen] = useState(false);
   const formScrollRef = useRef<HTMLFormElement | null>(null);
+
+  const handleClose = () => {
+    router.replace("/dashboard");
+    onClose();
+  };
 
   useEffect(() => {
     formScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -187,7 +195,7 @@ export default function CreatePropertyModal({
     }
   };
 
-const handleParcelConfirm = (parcel: SelectedParcel) => {
+  const handleParcelConfirm = (parcel: SelectedParcel) => {
     rhf.setValue("parcelCCA", parcel.cca ?? "");
     rhf.setValue("parcelPDA", parcel.pda ?? "");
     rhf.setValue(
@@ -278,7 +286,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
       rhf.reset(DEFAULT_VALUES);
       setActiveModuleId(1);
       onCreated();
-      onClose();
+      handleClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error inesperado");
     } finally {
@@ -312,7 +320,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
       <div className="fixed inset-0 z-[1100] flex items-center justify-center p-0 md:pt-20 md:px-6 md:pb-6">
         <div
           className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-          onClick={onClose}
+          onClick={handleClose}
         />
 
         <div className="relative w-full h-full max-w-none rounded-none md:max-w-xl md:h-[80vh] md:rounded-3xl bg-white/70 border border-white flex flex-col shadow-2xl overflow-hidden">
@@ -323,7 +331,7 @@ const handleParcelConfirm = (parcel: SelectedParcel) => {
               </h2>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose} 
                 className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
               >
                 <X size={16} />
