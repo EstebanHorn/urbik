@@ -15,6 +15,7 @@ import {
   Pencil,
   Building2,
   BadgeCheck,
+  Info
 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import CreateSearchModal from "@/components/dashboard/connections/CreateSearchModal";
@@ -102,10 +103,20 @@ function ConnectionsInner() {
     <div className="pt-24 pb-28 min-h-screen bg-gray-50/50">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
+<div>
             <h1 className="text-3xl font-black text-geora-black flex items-center gap-3">
-              <Network size={32} className="text-geora-black/80" /> Bolsa de
-              Conexiones
+              <Network size={32} className="text-geora-black/80" /> 
+              Bolsa de Conexiones
+              
+              <div className="relative flex items-center group ml-1">
+                <Info size={24} className="text-geora-black/40 hover:text-geora-black cursor-help transition-colors" />
+                
+                <div className="absolute left-0 top-full mt-3 w-[300px] md:w-[450px] p-4 bg-geora-black/90 text-white text-sm font-medium leading-relaxed rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                  La Bolsa de Conexiones es el espacio donde las inmobiliarias de Geora se conectan entre sí para colaborar en operaciones. Si tenés un comprador o inquilino y no encontrás la propiedad ideal en tu cartera, tu búsqueda se comparte con otras inmobiliarias que sí la tengan. Vos elegís los términos de honorarios con la otra parte; Geora solo facilita el contacto y protege los datos de tu cliente hasta que decidís avanzar.
+                  
+                  <div className="absolute left-2.5 -top-2 w-4 h-4 bg-geora-black/90 rotate-45 rounded-sm"></div>
+                </div>
+              </div>
             </h1>
             <p className="text-sm font-medium text-geora-black/60 mt-1">
               Publicá búsquedas para tus clientes o respondé a colegas.

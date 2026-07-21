@@ -684,11 +684,11 @@ export default async function PropertyPage({
     property.coveredArea || property.semiCoveredArea || property.uncoveredArea;
 
   return (
-    <main className="min-h-screen bg-white pb-32 lg:pb-20">
+    <main className="min-h-screen bg-white pb-32 lg:pb-20 mt-20">
       <TrackPropertyView propertyId={String(property.id)} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 md:pt-10 mb-6 sm:mb-2 flex items-center justify-between gap-3">
         <Link
-          href="/dashboard"
+          href="/properties"
           className="group text-geora-black/50 inline-flex items-center gap-2 text-sm font-bold hover:text-geora-black transition-colors"
         >
           <div className="p-2 group-hover:text-geora-black transition-colors">

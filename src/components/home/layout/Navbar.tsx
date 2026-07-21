@@ -330,44 +330,58 @@ function NavbarInner() {
     return true;
   };
 
-  const renderNavLinks = () => {
-    const linkClass =
-      "text-sm md:text-base text-geora-white hover:text-white/70 font-semibold transition-colors";
-    return getNavItems().map((item) => {
-      const showDot = hasUnread && item.href === "/dashboard";
-      return (
-        <Link key={item.label} href={item.href} className={`relative  overflow-visible ${linkClass}`}>
-          {item.label}
-          {showDot && <NotificationDot className="-top-0.5 -right-2.5" />}
-        </Link>
-      );
-    });
-  };
+const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const [path] = href.split("?");
+  if (pathname === path) {
+    e.preventDefault(); 
+    router.push(href);
+  }
+};
 
-  const renderMobileNavIcons = () => {
-    return getNavItems().map((item) => {
-      const active = isNavActive(item.href);
-      const Icon = item.Icon;
-      const showDot = hasUnread && item.href === "/dashboard";
-      return (
-        <Link
-          key={item.label}
-          href={item.href}
-          className={`flex flex-col items-center justify-center gap-1 px-1 min-w-0 transition-colors ${
-            active ? "text-geora-white" : "text-white/55 hover:text-white/80"
-          }`}
-        >
-          <span className="relative overflow-visible">
-            <Icon className="w-[22px] h-[22px] shrink-0" />
-            {showDot && <NotificationDot className="-top-0.5 -right-2.5" />}
-          </span>
-          <span className="text-[10px] font-medium leading-none truncate max-w-full">
-            {item.short ?? item.label}
-          </span>
-        </Link>
-      );
-    });
-  };
+const renderNavLinks = () => {
+  const linkClass =
+    "text-sm md:text-base text-geora-white hover:text-white/70 font-semibold transition-colors";
+  return getNavItems().map((item) => {
+    const showDot = hasUnread && item.href === "/dashboard";
+    return (
+      <Link 
+        key={item.label} 
+        href={item.href} 
+        onClick={(e) => handleNavClick(e, item.href)}
+        className={`relative overflow-visible ${linkClass}`}
+      >
+        {item.label}
+        {showDot && <NotificationDot className="-top-0.5 -right-2.5" />}
+      </Link>
+    );
+  });
+};
+
+const renderMobileNavIcons = () => {
+  return getNavItems().map((item) => {
+    const active = isNavActive(item.href);
+    const Icon = item.Icon;
+    const showDot = hasUnread && item.href === "/dashboard";
+    return (
+      <Link
+        key={item.label}
+        href={item.href}
+        onClick={(e) => handleNavClick(e, item.href)}
+        className={`flex flex-col items-center justify-center gap-1 px-1 min-w-0 transition-colors ${
+          active ? "text-geora-white" : "text-white/55 hover:text-white/80"
+        }`}
+      >
+        <span className="relative overflow-visible">
+          <Icon className="w-[22px] h-[22px] shrink-0" />
+          {showDot && <NotificationDot className="-top-0.5 -right-2.5" />}
+        </span>
+        <span className="text-[10px] font-medium leading-none truncate max-w-full">
+          {item.short ?? item.label}
+        </span>
+      </Link>
+    );
+  });
+};
 
   return (
     <>

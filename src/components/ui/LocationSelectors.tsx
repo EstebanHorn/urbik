@@ -147,18 +147,13 @@ export default function LocationSelectors({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
     if (!showLocality || !cityValue) {
       setLocalidades([]);
       setHasLocalidades(true);
       return;
     }
 
-    // El endpoint de georef filtra `departamento` por nombre, y muchos
-    // departamentos/partidos comparten nombre en distintas provincias
-    // (ej: "Adolfo Alsina" en Río Negro y Buenos Aires). Eso mezclaba las
-    // localidades. Resolvemos el id único del departamento dentro de la
-    // provincia seleccionada y filtramos por id.
     const depts = provinceValue
       ? ((geoData.departamentos as Record<string, GeorefItem[]>)[provinceValue] ?? [])
       : [];
@@ -172,12 +167,19 @@ export default function LocationSelectors({
       .then((res) => res.json())
       .then((data) => {
         const items = data.localidades || [];
+        
+        // --- FILTRO DE DUPLICADOS ---
+        // Usamos un Map para quedarnos con un solo registro por nombre
+        const uniqueItems = Array.from(
+          new Map(items.map((item: GeorefItem) => [item.nombre, item])).values()
+        );
+
         setLocalidades(
-          items.sort((a: GeorefItem, b: GeorefItem) =>
+          uniqueItems.sort((a: GeorefItem, b: GeorefItem) =>
             a.nombre.localeCompare(b.nombre),
           ),
         );
-        setHasLocalidades(items.length > 0);
+        setHasLocalidades(uniqueItems.length > 0);
         setLoadingLocalidades(false);
       })
       .catch(() => {
@@ -186,7 +188,6 @@ export default function LocationSelectors({
         setLoadingLocalidades(false);
       });
   }, [cityValue, showLocality, provinceValue]);
-
   useEffect(() => {
     if (openDropdown === "province" && provMenuRef.current) {
       provMenuRef.current.focus();

@@ -130,6 +130,7 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
   const propertyType = watch("type") ?? "";
   const statusType = watch("status") ?? "AVAILABLE";
   const saleCurrency = watch("saleCurrency") ?? "USD";
+  const rentCurrency = watch("rentCurrency") ?? "ARS";
 
   const propertyOptions = [
     { id: "HOUSE", label: "Casa" },
@@ -261,41 +262,82 @@ export function Module01PropertyData({ rhf }: ModuleProps) {
 
       {!watch("isPriceHidden") && (
         <div className="w-full space-y-6 flex flex-col items-center">
-          <div className="w-full flex flex-col items-center gap-3">
-            <div className="flex items-center gap-6">
-              <button
-                type="button"
-                onClick={() => setValue("saleCurrency", "ARS" as any)}
-                className={`font-bold transition-colors duration-200 ${
-                  saleCurrency === "ARS"
-                    ? "text-geora-black/80"
-                    : "text-geora-black/30"
-                }`}
-              >
-                ARS
-              </button>
-              <button
-                type="button"
-                onClick={() => setValue("saleCurrency", "USD" as any)}
-                className={`font-bold transition-colors duration-200 ${
-                  saleCurrency === "USD"
-                    ? "text-geora-black/80"
-                    : "text-geora-black/30"
-                }`}
-              >
-                USD
-              </button>
+          
+          {(operationType === "SALE" || operationType === "SALE_RENT") && (
+            <div className="w-full flex flex-col items-center gap-3">
+              <div className="flex items-center gap-6">
+                <button
+                  type="button"
+                  onClick={() => setValue("saleCurrency", "ARS" as any)}
+                  className={`font-bold transition-colors duration-200 ${
+                    saleCurrency === "ARS"
+                      ? "text-geora-black/80"
+                      : "text-geora-black/30"
+                  }`}
+                >
+                  ARS
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setValue("saleCurrency", "USD" as any)}
+                  className={`font-bold transition-colors duration-200 ${
+                    saleCurrency === "USD"
+                      ? "text-geora-black/80"
+                      : "text-geora-black/30"
+                  }`}
+                >
+                  USD
+                </button>
+              </div>
+
+              <AnimatedInput
+                type="number"
+                align="center"
+                rhf={rhf}
+                fieldName="salePrice"
+                placeholder={operationType === "SALE_RENT" ? "Precio de Venta" : "Precio"}
+              />
             </div>
+          )}
 
-            <AnimatedInput
-              type="number"
-              align="center"
-              rhf={rhf}
-              fieldName="salePrice"
-              placeholder="Precio"
-            />
-          </div>
+          {(operationType === "RENT" || operationType === "TEMP_RENT" || operationType === "SALE_RENT") && (
+            <div className="w-full flex flex-col items-center gap-3">
+              <div className="flex items-center gap-6">
+                <button
+                  type="button"
+                  onClick={() => setValue("rentCurrency", "ARS" as any)}
+                  className={`font-bold transition-colors duration-200 ${
+                    rentCurrency === "ARS"
+                      ? "text-geora-black/80"
+                      : "text-geora-black/30"
+                  }`}
+                >
+                  ARS
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setValue("rentCurrency", "USD" as any)}
+                  className={`font-bold transition-colors duration-200 ${
+                    rentCurrency === "USD"
+                      ? "text-geora-black/80"
+                      : "text-geora-black/30"
+                  }`}
+                >
+                  USD
+                </button>
+              </div>
 
+              <AnimatedInput
+                type="number"
+                align="center"
+                rhf={rhf}
+                fieldName="rentPrice"
+                placeholder={operationType === "SALE_RENT" ? "Precio de Alquiler" : "Precio"}
+              />
+            </div>
+          )}
+
+          {/* EXPENSAS */}
           <div className="w-full flex flex-col items-center">
             <AnimatedInput
               type="number"
@@ -722,6 +764,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       return [
         { key: "rooms", label: "Ambientes" },
         { key: "bedrooms", label: "Dormitorios" },
+        { key: "diningRooms", label: "Comedores" },
         { key: "bathrooms", label: "Baños" },
         { key: "toilets", label: "Toilettes" },
         { key: "garages", label: "Cocheras" },
@@ -732,6 +775,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       return [
         { key: "rooms", label: "Ambientes" },
         { key: "bedrooms", label: "Dormitorios" },
+        { key: "diningRooms", label: "Comedores" },
         { key: "bathrooms", label: "Baños" },
         { key: "toilets", label: "Toilettes" },
         { key: "garages", label: "Cocheras" },
@@ -742,6 +786,7 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       return [
         { key: "rooms", label: "Ambientes" },
         { key: "bedrooms", label: "Dormitorios" },
+        { key: "diningRooms", label: "Comedores" },
         { key: "bathrooms", label: "Baños" },
         { key: "toilets", label: "Toilettes" },
         { key: "garages", label: "Cocheras" },
@@ -1033,6 +1078,9 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
               value={normalizeFloorType(watch("floorType"))}
               onChange={(next) => setValue("floorType", next as any)}
             />
+                        <p className="text-sm font-bold text-geora-black/50 ml-1">
+             Vista
+            </p>
             <CustomDropdown
               label="Vista"
               options={viewOptions}
@@ -1051,6 +1099,9 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
             <p className="text-xs font-bold text-geora-black/40 uppercase tracking-widest">
               Terreno y entorno
             </p>
+                                    <p className="text-sm font-bold text-geora-black/50 ml-1">
+             Pendiente del terreno
+            </p>
             <CustomDropdown
               label="Pendiente del terreno"
               options={[
@@ -1064,6 +1115,9 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
               variant="white2"
               matchEmptyValue
             />
+                                    <p className="text-sm font-bold text-geora-black/50 ml-1">
+             Costa
+            </p>
             <CustomDropdown
               label="Costa"
               options={[
@@ -1077,6 +1131,9 @@ export function Module05BasicCharacteristics({ rhf }: ModuleProps) {
               variant="white2"
               matchEmptyValue
             />
+                                    <p className="text-sm font-bold text-geora-black/50 ml-1">
+             Vista
+            </p>
             <CustomDropdown
               label="Vista"
               options={viewOptions}

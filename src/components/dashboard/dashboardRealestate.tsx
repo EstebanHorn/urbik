@@ -1412,27 +1412,41 @@ const [clients, setClients] = useState<any[]>([]);
               </div>
 
               <div className="flex flex-col items-center gap-3 justify-end md:mr-8 w-full md:w-1/4">
-                <div className="flex items-center w-full justify-between gap-2">
-                  <button
-                    onClick={() => setProfileEditOpen(true)}
-                    className="text-center flex-1 px-3 py-2 text-md font-bold text-geora-black/80 cursor-pointer hover:text-geora-black/50 transform transition duration-200"
-                  >
-                    Editar Perfil
-                  </button>
+<div className="relative w-full h-12 flex items-center overflow-hidden">
+  <div
+    className={`absolute inset-0 flex items-center justify-between gap-2 transition-all duration-500 ease-in-out ${
+      isCopied ? "translate-y-[150%] opacity-0" : "translate-y-0 opacity-100"
+    }`}
+  >
+    <button
+      onClick={() => setProfileEditOpen(true)}
+      className="text-center flex-1 px-3 py-2 text-md font-bold text-geora-black/80 cursor-pointer hover:text-geora-black/50 transition duration-200"
+    >
+      Editar Perfil
+    </button>
 
-                  <button
-                    onClick={handleShareProfile}
-                    title="Compartir perfil"
-                    className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md cursor-pointer border shadow-sm border-black/10 text-geora-black/80 hover:scale-105 hover:bg-white transition duration-200"
-                  >
-                    {isCopied ? (
-                      <CheckCheck size={18} className="text-geora-emerald" />
-                    ) : (
-                      <Share2 size={18} />
-                    )}
-                  </button>
-                </div>
+    <button
+      onClick={handleShareProfile}
+      title="Compartir perfil"
+      className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md cursor-pointer border shadow-sm border-black/10 text-geora-black/80 hover:scale-105 hover:bg-white transition duration-200"
+    >
+      <Share2 size={18} />
+    </button>
+  </div>
 
+  <div
+    className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-in-out ${
+      isCopied ? "translate-y-0 opacity-100" : "-translate-y-[150%] opacity-0"
+    }`}
+  >
+    <div className="w-full h-10 flex items-center justify-center rounded-full  gap-2 px-4">
+      <CheckCheck size={18} className="text-geora-emerald" />
+      <span className="text-sm font-bold text-geora-emerald whitespace-nowrap">
+        Enlace copiado
+      </span>
+    </div>
+  </div>
+</div>
                 <button
                   onClick={() => setCreateOpen(true)}
                   disabled={profile?.status !== "APPROVED"}
