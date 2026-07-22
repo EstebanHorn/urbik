@@ -764,7 +764,6 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       return [
         { key: "rooms", label: "Ambientes" },
         { key: "bedrooms", label: "Dormitorios" },
-        { key: "diningRooms", label: "Comedores" },
         { key: "bathrooms", label: "Baños" },
         { key: "toilets", label: "Toilettes" },
         { key: "garages", label: "Cocheras" },
@@ -775,7 +774,6 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       return [
         { key: "rooms", label: "Ambientes" },
         { key: "bedrooms", label: "Dormitorios" },
-        { key: "diningRooms", label: "Comedores" },
         { key: "bathrooms", label: "Baños" },
         { key: "toilets", label: "Toilettes" },
         { key: "garages", label: "Cocheras" },
@@ -786,7 +784,6 @@ export function Module04Surfaces({ rhf }: ModuleProps) {
       return [
         { key: "rooms", label: "Ambientes" },
         { key: "bedrooms", label: "Dormitorios" },
-        { key: "diningRooms", label: "Comedores" },
         { key: "bathrooms", label: "Baños" },
         { key: "toilets", label: "Toilettes" },
         { key: "garages", label: "Cocheras" },

@@ -171,7 +171,9 @@ useEffect(() => {
         // --- FILTRO DE DUPLICADOS ---
         // Usamos un Map para quedarnos con un solo registro por nombre
         const uniqueItems = Array.from(
-          new Map(items.map((item: GeorefItem) => [item.nombre, item])).values()
+          new Map<string, GeorefItem>(
+            items.map((item: GeorefItem) => [item.nombre, item]),
+          ).values(),
         );
 
         setLocalidades(
