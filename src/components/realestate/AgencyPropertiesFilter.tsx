@@ -16,6 +16,7 @@ export type Property = {
   type: string;
   operation_type: string;
   address: string;
+  display_address?: string | null;
   city: string;
   images?: string[];
   sale_price?: number | null;
@@ -48,8 +49,7 @@ const glassCard = "md:rounded-[30px] rounded-3xl border border-white/70 bg-white
 
 function formatPrice(price?: number | null, currency?: string | null): string {
   if (!price) return "Consultar";
-  const symbol = currency === "ARS" ? "$" : "USD";
-  return `${symbol} ${price.toLocaleString("es-AR")}`;
+  return `${currency ?? "ARS"} ${price.toLocaleString("es-AR")}`;
 }
 
 export default function AgencyPropertiesFilter({ properties }: { properties: Property[] }) {
@@ -91,7 +91,9 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
     if (filterType && prop.type !== filterType) matches = false;
 
     const propPrice = prop.sale_price ?? prop.rent_price ?? 0;
-    const propCurrency = prop.sale_currency ?? prop.rent_currency ?? "USD";
+    const propCurrency = prop.sale_price
+      ? (prop.sale_currency ?? "USD")
+      : (prop.rent_currency ?? "ARS");
 
     if (minPrice && propPrice < Number(minPrice)) matches = false;
     if (maxPrice && propPrice > Number(maxPrice)) matches = false;
@@ -310,7 +312,7 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
                   </p>
                   <p className="mt-2 flex items-center gap-1 truncate text-xs font-semibold text-geora-black/80">
                     <MapPin size={12} className="shrink-0 text-geora-cyan" />
-                    {property.address}, {property.city}
+                    {property.display_address || property.address}, {property.city}
                   </p>
                 </div>
 
@@ -318,7 +320,9 @@ export default function AgencyPropertiesFilter({ properties }: { properties: Pro
                   <span className="text-base font-black tracking-tight text-geora-black/70 z-1">
                     {formatPrice(
                       property.sale_price || property.rent_price || null,
-                      property.sale_currency || property.rent_currency || null
+                      property.sale_price
+                        ? property.sale_currency ?? null
+                        : property.rent_currency ?? null
                     )}
                   </span>
                 </div>

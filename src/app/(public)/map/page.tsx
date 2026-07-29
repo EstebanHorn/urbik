@@ -194,7 +194,7 @@ export default function MapPage() {
         const normalizedList = rawList.map((p: RawProperty) => ({
           ...p,
           price: p.salePrice ?? p.rentPrice ?? p.price ?? 0,
-          currency: p.saleCurrency ?? p.rentCurrency,
+          currency: p.salePrice != null ? p.saleCurrency : p.rentCurrency,
           inMapBounds:
             p.lat >= visibleBounds.minLat &&
             p.lat <= visibleBounds.maxLat &&

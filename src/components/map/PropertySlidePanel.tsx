@@ -109,7 +109,7 @@ const LEGACY_ICON: Record<string, React.ReactNode> = {
 };
 
 interface Property {
-  id: string; title: string; description: string | null; address: string; city: string; province: string;
+  id: string; title: string; description: string | null; address: string; displayAddress: string | null; city: string; province: string;
   neighborhood: string | null; locality: string | null; status: string; type: string; operationType: string;
   salePrice: number | null; rentPrice: number | null; saleCurrency: string; rentCurrency: string; expenses: number | null;
   isPriceHidden: boolean; area: number | null; coveredArea: number | null; semiCoveredArea: number | null;
@@ -265,9 +265,9 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
             const otherIds = othersRaw.map((p) => p.id);
             const { data: favs } = await supabase.from("favorites").select("property_id").eq("profile_id", userId).in("property_id", otherIds);
             const favSet = new Set(favs?.map((f) => f.property_id));
-            otherProperties = othersRaw.map((p) => ({ id: p.id, title: p.title, type: p.type, operationType: p.operation_type, salePrice: p.sale_price, rentPrice: p.rent_price, currency: p.sale_currency || p.rent_currency || "USD", city: p.city, province: p.province, images: p.images || [], isFavorite: favSet.has(p.id) }));
+            otherProperties = othersRaw.map((p) => ({ id: p.id, title: p.title, type: p.type, operationType: p.operation_type, salePrice: p.sale_price, rentPrice: p.rent_price, currency: p.sale_price ? (p.sale_currency || "USD") : (p.rent_currency || "ARS"), city: p.city, province: p.province, images: p.images || [], isFavorite: favSet.has(p.id) }));
           } else {
-            otherProperties = othersRaw.map((p) => ({ id: p.id, title: p.title, type: p.type, operationType: p.operation_type, salePrice: p.sale_price, rentPrice: p.rent_price, currency: p.sale_currency || p.rent_currency || "USD", city: p.city, province: p.province, images: p.images || [], isFavorite: false }));
+            otherProperties = othersRaw.map((p) => ({ id: p.id, title: p.title, type: p.type, operationType: p.operation_type, salePrice: p.sale_price, rentPrice: p.rent_price, currency: p.sale_price ? (p.sale_currency || "USD") : (p.rent_currency || "ARS"), city: p.city, province: p.province, images: p.images || [], isFavorite: false }));
           }
         }
       }
@@ -275,7 +275,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
       const featureGroups = (propRaw.feature_groups && typeof propRaw.feature_groups === "object") ? propRaw.feature_groups : {};
 
       const property: Property = {
-        id: propRaw.id, title: propRaw.title, description: propRaw.description, address: propRaw.address, city: propRaw.city, province: propRaw.province,
+        id: propRaw.id, title: propRaw.title, description: propRaw.description, address: propRaw.address, displayAddress: propRaw.display_address ?? null, city: propRaw.city, province: propRaw.province,
         neighborhood: propRaw.neighborhood || null, locality: propRaw.locality || null, status: propRaw.status, type: propRaw.type, operationType: propRaw.operation_type,
         salePrice: propRaw.sale_price, rentPrice: propRaw.rent_price, saleCurrency: propRaw.sale_currency || "USD", rentCurrency: propRaw.rent_currency || "ARS", expenses: propRaw.expenses,
         isPriceHidden: Boolean(propRaw.is_price_hidden), area: propRaw.area, coveredArea: propRaw.covered_area, semiCoveredArea: propRaw.semi_covered_area,
@@ -368,7 +368,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
             <div className="flex justify-end items-center gap-2 text-geora-muted font-medium italic">
               <MapPin size={16} className="text-geora-black/60 shrink-0 sm:w-5 sm:h-5" />
               <span className="text-geora-black/60 sm:text-lg">
-                {property.address}{property.neighborhood ? `, ${property.neighborhood}` : ""}, {property.city}
+                {property.displayAddress || property.address}{property.neighborhood ? `, ${property.neighborhood}` : ""}, {property.city}
                 {property.locality && property.locality !== property.city ? ` (${property.locality})` : ""}
               </span>
             </div>

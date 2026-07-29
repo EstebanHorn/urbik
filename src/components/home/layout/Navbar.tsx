@@ -306,7 +306,7 @@ function NavbarInner() {
           : []),
         { href: "/dashboard", label: "Mi Perfil", short: "Perfil", Icon: User },
         ...(status === "APPROVED"
-          ? [{ href: "/connections", label: "Bolsa", short: "Bolsa", Icon: Network }]
+          ? [{ href: "/connections", label: "Bolsa de Conexiones", short: "Bolsa", Icon: Network }]
           : []),
         { href: "/", label: "Buscar", Icon: Search },
       ];

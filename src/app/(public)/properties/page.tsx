@@ -81,7 +81,9 @@ function PropertyFeatures({ property }: { property: SearchProperty }) {
 
 function PropertyCard({ property }: { property: SearchProperty }) {
   const price = property.salePrice ?? property.rentPrice ?? 0;
-  const currency = property.saleCurrency ?? property.rentCurrency ?? "ARS";
+  const currency = property.salePrice != null
+    ? (property.saleCurrency ?? "USD")
+    : (property.rentCurrency ?? "ARS");
 
   return (
     <Link
@@ -151,7 +153,9 @@ function PropertyCard({ property }: { property: SearchProperty }) {
 
 function PromotedPropertyCard({ property }: { property: SearchProperty }) {
   const price = property.salePrice ?? property.rentPrice ?? 0;
-  const currency = property.saleCurrency ?? property.rentCurrency ?? "ARS";
+  const currency = property.salePrice != null
+    ? (property.saleCurrency ?? "USD")
+    : (property.rentCurrency ?? "ARS");
 
   return (
     <motion.div
@@ -208,7 +212,7 @@ function PromotedPropertyCard({ property }: { property: SearchProperty }) {
           </div>
 
           <p className="mt-2 truncate text-sm font-medium text-geora-black/50 z-1">
-            {property.address}, {property.city}, {property.province}
+            {property.displayAddress || property.address}, {property.city}, {property.province}
           </p>
 
           <div className="mt-6 flex flex-col xl:flex-row xl:items-center justify-between gap-4 pt-6 border-t border-black/5">

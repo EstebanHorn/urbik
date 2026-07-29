@@ -1012,9 +1012,9 @@ const [clients, setClients] = useState<any[]>([]);
       prop.price ?? (prop as any).sale_price ?? (prop as any).rent_price ?? 0;
     const propCurrency =
       prop.currency ??
-      (prop as any).sale_currency ??
-      (prop as any).rent_currency ??
-      "USD";
+      ((prop as any).sale_price
+        ? (prop as any).sale_currency ?? "USD"
+        : (prop as any).rent_currency ?? "ARS");
 
     if (minPrice && propPrice < Number(minPrice)) matches = false;
     if (maxPrice && propPrice > Number(maxPrice)) matches = false;
@@ -1739,7 +1739,9 @@ const [clients, setClients] = useState<any[]>([]);
                               prop.sale_price ||
                               prop.rent_price ||
                               null,
-                            prop.sale_currency || prop.rent_currency || null,
+                            prop.sale_price
+                              ? prop.sale_currency ?? null
+                              : prop.rent_currency ?? null,
                           )}
                         </span>
                       </div>

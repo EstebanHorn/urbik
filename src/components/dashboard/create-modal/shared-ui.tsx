@@ -166,6 +166,7 @@ const TAG_CATEGORIES: AmenityCategory[] = [
       { key: "hasKitchenDining", label: "Cocina-comedor" },
       { key: "hasLiving", label: "Living" },
       { key: "hasLivingDining", label: "Living-comedor" },
+      { key: "hasDiningRoom", label: "Comedor" },
       { key: "hasGarageRoom", label: "Garaje" },
       { key: "hasLocal", label: "Local" },
       { key: "hasOffice", label: "Oficina" },
@@ -200,6 +201,7 @@ const TAG_CATEGORIES: AmenityCategory[] = [
       { key: "hasKitchenDining", label: "Cocina-comedor" },
       { key: "hasLiving", label: "Living" },
       { key: "hasLivingDining", label: "Living-comedor" },
+      { key: "hasDiningRoom", label: "Comedor" },
     ],
   },
 

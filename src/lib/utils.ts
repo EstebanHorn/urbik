@@ -1,8 +1,18 @@
 import { createClient } from './supabase/server';
 
-export function slugify(text: string) {
+function stripDiacritics(text: string) {
   return text
-    .toString()
+    .normalize('NFD')
+    .split('')
+    .filter((ch) => {
+      const code = ch.codePointAt(0) ?? 0;
+      return code < 0x300 || code > 0x36f;
+    })
+    .join('');
+}
+
+export function slugify(text: string) {
+  return stripDiacritics(text.toString())
     .toLowerCase()
     .trim()
     .replace(/\s+/g, '-')

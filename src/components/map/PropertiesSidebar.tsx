@@ -179,14 +179,14 @@ export function PropertiesSidebar({
 
                   <p className="mt-1 flex items-center gap-1 truncate text-xs font-semibold text-geora-black/80">
                     <MapPin size={12} className="shrink-0 text-geora-black/80" />
-                    {prop.address}, {prop.city}
+                    {prop.displayAddress || prop.address}, {prop.city}
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-3 border-t border-white/60">
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-black tracking-tight text-geora-black/90 z-1">
-                      $ {prop.price?.toLocaleString("es-AR")}
+                      {prop.currency ?? "ARS"} {prop.price?.toLocaleString("es-AR")}
                     </span>
 
                     {isInitiallyFavorite && (

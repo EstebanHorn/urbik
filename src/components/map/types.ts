@@ -48,7 +48,7 @@ export interface MapBounds { minLat: number; maxLat: number; minLon: number; max
 export interface MapProperty {
   id: string; title: string; price: number; currency?: string; latitude: number; longitude: number;
   parcelGeom?: Geometry | string | Record<string, unknown> | null; parcelCCA?: string;
-  operationType: string; type: string; images?: string[]; address?: string; city?: string;
+  operationType: string; type: string; images?: string[]; address?: string; displayAddress?: string | null; city?: string;
   rooms?: number; bathrooms?: number; area?: number; hasWater?: boolean; hasElectricity?: boolean;
   hasGas?: boolean; hasInternet?: boolean; hasParking?: boolean; hasPool?: boolean; hasBalcony?: boolean;
   hasGrill?: boolean; hasGarden?: boolean; hasLaundry?: boolean; hasAirConditioning?: boolean;

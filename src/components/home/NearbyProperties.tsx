@@ -89,7 +89,9 @@ export default function NearbyProperties() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((property) => {
           const price = property.salePrice ?? property.rentPrice ?? 0;
-          const currency = property.saleCurrency ?? property.rentCurrency ?? "ARS";
+          const currency = property.salePrice != null
+            ? (property.saleCurrency ?? "USD")
+            : (property.rentCurrency ?? "ARS");
           return (
             <Link key={property.id} href={`/property/${property.id}`} className={cardClass}>
               <div className="relative h-48 w-full overflow-hidden bg-slate-100">

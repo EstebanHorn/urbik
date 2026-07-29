@@ -360,7 +360,9 @@ async function getPropertyData(id: string) {
         operationType: p.operation_type,
         salePrice: p.sale_price,
         rentPrice: p.rent_price,
-        currency: p.sale_currency || p.rent_currency || "USD",
+        currency: p.sale_price
+          ? p.sale_currency || "USD"
+          : p.rent_currency || "ARS",
         city: p.city,
         province: p.province,
         images: p.images || [],
@@ -744,7 +746,7 @@ export default async function PropertyPage({
                 className="text-geora-black/60 shrink-0 sm:w-5 sm:h-5"
               />
               <span className="text-geora-black/60 sm:text-lg">
-                {property.address}
+                {property.displayAddress || property.address}
                 {property.neighborhood
                   ? `, ${property.neighborhood}`
                   : ""}, {property.city}

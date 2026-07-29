@@ -4,6 +4,7 @@ import { MapPin, Building2 } from "lucide-react";
 
 import AdminActions from "@/components/administrate/AdminActions";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import StartChatButton from "@/components/chat/StartChatButton";
 import RealEstateReviews from "@/components/realestate/RealEstateReviews";
 import TrackAgencyView from "@/components/analytics/TrackAgencyView";
@@ -64,8 +65,9 @@ export default async function RealEstateProfile({
   profileId: string;
 }) {
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: realEstate, error } = await supabase
+  const { data: realEstate, error } = await admin
     .from("real_estates")
     .select(
       `

@@ -14,7 +14,9 @@ export default function Top3({ items, setHoveredPropertyId }: Top3Props) {
     <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {items.slice(0, 3).map((property, index) => {
         const price = property.salePrice ?? property.rentPrice ?? 0;
-        const currency = property.saleCurrency ?? property.rentCurrency ?? "ARS";
+        const currency = property.salePrice != null
+          ? (property.saleCurrency ?? "USD")
+          : (property.rentCurrency ?? "ARS");
 
         return (
           <Link

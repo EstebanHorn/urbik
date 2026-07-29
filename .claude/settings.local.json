@@ -69,7 +69,17 @@
       "Bash(netstat -ano)",
       "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 3000 -State Listen | Select-Object -ExpandProperty OwningProcess\")",
       "Bash(powershell -Command \"Stop-Process -Id 18800 -Force\")",
-      "Bash(grep -A5 \"form-modules.tsx$\")"
+      "Bash(grep -A5 \"form-modules.tsx$\")",
+      "Bash(ls .env*)",
+      "Bash(grep -c \"SUPABASE\" .env.local)",
+      "WebFetch(domain:www.geora.com.ar)",
+      "Bash(grep -o '\\\\$18[^,]*' /tmp/realestate_response2.html)",
+      "Bash(grep -o '\"\\\\$L2[0-9a-f]\"' /tmp/realestate_response2.html)",
+      "Bash(grep -o '\\\\\\\\\"html\\\\\\\\\"' /tmp/realestate_response2.html)",
+      "Bash(grep -o '\\\\\\\\\"body\\\\\\\\\"' /tmp/realestate_response2.html)",
+      "Bash(PORT=3001 npm run dev)",
+      "Bash(echo \"started with pid $!\")",
+      "Bash(grep -E \"error|warning|\\\\.tsx$\")"
     ]
   }
 }
