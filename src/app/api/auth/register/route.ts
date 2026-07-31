@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateUniqueSlug } from "@/lib/utils";
+import { sendAdminNewAgencyPendingEmail } from "@/lib/mail";
 
 interface LicensePayload {
   licenseNumber: string;
@@ -82,6 +83,8 @@ export async function POST(req: NextRequest) {
         number: data.address || "S/N",
         phone: data.phone || "",
       });
+
+      await sendAdminNewAgencyPendingEmail(agencyName, data.email);
     }
 
     return NextResponse.json({ success: true, userId }, { status: 201 });

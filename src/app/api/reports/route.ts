@@ -1,11 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type {
-  Report,
-  ReportReason,
-  ReportStatus,
-  ReportTargetType,
+import { sendAdminNewReportEmail } from "@/lib/mail";
+import {
+  REPORT_REASON_LABELS,
+  type Report,
+  type ReportReason,
+  type ReportStatus,
+  type ReportTargetType,
 } from "@/lib/types";
 
 const VALID_TARGETS: ReportTargetType[] = [
@@ -185,6 +187,13 @@ export async function POST(req: NextRequest) {
       }
       throw error;
     }
+
+    await sendAdminNewReportEmail({
+      targetType,
+      targetLabel: targetId,
+      reason: REPORT_REASON_LABELS[reason] ?? reason,
+      reporterEmail: authUser.email,
+    });
 
     return NextResponse.json(mapBase(data as ReportRow), { status: 201 });
   } catch (err) {

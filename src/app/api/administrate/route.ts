@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendAgencyApprovedEmail, sendAgencyRejectedEmail } from "@/lib/mail";
 
 interface ProfileWithRealEstate {
   id: string;
@@ -54,16 +55,31 @@ export async function PATCH(req: Request) {
   const admin = createAdminClient();
   const { userId, action } = await req.json();
 
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("email, real_estates ( agency_name )")
+    .eq("id", userId)
+    .single();
+
+  const agencyEmail = profile?.email;
+  const agencyName =
+    (profile as { real_estates?: { agency_name: string | null }[] } | null)
+      ?.real_estates?.[0]?.agency_name || "tu inmobiliaria";
+
   if (action === "APPROVE") {
     await admin
       .from("profiles")
       .update({ status: "APPROVED", role: "REALESTATE" })
       .eq("id", userId);
+
+    if (agencyEmail) await sendAgencyApprovedEmail(agencyEmail, agencyName);
   } else if (action === "DELETE") {
     await admin
       .from("profiles")
       .delete()
       .eq("id", userId);
+
+    if (agencyEmail) await sendAgencyRejectedEmail(agencyEmail, agencyName);
   }
 
   return NextResponse.json({ success: true });
