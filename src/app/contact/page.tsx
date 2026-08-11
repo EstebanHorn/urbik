@@ -1,12 +1,17 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
-import { MapPin, Phone, Mail, CheckCircle2, ChevronDown } from "lucide-react";
+import { MapPin, Mail, CheckCircle2, ChevronDown } from "lucide-react";
 
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  
+  const [error, setError] = useState("");
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
   const [isOpen, setIsOpen] = useState(false);
   const [subject, setSubject] = useState("Consulta General");
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -25,11 +30,30 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "No pudimos enviar tu mensaje.");
+      }
+
+      setName("");
+      setEmail("");
+      setMessage("");
+      setSubject("Consulta General");
       setSubmitted(true);
-    }, 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No pudimos enviar tu mensaje.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -65,15 +89,6 @@ export default function Contact() {
 
             <div className="flex items-center bg-white border border-black/10 shadow-sm w-fit px-4 py-2 rounded-full">
               <div className="text-geora-black/80">
-                <Phone size={18} />
-              </div>
-              <div className="ml-5">
-                <p className="font-bold text-geora-dark">+54 11 1234-5678</p>
-              </div>
-            </div>
-
-            <div className="flex items-center bg-white border border-black/10 shadow-sm w-fit px-4 py-2 rounded-full">
-              <div className="text-geora-black/80">
                 <MapPin size={18} />
               </div>
               <div className="ml-5">
@@ -99,11 +114,25 @@ export default function Contact() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="ml-10 text-xmd font-medium text-geora-black opacity-40">Nombre</label>
-                  <input required type="text" className="w-full px-6 py-4 rounded-full bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none transition-all font-medium" placeholder="Tu nombre" />
+                  <input
+                    required
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-6 py-4 rounded-full bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none transition-all font-medium"
+                    placeholder="Tu nombre"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="ml-10 text-xmd font-medium text-geora-black opacity-40">Email</label>
-                  <input required type="email" className="w-full px-6 py-4 rounded-full bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none transition-all font-medium" placeholder="tu@email.com" />
+                  <input
+                    required
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-6 py-4 rounded-full bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none transition-all font-medium"
+                    placeholder="tu@email.com"
+                  />
                 </div>
               </div>
 
@@ -148,8 +177,19 @@ export default function Contact() {
 
               <div className="space-y-2">
                 <label className="ml-10 text-xmd font-medium text-geora-black opacity-40">Mensaje</label>
-                <textarea required rows={9} className="w-full px-6 py-5 rounded-4xl bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none transition-all font-medium resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
+                <textarea
+                  required
+                  rows={9}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="w-full px-6 py-5 rounded-4xl bg-geora-white border border-gray-300 focus:ring-2 focus:ring-geora-black outline-none transition-all font-medium resize-none"
+                  placeholder="¿En qué podemos ayudarte?"
+                ></textarea>
               </div>
+
+              {error && (
+                <p className="text-sm font-bold text-red-500 ml-4">{error}</p>
+              )}
 
               <div className="flex justify-end pt-4">
                 <button

@@ -88,6 +88,29 @@ export async function sendAgencyRejectedEmail(to: string, agencyName: string) {
   });
 }
 
+export async function sendAgencyWelcomeEmail(to: string) {
+  await sendMail({
+    to,
+    subject: "¡Bienvenido/a a Geora!",
+    html: wrapEmail(
+      "¡Bienvenido/a a Geora!",
+      `Gracias por sumarte a esta primera etapa del proyecto, un portal inmobiliario que llega para impulsar la colaboración en el sector.<br/><br/>
+      Con tu registro ya tenés acceso a:
+      <ul style="margin: 8px 0; padding-left: 20px;">
+        <li>Un perfil propio para tu inmobiliaria, con URL personalizada.</li>
+        <li>Publicaciones ilimitadas.</li>
+        <li>Una agenda de potenciales compradores y propietarios, para tener todo en un mismo lugar.</li>
+        <li>Acceso a la Bolsa de Conexiones.</li>
+      </ul>
+      Y vamos a seguir sumando funciones a medida que la plataforma crece.<br/><br/>
+      Estamos muy atentos a tu experiencia con la aplicación por lo que esperamos cualquier comentario, crítica o sugerencia que quieras hacernos, escribiéndonos desde la sección de contacto. Nos ayuda un montón a mejorar.<br/><br/>
+      ¡Gracias por ser parte de Geora desde el principio!`,
+      `${BASE_URL}/contact`,
+      "Ir a contacto"
+    ),
+  });
+}
+
 export async function sendAdminNewAgencyPendingEmail(agencyName: string, agencyEmail: string) {
   await sendMail({
     to: ADMIN_EMAIL,
@@ -118,6 +141,35 @@ export async function sendAdminNewReportEmail(params: {
       }`,
       `${BASE_URL}/administrate`,
       "Revisar en el panel"
+    ),
+  });
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+export async function sendContactMessageEmail(params: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  const { name, email, subject, message } = params;
+  await sendMail({
+    to: ADMIN_EMAIL,
+    subject: `Nuevo mensaje de contacto: ${subject}`,
+    html: wrapEmail(
+      "Nuevo mensaje desde el formulario de contacto",
+      `<strong>Nombre:</strong> ${escapeHtml(name)}<br/>
+      <strong>Email:</strong> ${escapeHtml(email)}<br/>
+      <strong>Asunto:</strong> ${escapeHtml(subject)}<br/><br/>
+      <strong>Mensaje:</strong><br/>${escapeHtml(message).replace(/\n/g, "<br/>")}`
     ),
   });
 }

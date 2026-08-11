@@ -189,6 +189,7 @@ interface Property {
   parcelGeom: Record<string, unknown> | null;
   realEstateId: string | null;
   images: string[];
+  youtubeUrl: string | null;
   isFavorite: boolean;
   legacyAmenities: Record<string, boolean>;
   featureGroups: Record<string, Record<string, boolean>>;
@@ -333,6 +334,7 @@ async function getPropertyData(id: string) {
       parcelGeom: propRaw.parcel_geom,
       realEstateId: propRaw.real_estate_id,
       images: propRaw.images || [],
+      youtubeUrl: propRaw.youtube_url ?? null,
       isFavorite,
       legacyAmenities: {
         hasElectricity: Boolean(propRaw.has_electricity),
@@ -731,6 +733,7 @@ export default async function PropertyPage({
           parcelGeom={property.parcelGeom}
           latitude={property.latitude}
           longitude={property.longitude}
+          youtubeUrl={property.youtubeUrl}
         />
       </div>
 

@@ -1477,7 +1477,7 @@ const [clients, setClients] = useState<any[]>([]);
             </span>
           </div>
           <div
-            className="flex flex-wrap items-center gap-2 mb-5"
+            className="relative flex flex-wrap items-center gap-2 mb-5"
             ref={filterPanelRef}
           >
             <CustomDropdown
@@ -1495,6 +1495,7 @@ const [clients, setClients] = useState<any[]>([]);
               ]}
               onChange={(val) => setFilterOperation(val)}
               variant="white1"
+              panelAnchor="row"
             />
 
             <CustomDropdown
@@ -1513,9 +1514,10 @@ const [clients, setClients] = useState<any[]>([]);
               ]}
               onChange={(val) => setFilterType(val)}
               variant="white1"
+              panelAnchor="row"
             />
 
-            <div className="relative">
+            <div className="static md:relative">
               <button
                 type="button"
                 onClick={() =>
@@ -1542,7 +1544,7 @@ const [clients, setClients] = useState<any[]>([]);
               </button>
 
               {activeFilter === "price" && (
-                <div className="absolute top-full left-0 md:right-0 md:left-auto mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
+                <div className="absolute top-full left-4 right-4 md:left-auto md:right-0 md:w-80 mt-3 z-[999] rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
                   <PriceFilterCard
                     minPrice={minPrice}
                     maxPrice={maxPrice}
@@ -1557,7 +1559,7 @@ const [clients, setClients] = useState<any[]>([]);
               )}
             </div>
 
-            <div className="relative">
+            <div className="static md:relative">
               <button
                 type="button"
                 onClick={() =>
@@ -1588,7 +1590,7 @@ const [clients, setClients] = useState<any[]>([]);
               </button>
 
               {activeFilter === "rooms" && (
-                <div className="absolute top-full right-0 mt-3 z-[999] w-80 rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
+                <div className="absolute top-full left-4 right-4 md:left-auto md:right-0 md:w-80 mt-3 z-[999] rounded-2xl border border-gray-200 bg-white text-geora-black/70 shadow-xl p-5">
                   <RoomsFilterCard
                     rooms={filterRooms}
                     bedrooms={filterBedrooms}
@@ -1611,6 +1613,7 @@ const [clients, setClients] = useState<any[]>([]);
                 ]}
                 onChange={(val) => setSortBy(val as SortBy)}
                 variant="white1"
+                panelAnchor="row"
               />
 
               <button
@@ -1655,7 +1658,7 @@ const [clients, setClients] = useState<any[]>([]);
                       animationFillMode: "both",
                     }}
                   >
-                    <div className="absolute top-6 right-6 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute top-6 right-6 z-20 flex flex-col gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

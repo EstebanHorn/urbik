@@ -16,6 +16,13 @@ interface CustomDropdownProps {
   variant?: "white" | "white1" | "white2" | "white3" | "map-layer" | "black" | "mobile-black";
   direction?: "up" | "down" | "responsive";
   matchEmptyValue?: boolean;
+  /**
+   * "trigger" (default) anchors the panel to this dropdown's own button, which can push it
+   * off-screen on mobile if the button sits near a screen edge inside a wrapping row.
+   * "row" anchors it to the nearest positioned ancestor (e.g. the filter row) instead, so the
+   * caller must wrap the group of dropdowns in a `relative` container.
+   */
+  panelAnchor?: "trigger" | "row";
 }
 
 export function CustomDropdown({
@@ -27,6 +34,7 @@ export function CustomDropdown({
   variant = "white",
   direction = "responsive",
   matchEmptyValue = false,
+  panelAnchor = "trigger",
 }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,6 +75,11 @@ export function CustomDropdown({
   let positionClasses = "";
   if (isField) {
     positionClasses = "top-full mt-2 left-0 right-0";
+  } else if (panelAnchor === "row") {
+    positionClasses =
+      direction === "up"
+        ? "bottom-full mb-3 left-4 right-4 md:left-auto md:right-0"
+        : "top-full mt-3 left-4 right-4 md:left-0 md:right-auto";
   } else if (direction === "up") {
     positionClasses = "bottom-full mb-3 right-0";
   } else if (direction === "down") {
@@ -75,8 +88,10 @@ export function CustomDropdown({
     positionClasses = "bottom-full mb-3 md:bottom-auto md:top-full md:mt-3 right-0 md:left-0 md:right-auto";
   }
 
+  const wrapperPositionClass = panelAnchor === "row" ? "static md:relative" : "relative";
+
   return (
-    <div className={`relative ${className}`} ref={containerRef}>
+    <div className={`${wrapperPositionClass} ${className}`} ref={containerRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -118,7 +133,7 @@ export function CustomDropdown({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className={`absolute ${isField ? "w-full" : "w-56"} rounded-2xl bg-geora-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden ${positionClasses}`}
+            className={`absolute ${isField ? "w-full" : panelAnchor === "row" ? "md:w-56" : "w-56"} rounded-2xl bg-geora-dark border border-white/10 shadow-2xl z-[2000] overflow-hidden ${positionClasses}`}
           >
             {options.map((opt) => (
                 <button

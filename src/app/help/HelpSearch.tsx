@@ -3,20 +3,13 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Building2, Users, Scale, FileSearch } from "lucide-react";
+import { HELP_CATEGORIES } from "@/lib/helpCategories";
 
 interface Post {
   slug: string;
   title: string;
   category: string;
 }
-
-const CATEGORIES = [
-  { name: "Inmobiliarias", slug: "realestates", icon: Building2 },
-  { name: "Compradores o Inquilinos", slug: "buyers", icon: Users },
-  { name: "Legales", slug: "legal", icon: Scale },
-  { name: "Valoraciones", slug: "valuations", icon: FileSearch },
-];
 
 export default function HelpSearch({ initialPosts }: { initialPosts: Post[] }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -70,7 +63,7 @@ export default function HelpSearch({ initialPosts }: { initialPosts: Post[] }) {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-          {CATEGORIES.map((cat) => {
+          {HELP_CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             return (
               <Link key={cat.slug} href={`/help/category/${cat.slug}`} className="flex items-center gap-4 p-2 text-center rounded-full bg-geora-white border border-gray-200 hover:border-geora-black transition-all group">
