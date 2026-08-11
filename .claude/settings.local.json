@@ -79,7 +79,13 @@
       "Bash(grep -o '\\\\\\\\\"body\\\\\\\\\"' /tmp/realestate_response2.html)",
       "Bash(PORT=3001 npm run dev)",
       "Bash(echo \"started with pid $!\")",
-      "Bash(grep -E \"error|warning|\\\\.tsx$\")"
+      "Bash(grep -E \"error|warning|\\\\.tsx$\")",
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique\" 2>&1)",
+      "Bash(powershell -Command \"Stop-Process -Id 27404 -Force\")",
+      "PowerShell(Get-NetTCPConnection *)",
+      "Bash(grep -o '^SMTP_[A-Z_]*=' .env.local)",
+      "Bash(grep -o '^MAIL_FROM=' .env.local)",
+      "Bash(grep -o '^ADMIN_EMAIL=' .env.local)"
     ]
   }
 }
