@@ -141,3 +141,77 @@ export async function findMatchingProperties(
   if (error) throw error;
   return (data ?? []) as unknown as MatchedProperty[];
 }
+
+/** Subset de columnas de "properties" necesario para evaluar un match en memoria. */
+export interface PropertyForMatch {
+  type: string | null;
+  operation_type: string | null;
+  city: string | null;
+  locality?: string | null;
+  sale_price: number | null;
+  rent_price: number | null;
+  sale_currency: string | null;
+  rent_currency: string | null;
+  area: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+}
+
+/**
+ * Misma lógica que findMatchingProperties pero evaluada en memoria contra una
+ * lista de propiedades ya cargada, para no hacer una query por búsqueda
+ * (ej. marcar en la lista de la red qué búsquedas coinciden con mi stock).
+ */
+export function propertyMatchesCriteria(
+  property: PropertyForMatch,
+  criteria: SearchCriteria
+): boolean {
+  const c = normalizeCriteria(criteria);
+  const isRent = c.operationType === "RENT" || c.operationType === "TEMP_RENT";
+  const price = isRent ? property.rent_price : property.sale_price;
+  const currency = isRent ? property.rent_currency : property.sale_currency;
+
+  if (c.operationType) {
+    if (property.operation_type !== c.operationType && property.operation_type !== "SALE_RENT") {
+      return false;
+    }
+  }
+  if (c.propertyType && property.type !== c.propertyType) return false;
+
+  if (c.city) {
+    const needle = c.city.toLowerCase();
+    const cityVal = (property.city ?? "").toLowerCase();
+    const localityVal = (property.locality ?? "").toLowerCase();
+    if (!cityVal.includes(needle) && !localityVal.includes(needle)) return false;
+  }
+
+  if (c.minPrice !== null && (price === null || price < c.minPrice)) return false;
+  if (c.maxPrice !== null && (price === null || price > c.maxPrice)) return false;
+  if (c.currency && currency !== c.currency) return false;
+
+  if (c.minArea !== null && (property.area === null || property.area < c.minArea)) return false;
+  if (c.maxArea !== null && (property.area === null || property.area > c.maxArea)) return false;
+
+  if (c.minBedrooms !== null && (property.bedrooms === null || property.bedrooms < c.minBedrooms)) {
+    return false;
+  }
+  if (c.minBathrooms !== null && (property.bathrooms === null || property.bathrooms < c.minBathrooms)) {
+    return false;
+  }
+
+  return true;
+}
+
+/** Ids de las búsquedas que coinciden con al menos una propiedad del stock dado. */
+export function findSearchIdsWithMatch<T extends SearchCriteria & { id: string }>(
+  searches: T[],
+  properties: PropertyForMatch[]
+): Set<string> {
+  const matched = new Set<string>();
+  for (const search of searches) {
+    if (properties.some((p) => propertyMatchesCriteria(p, search))) {
+      matched.add(search.id);
+    }
+  }
+  return matched;
+}

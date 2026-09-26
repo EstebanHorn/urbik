@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { findMatchingProperties } from "@/lib/connections/matching";
+import { findMatchingProperties, findSearchIdsWithMatch } from "@/lib/connections/matching";
 
 const AGENCY_ROLES = ["REALESTATE", "AGENT"];
 
@@ -103,6 +103,14 @@ export async function GET() {
     );
   }
 
+  // Marcar qué búsquedas de la red coinciden con alguna propiedad de mi propio stock.
+  const { data: myStock } = await admin
+    .from("properties")
+    .select("type, operation_type, city, locality, sale_price, rent_price, sale_currency, rent_currency, area, bedrooms, bathrooms")
+    .eq("real_estate_id", user.id)
+    .eq("status", "AVAILABLE");
+  const matchedSearchIds = findSearchIdsWithMatch(networkRaw ?? [], myStock ?? []);
+
   // Ocultar el contacto interno (client_id) en las búsquedas de la red.
   const networkSearches = (networkRaw ?? []).map((row) => {
     const rest = { ...row };
@@ -111,6 +119,7 @@ export async function GET() {
       ...rest,
       agencyName: agencyById[row.real_estate_id]?.agencyName ?? null,
       agencyLogo: agencyById[row.real_estate_id]?.agencyLogo ?? null,
+      hasMatch: matchedSearchIds.has(row.id),
     };
   });
 

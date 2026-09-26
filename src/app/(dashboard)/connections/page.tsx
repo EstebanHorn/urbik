@@ -15,7 +15,8 @@ import {
   Pencil,
   Building2,
   BadgeCheck,
-  Info
+  Info,
+  Sparkles
 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import CreateSearchModal from "@/components/dashboard/connections/CreateSearchModal";
@@ -203,18 +204,30 @@ function ConnectionsInner() {
 function SearchCardShell({
   search,
   children,
+  highlight = false,
 }: {
   search: any;
   children?: React.ReactNode;
+  highlight?: boolean;
 }) {
   return (
-    <div className={`group flex flex-col p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] ${glassCard}`}>
-      
+    <div
+      className={`group flex flex-col p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] ${
+        highlight ? "ring-2 ring-geora-emerald/50" : ""
+      } ${glassCard}`}
+    >
       {/* Wrapper z-10 para asegurar que el contenido no quede tapado por los gradientes del glass */}
       <div className="relative z-10 flex flex-col gap-4 h-full">
-        <Badge variant="neutral" className="self-start shadow-sm z-1">
-          {opLabel(search.operation_type)} · {propLabel(search.property_type)}
-        </Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="neutral" className="shadow-sm z-1">
+            {opLabel(search.operation_type)} · {propLabel(search.property_type)}
+          </Badge>
+          {highlight && (
+            <Badge variant="emerald" className="shadow-sm z-1" icon={<Sparkles size={11} />}>
+              Coincide con tu stock
+            </Badge>
+          )}
+        </div>
 
         <div>
           <h3 className="font-bold text-lg flex items-center gap-1.5 text-geora-black">
@@ -274,7 +287,7 @@ function NetworkGrid({ searches }: { searches: any[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {searches.map((s) => (
-        <SearchCardShell key={s.id} search={s}>
+        <SearchCardShell key={s.id} search={s} highlight={!!s.hasMatch}>
           <div className="flex items-center gap-1.5 text-sm font-bold text-geora-black/70">
             <Building2 size={14} className="text-geora-black/40 shrink-0" />
             <span className="truncate">
