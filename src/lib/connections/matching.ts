@@ -55,6 +55,7 @@ export interface MatchedProperty {
   type: string;
   operation_type: string;
   city: string | null;
+  locality: string | null;
   province: string | null;
   address: string | null;
   display_address: string | null;
@@ -99,7 +100,7 @@ export async function findMatchingProperties(
   let query = supabase
     .from("properties")
     .select(
-      "id, title, type, operation_type, city, province, address, display_address, " +
+      "id, title, type, operation_type, city, locality, province, address, display_address, " +
         "sale_price, rent_price, sale_currency, rent_currency, area, rooms, bedrooms, bathrooms, " +
         "images, status, real_estate_id"
     )
@@ -113,7 +114,16 @@ export async function findMatchingProperties(
     query = query.in("operation_type", [c.operationType, "SALE_RENT"]);
   }
   if (c.propertyType) query = query.eq("type", c.propertyType);
-  if (c.city) query = query.ilike("city", `%${c.city}%`);
+  if (c.city) {
+    // La búsqueda guarda en "city" el valor más específico elegido (localidad o
+    // departamento), pero la propiedad separa "city" (departamento) de
+    // "locality" (localidad puntual, ej. "City Bell" dentro de "La Plata").
+    // Hay que cruzar contra ambas columnas para no perder matches válidos.
+    const safeCity = c.city.replace(/[,()%]/g, " ").trim();
+    if (safeCity) {
+      query = query.or(`city.ilike.%${safeCity}%,locality.ilike.%${safeCity}%`);
+    }
+  }
 
   if (c.minPrice !== null) query = query.gte(priceCol, c.minPrice);
   if (c.maxPrice !== null) query = query.lte(priceCol, c.maxPrice);

@@ -1658,7 +1658,7 @@ const [clients, setClients] = useState<any[]>([]);
                       animationFillMode: "both",
                     }}
                   >
-                    <div className="absolute top-6 right-6 z-20 flex flex-col gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute top-6 right-6 z-20 flex flex-col gap-2 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity duration-300">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
