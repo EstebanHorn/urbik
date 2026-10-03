@@ -55,6 +55,7 @@ const PROPERTY_SELECT = `
   has_garden,
   has_laundry,
   has_air_conditioning,
+  has_mortgage_credit,
   created_at,
   real_estates (
     logo_url
@@ -92,6 +93,7 @@ interface SearchPropertyRow {
   has_garden: boolean;
   has_laundry: boolean;
   has_air_conditioning: boolean;
+  has_mortgage_credit: boolean;
   created_at: string;
   real_estates?: {
     logo_url: string | null;
@@ -129,6 +131,7 @@ const mapProperty = (property: SearchPropertyRow) => ({
   hasGarden: property.has_garden,
   hasLaundry: property.has_laundry,
   hasAirConditioning: property.has_air_conditioning,
+  hasMortgageCredit: property.has_mortgage_credit,
   createdAt: property.created_at,
   agencyLogo: property.real_estates?.logo_url ?? null,
 });
@@ -326,6 +329,7 @@ export async function GET(request: Request) {
       ["hasGarden", "has_garden"],
       ["hasLaundry", "has_laundry"],
       ["hasAirConditioning", "has_air_conditioning"],
+      ["hasMortgageCredit", "has_mortgage_credit"],
     ];
 
     for (const [param, column] of amenities) {

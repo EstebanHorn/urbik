@@ -30,6 +30,7 @@ import {
   Star,
   FlipVertical,
   Home,
+  Landmark,
 } from "lucide-react";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import ImageGallery from "@/components/property/ImageGallery";
@@ -131,6 +132,7 @@ const AMENITY_CATEGORIES = [
       { key: "hasInternet", label: "Internet" },
       { key: "hasCable", label: "TV por cable" },
       { key: "hasPhone", label: "Teléfono" },
+      { key: "hasMortgageCredit", label: "Apto crédito hipotecario" },
     ],
   },
 ];
@@ -142,6 +144,7 @@ const LEGACY_ICON: Record<string, React.ReactNode> = {
   hasParking: <Car size={14} />,
   hasPool: <Waves size={14} />,
   hasWater: <Droplets size={14} />,
+  hasMortgageCredit: <Landmark size={14} />,
   aire: <Snowflake size={14} />,
   jardin: <Trees size={14} />,
   seguridad: <ShieldCheck size={14} />,
@@ -343,6 +346,7 @@ async function getPropertyData(id: string) {
         hasParking: Boolean(propRaw.has_parking),
         hasPool: Boolean(propRaw.has_pool),
         hasWater: Boolean(propRaw.has_water),
+        hasMortgageCredit: Boolean(propRaw.has_mortgage_credit),
       },
       featureGroups,
       RealEstate: propRaw.real_estates

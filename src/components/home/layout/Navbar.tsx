@@ -338,9 +338,11 @@ const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) =>
   }
 };
 
+const navLinkClass =
+  "text-sm md:text-base text-geora-white hover:text-white/70 font-semibold transition-colors";
+
 const renderNavLinks = () => {
-  const linkClass =
-    "text-sm md:text-base text-geora-white hover:text-white/70 font-semibold transition-colors";
+  const linkClass = navLinkClass;
   return getNavItems().map((item) => {
     const showDot = hasUnread && item.href === "/dashboard";
     return (
@@ -411,6 +413,15 @@ const renderMobileNavIcons = () => {
 
             <div className="hidden md:flex items-center justify-center gap-4 md:gap-8 no-scrollbar whitespace-nowrap px-2 w-full">
               {renderNavLinks()}
+              {role !== "ADMIN" && role !== "admin" && (
+                <Link
+                  href="/map"
+                  onClick={(e) => handleNavClick(e, "/map")}
+                  className={`relative overflow-visible ${navLinkClass}`}
+                >
+                  Mapa
+                </Link>
+              )}
             </div>
           </div>
 

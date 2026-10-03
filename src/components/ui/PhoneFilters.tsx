@@ -239,6 +239,7 @@ export default function SidebarFilters() {
                       { key: "hasInternet", label: "Internet" },
                       { key: "hasAirConditioning", label: "Aire Acond." },
                       { key: "hasLaundry", label: "Lavadero" },
+                      { key: "hasMortgageCredit", label: "Apto créd. hipotecario" },
                     ].map((amenity) => {
                       const isActive = searchParams.get(amenity.key) === "true";
                       return (

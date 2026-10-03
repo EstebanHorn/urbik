@@ -173,6 +173,7 @@ export async function POST(req: Request) {
         has_internet: !!body.hasInternet,
         has_parking: !!body.hasParking,
         has_pool: !!body.hasPool,
+        has_mortgage_credit: !!(body.hasMortgageCredit ?? body.amenities?.hasMortgageCredit),
         feature_groups: body.featureGroups || {},
         extra_data: {
           ...(body.extraData || {}),

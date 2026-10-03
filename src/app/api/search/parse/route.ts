@@ -32,6 +32,7 @@ const AMENITY_PATTERNS = [
   { key: "hasGarden", regex: /\b(jardin|patio|parque)\b/i },
   { key: "hasLaundry", regex: /\b(lavadero|laundry)\b/i },
   { key: "hasAirConditioning", regex: /\b(aire|aire acondicionado|split|aa)\b/i },
+  { key: "hasMortgageCredit", regex: /\b(apto credito hipotecario|apto credito|credito hipotecario)\b/i },
 ];
 
 function normalizeText(text: string) {

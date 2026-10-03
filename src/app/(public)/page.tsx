@@ -64,6 +64,7 @@ export type SearchProperty = {
   hasGarden: boolean;
   hasLaundry: boolean;
   hasAirConditioning: boolean;
+  hasMortgageCredit: boolean;
   agencyLogo?: string | null;
 };
 
@@ -403,6 +404,7 @@ export default function HomePage() {
         a.hasBalcony,
         a.hasAirConditioning,
         a.hasParking,
+        a.hasMortgageCredit,
       ].filter(Boolean).length;
       const scoreB = [
         b.hasPool,
@@ -411,6 +413,7 @@ export default function HomePage() {
         b.hasBalcony,
         b.hasAirConditioning,
         b.hasParking,
+        b.hasMortgageCredit,
       ].filter(Boolean).length;
       if (scoreA !== scoreB) return scoreB - scoreA;
       const priceA = a.salePrice ?? a.rentPrice ?? 0;

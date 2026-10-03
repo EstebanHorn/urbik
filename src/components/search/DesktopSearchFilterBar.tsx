@@ -79,6 +79,7 @@ export default function DesktopSearchFilterBar() {
     currentFilters.hasGarden ||
     currentFilters.hasLaundry ||
     currentFilters.hasAirConditioning ||
+    currentFilters.hasMortgageCredit ||
     currentFilters.minArea ||
     currentFilters.maxArea ||
     currentFilters.age;

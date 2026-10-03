@@ -149,6 +149,10 @@ export async function PUT(
         typeof body.amenities?.pileta === "boolean"
           ? body.amenities.pileta
           : undefined,
+      has_mortgage_credit:
+        typeof body.amenities?.hasMortgageCredit === "boolean"
+          ? body.amenities.hasMortgageCredit
+          : undefined,
       sale_price:
         body.salePrice !== undefined
           ? body.salePrice === "" || body.salePrice === null

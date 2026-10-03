@@ -52,6 +52,7 @@ export interface MapProperty {
   rooms?: number; bathrooms?: number; area?: number; hasWater?: boolean; hasElectricity?: boolean;
   hasGas?: boolean; hasInternet?: boolean; hasParking?: boolean; hasPool?: boolean; hasBalcony?: boolean;
   hasGrill?: boolean; hasGarden?: boolean; hasLaundry?: boolean; hasAirConditioning?: boolean;
+  hasMortgageCredit?: boolean;
   realEstateId?: string | null;
   agencyName?: string | null;
   agencyLogoUrl?: string | null;

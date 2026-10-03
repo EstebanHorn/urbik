@@ -9,7 +9,7 @@ import {
   MapPin, Maximize2, BedDouble, Bath, Hash, ChevronLeft, Building2,
   Phone, Mail, Car, CheckCircle2, XCircle, Layers, Flame,
   Waves, Wifi, Zap, Droplets, ShieldCheck, Trees, Snowflake,
-  CalendarDays, Star, FlipVertical, Home, X, ExternalLink
+  CalendarDays, Star, FlipVertical, Home, X, ExternalLink, Landmark
 } from "lucide-react";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import ImageGallery from "@/components/property/ImageGallery";
@@ -92,6 +92,7 @@ const AMENITY_CATEGORIES = [
       { key: "hasInternet", label: "Internet" },
       { key: "hasCable", label: "TV por cable" },
       { key: "hasPhone", label: "Teléfono" },
+      { key: "hasMortgageCredit", label: "Apto crédito hipotecario" },
     ],
   },
 ];
@@ -103,6 +104,7 @@ const LEGACY_ICON: Record<string, React.ReactNode> = {
   hasParking: <Car size={14} />,
   hasPool: <Waves size={14} />,
   hasWater: <Droplets size={14} />,
+  hasMortgageCredit: <Landmark size={14} />,
   aire: <Snowflake size={14} />,
   jardin: <Trees size={14} />,
   seguridad: <ShieldCheck size={14} />,
@@ -282,7 +284,7 @@ export default function PropertySlidePanel({ propertyId, onClose }: { propertyId
         uncoveredArea: propRaw.uncovered_area, frontLength: propRaw.front_length, backLength: propRaw.back_length, rooms: propRaw.rooms,
         bedrooms: propRaw.bedrooms, bathrooms: propRaw.bathrooms, toilets: propRaw.toilets, garages: propRaw.garages, plants: propRaw.plants, floor: propRaw.floor, unitNumber: propRaw.unit_number, condition: propRaw.condition,
         constructionYear: propRaw.construction_year, latitude: propRaw.latitude, longitude: propRaw.longitude, parcelGeom: propRaw.parcel_geom, realEstateId: propRaw.real_estate_id, images: propRaw.images || [], isFavorite,
-        legacyAmenities: { hasElectricity: Boolean(propRaw.has_electricity), hasGas: Boolean(propRaw.has_gas), hasInternet: Boolean(propRaw.has_internet), hasParking: Boolean(propRaw.has_parking), hasPool: Boolean(propRaw.has_pool), hasWater: Boolean(propRaw.has_water) }, featureGroups,
+        legacyAmenities: { hasElectricity: Boolean(propRaw.has_electricity), hasGas: Boolean(propRaw.has_gas), hasInternet: Boolean(propRaw.has_internet), hasParking: Boolean(propRaw.has_parking), hasPool: Boolean(propRaw.has_pool), hasWater: Boolean(propRaw.has_water), hasMortgageCredit: Boolean(propRaw.has_mortgage_credit) }, featureGroups,
         RealEstate: propRaw.real_estates ? { agencyName: propRaw.real_estates.agency_name, phone: propRaw.real_estates.phone, logoUrl: propRaw.real_estates.logo_url ?? null } : null,
       };
 

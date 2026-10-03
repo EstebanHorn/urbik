@@ -140,7 +140,8 @@ export default function MobileSearchFilterBar() {
     filters.hasGrill ||
     filters.hasGarden ||
     filters.hasLaundry ||
-    filters.hasAirConditioning;
+    filters.hasAirConditioning ||
+    filters.hasMortgageCredit;
 
   return (
     <div className="md:hidden fixed top-0 left-0 right-0 z-[1000] bg-white shadow-sm border-b border-slate-100">

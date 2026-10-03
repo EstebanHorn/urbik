@@ -24,7 +24,8 @@ interface ParsedSearchFilters {
       | "hasGrill"
       | "hasGarden"
       | "hasLaundry"
-      | "hasAirConditioning",
+      | "hasAirConditioning"
+      | "hasMortgageCredit",
       boolean
     >
   >;

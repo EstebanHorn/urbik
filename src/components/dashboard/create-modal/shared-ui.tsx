@@ -248,6 +248,7 @@ const TAG_CATEGORIES: AmenityCategory[] = [
       { key: "hasInternet", label: "Internet", isLegacy: true },
       { key: "hasCable", label: "TV por cable" },
       { key: "hasPhone", label: "Teléfono" },
+      { key: "hasMortgageCredit", label: "Apto crédito hipotecario", isLegacy: true },
     ],
   },
 

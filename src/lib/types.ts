@@ -110,6 +110,7 @@ export interface Property {
   hasInternet: boolean;
   hasParking: boolean;
   hasPool: boolean;
+  hasMortgageCredit: boolean;
   propertySubtype?: string | null;
   youtubeUrl?: string | null;
   tour360Url?: string | null;

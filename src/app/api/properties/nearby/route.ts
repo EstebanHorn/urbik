@@ -78,6 +78,7 @@ const mapProperty = (p: NearbyPropertyRow) => ({
   hasGarden: false,
   hasLaundry: false,
   hasAirConditioning: false,
+  hasMortgageCredit: false,
 });
 
 export async function GET(request: Request) {

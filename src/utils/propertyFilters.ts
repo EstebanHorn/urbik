@@ -24,6 +24,7 @@ export type FilterState = {
   hasGarden: boolean;
   hasLaundry: boolean;
   hasAirConditioning: boolean;
+  hasMortgageCredit: boolean;
 };
 
 export type AmenityFlagKey =
@@ -37,7 +38,8 @@ export type AmenityFlagKey =
   | "hasGrill"
   | "hasGarden"
   | "hasLaundry"
-  | "hasAirConditioning";
+  | "hasAirConditioning"
+  | "hasMortgageCredit";
 
 export const AMENITY_KEYS: AmenityFlagKey[] = [
   "hasWater",
@@ -51,6 +53,7 @@ export const AMENITY_KEYS: AmenityFlagKey[] = [
   "hasGarden",
   "hasLaundry",
   "hasAirConditioning",
+  "hasMortgageCredit",
 ];
 
 export const DEFAULT_FILTERS: FilterState = {
@@ -79,6 +82,7 @@ export const DEFAULT_FILTERS: FilterState = {
   hasGarden: false,
   hasLaundry: false,
   hasAirConditioning: false,
+  hasMortgageCredit: false,
 };
 
 export function parseFiltersFromQuery(params: URLSearchParams): FilterState {
@@ -108,6 +112,7 @@ export function parseFiltersFromQuery(params: URLSearchParams): FilterState {
     hasGarden: params.get("hasGarden") === "true",
     hasLaundry: params.get("hasLaundry") === "true",
     hasAirConditioning: params.get("hasAirConditioning") === "true",
+    hasMortgageCredit: params.get("hasMortgageCredit") === "true",
   };
 }
 
@@ -135,6 +140,7 @@ export function areFiltersEqual(a: FilterState, b: FilterState) {
     a.hasGarden === b.hasGarden &&
     a.hasLaundry === b.hasLaundry &&
     a.hasAirConditioning === b.hasAirConditioning &&
+    a.hasMortgageCredit === b.hasMortgageCredit &&
     a.rooms.join("|") === b.rooms.join("|") &&
     a.bedrooms.join("|") === b.bedrooms.join("|") &&
     a.bathrooms.join("|") === b.bathrooms.join("|")
