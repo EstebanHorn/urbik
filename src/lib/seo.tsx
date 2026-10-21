@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 
-export const SITE_URL = "https://geora.com.ar";
+// The apex domain (geora.com.ar) 308-redirects to www in production (Vercel
+// domain config). Social crawlers (WhatsApp, Facebook) often won't follow
+// that redirect for og:image, so every absolute URL must use the final host.
+export const SITE_URL = "https://www.geora.com.ar";
 export const SITE_NAME = "Geora";
 export const DEFAULT_TITLE = "Geora - Encontrá tu lugar";
 export const DEFAULT_DESCRIPTION =
