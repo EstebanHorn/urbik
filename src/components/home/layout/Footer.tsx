@@ -68,6 +68,7 @@ export default function Footer() {
         <div>
           <h3 className="font-bold mb-4 uppercase text-sm tracking-widest text-gray-400">Soporte</h3>
           <ul className="space-y-2">
+            <li><Link href="/que-es-geora" className="hover:underline">¿Qué es Geora?</Link></li>
             <li><Link href="/about-us" className="hover:underline">Sobre Nosotros</Link></li>
             <li><Link href="/contact" className="hover:underline">Contacto</Link></li>
             <li><Link href="/help" className="hover:underline">Ayuda</Link></li>

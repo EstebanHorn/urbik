@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import type { SearchProperty } from "@/app/(public)/page";
+import type { SearchProperty } from "@/lib/propertyLabels";
 
 const cardClass =
   "group relative md:rounded-[20px] rounded-2xl border border-white/70 bg-white/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)]";

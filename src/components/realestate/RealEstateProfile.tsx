@@ -12,6 +12,7 @@ import AgencyPropertiesFilter, {
   Property,
 } from "@/components/realestate/AgencyPropertiesFilter";
 import ReportButton from "@/components/reports/ReportButton";
+import { JsonLd, absoluteUrl } from "@/lib/seo";
 
 function HeaderFractionalStars({
   average,
@@ -123,8 +124,41 @@ export default async function RealEstateProfile({
     realEstate.properties?.filter((p: Property) => p.status === "AVAILABLE") ||
     [];
 
+  const profilePath = realEstate.slug
+    ? `/${realEstate.slug}`
+    : `/realestate/${realEstate.profile_id}`;
+
   return (
     <div className="min-h-screen">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "RealEstateAgent",
+          name: realEstate.agency_name,
+          url: absoluteUrl(profilePath),
+          image: realEstate.logo_url || undefined,
+          description: realEstate.bio || undefined,
+          telephone: realEstate.phone || undefined,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: [realEstate.street, realEstate.address]
+              .filter(Boolean)
+              .join(" "),
+            addressLocality: realEstate.city,
+            addressRegion: realEstate.province,
+            addressCountry: "AR",
+          },
+          ...(totalReviews > 0
+            ? {
+                aggregateRating: {
+                  "@type": "AggregateRating",
+                  ratingValue: averageRating,
+                  reviewCount: totalReviews,
+                },
+              }
+            : {}),
+        }}
+      />
       <TrackAgencyView realEstateId={realEstate.profile_id} />
       <div className="max-w-7xl mx-auto px-4 py-8 mt-20">
         {isAdmin && (

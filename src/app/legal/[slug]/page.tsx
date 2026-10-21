@@ -1,9 +1,33 @@
+import type { Metadata } from "next";
 import { getLegalPage } from "@/lib/getLegalData";
 import ReactMarkdown from "react-markdown";
 import { notFound } from "next/navigation";
+import { buildMetadata } from "@/lib/seo";
 
 interface LegalPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: LegalPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const content = getLegalPage(slug);
+
+  if (!content) {
+    return buildMetadata({
+      title: "Página no encontrada",
+      description: "El contenido legal que buscás no existe.",
+      path: `/legal/${slug}`,
+      noIndex: true,
+    });
+  }
+
+  return buildMetadata({
+    title: content.frontmatter.title,
+    description: `${content.frontmatter.title} de Geora, la plataforma inmobiliaria argentina.`,
+    path: `/legal/${slug}`,
+  });
 }
 
 export default async function LegalPage({ params }: LegalPageProps) {

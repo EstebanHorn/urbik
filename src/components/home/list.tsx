@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { SearchProperty, ViewMode, getTypeLabel, getOperationLabel, glassCard } from "../../app/(public)/page";
+import { SearchProperty, ViewMode, getTypeLabel, getOperationLabel, glassCard } from "@/lib/propertyLabels";
 import { motion, AnimatePresence } from "framer-motion";
 
 const RoomIcon = ({ className = "w-4 h-4" }) => (

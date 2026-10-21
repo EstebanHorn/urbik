@@ -1,12 +1,45 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { getHelpPost } from "@/lib/getHelpData";
 import { HELP_CATEGORIES } from "@/lib/helpCategories";
+import { buildMetadata } from "@/lib/seo";
 
 interface HelpArticlePageProps {
   params: Promise<{ slug: string }>;
+}
+
+function excerptFromMarkdown(markdown: string, length = 160) {
+  const plain = markdown
+    .replace(/[#*_`>~-]/g, " ")
+    .replace(/\[(.*?)\]\(.*?\)/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+  return plain.length > length ? `${plain.slice(0, length).trim()}…` : plain;
+}
+
+export async function generateMetadata({
+  params,
+}: HelpArticlePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getHelpPost(slug);
+
+  if (!post) {
+    return buildMetadata({
+      title: "Artículo no encontrado",
+      description: "El artículo de ayuda que buscás no existe.",
+      path: `/help/${slug}`,
+      noIndex: true,
+    });
+  }
+
+  return buildMetadata({
+    title: post.title,
+    description: excerptFromMarkdown(post.content),
+    path: `/help/${slug}`,
+  });
 }
 
 export default async function HelpArticlePage({ params }: HelpArticlePageProps) {

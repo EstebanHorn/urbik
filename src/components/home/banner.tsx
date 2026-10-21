@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { SearchProperty } from "../../app/(public)/page";
+import { SearchProperty } from "@/lib/propertyLabels";
 import { useSearch, type SearchSuggestion } from "@/hooks/useSearch";
 
 import bg1 from "../../assets/banner/bg1.png";

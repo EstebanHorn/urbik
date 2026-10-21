@@ -1,11 +1,35 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getHelpPostsByCategory, groupHelpPostsBySubcategory } from "@/lib/getHelpData";
 import { getHelpCategoryBySlug } from "@/lib/helpCategories";
+import { buildMetadata } from "@/lib/seo";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: CategoryPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const category = getHelpCategoryBySlug(slug);
+
+  if (!category) {
+    return buildMetadata({
+      title: "Categoría no encontrada",
+      description: "La categoría de ayuda que buscás no existe.",
+      path: `/help/category/${slug}`,
+      noIndex: true,
+    });
+  }
+
+  return buildMetadata({
+    title: `Ayuda para ${category.name}`,
+    description: `Artículos de ayuda de Geora para ${category.name.toLowerCase()}.`,
+    path: `/help/category/${slug}`,
+  });
 }
 
 export default async function HelpCategoryPage({ params }: CategoryPageProps) {

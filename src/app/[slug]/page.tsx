@@ -1,7 +1,18 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import RealEstateProfile from "@/components/realestate/RealEstateProfile";
+import { getRealEstateMetadataBySlug } from "@/lib/realEstateMeta";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return getRealEstateMetadataBySlug(slug);
+}
 
 export default async function RealEstateBySlugPage({
   params,

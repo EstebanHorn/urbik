@@ -1,8 +1,10 @@
-import React from "react";
+import React, { cache } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { absoluteUrl, breadcrumbJsonLd, buildMetadata, JsonLd } from "@/lib/seo";
 import AdminActions from "@/components/administrate/AdminActions";
 import {
   MapPin,
@@ -217,7 +219,7 @@ interface FormattedOtherProperty {
   isFavorite: boolean;
 }
 
-async function getPropertyData(id: string) {
+const getPropertyData = cache(async function getPropertyData(id: string) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -381,6 +383,41 @@ async function getPropertyData(id: string) {
     console.error("Error fetching property:", err);
     return null;
   }
+});
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const result = await getPropertyData(id);
+
+  if (!result) {
+    return buildMetadata({
+      title: "Propiedad no encontrada",
+      description: "La propiedad que buscás no existe o ya no está disponible.",
+      path: `/property/${id}`,
+      noIndex: true,
+    });
+  }
+
+  const { property } = result;
+  const location = [property.neighborhood, property.city, property.province]
+    .filter(Boolean)
+    .join(", ");
+  const title = `${property.title} - ${getOperationLabel(property.operationType)} en ${property.city}`;
+  const description =
+    property.description?.slice(0, 160) ||
+    `${getPropertyLabel(property.type)} en ${getOperationLabel(property.operationType).toLowerCase()} ubicada en ${location}.${property.rooms ? ` ${property.rooms} ambientes.` : ""}${property.area ? ` ${property.area} m².` : ""}`;
+
+  return buildMetadata({
+    title,
+    description,
+    path: `/property/${property.id}`,
+    image: property.images?.[0],
+    noIndex: property.status !== "AVAILABLE",
+  });
 }
 
 function StatChip({
@@ -691,8 +728,59 @@ export default async function PropertyPage({
   const hasSurfaceBreakdown =
     property.coveredArea || property.semiCoveredArea || property.uncoveredArea;
 
+  const priceAmount = property.salePrice ?? property.rentPrice ?? undefined;
+  const priceCurrency = property.salePrice
+    ? property.saleCurrency
+    : property.rentCurrency;
+
   return (
     <main className="min-h-screen bg-white pb-32 lg:pb-20 mt-20">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "RealEstateListing",
+          name: property.title,
+          description: property.description || undefined,
+          url: absoluteUrl(`/property/${property.id}`),
+          image: property.images,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: property.displayAddress || property.address,
+            addressLocality: property.city,
+            addressRegion: property.province,
+            addressCountry: "AR",
+          },
+          ...(property.latitude && property.longitude
+            ? {
+                geo: {
+                  "@type": "GeoCoordinates",
+                  latitude: property.latitude,
+                  longitude: property.longitude,
+                },
+              }
+            : {}),
+          ...(priceAmount
+            ? {
+                offers: {
+                  "@type": "Offer",
+                  price: priceAmount,
+                  priceCurrency: priceCurrency || "ARS",
+                  availability:
+                    property.status === "AVAILABLE"
+                      ? "https://schema.org/InStock"
+                      : "https://schema.org/OutOfStock",
+                },
+              }
+            : {}),
+        }}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Inicio", path: "/" },
+          { name: "Propiedades", path: "/properties" },
+          { name: property.title, path: `/property/${property.id}` },
+        ])}
+      />
       <TrackPropertyView propertyId={String(property.id)} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 md:pt-10 mb-6 sm:mb-2 flex items-center justify-between gap-3">
         <Link

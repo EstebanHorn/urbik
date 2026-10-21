@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { SearchProperty, getTypeLabel, getOperationLabel, glassCard } from "../../app/(public)/page";
+import { SearchProperty, getTypeLabel, getOperationLabel, glassCard } from "@/lib/propertyLabels";
 
 interface Top3Props {
   items: SearchProperty[];
