@@ -2,6 +2,11 @@ import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_URL } from "@/lib/seo";
 
+// Without this, Next.js prerenders sitemap.xml once at build time and it only
+// updates on a new deploy. This regenerates it from the DB at most once per
+// hour, so newly published properties/agencies show up without a redeploy.
+export const revalidate = 3600;
+
 const STATIC_ROUTES: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
   { path: "/", priority: 1, changeFrequency: "hourly" },
   { path: "/map", priority: 0.9, changeFrequency: "hourly" },
