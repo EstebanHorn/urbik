@@ -19,6 +19,7 @@ import {
   Users as UsersIcon,
   BarChart3,
   LogOut,
+  Map,
   type LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
@@ -285,6 +286,7 @@ function NavbarInner() {
         { href: "/?operationType=SALE", label: "Comprar", Icon: Home },
         { href: "/?operationType=RENT", label: "Alquilar", Icon: Key },
         { href: "/dashboard?nueva=1", label: "Publicar", Icon: PlusCircle },
+        { href: "/map", label: "Mapa", Icon: Map },
       ];
     }
 
@@ -309,6 +311,7 @@ function NavbarInner() {
           ? [{ href: "/connections", label: "Bolsa de Conexiones", short: "Bolsa", Icon: Network }]
           : []),
         { href: "/", label: "Buscar", Icon: Search },
+        { href: "/map", label: "Mapa", Icon: Map },
       ];
     }
 
@@ -316,6 +319,7 @@ function NavbarInner() {
       { href: "/?operationType=SALE", label: "Comprar", Icon: Home },
       { href: "/?operationType=RENT", label: "Alquilar", Icon: Key },
       { href: "/dashboard", label: "Mi Perfil", short: "Perfil", Icon: User },
+      { href: "/map", label: "Mapa", Icon: Map },
     ];
   };
 
@@ -413,15 +417,6 @@ const renderMobileNavIcons = () => {
 
             <div className="hidden md:flex items-center justify-center gap-4 md:gap-8 no-scrollbar whitespace-nowrap px-2 w-full">
               {renderNavLinks()}
-              {role !== "ADMIN" && role !== "admin" && (
-                <Link
-                  href="/map"
-                  onClick={(e) => handleNavClick(e, "/map")}
-                  className={`relative overflow-visible ${navLinkClass}`}
-                >
-                  Mapa
-                </Link>
-              )}
             </div>
           </div>
 
